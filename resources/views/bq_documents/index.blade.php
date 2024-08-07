@@ -9,17 +9,22 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <a href="{{ route('bq_documents.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded-md">Create New BQ Document</a>
+                    <!-- Button to create a new BQ document -->
+                    <a href="{{ route('bq_documents.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
+                        {{ __('Create New BQ Document') }}
+                    </a>
 
                     <div class="mt-6">
-                        <!-- Display the list of BQ documents here -->
+                        <!-- Display the list of BQ documents -->
                         @if($documents->isEmpty())
                             <p>{{ __('No BQ documents found.') }}</p>
                         @else
-                            <ul>
+                            <ul class="list-disc pl-5 space-y-2">
                                 @foreach($documents as $document)
                                     <li>
-                                        <a href="{{ route('bq_documents.show', $document) }}" class="text-blue-500">{{ $document->name }}</a>
+                                        <a href="{{ route('bq_documents.show', $document) }}" class="text-blue-500 hover:underline">
+                                            {{ $document->title }}
+                                        </a>
                                     </li>
                                 @endforeach
                             </ul>

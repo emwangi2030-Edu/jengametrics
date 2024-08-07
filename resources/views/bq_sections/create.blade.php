@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Create New Section for Bill of Quantities') }}
+            {{ __('Create New Section for: ') . $bqDocument->title }}
         </h2>
     </x-slot>
 
@@ -12,11 +12,18 @@
                     <form method="POST" action="{{ route('bq_sections.store', $bqDocument) }}">
                         @csrf
                         <div class="mb-4">
-                            <label for="name" class="block text-gray-700">{{ __('Section Name') }}</label>
-                            <input type="text" name="name" id="name" class="mt-1 block w-full" required>
+                            <label for="section_name" class="block text-gray-700">{{ __('Section Name') }}</label>
+                            <input type="text" name="section_name" id="section_name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
                         </div>
 
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">{{ __('Create Section') }}</button>
+                        <div class="mb-4">
+                            <label for="details" class="block text-gray-700">{{ __('Details') }}</label>
+                            <textarea name="details" id="details" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></textarea>
+                        </div>
+
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                            {{ __('Create Section') }}
+                        </button>
                     </form>
                 </div>
             </div>
