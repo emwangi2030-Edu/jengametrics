@@ -22,6 +22,12 @@
 
 
 
+<x-nav-link :href="route('boms.index')" :active="request()->routeIs('boms.index')">
+    {{ __('Bills of Materials ') }}
+</x-nav-link>
+
+
+
                 </div>
             </div>
 

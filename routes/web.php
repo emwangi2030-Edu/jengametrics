@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BqDocumentController;
 use App\Http\Controllers\BqSectionController;
 use App\Http\Controllers\BqItemController;
+use App\Http\Controllers\BOMController;
 
 // Home Route
 Route::get('/', function () {
@@ -33,6 +34,11 @@ Route::delete('bq_documents/{bqDocument}/items/{bqItem}', [BqItemController::cla
 
 Route::post('save-item', ['as'=>'save_bq_item', 'uses' => '\App\Http\Controllers\BqItemController@store']);
 Route::get('create-bq-item', ['as'=>'create_bq_item', 'uses' => '\App\Http\Controllers\BqItemController@create']);
+
+
+
+
+Route::resource('boms', BOMController::class);
 
 
 

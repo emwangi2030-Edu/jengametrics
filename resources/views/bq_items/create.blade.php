@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('save_bq_item', $bqSection) }}">
+                    <form method="POST" action="{{ route('save_bq_item', $bqSection) }}" id="bqForm">
                         @csrf
                         <input type="hidden" name="bq_section_id" value="{{ $bqSection->id }}">
 
@@ -40,7 +40,7 @@
 
                         <div class="mb-4">
                             <label for="amount" class="block text-gray-700">{{ __('Amount') }}</label>
-                            <input type="number" name="amount" id="amount" class="mt-1 block w-full" step="0.01" placeholder="Enter amount" required>
+                            <input type="number" name="amount" id="amount" class="mt-1 block w-full" step="0.01" placeholder="Enter amount" readonly>
                         </div>
 
                         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">{{ __('Add Item') }}</button>
@@ -51,4 +51,22 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const quantityInput = document.getElementById('quantity');
+            const rateInput = document.getElementById('rate');
+            const amountInput = document.getElementById('amount');
+
+            function calculateAmount() {
+                const quantity = parseFloat(quantityInput.value) || 0;
+                const rate = parseFloat(rateInput.value) || 0;
+                const amount = quantity * rate;
+                amountInput.value = amount.toFixed(2); // Display amount with 2 decimal places
+            }
+
+            quantityInput.addEventListener('input', calculateAmount);
+            rateInput.addEventListener('input', calculateAmount);
+        });
+    </script>
 </x-app-layout>
