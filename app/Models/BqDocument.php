@@ -15,4 +15,9 @@ class BqDocument extends Model
     {
         return $this->hasMany(BqSection::class);
     }
+
+    public function items()
+    {
+        return $this->hasMany(BqItem::class);
+    }
 }

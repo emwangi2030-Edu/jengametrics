@@ -31,6 +31,10 @@
                                         <li class="mb-2">
                                             <p><strong>{{ __('Section Name:') }}</strong> {{ $section->section_name }}</p>
                                             <p><strong>{{ __('Details:') }}</strong> {{ $section->details }}</p>
+                                            <!-- Optionally, add a link to view more details or edit the section -->
+                                            <a href="{{ route('bq_sections.show', [$bqDocument, $section]) }}" class="text-blue-500">
+                                                {{ __('View Section') }}
+                                            </a>
                                         </li>
                                     @endforeach
                                 </ul>

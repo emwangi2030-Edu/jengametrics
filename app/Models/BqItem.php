@@ -1,25 +1,22 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class BqSection extends Model
+class BqItem extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['section_name', 'details', 'bq_document_id'];
+    protected $fillable = ['bq_document_id', 'bq_section_id', 'item_description', 'quantity', 'unit', 'rate', 'amount'];
 
     public function bqDocument()
     {
         return $this->belongsTo(BqDocument::class);
     }
 
-    public function items()
+    public function bqSection()
     {
-        return $this->hasMany(BqItem::class);
+        return $this->belongsTo(BqSection::class);
     }
 }
-
-
