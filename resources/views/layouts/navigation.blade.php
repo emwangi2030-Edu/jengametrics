@@ -26,6 +26,10 @@
     {{ __('Bills of Materials ') }}
 </x-nav-link>
 
+<x-nav-link :href="route('documents.upload')" :active="request()->routeIs('documents.upload')">
+    {{ __('Documents ') }}
+</x-nav-link>
+
 
 
                 </div>
