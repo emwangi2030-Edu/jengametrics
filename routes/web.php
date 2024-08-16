@@ -7,6 +7,7 @@ use App\Http\Controllers\BqSectionController;
 use App\Http\Controllers\BqItemController;
 use App\Http\Controllers\BOMController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\WorkerController;
 
 // Home Route
 Route::get('/', function () {
@@ -47,6 +48,10 @@ Route::get('/documents/upload', [DocumentController::class, 'index'])->name('doc
 
 // Route to store the uploaded document
 Route::post('/documents', [DocumentController::class, 'store'])->name('documents.store');
+
+// Workers Table Route
+Route::resource('workers', WorkerController::class);
+
 
 
 // Dashboard Route
