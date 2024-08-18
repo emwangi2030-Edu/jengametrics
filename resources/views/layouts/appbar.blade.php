@@ -2189,16 +2189,9 @@ License: For each use you must have a valid license purchased only from above li
         <span class="menu-arrow"></span>
     </span>
     <div class="menu-sub menu-sub-accordion">
-        <!-- Add Labour -->
-        <div class="menu-item">
-            <a class="menu-link" href="add-labour.html" title="Add new labour resources">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Add Labour</span>
-            </a>
-        </div>
         <!-- Manage Labour -->
         <div class="menu-item">
-            <a class="menu-link" href="manage-labour.html" title="Manage existing labour resources">
+            <a class="menu-link" href="{{ url(route('workers.index')) }}" title="Manage existing labour resources">
                 <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
                 <span class="menu-title">Manage Labour</span>
             </a>

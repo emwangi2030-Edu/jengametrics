@@ -52,6 +52,15 @@ Route::post('/documents', [DocumentController::class, 'store'])->name('documents
 // Workers Table Route
 Route::resource('workers', WorkerController::class);
 
+// Routes to add workers to database
+Route::get('/workers/create', [WorkerController::class, 'create'])->name('workers.create');
+Route::post('/workers', [WorkerController::class, 'store'])->name('workers.store');
+
+// Route to show worker's details page
+Route::get('/workers/{id}', [WorkerController::class, 'show'])->name('workers.show');
+
+
+
 
 
 // Dashboard Route

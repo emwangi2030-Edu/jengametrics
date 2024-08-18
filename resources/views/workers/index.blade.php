@@ -1,47 +1,50 @@
 <!-- resources/views/workers/index.blade.php -->
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Workers') }}
-        </h2>
-    </x-slot>
+@extends('layouts.appbar')
+@section('content')
+
+    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        {{ __('Manage Labour') }}
+    </h2>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <a href="{{ route('workers.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded-md">Add Worker</a>
+        <div class="container mx-auto px-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <a href="{{ route('workers.create') }}" class="btn btn-primary mb-4">Add Worker</a>
 
-                    <table class="mt-4 w-full">
-                        <thead>
-                            <tr>
-                                <th class="px-4 py-2">Full Name</th>
-                                <th class="px-4 py-2">ID Number</th>
-                                <th class="px-4 py-2">Job Category</th>
-                                <th class="px-4 py-2">Work Type</th>
-                                <th class="px-4 py-2">Phone</th>
-                                <th class="px-4 py-2">Email</th>
-                                <th class="px-4 py-2">Details</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($workers as $worker)
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="thead-dark">
                                 <tr>
-                                    <td class="px-4 py-2">{{ $worker->full_name }}</td>
-                                    <td class="px-4 py-2">{{ $worker->id_number }}</td>
-                                    <td class="px-4 py-2">{{ $worker->job_category }}</td>
-                                    <td class="px-4 py-2">{{ $worker->work_type }}</td>
-                                    <td class="px-4 py-2">{{ $worker->phone }}</td>
-                                    <td class="px-4 py-2">{{ $worker->email }}</td>
-                                    <td class="px-4 py-2">
-                                        <a href="{{ route('workers.show', $worker->id) }}" class="text-blue-500">></a>
-                                    </td>
+                                    <th scope="col">Full Name</th>
+                                    <th scope="col">ID Number</th>
+                                    <th scope="col">Job Category</th>
+                                    <th scope="col">Work Type</th>
+                                    <th scope="col">Phone</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Details</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach($workers as $worker)
+                                    <tr>
+                                        <td>{{ $worker->full_name }}</td>
+                                        <td>{{ $worker->id_number }}</td>
+                                        <td>{{ $worker->job_category }}</td>
+                                        <td>{{ $worker->work_type }}</td>
+                                        <td>{{ $worker->phone }}</td>
+                                        <td>{{ $worker->email }}</td>
+                                        <td>
+                                            <a href="{{ route('workers.show', $worker->id) }}" class="btn btn-link text-primary p-0">></a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</x-app-layout>
+
+@endsection
