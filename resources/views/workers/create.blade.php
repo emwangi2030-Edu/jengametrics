@@ -1,7 +1,7 @@
 <!-- resources/views/workers/create.blade.php -->
 @extends('layouts.appbar')
 @section('content')
-    
+
     <h2 class="font-semibold text-xl text-gray-800 leading-tight">
         {{ __('Add Worker') }}
     </h2>
@@ -58,11 +58,16 @@
                             <input type="email" name="email" class="form-control">
                         </div>
 
+                        <br>
                         <button type="submit" class="btn btn-primary">Save</button>
+
+                        <!-- Back Button -->
+                        <a href="{{ route('workers.index') }}" class="btn btn-secondary">Back</a>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    
+
 @endsection
+

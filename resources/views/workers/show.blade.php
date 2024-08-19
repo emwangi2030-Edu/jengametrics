@@ -17,7 +17,7 @@
                     <p><strong>Phone:</strong> {{ $worker->phone }}</p>
                     <p><strong>Email:</strong> {{ $worker->email }}</p>
                     <div class="mt-4">
-                    <a href="{{ route('workers.index') }}" class="btn btn-primary mb-4">Back to Workers</a>
+                    <a href="{{ route('workers.index') }}" class="btn btn-primary mb-4">Back</a>
                     </div>
                 </div>
             </div>
