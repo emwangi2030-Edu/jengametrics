@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('user_type')->nullable();
+            $table->string('project_id')->nullable();
+            $table->string('has_project')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
@@ -36,6 +38,17 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        DB::table('users')->insert([
+            'name' => 'Ezekiel Muki',
+            'user_type' => 'user',
+            'email' => 'user@demo.com',
+            'email_verified_at' => null,
+            'password' => Hash::make('12345678'), // Use the plaintext password
+            'remember_token' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     /**

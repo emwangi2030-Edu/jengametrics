@@ -10,7 +10,7 @@ class CreateBqItemsTable extends Migration
     {
         Schema::create('bq_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('bq_document_id')->constrained()->onDelete('cascade');
+            $table->foreignId('bq_document_id')->constrained()->onDelete('cascade')->nullable();
             $table->foreignId('bq_section_id')->constrained()->onDelete('cascade');
             $table->string('item_description');
             $table->integer('quantity');

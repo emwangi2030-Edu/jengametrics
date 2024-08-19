@@ -44,4 +44,41 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+
+    public function get_gravatar( $s = 40, $d = 'mm', $r = 'g', $img = false, $atts = array() ) {
+
+        $email = $this->email;
+        $url = 'https://www.gravatar.com/avatar/';
+        $url .= md5( strtolower( trim( $email ) ) );
+        $url .= "?s=$s&d=$d&r=$r";
+
+        if( ! empty($this->photo)) {
+            $url = avatar_img_url($this->photo, $this->photo_storage);
+        }
+
+        if ( $img ) {
+            $url = '<img src="' . $url . '"';
+            foreach ( $atts as $key => $val )
+                $url .= ' ' . $key . '="' . $val . '"';
+            $url .= ' />';
+        }
+
+        return $url;
+    }
+
+
+    public function is_admin(){
+        if ($this->user_type == 'admin'){
+            return true;
+        }
+        return false;
+    }
+
+    public function is_client(){
+        if ($this->user_type == 'user'){
+            return true;
+        }
+        return false;
+    }
 }

@@ -14,17 +14,18 @@ return new class extends Migration
         Schema::create('workers', function (Blueprint $table) {
             $table->id();
             $table->string('full_name');
-            $table->integer('id_number')->unique();
+            $table->string('id_number')->unique();
             $table->enum('job_category', [
                 'Mason', 'Site Manager', 'Quantity Surveyor', 'Carpenter', 
                 'Plumber', 'Helper/Casual', 'Painter', 'Sub Contractor', 
                 'Electrician', 'Supervisor', 'Assistant Supervisor'
             ]);
             $table->enum('work_type', ['Under Contract', 'Casual']);
-            $table->integer('phone')->unique();
+            $table->string('phone')->unique();
             $table->string('email')->unique();
             $table->string('details')->default('>');
             $table->timestamps();
+
         });
     }
 

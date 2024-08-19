@@ -43,10 +43,10 @@
                             <input type="number" name="amount" id="amount" class="mt-1 block w-full" step="0.01" placeholder="Enter amount" readonly>
                         </div>
 
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">{{ __('Add Item') }}</button>
+                        <button type="submit" class="">{{ __('Add Item') }}</button>
                     </form>
 
-                    <a href="#" class="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 inline-block">{{ __('Back to Section') }}</a>
+                    <a href="#" class="">{{ __('Back to Section') }}</a>
                 </div>
             </div>
         </div>

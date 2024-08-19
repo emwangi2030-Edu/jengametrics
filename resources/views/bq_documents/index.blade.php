@@ -1,4 +1,5 @@
-<x-app-layout>
+@extends('layouts.appbar')
+@section('content')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Bills of Quantities') }}
@@ -10,7 +11,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <!-- Button to create a new BQ document -->
-                    <a href="{{ route('bq_documents.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
+                    <a href="{{ route('bq_documents.create') }}" class="btn btn-info">
                         {{ __('Create New BQ Document') }}
                     </a>
 
@@ -34,4 +35,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+    @endsection

@@ -1,7 +1,6 @@
+@extends('layouts.appbar')
 
-
-
-<x-app-layout>
+@section('content')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Section: ') . $bqSection->section_name }}
@@ -9,9 +8,9 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+        <div class="container">
+            <div class="card">
+                <div class="card-body">
                     <!-- Display Section Details -->
                     <p><strong>{{ __('Section Name:') }}</strong> {{ $bqSection->section_name }}</p>
                     <p><strong>{{ __('Details:') }}</strong> {{ $bqSection->details }}</p>
@@ -19,59 +18,37 @@
                     <p><strong>{{ __('Quantity:') }}</strong> {{ $bqSection->quantity }}</p>
 
                     <!-- Link to Edit Section -->
-                    <a href="{{ route('bq_sections.edit', [$bqDocument, $bqSection]) }}" class="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 inline-block">
+                    <a href="{{ route('bq_sections.edit', [$bqDocument, $bqSection]) }}" class="btn btn-primary mt-4">
                         {{ __('Edit Section') }}
                     </a>
 
-          <!-- Link to Add New Item -->
-          <a href="{{ route('create_bq_item', ['bqSection'=> $bqSection]) }}" class="bg-green-500 text-white px-4 py-2 rounded-md mt-4 inline-block">
+                    <!-- Link to Add New Item -->
+                    <a href="{{ route('create_bq_item', ['bqSection'=> $bqSection]) }}" class="btn btn-success mt-4">
                         {{ __('Add New Item') }}
                     </a>
 
                     <!-- Table to display items -->
                     <h3 class="text-lg font-medium mt-6">{{ __('Items List') }}</h3>
-                    <table class="min-w-full divide-y divide-gray-200 mt-4">
+                    <table class="table table-striped mt-4">
                         <thead>
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('Description') }}
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('Quantity') }}
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('Unit') }}
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('Rate') }}
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('Amount') }}
-                                </th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __('Actions') }}
-                                </th>
+                                <th scope="col">{{ __('Description') }}</th>
+                                <th scope="col">{{ __('Quantity') }}</th>
+                                <th scope="col">{{ __('Unit') }}</th>
+                                <th scope="col">{{ __('Rate') }}</th>
+                                <th scope="col">{{ __('Amount') }}</th>
+                                <th scope="col">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody>
                             @foreach ($items as $item)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {{ $item->item_description }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $item->quantity }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $item->unit }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ number_format($item->rate, 2) }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ number_format($item->amount, 2) }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <td>{{ $item->item_description }}</td>
+                                    <td>{{ $item->quantity }}</td>
+                                    <td>{{ $item->unit }}</td>
+                                    <td>{{ number_format($item->rate, 2) }}</td>
+                                    <td>{{ number_format($item->amount, 2) }}</td>
+                                    <td>
                                         <!-- Add Edit and Delete Links for Items Here if needed -->
                                     </td>
                                 </tr>
@@ -80,12 +57,12 @@
                     </table>
 
                     <!-- Link Back to Document -->
-                    <a href="{{ route('bq_documents.show', $bqDocument) }}" class="bg-gray-500 text-white px-4 py-2 rounded-md mt-4 inline-block">
+                    <a href="{{ route('bq_documents.show', $bqDocument) }}" class="btn btn-secondary mt-4">
                         {{ __('Back to Document') }}
                     </a>
                 </div>
             </div>
         </div>
     </div>
-</x-app-layout>
+    @endsection
 

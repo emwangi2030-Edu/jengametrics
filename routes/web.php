@@ -8,11 +8,60 @@ use App\Http\Controllers\BqItemController;
 use App\Http\Controllers\BOMController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\WorkerController;
+use App\Http\Controllers\ProjectWizardController;
+use App\Http\Controllers\ProjectController;
+
+
+
 
 // Home Route
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+// Route for the first step
+Route::get('/wizard/step1', [ProjectWizardController::class, 'step1'])->name('wizard.step1');
+
+// Route for the second step
+Route::get('/wizard/step2', [ProjectWizardController::class, 'step2'])->name('wizard.step2');
+
+// Route for the third step
+Route::get('/wizard/step3', [ProjectWizardController::class, 'step3'])->name('wizard.step3');
+
+// Route to handle form submission
+Route::post('/wizard/complete', [ProjectWizardController::class, 'complete'])->name('wizard.complete');
+
+// Route for Step 1 POST request
+Route::post('/wizard/step1', [ProjectWizardController::class, 'step1Post'])->name('wizard.step1.post');
+// Route for Step 2 POST request
+Route::post('/wizard/step2', [ProjectWizardController::class, 'step2Post'])->name('wizard.step2.post');
+// Route to handle form submission and complete the wizard
+Route::post('/wizard/complete', [ProjectWizardController::class, 'complete'])->name('wizard.complete');
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        $user = Auth::user();
+        if (!$user->has_project) {
+            return redirect()->route('wizard.step1');
+        }
+
+        return view('dashboard');
+    })->name('dashboard');
+
+    Route::get('/users', function () {
+        $user = Auth::user();
+        if (!$user->has_school) {
+            return redirect()->route('wizard.step1');
+        }
+
+        return view('users');
+    })->name('view_users');
+});
+
+Route::resource('projects', ProjectController::class);
+
 
 // BoQ Documents Routes
 Route::resource('bq_documents', BqDocumentController::class);
@@ -63,10 +112,7 @@ Route::get('/workers/{id}', [WorkerController::class, 'show'])->name('workers.sh
 
 
 
-// Dashboard Route
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
 
 // Profile Routes
 Route::middleware('auth')->group(function () {
