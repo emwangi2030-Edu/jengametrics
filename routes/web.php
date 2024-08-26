@@ -10,6 +10,8 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\WorkerController;
 use App\Http\Controllers\ProjectWizardController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\MaterialController;
 
 
 
@@ -109,7 +111,15 @@ Route::post('/workers', [WorkerController::class, 'store'])->name('workers.store
 Route::get('/workers/{id}', [WorkerController::class, 'show'])->name('workers.show');
 
 
+// Route to Suppliers page
+Route::resource('suppliers', SupplierController::class);
 
+// Route to Materials page
+Route::resource('materials', MaterialController::class);
+
+// Routes for Supplier Name and Contact Autocomplete Feature
+Route::get('/suppliers/autocomplete', [SupplierController::class, 'autocomplete'])->name('suppliers.autocomplete');
+Route::get('/suppliers/autocompleteContact', [SupplierController::class, 'autocompleteContact'])->name('suppliers.autocompleteContact');
 
 
 

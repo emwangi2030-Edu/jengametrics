@@ -58,6 +58,13 @@ License: For each use you must have a valid license purchased only from above li
             window.top.location.replace(window.self.location.href);
         }
     </script>
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Include jQuery UI -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 </head>
 <!--end::Head-->
 
@@ -1358,9 +1365,15 @@ License: For each use you must have a valid license purchased only from above li
     </span>
     <div class="menu-sub menu-sub-accordion">
         <div class="menu-item">
-            <a class="menu-link" href="procurement-supply-chain.html" title="Procurement and supply chain management">
+            <a class="menu-link" href="{{ url(route('suppliers.index')) }}" title="Procurement and supply chain management">
                 <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Procurement & Supply Chain</span>
+                <span class="menu-title">Suppliers</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a class="menu-link" href="{{ url(route('materials.index')) }}" title="Procurement and supply chain management">
+                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                <span class="menu-title">Materials</span>
             </a>
         </div>
         <div class="menu-item">

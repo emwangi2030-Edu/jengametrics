@@ -85,7 +85,7 @@ public function complete(Request $request)
     // Clear session data
     $request->session()->forget(['name', 'address', 'description', 'budget']);
 
-    return redirect()->url('dashboard')->with('success', 'Project added successfully!');
+    return redirect()->to(url('dashboard'))->with('success', 'Project added successfully!');
 }
 
 
