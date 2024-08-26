@@ -12,9 +12,11 @@ class CreateProjectsTable extends Migration
             $table->bigIncrements('id'); // Auto-incrementing primary key
             $table->string('name'); // Project name
             $table->text('description')->nullable(); // Project description
+            $table->text('account_status')->nullable(); // Project description
+            $table->text('package')->nullable(); // Project description
             $table->decimal('budget', 15, 2)->nullable(); // Project budget
-            $table->date('start_date')->nullable(); // Project start date
-            $table->date('end_date')->nullable(); // Project end date
+            $table->date('subscribe_start')->nullable(); // Project start date
+            $table->date('subscribe_end')->nullable(); // Project end date
             $table->enum('status', ['pending', 'in_progress', 'completed', 'on_hold'])->default('pending'); // Project status
             $table->unsignedBigInteger('user_id'); // Foreign key for user (assuming projects are associated with a user)
             $table->timestamps(); // Created and updated timestamps

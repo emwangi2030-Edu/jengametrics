@@ -14,7 +14,7 @@ License: For each use you must have a valid license purchased only from above li
 <!--begin::Head-->
 
 <head>
-    <title>Saul Theme by KeenThemes</title>
+    <title>JengaMetrics</title>
     <meta charset="utf-8">
     <meta name="description" content="Saul HTML Pro - Bootstrap 5 HTML Multipurpose Admin Dashboard Theme">
     <meta name="keywords"
@@ -1069,13 +1069,13 @@ License: For each use you must have a valid license purchased only from above li
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-5">
-                                    <a href="{{ url('account') }}" class="menu-link px-5">My Profile</a>
+                                    <a href="{{ url('profile') }}" class="menu-link px-5">My Profile</a>
                                 </div>
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-5">
-                                    <a href="/admin/settings" class="menu-link px-5">Business settings</a>
+                                    <a href="/admin/settings" class="menu-link px-5">Project settings</a>
                                 </div>
                                 <!--end::Menu item-->
 
@@ -1090,7 +1090,7 @@ License: For each use you must have a valid license purchased only from above li
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-5">
-                                    <a href="{{ url('businesses') }}" class="menu-link px-5">Manage your businesses</a>
+                                    <a href="{{ url('projects') }}" class="menu-link px-5">Manage your projects</a>
                                 </div>
                                 <!--end::Menu item-->
 
