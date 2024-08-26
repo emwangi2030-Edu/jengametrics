@@ -2,6 +2,11 @@
 
 @section('content')
 <div class="container">
+    @if(session('success'))
+        <div class="alert alert-success" id="success-alert">
+            {{ session('success') }}
+        </div>
+    @endif
     <h1>Materials</h1>
 
     <a href="{{ route('materials.create') }}" class="btn btn-primary mb-3">Add New Material</a>
@@ -12,7 +17,7 @@
                 <th>Name</th>
                 <th>Unit Price</th>
                 <th>Unit of Measure</th>
-                <th>Quantity in Stock</th>
+                <th>Amount Purchased</th>
                 <th>Supplier Name</th>
                 <th>Date Added</th>
                 <th>Actions</th>
@@ -41,3 +46,14 @@
     </table>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        // Hide the alert after 5 seconds with a fade-out effect
+        setTimeout(function() {
+            $('#success-alert').fadeOut('slow');
+        }, 5000);
+    });
+</script>
+@endpush

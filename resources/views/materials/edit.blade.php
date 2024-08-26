@@ -2,12 +2,10 @@
 
 @section('content')
 <div class="container">
-    <h1>{{ isset($material) ? 'Edit Material' : 'Add New Material' }}</h1>
-    <form action="{{ isset($material) ? route('materials.update', $material->id) : route('materials.store') }}" method="POST">
+    <h1>Edit Material</h1>
+    <form action="{{ route('materials.update', $material->id) }}" method="POST">
         @csrf
-        @if(isset($material))
-            @method('PUT')
-        @endif
+        @method('PUT')
 
         <div class="form-group">
             <label for="name">Name</label>
@@ -30,21 +28,23 @@
         </div>
 
         <div class="form-group">
-            <label for="supplier_id">Supplier</label>
-            <select id="supplier_id" name="supplier_id" class="form-control">
-                @foreach ($suppliers as $supplier)
-                    <option value="{{ $supplier->id }}" {{ $material->supplier_id == $supplier->id ? 'selected' : '' }}>
-                        {{ $supplier->name }}
-                    </option>
-                @endforeach
-            </select>
+            <label for="supplier_name">Supplier Name</label>
+            <input type="text" class="form-control" id="supplier_name" name="supplier_name" value="{{ old('supplier_name', $material->supplier->name ?? '') }}" required>
         </div>
 
+        <div class="form-group">
+            <label for="supplier_contact">Supplier Contact</label>
+            <input type="text" class="form-control" id="supplier_contact" name="supplier_contact" value="{{ old('supplier_contact', $material->supplier->contact_info ?? '') }}" required>
+        </div>
 
-        <button type="submit" class="btn btn-success">{{ isset($material) ? 'Update Material' : 'Add Material' }}</button>
+        <!-- Read-Only Supplier ID Field -->
+        <input type="hidden" id="supplier_id" name="supplier_id" value="{{ old('supplier_id', $material->supplier_id ?? '') }}">
+
+        <button type="submit" class="btn btn-success">Update Material</button>
     </form>
 </div>
 @endsection
+
 @push('scripts')
 <script>
     $(document).ready(function() {
@@ -56,11 +56,20 @@
                         term: request.term
                     },
                     success: function(data) {
-                        response(data);
+                        response($.map(data, function(item) {
+                            return {
+                                label: item.name,
+                                value: item.name,
+                                id: item.id
+                            };
+                        }));
                     }
                 });
             },
             minLength: 2,
+            select: function(event, ui) {
+                $('#supplier_id').val(ui.item.id);
+            }
         });
     });
 </script>
