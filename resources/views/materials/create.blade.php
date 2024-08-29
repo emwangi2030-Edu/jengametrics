@@ -33,7 +33,7 @@
                 <option value="Piece">Piece</option>
                 <option value="Foot">Foot</option>
                 <option value="Centimeter">Centimeter</option>
-                <option value="Liter">Litre</option>
+                <option value="Litre">Litre</option>
                 <option value="Roll">Roll</option>
                 <option value="Packet">Packet</option>
                 <option value="carton">Carton</option>
@@ -67,7 +67,8 @@
             <input type="file" name="document" id="document" class="form-control" placeholder="PDFs, JPEGs, PNGs etc...">
         </div>
 
-        <button type="submit" class="btn btn-success">{{ isset($material) ? 'Update Material' : 'Add Material' }}</button>
+        <button type="submit" class="btn btn-success my-4">{{ isset($material) ? 'Update Material' : 'Add Material' }}</button>
+        <a href="{{ route('materials.index') }}"><button type="button" class="btn btn-secondary">Back to Materials</button></a>
     </form>
 </div>
 @endsection
