@@ -126,6 +126,9 @@ Route::middleware(['web'])->group(function () {
     Route::resource('materials', MaterialController::class);
 });
 
+// Route to serve document
+Route::get('/materials/view-document/{id}', [MaterialController::class, 'viewDocument'])->name('materials.viewDocument');
+
 // Profile Routes
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h1>Edit Material</h1>
-    <form action="{{ route('materials.update', $material->id) }}" method="POST">
+    <form action="{{ route('materials.update', $material->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -23,7 +23,7 @@
         </div>
 
         <div class="form-group">
-            <label for="quantity_in_stock">Quantity in Stock</label>
+            <label for="quantity_in_stock">Amount Purchased</label>
             <input type="number" class="form-control" id="quantity_in_stock" name="quantity_in_stock" value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}" required>
         </div>
 
@@ -40,8 +40,37 @@
         <!-- Read-Only Supplier ID Field -->
         <input type="hidden" id="supplier_id" name="supplier_id" value="{{ old('supplier_id', $material->supplier_id ?? '') }}">
 
+        <div class="form-group">
+            <label for="document">Document</label>
+            <input type="file" class="form-control" id="document" name="document">
+            @if(isset($material) && $material->document)
+                <a href="{{ route('materials.viewDocument', $material->id) }}"><button type="button" class="btn btn-primary my-4">View Current Document</button></a>
+            @endif
+        </div>
+        <a href="{{ route('materials.index') }}"><button type="button" class="btn btn-secondary">Back to Materials</button></a>
         <button type="submit" class="btn btn-success">Update Material</button>
     </form>
+</div>
+
+<!-- Modals -->
+
+<div class="modal fade" id="noDocumentModal" tabindex="-1" role="dialog" aria-labelledby="noDocumentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noDocumentModalLabel">Notification</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                No Document Uploaded.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 

@@ -65,6 +65,7 @@ License: For each use you must have a valid license purchased only from above li
     <!-- Include jQuery UI -->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <!--end::Head-->
 
@@ -1365,18 +1366,18 @@ License: For each use you must have a valid license purchased only from above li
     </span>
     <div class="menu-sub menu-sub-accordion">
         <div class="menu-item">
-            <a class="menu-link" href="{{ url(route('suppliers.index')) }}" title="Procurement and supply chain management">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Suppliers</span>
-            </a>
-        </div>
-        <div class="menu-item">
             <a class="menu-link" href="{{ url(route('materials.index')) }}" title="Procurement and supply chain management">
                 <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Materials</span>
+                <span class="menu-title">Materials Purchased</span>
             </a>
         </div>
         <div class="menu-item">
+            <a class="menu-link" href="{{ url(route('suppliers.index')) }}" title="Procurement and supply chain management">
+                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                <span class="menu-title">List of Suppliers</span>
+            </a>
+        </div>
+        <!-- <div class="menu-item">
             <a class="menu-link" href="payment-integration.html" title="Payment integration (MPESA, Bank, etc.)">
                 <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
                 <span class="menu-title">Payment Integration</span>
@@ -1387,7 +1388,7 @@ License: For each use you must have a valid license purchased only from above li
                 <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
                 <span class="menu-title">Inventory Tracking</span>
             </a>
-        </div>
+        </div> -->
     </div>
 </div>
 
