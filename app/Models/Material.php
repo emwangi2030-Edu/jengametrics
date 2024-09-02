@@ -10,13 +10,12 @@ class Material extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 
-        'unit_price', 
-        'unit_of_measure', 
-        'quantity_in_stock', 
-        'supplier_id', 
-        'contact_info', 
-        'created_at'
+        'name',
+        'unit_price',
+        'unit_of_measure',
+        'quantity_in_stock',
+        'supplier_id',
+        'document',
     ];
 
     // A material belongs to one supplier
@@ -24,4 +23,11 @@ class Material extends Model
     {
         return $this->belongsTo(Supplier::class);
     }
+
+    // Add a computed property for total amount
+    public function getTotalAmountAttribute()
+    {
+        return (float) $this->unit_price * (float) $this->quantity_in_stock;
+    }
+
 }

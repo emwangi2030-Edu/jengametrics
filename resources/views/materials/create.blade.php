@@ -2,8 +2,8 @@
 
 @section('content')
 <div class="container">
-    <h1>{{ isset($material) ? 'Edit Material' : 'Add New Material' }}</h1>
-    <form action="{{ isset($material) ? route('materials.update', $material->id) : route('materials.store') }}" method="POST">
+    <h1>Add New Material</h1>
+    <form action="{{ route('materials.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @if(isset($material))
             @method('PUT')
@@ -21,11 +21,34 @@
 
         <div class="form-group">
             <label for="unit_of_measure">Unit of Measurement</label>
-            <input type="text" class="form-control" id="unit_of_measure" name="unit_of_measure" value="{{ old('unit_of_measure', $material->unit_of_measure ?? '') }}" required>
+            <select type="text" class="form-control" id="unit_of_measure" name="unit_of_measure" value="{{ old('unit_of_measure', $material->unit_of_measure ?? '') }}" required>
+                <option value="Square Meter">Square Meter</option>
+                <option value="Square Root">Square Foot</option>
+                <option value="Meter">Meter</option>
+                <option value="Inch">Inch</option>
+                <option value="Millimeter">Millimeter</option>
+                <option value="Ton">Ton</option>
+                <option value="Kilogram">Kilogram</option>
+                <option value="Bag">Bag</option>
+                <option value="Piece">Piece</option>
+                <option value="Foot">Foot</option>
+                <option value="Centimeter">Centimeter</option>
+                <option value="Litre">Litre</option>
+                <option value="Roll">Roll</option>
+                <option value="Packet">Packet</option>
+                <option value="carton">Carton</option>
+                <option value="Bucket">Bucket</option>
+                <option value="Bundle">Bundle</option>
+                <option value="Box">Box</option>
+                <option value="Bale">Bale</option>
+                <option value="Gallon">Gallon</option>
+                <option value="Ream">Ream</option>
+                <option value="Sheet">Sheet</option>
+            </select>
         </div>
 
         <div class="form-group">
-            <label for="quantity_in_stock">Stock Purchased</label>
+            <label for="quantity_in_stock">Amount Purchased</label>
             <input type="number" class="form-control" id="quantity_in_stock" name="quantity_in_stock" value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}" required>
         </div>
 
@@ -39,7 +62,13 @@
             <input type="text" name="supplier_contact" id="supplier_contact" class="form-control" value="{{ old('supplier_contact', $material->supplier_contact ?? '') }}">
         </div>
 
-        <button type="submit" class="btn btn-success">{{ isset($material) ? 'Update Material' : 'Add Material' }}</button>
+        <div class="form-group">
+            <label for="document">Documents</label>
+            <input type="file" name="document" id="document" class="form-control" placeholder="PDFs, JPEGs, PNGs etc...">
+        </div>
+
+        <button type="submit" class="btn btn-success my-4">{{ isset($material) ? 'Update Material' : 'Add Material' }}</button>
+        <a href="{{ route('materials.index') }}"><button type="button" class="btn btn-secondary">Back to Materials</button></a>
     </form>
 </div>
 @endsection

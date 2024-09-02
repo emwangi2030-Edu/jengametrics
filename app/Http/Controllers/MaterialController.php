@@ -5,16 +5,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Material;
 use App\Models\Supplier;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Log;
 
 
 class MaterialController extends Controller
 {
     public function index()
     {
-        $materials = Material::all();
+        $materials = Material::with('supplier')->get();
         return view('materials.index', compact('materials'));
     }
-
 
     public function create()
     {
@@ -30,6 +32,7 @@ class MaterialController extends Controller
             'quantity_in_stock' => 'required|integer',
             'supplier_name' => 'required|string|max:255',
             'supplier_contact' => 'nullable|string|max:255',
+            'document' => 'nullable|file|mimes:pdf,doc,docx,txt,jpg,jpeg,png|max:2048',
         ]);
 
         // Check if the supplier exists, or create a new one
@@ -38,14 +41,27 @@ class MaterialController extends Controller
             ['contact_info' => $request->supplier_contact]
         );
 
-        Material::create([
-            'name' => $request->name,
-            'unit_price' => $request->unit_price,
-            'unit_of_measure' => $request->unit_of_measure,
-            'quantity_in_stock' => $request->quantity_in_stock,
-            'supplier_id' => $supplier->id,
-            'supplier_contact' => $request->supplier_contact,
+        // Initialize validated data array
+        $validatedData = $request->only([
+            'name', 
+            'unit_price', 
+            'unit_of_measure', 
+            'quantity_in_stock'
         ]);
+
+        // Assign supplier information
+        $validatedData['supplier_id'] = $supplier->id;
+
+        // Handle document upload
+        if ($request->hasFile('document')) {
+            $documentPath = $request->file('document')->store('documents', 'public');
+            $validatedData['document'] = $documentPath;
+        } else {
+            $validatedData['document'] = null; // Set to null if no document is uploaded
+        }
+
+        // Create material using the validated data
+        Material::create($validatedData);
 
         return redirect()->route('materials.index')->with('success', 'Material added successfully!');
     }
@@ -58,39 +74,53 @@ class MaterialController extends Controller
 
     public function edit($id)
     {
-        $material = Material::findOrFail($id);
-        $suppliers = Supplier::all(); // Fetch all suppliers
-
-        return view('materials.edit', compact('material', 'suppliers'));
+        $material = Material::with('supplier')->findOrFail($id);
+        return view('materials.edit', compact('material'));
     }
+    
 
     public function update(Request $request, $id)
     {
+        // Validate the incoming data
         $request->validate([
             'name' => 'required|string|max:255',
             'unit_price' => 'required|numeric',
             'unit_of_measure' => 'required|string|max:255',
             'quantity_in_stock' => 'required|integer',
-            'supplier_id' => 'required|exists:suppliers,id', // Validate the supplier ID exists
+            'supplier_name' => 'required|string|max:255',
+            'supplier_contact' => 'nullable|string|max:255',
+            'document' => 'nullable|file|mimes:pdf,doc,docx,txt,jpg,jpeg,png|max:2048',
         ]);
-
+    
+        // Find the material
         $material = Material::findOrFail($id);
-
-        $material->name = $request->input('name');
-        $material->unit_price = $request->input('unit_price');
-        $material->unit_of_measure = $request->input('unit_of_measure');
-        $material->quantity_in_stock = $request->input('quantity_in_stock');
-        $material->supplier_id = $request->input('supplier_id'); // Set the supplier ID
-
-        // Retrieve supplier contact from the selected supplier ID
-        $supplier = Supplier::findOrFail($material->supplier_id);
-        $material->supplier_contact = $supplier->contact_info;
-
-        $material->save();
-
-        return redirect()->route('materials.index')->with('success', 'Material updated successfully.');
+    
+        // Handle document upload
+        if ($request->hasFile('document')) {
+            $documentPath = $request->file('document')->store('documents', 'public');
+            $material->document = $documentPath;  // Assign new document path
+        }
+    
+        // Check if the supplier exists, or create a new one
+        $supplier = Supplier::firstOrCreate(
+            ['name' => $request->supplier_name],
+            ['contact_info' => $request->supplier_contact]
+        );
+    
+        // Update the material's attributes
+        $material->update([
+            'name' => $request->name,
+            'unit_price' => $request->unit_price,
+            'unit_of_measure' => $request->unit_of_measure,
+            'quantity_in_stock' => $request->quantity_in_stock,
+            'supplier_id' => $supplier->id,
+            'document' => $material->document,
+        ]);
+    
+        // Redirect back to the materials index with a success message
+        return redirect()->route('materials.index')->with('success', 'Material and Supplier updated successfully.');
     }
-
+    
     public function destroy(Material $material)
     {
         // Get the supplier associated with this material
@@ -115,4 +145,18 @@ class MaterialController extends Controller
 
         return redirect()->route('materials.index')->with('success', 'Material and related supplier information updated successfully.');
     }
+
+    public function viewDocument($id)
+    {
+        $material = Material::findOrFail($id);
+
+        if ($material->document) {
+            $documentUrl = 'storage/' . $material->document;
+
+            return view('materials.document', compact('documentUrl'));
+        }
+
+        return redirect()->route('materials.index')->with('error', 'Document not found.');
+    }
+
 }

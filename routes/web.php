@@ -122,7 +122,12 @@ Route::get('/suppliers/autocomplete', [SupplierController::class, 'autocomplete'
 Route::get('/suppliers/autocompleteContact', [SupplierController::class, 'autocompleteContact'])->name('suppliers.autocompleteContact');
 
 
+Route::middleware(['web'])->group(function () {
+    Route::resource('materials', MaterialController::class);
+});
 
+// Route to serve document
+Route::get('/materials/view-document/{id}', [MaterialController::class, 'viewDocument'])->name('materials.viewDocument');
 
 // Profile Routes
 Route::middleware('auth')->group(function () {
