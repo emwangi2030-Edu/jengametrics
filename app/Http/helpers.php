@@ -271,9 +271,7 @@ function wlogo_url(){
 
 function favicon_url(){
 
-
-  $website = Website::whereDomainName(domain_name())->first();
-  $url_path = $website->favicon_url;
+  $url_path =  asset('assets/metrics/assets/img/favicon-metrics.webp');
 
   return $url_path;
 }

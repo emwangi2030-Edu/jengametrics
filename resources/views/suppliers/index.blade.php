@@ -1,7 +1,7 @@
 @extends('layouts.appbar')
 
 @section('content')
-<div class="container">
+<div class="content">
     <h1>Suppliers</h1>
 
     <a href="{{ route('materials.index') }}" class="btn btn-primary mb-3">Materials Purchased</a>

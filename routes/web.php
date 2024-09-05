@@ -93,6 +93,8 @@ Route::get('create-bq-item', ['as'=>'create_bq_item', 'uses' => '\App\Http\Contr
 
 Route::resource('boms', BOMController::class);
 
+Route::resource('projects', ProjectController::class);
+
 
 // Document Upload & List Route
 Route::get('/documents/upload', [DocumentController::class, 'index'])->name('documents.upload');

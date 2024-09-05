@@ -2,6 +2,7 @@
 @extends('layouts.appbar')
 @section('content')
 
+<div class="content">
     <h2 class="font-semibold text-xl text-gray-800 leading-tight">
         {{ __('Manage Labour') }}
     </h2>
@@ -46,5 +47,8 @@
             </div>
         </div>
     </div>
+
+    </div>
+
 
 @endsection

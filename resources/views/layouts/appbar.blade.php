@@ -1,694 +1,1001 @@
 <!DOCTYPE html>
-<!--
-Author: Keenthemes
-Product Name: SaulProduct Version: 1.0.4
-Purchase: https://keenthemes.com/products/saul-html-pro
-Website: http://www.keenthemes.com
-Contact: support@keenthemes.com
-Follow: www.twitter.com/keenthemes
-Dribbble: www.dribbble.com/keenthemes
-Like: www.facebook.com/keenthemes
-License: For each use you must have a valid license purchased only from above link in order to legally use the theme for your project.
--->
-<html lang="en">
-<!--begin::Head-->
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default">
 
 <head>
-    <title>JengaMetrics</title>
     <meta charset="utf-8">
-    <meta name="description" content="Saul HTML Pro - Bootstrap 5 HTML Multipurpose Admin Dashboard Theme">
-    <meta name="keywords"
-        content="Saul, bootstrap, bootstrap 5, dmin themes, free admin themes, bootstrap admin, bootstrap dashboard">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta property="og:locale" content="en_US">
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Saul Theme by KeenThemes">
-    <meta property="og:url" content="https://keenthemes.com/products/saul-html-pro">
-    <meta property="og:site_name" content="Saul HTML Pro by Keenthemes">
-    <link rel="canonical" href="https://preview.keenthemes.com#">
-    <link rel="shortcut icon" href="{{ asset('assets') }}/media/logos/favicon.ico">
 
-    <!--begin::Fonts(mandatory for all pages)-->
-    <link rel="stylesheet" href="../css?family=Inter:300,400,500,600,700"> <!--end::Fonts-->
+    <!-- ===============================================-->
+    <!--    Document Title-->
+    <!-- ===============================================-->
+    <title>@section('title') Jengametrics @show</title>
+    <meta name="description" content="@section('description') Jengametrics @show">
 
-    <!--begin::Vendor Stylesheets(used for this page only)-->
-    <link href="{{ asset('assets') }}/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet"
-        type="text/css">
-    <link href="{{ asset('assets') }}/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css">
-    <!--end::Vendor Stylesheets-->
+    <!-- ===============================================-->
+    <!--    Favicons-->
+    <!-- ===============================================-->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ favicon_url() }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_url() }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_url() }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ favicon_url() }}">
+    <link rel="manifest" href="{{ favicon_url() }}">
+    <meta name="msapplication-TileImage" content="{{ favicon_url() }}">
+    <meta name="theme-color" content="#ffffff">
+    <script src="{{ asset('assets/metrics/vendors/simplebar/simplebar.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/assets/js/config.js') }}"></script>
 
-    <!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
-    <link href="{{ asset('assets') }}/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css">
-    <link href="{{ asset('assets') }}/css/style.bundle.css" rel="stylesheet" type="text/css">
-    <!--end::Global Stylesheets Bundle-->
+    <!-- ===============================================-->
+    <!--    Stylesheets-->
+    <!-- ===============================================-->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&amp;display=swap"
+        rel="stylesheet">
+    <link href="{{ asset('assets/metrics/vendors/simplebar/simplebar.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/metrics/assets/css/line.css') }}">
+    <link href="{{ asset('assets/metrics/assets/css/theme-rtl.min.css') }}" type="text/css" rel="stylesheet" id="style-rtl">
+    <link href="{{ asset('assets/metrics/assets/css/theme.min.css') }}" type="text/css" rel="stylesheet" id="style-default">
+    <link href="{{ asset('assets/metrics/assets/css/user-rtl.min.css') }}" type="text/css" rel="stylesheet"
+        id="user-style-rtl">
+    <link href="{{ asset('assets/metrics/assets/css/user.min.css') }}" type="text/css" rel="stylesheet"
+        id="user-style-default">
+    <link href="{{ asset('assets/metrics/vendors/prism/prism-okaidia.css') }}" rel="stylesheet">
 
-    <!--begin::Google tag-->
-    <script async="" src="../gtag/js?id=UA-37564768-1"></script>
+
+
+    <!-- ===============================================-->
+    <!--    Additional Scripts and Styles-->
+    <!-- ===============================================-->
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'UA-37564768-1');
-    </script>
-    <!--end::Google tag-->
-    <script>
-        // Frame-busting to prevent site from being loaded within a frame without permission (click-jacking)
-        if (window.top != window.self) {
-            window.top.location.replace(window.self.location.href);
+        var phoenixIsRTL = window.config.config.phoenixIsRTL;
+        if (phoenixIsRTL) {
+            var linkDefault = document.getElementById('style-default');
+            var userLinkDefault = document.getElementById('user-style-default');
+            linkDefault.setAttribute('disabled', true);
+            userLinkDefault.setAttribute('disabled', true);
+            document.querySelector('html').setAttribute('dir', 'rtl');
+        } else {
+            var linkRTL = document.getElementById('style-rtl');
+            var userLinkRTL = document.getElementById('user-style-rtl');
+            linkRTL.setAttribute('disabled', true);
+            userLinkRTL.setAttribute('disabled', true);
         }
     </script>
+    <link href="{{ asset('assets/metrics/vendors/leaflet/leaflet.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/metrics/vendors/leaflet.markercluster/MarkerCluster.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/metrics/vendors/leaflet.markercluster/MarkerCluster.Default.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
 
-    <!-- Include jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <!-- Include jQuery UI -->
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    @yield('page-css')
+
+
+    <style>
+        .modal {
+            z-index: 1050 !important;
+            /* Ensure the modal is above other elements */
+        }
+
+        .modal-backdrop {
+            z-index: 1040 !important;
+            /* Ensure the backdrop is below the modal */
+        }
+    </style>
 </head>
-<!--end::Head-->
-
-<!--begin::Body-->
-
-<body id="kt_app_body" data-kt-app-header-fixed="true" data-kt-app-header-fixed-mobile="true"
-    data-kt-app-sidebar-enabled="true" data-kt-app-sidebar-fixed="true" data-kt-app-sidebar-hoverable="true"
-    data-kt-app-sidebar-push-toolbar="true" data-kt-app-sidebar-push-footer="true" data-kt-app-toolbar-enabled="true"
-    data-kt-app-aside-enabled="true" data-kt-app-aside-fixed="true" data-kt-app-aside-push-toolbar="true"
-    data-kt-app-aside-push-footer="true" class="app-default">
-    <!--begin::Theme mode setup on page load-->
-    <script>
-        var defaultThemeMode = "light";
-        var themeMode;
-
-        if (document.documentElement) {
-            if (document.documentElement.hasAttribute("data-bs-theme-mode")) {
-                themeMode = document.documentElement.getAttribute("data-bs-theme-mode");
-            } else {
-                if (localStorage.getItem("data-bs-theme") !== null) {
-                    themeMode = localStorage.getItem("data-bs-theme");
-                } else {
-                    themeMode = defaultThemeMode;
-                }
-            }
-
-            if (themeMode === "system") {
-                themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-            }
-
-            document.documentElement.setAttribute("data-bs-theme", themeMode);
-        }            
-    </script>
-    <!--end::Theme mode setup on page load-->
-    <!--Begin::Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5FS8GGP" height="0" width="0"
-            style="display:none;visibility:hidden"></iframe></noscript>
-    <!--End::Google Tag Manager (noscript) -->
 
 
-    <!--begin::App-->
-    <div class="d-flex flex-column flex-root app-root" id="kt_app_root">
-        <!--begin::Page-->
-        <div class="app-page  flex-column flex-column-fluid " id="kt_app_page">
+<body>
+    <!-- ===============================================-->
+    <!--    Main Content-->
+    <!-- ===============================================-->
+    <main class="main" id="top">
+        <nav class="navbar navbar-vertical navbar-expand-lg" style="display:none;">
+            <div class="collapse navbar-collapse" id="navbarVerticalCollapse">
+                <!-- scrollbar removed-->
+                <div class="navbar-vertical-content">
+                    <ul class="navbar-nav flex-column" id="navbarVerticalNav">
+
+                        <li class="nav-item">
+                            <!-- label-->
+                            <p class="navbar-vertical-label">Apps</p>
+                            <hr class="navbar-vertical-line" /><!-- parent pages-->
 
 
-            <!--begin::Header-->
-            <div id="kt_app_header" class="app-header  d-flex flex-column flex-stack ">
+                            <style>
+                                /* Navigation Item Styles */
+                                .nav-item-wrapper {
+                                    margin-bottom: 1rem;
+                                    /* Add spacing between navigation items */
+                                }
 
-                <!--begin::Header main-->
-                <div class="d-flex align-items-center flex-stack flex-grow-1">
+                                .nav-link {
+                                    padding: 0.75rem 1rem;
+                                    /* Add padding for better touch target size */
+                                    border-radius: 0.375rem;
+                                    /* Add rounded corners */
+                                    transition: background-color 0.3s ease, color 0.3s ease;
+                                    /* Smooth transition effects */
+                                    color: #000000;
+                                    /* Default text color in green */
+                                    text-decoration: none;
+                                    /* Remove underline from links */
+                                }
 
-                    <div class="app-header-logo d-flex align-items-center flex-stack px-lg-10 mb-2"
-                        id="kt_app_header_logo">
-                        <!--begin::Sidebar mobile toggle-->
-                        <div class="btn btn-icon btn-active-color-primary w-35px h-35px ms-3 me-2 d-flex d-lg-none"
-                            id="kt_app_sidebar_mobile_toggle">
-                            <i class="ki-duotone ki-abstract-14 fs-2"><span class="path1"></span><span
-                                    class="path2"></span></i>
-                        </div>
-                        <!--end::Sidebar mobile toggle-->
+                                .nav-link:hover {
+                                    background-color: #e0f2f1;
+                                    /* Light green background on hover */
+                                    color: #000000;
+                                    /* Darker green color on hover */
+                                }
 
-                        <!--begin::Logo-->
-                        <a href="index.html" class="app-sidebar-logo">
-                            <img alt="Logo" src="{{ asset('assets') }}/media/logos/default.svg"
-                                class="h-30px theme-light-show">
-                            <img alt="Logo" src="{{ asset('assets') }}/media/logos/default-dark.svg"
-                                class="h-30px theme-dark-show">
-                        </a>
-                        <!--end::Logo-->
+                                .nav-link-icon i {
+                                    font-size: 20px;
+                                    /* Adjust the font size for a balanced size */
+                                    color: #000000;
+                                    /* Green icon color */
+                                    margin-right: 0.5rem;
+                                    /* Add spacing between icon and text */
+                                }
 
-                        <!--begin::Sidebar toggle-->
-                        <div id="kt_app_sidebar_toggle"
-                            class="app-sidebar-toggle btn btn-sm btn-icon btn-color-warning me-n2 d-none d-lg-flex "
-                            data-kt-toggle="true" data-kt-toggle-state="active" data-kt-toggle-target="body"
-                            data-kt-toggle-name="app-sidebar-minimize">
-
-                            <i class="ki-duotone ki-exit-left fs-2x rotate-180"><span class="path1"></span><span
-                                    class="path2"></span></i>
-                        </div>
-                        <!--end::Sidebar toggle-->
-                    </div>
-
-                    <!--begin::Navbar-->
-                    <div class="app-navbar flex-grow-1 justify-content-end" id="kt_app_header_navbar">
-                        <div class="app-navbar-item d-flex align-items-stretch flex-lg-grow-1 me-2 me-lg-0">
-
-                            <!--begin::Search-->
-                            <div id="kt_header_search" class="header-search d-flex align-items-center w-lg-350px"
-                                data-kt-search-keypress="true" data-kt-search-min-length="2"
-                                data-kt-search-enter="enter" data-kt-search-layout="menu"
-                                data-kt-search-responsive="true" data-kt-menu-trigger="auto"
-                                data-kt-menu-permanent="true" data-kt-menu-placement="bottom-start">
-
-                                <!--begin::Tablet and mobile search toggle-->
-                                <div data-kt-search-element="toggle"
-                                    class="search-toggle-mobile d-flex d-lg-none align-items-center">
-                                    <div class="d-flex ">
-                                        <i class="ki-duotone ki-magnifier fs-1 fs-1"><span class="path1"></span><span
-                                                class="path2"></span></i>
-                                    </div>
-                                </div>
-                                <!--end::Tablet and mobile search toggle-->
-
-                                <!--begin::Form(use d-none d-lg-block classes for responsive search)-->
-                                <form data-kt-search-element="form"
-                                    class="d-none d-lg-block w-100 position-relative mb-5 mb-lg-0" autocomplete="off">
-                                    <!--begin::Hidden input(Added to disable form autocomplete)-->
-                                    <input type="hidden">
-                                    <!--end::Hidden input-->
-
-                                    <!--begin::Icon-->
-                                    <i
-                                        class="ki-duotone ki-magnifier search-icon fs-2 text-gray-500 position-absolute top-50 translate-middle-y ms-5"><span
-                                            class="path1"></span><span class="path2"></span></i> <!--end::Icon-->
-
-                                    <!--begin::Input-->
-                                    <input type="text"
-                                        class="search-input form-control form-control border-0 h-lg-40px  ps-13"
-                                        name="search" value="" placeholder="Search..." data-kt-search-element="input">
-                                    <!--end::Input-->
-
-                                    <!--begin::Spinner-->
-                                    <span
-                                        class="search-spinner  position-absolute top-50 end-0 translate-middle-y lh-0 d-none me-5"
-                                        data-kt-search-element="spinner">
-                                        <span class="spinner-border h-15px w-15px align-middle text-gray-500"></span>
-                                    </span>
-                                    <!--end::Spinner-->
-
-                                    <!--begin::Reset-->
-                                    <span
-                                        class="search-reset  btn btn-flush btn-active-color-primary position-absolute top-50 end-0 translate-middle-y lh-0 d-none me-4"
-                                        data-kt-search-element="clear">
-                                        <i class="ki-duotone ki-cross fs-2 fs-lg-1 me-0"><span
-                                                class="path1"></span><span class="path2"></span></i> </span>
-                                    <!--end::Reset-->
-                                </form>
-                                <!--end::Form-->
-                    
-                            </div>
-                            <!--end::Search-->
-                        </div>
-
-  
-
-                     
-
-                                 <!--begin::User menu-->
-                                 <div class="app-navbar-item ms-3 ms-lg-4 me-lg-2" id="kt_header_user_menu_toggle">
-                            <!--begin::Menu wrapper-->
-                            <div class="cursor-pointer symbol symbol-30px symbol-lg-40px"
-                                data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-attach="parent"
-                                data-kt-menu-placement="bottom-end">
-                                {{ project() }} <i class="fas fa-angle-down"></i>
-                            </div>
-
-                            <!--begin::User account menu-->
-                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-color fw-semibold py-4 fs-6 w-275px"
-                                data-kt-menu="true">
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-3">
-                                    <div class="menu-content d-flex align-items-center px-3">
-                                        <!--begin::Avatar-->
-                                        <div class="symbol symbol-50px me-5">
-                                            <img alt="Avatar" src="{{ Auth::user()->get_gravatar(150) }}">
-                                        </div>
-                                        <!--end::Avatar-->
-
-                                        <!--begin::Username-->
-                                        <div class="d-flex flex-column">
-                                            <div class="fw-bold d-flex align-items-center fs-5">
-                                                {{ Auth::user()->name }}
-                                                @if(Auth::user()->is_client() && Auth::user()->package && package(Auth::user()->package)->name == "Basic")
-                                                    <span
-                                                        class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">Basic</span>
-                                                @endif
-                                            </div>
-                                            <a href="#" class="fw-semibold text-muted text-hover-primary fs-7">
-                                                {{ Auth::user()->email }}
-                                            </a>
-                                        </div>
-                                        <!--end::Username-->
-                                    </div>
-                                </div>
-                                <!--end::Menu item-->
-
-                                <!--begin::Menu separator-->
-                                <div class="separator my-2"></div>
-                                <!--end::Menu separator-->
-                                @if(Auth::user()->is_client())
-                                @if(Auth::user()->is_client() && Auth::user()->package && package(Auth::user()->package)->name == "Basic")
-                                    <div class="help-box text-center">
-                                        <p class="mb-3 mt-2 text-muted">
-                                            <strong>{{ package(Auth::user()->package)->name }}</strong><br>
-                                            Upgrade your plan and get the most out of Fedhatrac
-                                        </p>
-                                        <div class="mt-3">
-                                            <a href="{{ route('subscribe') }}" class="btn btn-success">Upgrade now</a>
-                                        </div>
-                                    </div>
-                                @endif
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-5">
-                                    <a href="{{ url('profile') }}" class="menu-link px-5">My Profile</a>
-                                </div>
-                                <!--end::Menu item-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-5">
-                                    <a href="/admin/settings" class="menu-link px-5">Project settings</a>
-                                </div>
-                                <!--end::Menu item-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-5">
-                                    <a href="#" class="menu-link px-5" data-bs-toggle="modal"
-                                        data-bs-target="#switchbusinesses">
-                                        Switch businesses
-                                    </a>
-                                </div>
-                                <!--end::Menu item-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-5">
-                                    <a href="{{ url('projects') }}" class="menu-link px-5">Manage your projects</a>
-                                </div>
-                                <!--end::Menu item-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-5">
-                                    <a href="{{ url('billings') }}" class="menu-link px-5">Manage your billings</a>
-                                </div>
-                                <!--end::Menu item-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-5">
-                                    <a href="{{ url('subscribe') }}" class="menu-link px-5">Manage your
-                                        subscriptions</a>
-                                </div>
-                                <!--end::Menu item-->
-
-                                @endif
-
-                                @if(Auth::user()->is_admin())
-                                    <!--begin::Menu item-->
-                                    <div class="menu-item px-5">
-                                        <a href="{{ route('dashboard') }}" class="menu-link px-5"><i class="fa fa-home"></i> 
-                                            Switch to B2C</a>
-                                    </div>
-                                    <!--end::Menu item-->
-
-                                    <!--begin::Menu item-->
-                                    <div class="menu-item px-5">
-                                        <a href="{{ route('website_info', $website->id) }}" class="menu-link px-5"><i
-                                                class="fa fa-gear"></i>  Website settings</a>
-                                    </div>
-                                    <!--end::Menu item-->
-                                @endif
-
-                                <!--begin::Menu separator-->
-                                <div class="separator my-2"></div>
-                                <!--end::Menu separator-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-5">
-                                    <a href="{{ route('logout') }}" class="menu-link px-5"
-                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Sign
-                                        out</a>
-                                </div>
-                                <!--end::Menu item-->
-
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
-
-                                <!--begin::Menu separator-->
-                                <div class="separator my-2"></div>
-                                <!--end::Menu separator-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-5 text-center fw-bold fs-10 text-body-quaternary">
-                                    <a class="text-body-quaternary me-1" href="#!">Privacy policy</a>&bull;
-                                    <a class="text-body-quaternary mx-1" href="#!">Terms</a>&bull;
-                                    <a class="text-body-quaternary ms-1" href="#!">Cookies</a>
-                                </div>
-                                <!--end::Menu item-->
-                            </div>
-                            <!--end::User account menu-->
-                        </div>
-
-                        <!--begin::Action-->
-                        <div class="app-navbar-item ms-3 ms-lg-4 me-lg-6">
-                            <!--begin::Link-->
-                            <a href="#"
-                                class="btn btn-icon btn-custom btn-color-gray-600 btn-active-color-primary w-35px h-35px w-md-40px h-md-40px">
-                                <i class="ki-duotone ki-setting-3 fs-1"><span class="path1"></span><span
-                                        class="path2"></span><span class="path3"></span><span class="path4"></span><span
-                                        class="path5"></span></i>
-                            </a>
-                            <!--end::Link-->
-                        </div>
-                        <!--end::Action-->
-
-                
-                        <!--end::Header menu toggle-->
-                    </div>
-                    <!--end::Navbar-->
-                </div>
-                <!--end::Header main-->
-
-                <!--begin::Separator-->
-                <div class="app-header-separator"></div>
-                <!--end::Separator-->
-            </div>
-            <!--end::Header-->
+                                .nav-link-text {
+                                    font-size: 16px;
+                                    /* Set a professional font size */
+                                    font-weight: 500;
+                                    /* Slightly bolder text */
+                                    margin-left: 0.5rem;
+                                    /* Add spacing between icon and text */
+                                    color: #027333;
+                                    /* Ensure text color matches the nav-link color */
+                                }
+                            </style>
 
 
-
-            <!--begin::Wrapper-->
-            <div class="app-wrapper  flex-column flex-row-fluid " id="kt_app_wrapper">
-
-
-
-
-
-
-                <!--begin::Sidebar-->
-                <div id="kt_app_sidebar" class="app-sidebar  flex-column " data-kt-drawer="true"
-                    data-kt-drawer-name="app-sidebar" data-kt-drawer-activate="{default: true, lg: false}"
-                    data-kt-drawer-overlay="true" data-kt-drawer-width="250px" data-kt-drawer-direction="start"
-                    data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
-
-                    <!--begin::Main-->
-                    <div class="d-flex flex-column justify-content-between h-100 hover-scroll-overlay-y my-2 mx-5 d-flex flex-column"
-                        id="kt_app_sidebar_main" data-kt-scroll="true" data-kt-scroll-activate="true"
-                        data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_app_header"
-                        data-kt-scroll-wrappers="#kt_app_main" data-kt-scroll-offset="5px">
-                        <!--begin::Sidebar menu-->
-                        <div id="#kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false"
-                            class="flex-column-fluid menu menu-sub-indention menu-column menu-rounded menu-active-bg mb-7">
-                            <!--begin:Menu item-->
-                            <div data-kt-menu-trigger="click" class="menu-item here show menu-accordion">
-                                <!--begin:Menu link-->
-<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-    <!--begin:Menu link-->
-    <a href="{{ url('dashboard') }}" class="menu-link">
-        <span class="menu-icon">
-            <i class="ki-duotone ki-element-11 fs-1">
-                <span class="path1"></span>
-                <span class="path2"></span>
-                <span class="path3"></span>
-                <span class="path4"></span>
-            </i>
-        </span>
-        <span class="menu-title">Dashboards</span>
+                            <!-- Dashboard Item -->
+<!-- Dashboard Item -->
+<div class="nav-item-wrapper">
+    <a class="nav-link label-1" href="{{ route('dashboard') }}" role="button" aria-expanded="false">
+        <div class="d-flex align-items-center">
+            <span class="nav-link-icon"><span data-feather="home"></span></span>
+            <span class="nav-link-text-wrapper">
+                <span class="nav-link-text">Dashboard</span>
+            </span>
+        </div>
     </a>
 </div>
 
 
 
-                   
-                            </div><!--end:Menu item--><!--begin:Menu item-->
+                            @if(Auth::user()->is_client())
 
-
-              
-<!-- Ensure Font Awesome CSS is included in the <head> of your HTML -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-
-
+                          
 <!-- Bills of Quantities (BQ) -->
-<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-    <!--begin:Menu link-->
-    <a href="{{ url('bq_documents') }}" class="menu-link">
-        <span class="menu-icon">
-        <i class="fas fa-file-alt fs-1"></i>
-        </span>
-        <span class="menu-title">Bills of Quantities</span>
+<div class="nav-item-wrapper">
+    <a class="nav-link label-1" href="{{ url('bq_documents') }}" role="button" aria-expanded="false">
+        <div class="d-flex align-items-center">
+            <span class="nav-link-icon">
+                <span data-feather="file-text"></span>
+            </span>
+            <span class="nav-link-text-wrapper">
+                <span class="nav-link-text">Bills of Quantities</span>
+            </span>
+        </div>
     </a>
 </div>
-
 
 <!-- Bills of Materials (BOM) -->
-<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-    <!--begin:Menu link-->
-    <a href="{{ route('boms.index') }}" class="menu-link">
-        <span class="menu-icon">
-        <i class="fas fa-cogs fs-1"></i>
-        </span>
-        <span class="menu-title">Bills of Materials</span>
+<div class="nav-item-wrapper">
+    <a class="nav-link label-1" href="{{ route('boms.index') }}" role="button" aria-expanded="false">
+        <div class="d-flex align-items-center">
+            <span class="nav-link-icon">
+                <span data-feather="settings"></span>
+            </span>
+            <span class="nav-link-text-wrapper">
+                <span class="nav-link-text">Bills of Materials</span>
+            </span>
+        </div>
     </a>
 </div>
 
-
-
-
-
-
-
 <!-- Labour -->
-<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-    <span class="menu-link">
-        <span class="menu-icon"><i class="fas fa-users fs-1"></i></span>
-        <span class="menu-title">Labour</span>
-        <span class="menu-arrow"></span>
-    </span>
+<div class="nav-item-wrapper">
+    <div class="nav-link label-1" role="button" aria-expanded="false">
+        <div class="d-flex align-items-center">
+            <span class="nav-link-icon">
+                <span data-feather="users"></span>
+            </span>
+            <span class="nav-link-text-wrapper">
+                <span class="nav-link-text">Labour</span>
+            </span>
+            <span class="menu-arrow"></span>
+        </div>
+    </div>
     <div class="menu-sub menu-sub-accordion">
         <!-- Manage Labour -->
-        <div class="menu-item">
-            <a class="menu-link" href="{{ url(route('workers.index')) }}" title="Manage existing labour resources">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Manage Labour</span>
+        <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="{{ url(route('workers.index')) }}" title="Manage existing labour resources">
+                <div class="d-flex align-items-center">
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Manage Labour</span>
+                    </span>
+                </div>
             </a>
         </div>
         <!-- Labour Costing -->
-        <div class="menu-item">
-            <a class="menu-link" href="labour-costing.html" title="Estimate and track labour costs">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Labour Costing</span>
+        <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="labour-costing.html" title="Estimate and track labour costs">
+                <div class="d-flex align-items-center">
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Labour Costing</span>
+                    </span>
+                </div>
             </a>
         </div>
         <!-- Labour Reports -->
-        <div class="menu-item">
-            <a class="menu-link" href="labour-reports.html" title="Generate and view labour reports">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Labour Reports</span>
+        <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="labour-reports.html" title="Generate and view labour reports">
+                <div class="d-flex align-items-center">
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Labour Reports</span>
+                    </span>
+                </div>
             </a>
         </div>
     </div>
 </div>
 
-
 <!-- Cost Tracking -->
-<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-    <span class="menu-link">
-        <span class="menu-icon"><i class="fas fa-chart-line fs-1"></i></span>
-        <span class="menu-title">Cost Tracking</span>
-        <span class="menu-arrow"></span>
-    </span>
+<div class="nav-item-wrapper">
+    <div class="nav-link label-1" role="button" aria-expanded="false">
+        <div class="d-flex align-items-center">
+            <span class="nav-link-icon">
+                <span data-feather="trending-up"></span>
+            </span>
+            <span class="nav-link-text-wrapper">
+                <span class="nav-link-text">Cost Tracking</span>
+            </span>
+            <span class="menu-arrow"></span>
+        </div>
+    </div>
     <div class="menu-sub menu-sub-accordion">
-        <div class="menu-item">
-            <a class="menu-link" href="real-time-cost.html" title="Real-time cost tracking">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Real-Time Tracking</span>
+        <!-- Real-Time Tracking -->
+        <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="real-time-cost.html" title="Real-time cost tracking">
+                <div class="d-flex align-items-center">
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Real-Time Tracking</span>
+                    </span>
+                </div>
             </a>
         </div>
-        <div class="menu-item">
-            <a class="menu-link" href="input-output-comparison.html" title="Input vs. output cost comparison">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Cost Comparison</span>
+        <!-- Cost Comparison -->
+        <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="input-output-comparison.html" title="Input vs. output cost comparison">
+                <div class="d-flex align-items-center">
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Cost Comparison</span>
+                    </span>
+                </div>
             </a>
         </div>
-        <div class="menu-item">
-            <a class="menu-link" href="budget-tracking.html" title="Budget tracking for each project stage">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Budget Tracking</span>
+        <!-- Budget Tracking -->
+        <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="budget-tracking.html" title="Budget tracking for each project stage">
+                <div class="d-flex align-items-center">
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Budget Tracking</span>
+                    </span>
+                </div>
             </a>
         </div>
     </div>
 </div>
 
 <!-- Material Management -->
-<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-    <span class="menu-link">
-        <span class="menu-icon"><i class="fas fa-truck-loading fs-1"></i></span>
-        <span class="menu-title">Material Management</span>
-        <span class="menu-arrow"></span>
-    </span>
+<div class="nav-item-wrapper">
+    <div class="nav-link label-1" role="button" aria-expanded="false">
+        <div class="d-flex align-items-center">
+            <span class="nav-link-icon">
+                <span data-feather="box"></span>
+            </span>
+            <span class="nav-link-text-wrapper">
+                <span class="nav-link-text">Material Management</span>
+            </span>
+            <span class="menu-arrow"></span>
+        </div>
+    </div>
     <div class="menu-sub menu-sub-accordion">
-        <div class="menu-item">
-            <a class="menu-link" href="{{ url(route('materials.index')) }}" title="Procurement and supply chain management">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Materials Purchased</span>
+        <!-- Materials Purchased -->
+        <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="{{ url(route('materials.index')) }}" title="Procurement and supply chain management">
+                <div class="d-flex align-items-center">
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Materials Purchased</span>
+                    </span>
+                </div>
             </a>
         </div>
-        <div class="menu-item">
-            <a class="menu-link" href="{{ url(route('suppliers.index')) }}" title="Procurement and supply chain management">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">List of Suppliers</span>
+        <!-- List of Suppliers -->
+        <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="{{ url(route('suppliers.index')) }}" title="Procurement and supply chain management">
+                <div class="d-flex align-items-center">
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">List of Suppliers</span>
+                    </span>
+                </div>
             </a>
         </div>
-        <!-- <div class="menu-item">
-            <a class="menu-link" href="payment-integration.html" title="Payment integration (MPESA, Bank, etc.)">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Payment Integration</span>
-            </a>
-        </div>
-        <div class="menu-item">
-            <a class="menu-link" href="inventory-tracking.html" title="Inventory tracking">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Inventory Tracking</span>
-            </a>
-        </div> -->
     </div>
 </div>
 
 <!-- Reporting -->
-<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-    <span class="menu-link">
-        <span class="menu-icon"><i class="fas fa-file-alt fs-1"></i></span>
-        <span class="menu-title">Reporting</span>
-        <span class="menu-arrow"></span>
-    </span>
+<div class="nav-item-wrapper">
+    <div class="nav-link label-1" role="button" aria-expanded="false">
+        <div class="d-flex align-items-center">
+            <span class="nav-link-icon">
+                <span data-feather="file"></span>
+            </span>
+            <span class="nav-link-text-wrapper">
+                <span class="nav-link-text">Reporting</span>
+            </span>
+            <span class="menu-arrow"></span>
+        </div>
+    </div>
     <div class="menu-sub menu-sub-accordion">
-        <div class="menu-item">
-            <a class="menu-link" href="daily-logs.html" title="Daily logs/reports">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Daily Logs</span>
+        <!-- Daily Logs -->
+        <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="daily-logs.html" title="Daily logs/reports">
+                <div class="d-flex align-items-center">
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Daily Logs</span>
+                    </span>
+                </div>
             </a>
         </div>
-        <div class="menu-item">
-            <a class="menu-link" href="weekly-reports.html" title="Weekly performance reports">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Weekly Reports</span>
+        <!-- Weekly Reports -->
+        <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="weekly-reports.html" title="Weekly performance reports">
+                <div class="d-flex align-items-center">
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Weekly Reports</span>
+                    </span>
+                </div>
             </a>
         </div>
-        <div class="menu-item">
-            <a class="menu-link" href="cost-vs-work.html" title="Graphs and charts for input costs vs. work done">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Cost vs. Work</span>
+        <!-- Cost vs. Work -->
+        <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="cost-vs-work.html" title="Graphs and charts for input costs vs. work done">
+                <div class="d-flex align-items-center">
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Cost vs. Work</span>
+                    </span>
+                </div>
             </a>
         </div>
     </div>
 </div>
 
 <!-- Communication -->
-<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-    <span class="menu-link">
-        <span class="menu-icon"><i class="fas fa-comments fs-1"></i></span>
-        <span class="menu-title">Communication</span>
-        <span class="menu-arrow"></span>
-    </span>
+<div class="nav-item-wrapper">
+    <div class="nav-link label-1" role="button" aria-expanded="false">
+        <div class="d-flex align-items-center">
+            <span class="nav-link-icon">
+                <span data-feather="message-circle"></span>
+            </span>
+            <span class="nav-link-text-wrapper">
+                <span class="nav-link-text">Communication</span>
+            </span>
+            <span class="menu-arrow"></span>
+        </div>
+    </div>
     <div class="menu-sub menu-sub-accordion">
-        <div class="menu-item">
-            <a class="menu-link" href="document-sharing.html" title="Document sharing">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Document Sharing</span>
+        <!-- Document Sharing -->
+        <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="document-sharing.html" title="Document sharing">
+                <div class="d-flex align-items-center">
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Document Sharing</span>
+                    </span>
+                </div>
             </a>
         </div>
-        <div class="menu-item">
-            <a class="menu-link" href="messaging-system.html" title="Messaging system with notifications and alerts">
-                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                <span class="menu-title">Messaging System</span>
+        <!-- Meeting Scheduler -->
+        <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="meeting-scheduler.html" title="Scheduling meetings">
+                <div class="d-flex align-items-center">
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Meeting Scheduler</span>
+                    </span>
+                </div>
             </a>
         </div>
     </div>
 </div>
 
 
+                            @endif
 
 
 
+                            @if(Auth::user()->is_admin())
+
+                                                            <!-- Sales & Payment Section -->
+                                                            <div class="nav-item-wrapper">
+                                                                <a class="nav-link dropdown-indicator label-1" href="#sidebarSalesPayment" role="button"
+                                                                    data-bs-toggle="collapse" aria-expanded="false" aria-controls="sidebarSalesPayment">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="dropdown-indicator-icon-wrapper">
+                                                                            <span class="fas fa-caret-right dropdown-indicator-icon"></span>
+                                                                        </div>
+                                                                        <span class="nav-link-icon"><span data-feather="credit-card"></span></span>
+                                                                        <span class="nav-link-text">Clients</span>
+                                                                    </div>
+                                                                </a>
+                                                                <div class="parent-wrapper label-1 ">
+                                                                    <ul class="nav collapse parent {{ request()->is('transactions') || request()->is('billings') || request()->is('recurring-invoices') || request()->is('admin/listofusers') || request()->is('products') ? 'show' : '' }}"
+                                                                        data-bs-parent="#navbarVerticalCollapse" id="sidebarSalesPayment">
+
+                                                                        <li class="nav-item"><a
+                                                                                class="nav-link {{ request()->is('admin/listofusers') ? 'active' : '' }}"
+                                                                                href="{{ route('listofadmins') }}">
+                                                                                <div class="d-flex align-items-center"><span
+                                                                                        class="nav-link-text">Merchants</span></div>
+                                                                            </a>
+                                                                        </li>
+
+                                                                        <li class="nav-item"><a
+                                                                                class="nav-link {{ request()->is('transactions') ? 'active' : '' }}"
+                                                                                href="/transactions">
+                                                                                <div class="d-flex align-items-center"><span
+                                                                                        class="nav-link-text">Payments</span></div>
+                                                                            </a>
+                                                                        </li>
+
+                                                                        <li class="nav-item"><a
+                                                                                class="nav-link {{ request()->is('billings') ? 'active' : '' }}"
+                                                                                href="/billings">
+                                                                                <div class="d-flex align-items-center"><span
+                                                                                        class="nav-link-text">Invoices</span></div>
+                                                                            </a>
+                                                                        </li>
+
+
+
+
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+
+
+
+
+
+
+                                                            <?php
+                                    $website = \App\Models\Website::find(1);
+                                ?>
+
+
+
+                                                            <div class="nav-item-wrapper">
+                                                                <a class="nav-link dropdown-indicator label-1" href="#settings" role="button"
+                                                                    data-bs-toggle="collapse" aria-expanded="false" aria-controls="settings">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="dropdown-indicator-icon-wrapper">
+                                                                            <span class="fas fa-caret-right dropdown-indicator-icon"></span>
+                                                                        </div>
+                                                                        <span class="nav-link-icon"><span data-feather="settings"></span></span>
+                                                                        <span class="nav-link-text">Settings</span>
+                                                                    </div>
+                                                                </a>
+                                                                <div class="parent-wrapper label-1">
+                                                                    <ul class="nav collapse parent {{ request()->is('transactions') || request()->is('reconciliation') || request()->is('chart-of-accounts') ? 'show' : '' }}"
+                                                                        data-bs-parent="#navbarVerticalCollapse" id="settings">
+                                                                        <li class="nav-item"><a class="nav-link"
+                                                                                href="{{ route('website_info', $website->id)}}">
+                                                                                <div class="d-flex align-items-center"><span
+                                                                                        class="nav-link-text">Website setting</span></div>
+                                                                            </a></li>
+                                                                        <li class="nav-item"><a class="nav-link" href="#">
+                                                                                <div class="d-flex align-items-center"><span
+                                                                                        class="nav-link-text">Business category</span></div>
+                                                                            </a></li>
+
+
+                                                                        <li class="nav-item"><a class="nav-link" href="#">
+                                                                                <div class="d-flex align-items-center"><span
+                                                                                        class="nav-link-text">Business subcatgory</span></div>
+                                                                            </a></li>
+
+
+                                                                        <li class="nav-item"><a class="nav-link" href="#">
+                                                                                <div class="d-flex align-items-center"><span
+                                                                                        class="nav-link-text">Expense category</span></div>
+                                                                            </a></li>
+
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+
+
+
+                            @endif
+
+
+
+
+
+
+
+
+
+                        </li>
+
+
+
+                    </ul>
+                </div>
+            </div>
+            <div class="navbar-vertical-footer"><button
+                    class="btn navbar-vertical-toggle border-0 fw-semibold w-100 white-space-nowrap d-flex align-items-center"><span
+                        class="uil uil-left-arrow-to-left fs-8"></span><span
+                        class="uil uil-arrow-from-right fs-8"></span><span
+                        class="navbar-vertical-footer-text ms-2">Collapsed View</span></button></div>
+        </nav>
+
+        <nav class="navbar navbar-top fixed-top navbar-expand" id="navbarDefault" style="display:none;">
+            <div class="collapse navbar-collapse justify-content-between">
+                <div class="navbar-logo">
+                    <button class="btn navbar-toggler navbar-toggler-humburger-icon hover-bg-transparent" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse"
+                        aria-controls="navbarVerticalCollapse" aria-expanded="false"
+                        aria-label="Toggle Navigation"><span class="navbar-toggle-icon"><span
+                                class="toggle-line"></span></span></button>
+                    <a class="navbar-brand me-1 me-sm-3" href="{{ url('/') }}">
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center"><img src="{{ favicon_url() }}" alt="b2b"
+                                    width="27" />
+                                <h5 class="logo-text ms-2 d-none d-sm-block" style="color: #027333;">JengaMetrics</h5>
+                            </div>
                         </div>
-                     
-                        <!--end::Footer-->
-                    </div>
-                    <!--end::Main-->
+                    </a>
                 </div>
-                <!--end::Sidebar-->
+
+
+                <ul class="navbar-nav navbar-nav-icons flex-row">
+
+
+                    <li class="nav-item">
+                        <div class="theme-control-toggle fa-icon-wait px-2"><input
+                                class="form-check-input ms-0 theme-control-toggle-input" type="checkbox"
+                                data-theme-control="phoenixTheme" value="dark" id="themeControlToggle" /><label
+                                class="mb-0 theme-control-toggle-label theme-control-toggle-light"
+                                for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
+                                data-bs-title="Switch theme" style="height:32px;width:32px;"><span class="icon"
+                                    data-feather="moon"></span></label><label
+                                class="mb-0 theme-control-toggle-label theme-control-toggle-dark"
+                                for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
+                                data-bs-title="Switch theme" style="height:32px;width:32px;"><span class="icon"
+                                    data-feather="sun"></span></label></div>
+                    </li>
+
+
+
+                    <li class="nav-item dropdown">
+
+                        <a class="nav-link lh-1 pe-0" id="navbarDropdownUser" href="#!" role="button"
+                            data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true"
+                            aria-expanded="false">
+                            <span class="fs-8">{{ project() }}</span>
+                            <i class="fas fa-angle-down"></i>
+                        </a>
+
+
+                        <div class="dropdown-menu dropdown-menu-end navbar-dropdown-caret py-0 dropdown-profile shadow border"
+                            aria-labelledby="navbarDropdownUser">
+                            <div class="card position-relative border-0">
+                                <div class="card-body p-0">
+                                    <div class="text-center pt-4 pb-3">
+                                        <div class="avatar avatar-xl ">
+                                            <img class="rounded-circle " src="{{ Auth::user()->get_gravatar(150) }}"
+                                                alt="" />
+                                        </div>
+                                        <h6 class="mt-2 text-body-emphasis">{{ project() }}</h6>
+                                    </div>
+
+                                </div>
+                                <div>
+
+                                    @if(Auth::user()->is_client())
+                                        @if(Auth::user()->package)
+                                            @if(package(Auth::user()->package)->name == "Basic")
+
+                                                <div class="help-box text-center">
+
+                                                    <p class="mb-3 mt-2 text-muted">
+                                                        <strong>{{ package(Auth::user()->package)->name }}</strong><br>
+                                                        Upgrade your plan and get the most out of fedhatrac
+                                                    </p>
+                                                    <div class="mt-3">
+                                                        <a href="{{ route('subscribe') }}" class="btn btn-success"> Upgrade now</a>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endif
+                                    @endif
+
+
+
+                                    <ul class="nav d-flex flex-column mb-2 pb-1">
+                                        @if(Auth::user()->is_client())
+                                            @if(Auth::user()->project_id)
+                                                <li class="nav-item"><a class="nav-link px-3 d-block"
+                                                        href="/admin/settings"><span class="me-2 text-body align-bottom"
+                                                            data-feather="pie-chart"></span>Business settings</a></li>
+                                                <li class="nav-item">
+
+
+                                                    <a class="nav-link px-3 d-block" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#switchbusinesses">
+                                                        <span class="me-2 text-body align-bottom" data-feather="pie-chart">
+
+                                                        </span>Switch businesses
+                                                    </a>
 
 
 
 
-            <!--begin::Main-->
-            <div class="app-main flex-column flex-row-fluid " id="kt_app_main">
-                <!--begin::Content wrapper-->
-                <div class="d-flex flex-column flex-column-fluid">
-                                            
-<!--begin::Toolbar-->
-<div id="kt_app_toolbar" class="app-toolbar  pt-5 ">
+
+
+
+                                                </li>
+                                            @endif 
+
+                                        @endif
+                                    </ul>
+                                </div>
+                                <div class="card-footer p-0 border-top border-translucent">
+                                    <ul class="nav d-flex flex-column my-3">
 
 
 
 
 
-                @yield('content')
+                                  
+                                        <!-- item--> @if(Auth::user()->is_client())
+                                            <a class="dropdown-item" href="{{ url('account') }}"><i
+                                                    class="fa fa-user"></i> <span key="t-profile">Profile</span></a>
+                                            <a class="dropdown-item" href="{{ url('businesses') }}"><i
+                                                    class="fa fa-users"></i> <span key="t-profile">Manage your
+                                                    businesses</span></a>
+                                            <a class="dropdown-item" href="{{ url('billings') }}"><i
+                                                    class="fa fa-users"></i> <span key="t-profile">Manage your
+                                                    billings</span></a>
+                                            <a class="dropdown-item" href="{{ url('subscribe') }}"><i
+                                                    class="fa fa-users"></i> <span key="t-profile">Manage your
+                                                    subscriptions</span></a>
+                                        @endif
 
 
-
-
-</div>
-
-</div>
-
-</div>
-
-
-
-
-                </div>
+                                    </ul>
+                                    <hr />
+                                    <div class="px-3"> <a class="btn btn-phoenix-secondary d-flex flex-center w-100"
+                                            href="{{ route('logout') }}"> <span class="me-2" data-feather="log-out">
+                                            </span>Sign out</a></div>
+                                    <div class="my-2 text-center fw-bold fs-10 text-body-quaternary"><a
+                                            class="text-body-quaternary me-1" href="#!">Privacy policy</a>&bull;<a
+                                            class="text-body-quaternary mx-1" href="#!">Terms</a>&bull;<a
+                                            class="text-body-quaternary ms-1" href="#!">Cookies</a></div>
+                                </div>
+                            </div>
                         </div>
-                        <!--end::Footer-->
-                    </div>
-                    <!--end::Main-->
-                </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
 
-    <!--begin::Javascript-->
+
+
+
+
+
+        <script>
+            var navbarTopShape = window.config.config.phoenixNavbarTopShape;
+            var navbarPosition = window.config.config.phoenixNavbarPosition;
+            var body = document.querySelector('body');
+            var navbarDefault = document.querySelector('#navbarDefault');
+            var navbarTop = document.querySelector('#navbarTop');
+            var topNavSlim = document.querySelector('#topNavSlim');
+            var navbarTopSlim = document.querySelector('#navbarTopSlim');
+            var navbarCombo = document.querySelector('#navbarCombo');
+            var navbarComboSlim = document.querySelector('#navbarComboSlim');
+            var dualNav = document.querySelector('#dualNav');
+
+            var documentElement = document.documentElement;
+            var navbarVertical = document.querySelector('.navbar-vertical');
+
+            if (navbarPosition === 'dual-nav') {
+                topNavSlim?.remove();
+                navbarTop?.remove();
+                navbarTopSlim?.remove();
+                navbarCombo?.remove();
+                navbarComboSlim?.remove();
+                navbarDefault?.remove();
+                navbarVertical?.remove();
+                dualNav.removeAttribute('style');
+                document.documentElement.setAttribute('data-navigation-type', 'dual');
+
+            } else if (navbarTopShape === 'slim' && navbarPosition === 'vertical') {
+                navbarDefault?.remove();
+                navbarTop?.remove();
+                navbarTopSlim?.remove();
+                navbarCombo?.remove();
+                navbarComboSlim?.remove();
+                topNavSlim.style.display = 'block';
+                navbarVertical.style.display = 'inline-block';
+                document.documentElement.setAttribute('data-navbar-horizontal-shape', 'slim');
+
+            } else if (navbarTopShape === 'slim' && navbarPosition === 'horizontal') {
+                navbarDefault?.remove();
+                navbarVertical?.remove();
+                navbarTop?.remove();
+                topNavSlim?.remove();
+                navbarCombo?.remove();
+                navbarComboSlim?.remove();
+                dualNav?.remove();
+                navbarTopSlim.removeAttribute('style');
+                document.documentElement.setAttribute('data-navbar-horizontal-shape', 'slim');
+            } else if (navbarTopShape === 'slim' && navbarPosition === 'combo') {
+                navbarDefault?.remove();
+                navbarTop?.remove();
+                topNavSlim?.remove();
+                navbarCombo?.remove();
+                navbarTopSlim?.remove();
+                dualNav?.remove();
+                navbarComboSlim.removeAttribute('style');
+                navbarVertical.removeAttribute('style');
+                document.documentElement.setAttribute('data-navbar-horizontal-shape', 'slim');
+            } else if (navbarTopShape === 'default' && navbarPosition === 'horizontal') {
+                navbarDefault?.remove();
+                topNavSlim?.remove();
+                navbarVertical?.remove();
+                navbarTopSlim?.remove();
+                navbarCombo?.remove();
+                navbarComboSlim?.remove();
+                dualNav?.remove();
+                navbarTop.removeAttribute('style');
+                document.documentElement.setAttribute('data-navigation-type', 'horizontal');
+            } else if (navbarTopShape === 'default' && navbarPosition === 'combo') {
+                topNavSlim?.remove();
+                navbarTop?.remove();
+                navbarTopSlim?.remove();
+                navbarDefault?.remove();
+                navbarComboSlim?.remove();
+                dualNav?.remove();
+                navbarCombo.removeAttribute('style');
+                navbarVertical.removeAttribute('style');
+                document.documentElement.setAttribute('data-navigation-type', 'combo');
+            } else {
+                topNavSlim?.remove();
+                navbarTop?.remove();
+                navbarTopSlim?.remove();
+                navbarCombo?.remove();
+                navbarComboSlim?.remove();
+                dualNav?.remove();
+                navbarDefault.removeAttribute('style');
+                navbarVertical.removeAttribute('style');
+            }
+
+            var navbarTopStyle = window.config.config.phoenixNavbarTopStyle;
+            var navbarTop = document.querySelector('.navbar-top');
+            if (navbarTopStyle === 'darker') {
+                navbarTop.setAttribute('data-navbar-appearance', 'darker');
+            }
+
+            var navbarVerticalStyle = window.config.config.phoenixNavbarVerticalStyle;
+            var navbarVertical = document.querySelector('.navbar-vertical');
+            if (navbarVerticalStyle === 'darker') {
+                navbarVertical.setAttribute('data-navbar-appearance', 'darker');
+            }
+        </script>
+
+        <div class="modal modal-blur fade" id="switchbusinesses" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Switch businesses</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <?php
+$businesses = \App\Models\Project::whereUserId(Auth::user()->id)->get();
+?>
+                    <div class="modal-body">
+
+
+                        <table class="table table-striped">
+
+                            <tbody>
+                                @foreach ($businesses as $business)
+                                    <tr>
+                                        <td>{{ $business->name }}</td>
+                                        <td>
+
+                                            <form action="#" method="POST"
+                                                style="display:inline;">
+                                                @csrf
+                                                <input type="hidden" name="id" value="{{ $business->id }}">
+                                                <button type="submit" class="btn btn-success btn-sm">Select</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+
+                                @endforeach
+
+
+                                <tr>
+                                    <td>
+                                        <a class="dropdown-item" href="{{ url('businesses') }}"><i
+                                                class="fa fa-users"></i> <span key="t-profile">Manage your
+                                                projects</span></a>
+                                        <br>
+                                        <a class="dropdown-item" href="{{ route('wizard.step1') }}"><i
+                                                class="fa fa-users"></i> <span key="t-profile">Create new
+                                                project</span></a>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- Pagination Links -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="content">
+
+        @yield('content')
+
+</div>
+        <style>
+#toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.toast {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.toast-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.toast-body {
+    font-size: 0.9rem;
+}
+
+.toast .badge {
+    margin-right: 0.5rem;
+    font-size: 0.75rem;
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+</style>
+<div id="toast-container">
+    @if (\Session::has('success'))
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="toast-header">
+                <span class="avatar avatar-xs me-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-success" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /><path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727" /><path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" /></svg>
+                </span>
+                <strong class="me-auto">System</strong>
+                <small>Just now</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                <span class="badge bg-success">Success</span>
+                {!! \Session::get('success') !!}
+            </div>
+        </div>
+    @endif 
+
+    @if (\Session::has('warning'))
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="toast-header">
+                <span class="avatar avatar-xs me-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-warning" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /><path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727" /><path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" /></svg>
+                </span>
+                <strong class="me-auto">System</strong>
+                <small>Just now</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                <span class="badge bg-warning">Warning</span>
+                {!! \Session::get('warning') !!}
+            </div>
+        </div>
+    @endif 
+
+    @if (\Session::has('danger'))
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="toast-header">
+                <span class="avatar avatar-xs me-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-danger" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /><path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727" /><path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" /></svg>
+                </span>
+                <strong class="me-auto">System</strong>
+                <small>Just now</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                <span class="badge bg-danger">Error</span>
+                {!! \Session::get('danger') !!}
+            </div>
+        </div>
+    @endif 
+</div>
+
+
+   
+   </main><!-- ===============================================-->
+    <!--    End of Main Content-->
+    <!-- ===============================================-->
+
+
+    <!-- ===============================================-->
+    <!--    JavaScripts-->
+    <!-- ===============================================-->
+    <script src="{{ asset('assets/metrics/vendors/popper/popper.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/bootstrap/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/anchorjs/anchor.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/is/is.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/fontawesome/all.min.js') }}"></script>
+
+
+    <script src="{{ asset('assets/metrics/vendors/lodash/lodash.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/list.js/list.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/feather-icons/feather.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/dayjs/dayjs.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/leaflet/leaflet.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/leaflet.markercluster/leaflet.markercluster.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/leaflet.tilelayer.colorfilter/leaflet-tilelayer-colorfilter.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/assets/js/phoenix.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/echarts/echarts.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/assets/js/ecommerce-dashboard.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/prism/prism.js') }}"></script>
+
     <script>
-        var hostUrl = "/saul-html-pro/{{ asset('assets') }}/";        </script>
+    var toastr_options = {closeButton : true};
+</script>
+    @yield('page-js')
 
-    <!--begin::Global Javascript Bundle(mandatory for all pages)-->
-    <script src="{{ asset('assets') }}/plugins/global/plugins.bundle.js"></script>
-    <script src="{{ asset('assets') }}/js/scripts.bundle.js"></script>
-    <!--end::Global Javascript Bundle-->
 
-    <!--begin::Vendors Javascript(used for this page only)-->
-    <script src="{{ asset('assets') }}/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
 
-    <script src="{{ asset('assets') }}/plugins/custom/datatables/datatables.bundle.js"></script>
-    <!--end::Vendors Javascript-->
-
-    <!--begin::Custom Javascript(used for this page only)-->
-    <script src="{{ asset('assets') }}/js/widgets.bundle.js"></script>
-    <script src="{{ asset('assets') }}/js/custom/widgets.js"></script>
-    <script src="{{ asset('assets') }}/js/custom/apps/chat/chat.js"></script>
-    <script src="{{ asset('assets') }}/js/custom/utilities/modals/upgrade-plan.js"></script>
-    <script src="{{ asset('assets') }}/js/custom/utilities/modals/create-account.js"></script>
-    <script src="{{ asset('assets') }}/js/custom/utilities/modals/create-app.js"></script>
-    <script src="{{ asset('assets') }}/js/custom/utilities/modals/users-search.js"></script>
-    <!--end::Custom Javascript-->
-    <!--end::Javascript-->
+<script>
+    $(document).on('click', '.ghuranti', function(){
+        $('.themeqx-demo-chooser-wrap').toggleClass('open');
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
-<!--end::Body-->
-
 </html>
