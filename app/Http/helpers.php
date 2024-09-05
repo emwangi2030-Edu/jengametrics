@@ -297,7 +297,6 @@ function project_name(){
 
 function project(){
 
-
     $user = Auth::user();
     $project_count = Project::whereUserId($user->id)->count();
     if($project_count>0){
@@ -306,7 +305,27 @@ function project(){
         $business = 'Personal';    
     }
 
-    return $business;
+ return $business;
+
+}
+
+
+function get_project(){
+
+    $user = Auth::user();
+    $business = Project::find($user->project_id)->first();
+
+ return $business;
+
+}
+
+
+function project_id(){
+
+    $user = Auth::user();
+    $project = Project::find($user->project_id)->first()->id;
+
+ return $project;
 
 }
 

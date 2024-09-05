@@ -1,38 +1,47 @@
 @extends('layouts.appbar')
+
 @section('content')
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Bills of Quantities') }}
-        </h2>
-    </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <!-- Button to create a new BQ document -->
-                    <a href="{{ route('bq_documents.create') }}" class="btn btn-info">
-                        {{ __('Create New BQ Document') }}
-                    </a>
+    <div class="container py-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="font-weight-bold text-dark">
+                    {{ __('Bills of Quantities') }}
+                </h2>
 
-                    <div class="mt-6">
+                @include('flash_msg')
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Button to create a new BQ document -->
+                        <a href="{{ route('bq_documents.create') }}" class="btn btn-info mb-3">
+                            {{ __('Create New BQ Document') }}
+                        </a>
+
                         <!-- Display the list of BQ documents -->
-                        @if($documents->isEmpty())
-                            <p>{{ __('No BQ documents found.') }}</p>
-                        @else
-                            <ul class="list-disc pl-5 space-y-2">
-                                @foreach($documents as $document)
-                                    <li>
-                                        <a href="{{ route('bq_documents.show', $document) }}" class="text-blue-500 hover:underline">
-                                            {{ $document->title }}
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @endif
+                        <div>
+                            @if($documents->isEmpty())
+                                <p>{{ __('No BQ documents found.') }}</p>
+                            @else
+                                <ul class="list-group">
+                                    @foreach($documents as $document)
+                                        <li class="list-group-item">
+                                            <a href="{{ route('bq_documents.show', $document) }}" class="text-info">
+                                                {{ $document->title }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    @endsection
+
+@endsection

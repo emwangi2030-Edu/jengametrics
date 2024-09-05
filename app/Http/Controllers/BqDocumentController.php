@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BqDocument;
+use App\Models\BqSection;
 use Illuminate\Http\Request;
 
 class BqDocumentController extends Controller
@@ -15,8 +16,13 @@ class BqDocumentController extends Controller
     public function index()
     {
         // Retrieve all BQ documents with their associated sections
-        $documents = BqDocument::with('sections')->get();
-        return view('bq_documents.index', compact('documents'));
+        // $documents = BqDocument::with('sections')->get();
+        // return view('bq_documents.index', compact('documents'));
+
+        $bqDocument = get_project();
+        $sections = BqSection::whereProjectId(project_id())->get();
+
+        return view('bq_documents.show', compact('bqDocument', 'sections'));
     }
 
     /**

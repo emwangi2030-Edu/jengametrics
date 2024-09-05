@@ -10,7 +10,8 @@ class CreateBqSectionsTable extends Migration
     {
         Schema::create('bq_sections', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('bq_document_id')->constrained('bq_documents')->onDelete('cascade');
+            $table->string('project_id')->nullable();
+            $table->foreignId('bq_document_id')->constrained('bq_documents')->onDelete('cascade')->nullable();
             $table->string('section_name');
             $table->text('details')->nullable();
             $table->timestamps();

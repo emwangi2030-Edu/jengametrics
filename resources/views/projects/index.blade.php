@@ -1,8 +1,8 @@
 @extends('layouts.appbar')
 
 @section('content')
-    <h1>Classes</h1>
-    <a href="{{ route('projects.create') }}" project="btn btn-primary mb-3">Add Class</a>
+    <h1>Projects</h1>
+    <a href="{{ route('wizard.step1') }}" project="btn btn-primary mb-3">Add project</a>
     <table project="table table-bordered">
         <thead>
             <tr>

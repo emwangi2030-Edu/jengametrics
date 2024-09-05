@@ -10,22 +10,33 @@ class BqSectionController extends Controller
 {
     public function create(BqDocument $bqDocument)
     {
+
+
+        $bqDocument = get_project();
+
         return view('bq_sections.create', compact('bqDocument'));
     }
 
-    public function store(Request $request, BqDocument $bqDocument)
+    public function store(Request $request)
     {
         $request->validate([
             'section_name' => 'required|string|max:255',
             'details' => 'nullable|string',
         ]);
 
-        $bqDocument->sections()->create([
+
+
+        $data = [
             'section_name' => $request->section_name,
             'details' => $request->details,
-        ]);
+            'project_id' => project_id(),
+        ];
 
-        return redirect()->route('bq_documents.show', $bqDocument);
+        BqSection::create($data);
+
+
+        return redirect()->route('bq_documents.index')->with('success', trans('Section added successfully.'));
+
     }
 
     public function edit(BqDocument $bqDocument, BqSection $bqSection)

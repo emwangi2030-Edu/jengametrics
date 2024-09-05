@@ -9,7 +9,7 @@ class BqSection extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['section_name', 'details', 'bq_document_id'];
+    protected $fillable = ['section_name', 'details', 'bq_document_id', 'project_id'];
 
     public function bqDocument()
     {
