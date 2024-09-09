@@ -1,38 +1,58 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('BOMs') }}
-        </h2>
-    </x-slot>
+@extends('layouts.appbar')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <a href="{{ route('boms.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded-md">Create New BOM</a>
-
-                    <table class="mt-4 w-full">
-                        <thead>
-                            <tr>
-                                <th class="px-4 py-2">BOM Name</th>
-                                <th class="px-4 py-2">BQ Document</th>
-                                <th class="px-4 py-2">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($boms as $bom)
-                                <tr>
-                                    <td class="px-4 py-2">{{ $bom->bom_name }}</td>
-                                    <td class="px-4 py-2">{{ $bom->bqDocument->title }}</td>
-                                    <td class="px-4 py-2">
-                                        <a href="{{ route('boms.show', $bom->id) }}" class="bg-green-500 text-white px-2 py-1 rounded-md">View</a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+@section('content')
+<div class="container">
+    @if(session('success'))
+        <div class="alert alert-success" id="success-alert" style="display: block;">
+            {{ session('success') }}
         </div>
-    </div>
-</x-app-layout>
+    @endif
+    
+    <h1>BOMs</h1>
+
+    <a href="{{ route('boms.create') }}" class="btn btn-primary mb-3">Create New BOM</a>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>BOM Name</th>
+                <th>BQ Document</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($boms as $bom)
+                <tr>
+                    <td>{{ $bom->bom_name }}</td>
+                    <td>{{ $bom->bqDocument->title }}</td>
+                    <td>
+                        <a href="{{ route('boms.show', $bom->id) }}" class="btn btn-primary btn-sm">View</a>
+                        <form action="{{ route('boms.destroy', $bom->id) }}" method="POST" style="display:inline-block;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        setTimeout(function() {
+            if ($('#success-alert').length) {
+                console.log('Success alert found. It will fade out in 4 seconds.');
+                setTimeout(function() {
+                    $('#success-alert').fadeOut('slow');
+                }, 4000);
+            } else {
+                console.log('No success alert found.');
+            }
+        }, 1000); // Add a slight delay before checking for the alert
+    });
+</script>
+@endpush

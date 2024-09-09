@@ -203,15 +203,17 @@
             <span class="nav-link-icon">
                 <span data-feather="users"></span>
             </span>
-            <span class="nav-link-text-wrapper">
-                <span class="nav-link-text">Labour</span>
-            </span>
+            <a href="{{ url(route('workers.index')) }}" title="Manage existing labour">
+                <span class="nav-link-text-wrapper">
+                    <span class="nav-link-text">Labour</span>
+                </span>
+            </a>
             <span class="menu-arrow"></span>
         </div>
     </div>
-    <div class="menu-sub menu-sub-accordion">
+    <!-- <div class="menu-sub menu-sub-accordion"> -->
         <!-- Manage Labour -->
-        <div class="nav-item-wrapper">
+        <!-- <div class="nav-item-wrapper">
             <a class="nav-link label-1" href="{{ url(route('workers.index')) }}" title="Manage existing labour resources">
                 <div class="d-flex align-items-center">
                     <span class="nav-link-text-wrapper">
@@ -219,9 +221,9 @@
                     </span>
                 </div>
             </a>
-        </div>
+        </div> -->
         <!-- Labour Costing -->
-        <div class="nav-item-wrapper">
+        <!-- <div class="nav-item-wrapper">
             <a class="nav-link label-1" href="labour-costing.html" title="Estimate and track labour costs">
                 <div class="d-flex align-items-center">
                     <span class="nav-link-text-wrapper">
@@ -229,9 +231,9 @@
                     </span>
                 </div>
             </a>
-        </div>
+        </div> -->
         <!-- Labour Reports -->
-        <div class="nav-item-wrapper">
+        <!-- <div class="nav-item-wrapper">
             <a class="nav-link label-1" href="labour-reports.html" title="Generate and view labour reports">
                 <div class="d-flex align-items-center">
                     <span class="nav-link-text-wrapper">
@@ -240,7 +242,7 @@
                 </div>
             </a>
         </div>
-    </div>
+    </div> -->
 </div>
 
 <!-- Cost Tracking -->
@@ -256,9 +258,9 @@
             <span class="menu-arrow"></span>
         </div>
     </div>
-    <div class="menu-sub menu-sub-accordion">
-        <!-- Real-Time Tracking -->
-        <div class="nav-item-wrapper">
+    <!-- <div class="menu-sub menu-sub-accordion">
+        Real-Time Tracking -->
+        <!-- <div class="nav-item-wrapper">
             <a class="nav-link label-1" href="real-time-cost.html" title="Real-time cost tracking">
                 <div class="d-flex align-items-center">
                     <span class="nav-link-text-wrapper">
@@ -266,9 +268,9 @@
                     </span>
                 </div>
             </a>
-        </div>
+        </div> -->
         <!-- Cost Comparison -->
-        <div class="nav-item-wrapper">
+        <!-- <div class="nav-item-wrapper">
             <a class="nav-link label-1" href="input-output-comparison.html" title="Input vs. output cost comparison">
                 <div class="d-flex align-items-center">
                     <span class="nav-link-text-wrapper">
@@ -276,9 +278,9 @@
                     </span>
                 </div>
             </a>
-        </div>
+        </div> -->
         <!-- Budget Tracking -->
-        <div class="nav-item-wrapper">
+        <!-- <div class="nav-item-wrapper">
             <a class="nav-link label-1" href="budget-tracking.html" title="Budget tracking for each project stage">
                 <div class="d-flex align-items-center">
                     <span class="nav-link-text-wrapper">
@@ -287,7 +289,7 @@
                 </div>
             </a>
         </div>
-    </div>
+    </div> -->
 </div>
 
 <!-- Material Management -->
@@ -297,25 +299,29 @@
             <span class="nav-link-icon">
                 <span data-feather="box"></span>
             </span>
-            <span class="nav-link-text-wrapper">
-                <span class="nav-link-text">Material Management</span>
-            </span>
+            <a href="{{ url(route('materials.index')) }}" title="Material Management">
+                <!-- <div class="d-flex align-items-center">   -->
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Material Management</span>
+                    </span>
+                <!-- </div> -->
+            </a>
             <span class="menu-arrow"></span>
         </div>
     </div>
-    <div class="menu-sub menu-sub-accordion">
+    <!-- <div class="menu-sub menu-sub-accordion"> -->
         <!-- Materials Purchased -->
-        <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="{{ url(route('materials.index')) }}" title="Procurement and supply chain management">
+        <!-- <div class="nav-item-wrapper">
+            <a class="nav-link label-1" href="{{ url(route('materials.index')) }}" title="Materials Purchased">
                 <div class="d-flex align-items-center">
                     <span class="nav-link-text-wrapper">
                         <span class="nav-link-text">Materials Purchased</span>
                     </span>
                 </div>
             </a>
-        </div>
+        </div> -->
         <!-- List of Suppliers -->
-        <div class="nav-item-wrapper">
+        <!-- <div class="nav-item-wrapper">
             <a class="nav-link label-1" href="{{ url(route('suppliers.index')) }}" title="Procurement and supply chain management">
                 <div class="d-flex align-items-center">
                     <span class="nav-link-text-wrapper">
@@ -324,7 +330,7 @@
                 </div>
             </a>
         </div>
-    </div>
+    </div> -->
 </div>
 
 <!-- Reporting -->
@@ -334,15 +340,17 @@
             <span class="nav-link-icon">
                 <span data-feather="file"></span>
             </span>
-            <span class="nav-link-text-wrapper">
-                <span class="nav-link-text">Reporting</span>
-            </span>
+            <a href="#" title="Daily logs/reports">
+                <span class="nav-link-text-wrapper">
+                    <span class="nav-link-text">Reporting</span>
+                </span>
+            </a>
             <span class="menu-arrow"></span>
         </div>
     </div>
-    <div class="menu-sub menu-sub-accordion">
+    <!-- <div class="menu-sub menu-sub-accordion"> -->
         <!-- Daily Logs -->
-        <div class="nav-item-wrapper">
+        <!-- <div class="nav-item-wrapper">
             <a class="nav-link label-1" href="daily-logs.html" title="Daily logs/reports">
                 <div class="d-flex align-items-center">
                     <span class="nav-link-text-wrapper">
@@ -350,9 +358,9 @@
                     </span>
                 </div>
             </a>
-        </div>
+        </div> -->
         <!-- Weekly Reports -->
-        <div class="nav-item-wrapper">
+        <!-- <div class="nav-item-wrapper">
             <a class="nav-link label-1" href="weekly-reports.html" title="Weekly performance reports">
                 <div class="d-flex align-items-center">
                     <span class="nav-link-text-wrapper">
@@ -360,9 +368,9 @@
                     </span>
                 </div>
             </a>
-        </div>
+        </div> -->
         <!-- Cost vs. Work -->
-        <div class="nav-item-wrapper">
+        <!-- <div class="nav-item-wrapper">
             <a class="nav-link label-1" href="cost-vs-work.html" title="Graphs and charts for input costs vs. work done">
                 <div class="d-flex align-items-center">
                     <span class="nav-link-text-wrapper">
@@ -372,7 +380,7 @@
             </a>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Communication -->
 <div class="nav-item-wrapper">
@@ -381,15 +389,17 @@
             <span class="nav-link-icon">
                 <span data-feather="message-circle"></span>
             </span>
-            <span class="nav-link-text-wrapper">
-                <span class="nav-link-text">Communication</span>
-            </span>
+            <a href="#" title="Document sharing">
+                <span class="nav-link-text-wrapper">
+                    <span class="nav-link-text">Communication</span>
+                </span>
+            </a>
             <span class="menu-arrow"></span>
         </div>
     </div>
-    <div class="menu-sub menu-sub-accordion">
+    <!-- <div class="menu-sub menu-sub-accordion"> -->
         <!-- Document Sharing -->
-        <div class="nav-item-wrapper">
+        <!-- <div class="nav-item-wrapper">
             <a class="nav-link label-1" href="document-sharing.html" title="Document sharing">
                 <div class="d-flex align-items-center">
                     <span class="nav-link-text-wrapper">
@@ -397,9 +407,9 @@
                     </span>
                 </div>
             </a>
-        </div>
+        </div> -->
         <!-- Meeting Scheduler -->
-        <div class="nav-item-wrapper">
+        <!-- <div class="nav-item-wrapper">
             <a class="nav-link label-1" href="meeting-scheduler.html" title="Scheduling meetings">
                 <div class="d-flex align-items-center">
                     <span class="nav-link-text-wrapper">
@@ -408,7 +418,7 @@
                 </div>
             </a>
         </div>
-    </div>
+    </div> -->
 </div>
 
 
