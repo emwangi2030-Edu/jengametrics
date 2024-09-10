@@ -13,16 +13,7 @@
             <input type="text" name="bom_name" id="bom_name" class="form-control" placeholder="Enter BOM Name" required>
         </div>
 
-        <!-- Select BQ Document -->
-        <div class="form-group mb-4">
-            <label for="bq_document_id" class="form-label">{{ __('Select BQ Document') }}</label>
-            <select name="bq_document_id" id="bq_document_id" class="form-control" required>
-                <option value="" disabled selected>Select a BQ Document</option>
-                @foreach($bqDocuments as $document)
-                    <option value="{{ $document->id }}">{{ $document->title }}</option>
-                @endforeach
-            </select>
-        </div>
+
 
         <!-- Items Container -->
         <div id="items-container">

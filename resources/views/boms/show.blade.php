@@ -12,7 +12,6 @@
                     <div class="mb-4">
                         <h3 class="text-lg font-semibold">{{ __('BOM Information') }}</h3>
                         <p><strong>{{ __('BOM Name:') }}</strong> {{ $bom->bom_name }}</p>
-                        <p><strong>{{ __('BQ Document:') }}</strong> {{ $bom->bqDocument->document_name }}</p>
                         <p><strong>{{ __('Created At:') }}</strong> {{ $bom->created_at->format('Y-m-d H:i:s') }}</p>
                     </div>
 

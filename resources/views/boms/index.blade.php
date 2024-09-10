@@ -10,7 +10,7 @@
     
     <h1>BOMs</h1>
 
-    <a href="{{ route('boms.create') }}" class="btn btn-primary mb-3">Create New BOM</a>
+    <a href="{{ route('boms.create') }}" class="btn btn-primary mb-3">Create New Stage</a>
 
     <table class="table table-bordered">
         <thead>
@@ -24,7 +24,7 @@
             @foreach($boms as $bom)
                 <tr>
                     <td>{{ $bom->bom_name }}</td>
-                    <td>{{ $bom->bqDocument->title }}</td>
+                    <td>{{ $bom->bqDocument->title ?? "" }}</td>
                     <td>
                         <a href="{{ route('boms.show', $bom->id) }}" class="btn btn-primary btn-sm">View</a>
                         <form action="{{ route('boms.destroy', $bom->id) }}" method="POST" style="display:inline-block;">
