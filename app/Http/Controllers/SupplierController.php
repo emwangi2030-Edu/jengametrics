@@ -13,9 +13,12 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        $suppliers = Supplier::with('materials')->get();
+        // Retrieve paginated suppliers with their related materials
+        $suppliers = Supplier::with('materials')->paginate(10); // Adjust the number 10 to your desired pagination size
+
         return view('suppliers.index', compact('suppliers'));
     }
+
     
     /**
      * Show the form for creating a new resource.
@@ -90,15 +93,15 @@ class SupplierController extends Controller
     // Method for supplier name autocomplete
     public function autocomplete(Request $request)
     {
-        $term = $request->get('term');
-        $suppliers = Supplier::where('name', 'LIKE', '%' . $term . '%')->get();
+        $term = $request->input('term');
+        $suppliers = Supplier::where('name', 'LIKE', '%' . $term . '%')->pluck('name');
         
-        $results = [];
-        foreach ($suppliers as $supplier) {
-            $results[] = ['value' => $supplier->name, 'id' => $supplier->id];
-        }
+        // $results = [];
+        // foreach ($suppliers as $supplier) {
+        //     $results[] = ['value' => $supplier->name, 'id' => $supplier->id];
+        // }
 
-        return response()->json($results);
+        return response()->json($suppliers);
     }
 
 //     // Method for supplier contact autocomplete

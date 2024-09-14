@@ -640,7 +640,7 @@
                                             @if(Auth::user()->project_id)
                                                 <li class="nav-item"><a class="nav-link px-3 d-block"
                                                         href="/admin/settings"><span class="me-2 text-body align-bottom"
-                                                            data-feather="pie-chart"></span>Business settings</a></li>
+                                                            data-feather="pie-chart"></span>Project settings</a></li>
                                                 <li class="nav-item">
 
 
@@ -648,7 +648,7 @@
                                                         data-bs-target="#switchbusinesses">
                                                         <span class="me-2 text-body align-bottom" data-feather="pie-chart">
 
-                                                        </span>Switch businesses
+                                                        </span>Switch Projects
                                                     </a>
 
 
@@ -676,7 +676,7 @@
                                                     class="fa fa-user"></i> <span key="t-profile">Profile</span></a>
                                             <a class="dropdown-item" href="{{ url('businesses') }}"><i
                                                     class="fa fa-users"></i> <span key="t-profile">Manage your
-                                                    businesses</span></a>
+                                                    projects</span></a>
                                             <a class="dropdown-item" href="{{ url('billings') }}"><i
                                                     class="fa fa-users"></i> <span key="t-profile">Manage your
                                                     billings</span></a>
@@ -1007,5 +1007,8 @@ $businesses = \App\Models\Project::whereUserId(Auth::user()->id)->get();
     });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!--JQuery CDN-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/5hb5g6Q2bj0Ib6W9crrxJKKo4qklqUhcHZCl1r" crossorigin="anonymous"></script>
+@stack('scripts')
 </body>
 </html>

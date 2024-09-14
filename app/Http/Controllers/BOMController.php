@@ -47,5 +47,19 @@ class BOMController extends Controller
         $bom = BOM::with('bqDocument', 'items')->findOrFail($id);
         return view('boms.show', compact('bom'));
     }
-    
+
+    public function destroy($id)
+    {
+        // Find the BOM by its ID
+        $bom = Bom::findOrFail($id);
+
+        // Optionally, delete related items (if applicable)
+        $bom->items()->delete();
+
+        // Delete the BOM
+        $bom->delete();
+
+        // Redirect back to the index page with a success message
+        return redirect()->route('boms.index')->with('success', 'BOM deleted successfully.');
+    }
 }

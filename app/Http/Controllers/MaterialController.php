@@ -20,7 +20,8 @@ class MaterialController extends Controller
 
     public function create()
     {
-        return view('materials.create');
+        $suppliers = Supplier::all(); // Get all suppliers to populate dropdown
+        return view('materials.create', compact('suppliers'));
     }
 
     public function store(Request $request)

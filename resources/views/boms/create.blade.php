@@ -114,8 +114,31 @@
 
                 <div class="row">
                     <div class="col-md-3">
-                        <label for="unit" class="form-label">{{ __('Unit') }}</label>
-                        <input type="text" name="items[${itemIndex}][unit]" class="form-control mb-2" required>
+                        <label for="unit" class="form-label">{{ __('Unit of Measurement') }}</label>
+                        <select name="items[${itemIndex}][unit]" class="form-control mb-2" required>
+                            <option value="Square Meter">Square Meter</option>
+                            <option value="Square Root">Square Foot</option>
+                            <option value="Meter">Meter</option>
+                            <option value="Inch">Inch</option>
+                            <option value="Millimeter">Millimeter</option>
+                            <option value="Ton">Ton</option>
+                            <option value="Kilogram">Kilogram</option>
+                            <option value="Bag">Bag</option>
+                            <option value="Piece">Piece</option>
+                            <option value="Foot">Foot</option>
+                            <option value="Centimeter">Centimeter</option>
+                            <option value="Litre">Litre</option>
+                            <option value="Roll">Roll</option>
+                            <option value="Packet">Packet</option>
+                            <option value="carton">Carton</option>
+                            <option value="Bucket">Bucket</option>
+                            <option value="Bundle">Bundle</option>
+                            <option value="Box">Box</option>
+                            <option value="Bale">Bale</option>
+                            <option value="Gallon">Gallon</option>
+                            <option value="Ream">Ream</option>
+                            <option value="Sheet">Sheet</option>
+                        </select>
                     </div>
                     <div class="col-md-3">
                         <label for="rate" class="form-label">{{ __('Rate') }}</label>

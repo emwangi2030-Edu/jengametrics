@@ -16,7 +16,6 @@
         <thead>
             <tr>
                 <th>BOM Name</th>
-                <th>BQ Document</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -24,7 +23,6 @@
             @foreach($boms as $bom)
                 <tr>
                     <td>{{ $bom->bom_name }}</td>
-                    <td>{{ $bom->bqDocument->title ?? "" }}</td>
                     <td>
                         <a href="{{ route('boms.show', $bom->id) }}" class="btn btn-primary btn-sm">View</a>
                         <form action="{{ route('boms.destroy', $bom->id) }}" method="POST" style="display:inline-block;">
@@ -40,7 +38,6 @@
 </div>
 @endsection
 
-@push('scripts')
 <script>
     $(document).ready(function() {
         setTimeout(function() {
@@ -55,4 +52,3 @@
         }, 1000); // Add a slight delay before checking for the alert
     });
 </script>
-@endpush

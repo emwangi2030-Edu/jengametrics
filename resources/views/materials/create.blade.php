@@ -15,51 +15,57 @@
         </div>
 
         <div class="form-group">
+            <label for="unit_of_measure">Unit of Measurement</label>
+            <select class="form-control" id="unit_of_measure" name="unit_of_measure" required>
+                <option value="" disabled selected>Select Unit</option>
+                <option value="Square Meter" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Square Meter' ? 'selected' : '' }}>Square Meter</option>
+                <option value="Square Foot" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Square Foot' ? 'selected' : '' }}>Square Foot</option>
+                <option value="Meter" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Meter' ? 'selected' : '' }}>Meter</option>
+                <option value="Inch" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Inch' ? 'selected' : '' }}>Inch</option>
+                <option value="Millimeter" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Millimeter' ? 'selected' : '' }}>Millimeter</option>
+                <option value="Ton" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Ton' ? 'selected' : '' }}>Ton</option>
+                <option value="Kilogram" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Kilogram' ? 'selected' : '' }}>Kilogram</option>
+                <option value="Bag" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Bag' ? 'selected' : '' }}>Bag</option>
+                <option value="Piece" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Piece' ? 'selected' : '' }}>Piece</option>
+                <option value="Foot" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Foot' ? 'selected' : '' }}>Foot</option>
+                <option value="Centimeter" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Centimeter' ? 'selected' : '' }}>Centimeter</option>
+                <option value="Litre" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Litre' ? 'selected' : '' }}>Litre</option>
+                <option value="Roll" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Roll' ? 'selected' : '' }}>Roll</option>
+                <option value="Packet" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Packet' ? 'selected' : '' }}>Packet</option>
+                <option value="carton" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Carton' ? 'selected' : '' }}>Carton</option>
+                <option value="Bucket" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Bucket' ? 'selected' : '' }}>Bucket</option>
+                <option value="Bundle" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Bundle' ? 'selected' : '' }}>Bundle</option>
+                <option value="Box" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Box' ? 'selected' : '' }}>Box</option>
+                <option value="Bale" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Bale' ? 'selected' : '' }}>Bale</option>
+                <option value="Gallon" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Gallon' ? 'selected' : '' }}>Gallon</option>
+                <option value="Ream" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Ream' ? 'selected' : '' }}>Ream</option>
+                <option value="Sheet" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Sheet' ? 'selected' : '' }}>Sheet</option>
+            </select>
+        </div>
+
+        <div class="form-group">
             <label for="unit_price">Price per Unit</label>
             <input type="text" class="form-control" id="unit_price" name="unit_price" value="{{ old('unit_price', $material->unit_price ?? '') }}" required>
         </div>
 
         <div class="form-group">
-            <label for="unit_of_measure">Unit of Measurement</label>
-            <select type="text" class="form-control" id="unit_of_measure" name="unit_of_measure" value="{{ old('unit_of_measure', $material->unit_of_measure ?? '') }}" required>
-                <option value="Square Meter">Square Meter</option>
-                <option value="Square Root">Square Foot</option>
-                <option value="Meter">Meter</option>
-                <option value="Inch">Inch</option>
-                <option value="Millimeter">Millimeter</option>
-                <option value="Ton">Ton</option>
-                <option value="Kilogram">Kilogram</option>
-                <option value="Bag">Bag</option>
-                <option value="Piece">Piece</option>
-                <option value="Foot">Foot</option>
-                <option value="Centimeter">Centimeter</option>
-                <option value="Litre">Litre</option>
-                <option value="Roll">Roll</option>
-                <option value="Packet">Packet</option>
-                <option value="carton">Carton</option>
-                <option value="Bucket">Bucket</option>
-                <option value="Bundle">Bundle</option>
-                <option value="Box">Box</option>
-                <option value="Bale">Bale</option>
-                <option value="Gallon">Gallon</option>
-                <option value="Ream">Ream</option>
-                <option value="Sheet">Sheet</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="quantity_in_stock">Amount Purchased</label>
+            <label for="quantity_in_stock">Quantity</label>
             <input type="number" class="form-control" id="quantity_in_stock" name="quantity_in_stock" value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}" required>
         </div>
 
         <div class="form-group">
             <label for="supplier_name">Supplier Name</label>
-            <input type="text" name="supplier_name" id="supplier_name" class="form-control" value="{{ old('supplier_name', $material->supplier->name ?? '') }}" autocomplete="off">
+            <select class="form-control" id="supplier_name" name="supplier_name" required>
+                <option value="" disabled selected>Select Supplier</option>
+                @foreach($suppliers as $supplier)
+                    <option value="{{ $supplier->id }}" data-contact="{{ $supplier->contact_info }}">{{ $supplier->name }}</option>
+                @endforeach
+            </select>
         </div>
 
         <div class="form-group">
             <label for="supplier_contact">Supplier Contact</label>
-            <input type="text" name="supplier_contact" id="supplier_contact" class="form-control" value="{{ old('supplier_contact', $material->supplier_contact ?? '') }}">
+            <input type="text" class="form-control" id="supplier_contact" name="supplier_contact" readonly>
         </div>
 
         <div class="form-group">
@@ -76,20 +82,14 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
-        $('#supplier_name').autocomplete({
-            source: function(request, response) {
-                $.ajax({
-                    url: "{{ route('suppliers.autocomplete') }}",
-                    data: {
-                        term: request.term
-                    },
-                    success: function(data) {
-                        response(data);
-                    }
-                });
-            },
-            minLength: 2,
+        // Populate supplier contact when supplier is selected
+        $('#supplier_name').on('change', function() {
+            var selectedOption = $(this).find('option:selected');
+            var contact = selectedOption.data('contact');
+            $('#supplier_contact').val(contact); // Populate supplier contact
         });
     });
 </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 @endpush
