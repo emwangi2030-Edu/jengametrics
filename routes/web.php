@@ -12,6 +12,7 @@ use App\Http\Controllers\ProjectWizardController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\CostTrackingController;
 
 
 
@@ -130,6 +131,9 @@ Route::middleware(['web'])->group(function () {
 
 // Route to serve document
 Route::get('/materials/view-document/{id}', [MaterialController::class, 'viewDocument'])->name('materials.viewDocument');
+
+// Cost Tracking Route
+Route::get('/cost-tracking', [CostTrackingController::class, 'index'])->name('cost-tracking.index');
 
 // Profile Routes
 Route::middleware('auth')->group(function () {

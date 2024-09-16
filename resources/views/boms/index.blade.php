@@ -22,7 +22,7 @@
         <tbody>
             @foreach($boms as $bom)
                 <tr>
-                    <td>{{ $bom->bom_name }}</td>
+                    <td><span class="ml-4">{{ $bom->bom_name }}</span></td>
                     <td>
                         <a href="{{ route('boms.show', $bom->id) }}" class="btn btn-primary btn-sm">View</a>
                         <form action="{{ route('boms.destroy', $bom->id) }}" method="POST" style="display:inline-block;">

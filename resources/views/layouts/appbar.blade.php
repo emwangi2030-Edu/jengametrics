@@ -252,9 +252,11 @@
             <span class="nav-link-icon">
                 <span data-feather="trending-up"></span>
             </span>
-            <span class="nav-link-text-wrapper">
-                <span class="nav-link-text">Cost Tracking</span>
-            </span>
+            <a href="{{ route('cost-tracking.index') }}" title="Cost-tracking">
+                <span class="nav-link-text-wrapper">
+                    <span class="nav-link-text">Cost Tracking</span>
+                </span>
+            </a>
             <span class="menu-arrow"></span>
         </div>
     </div>
