@@ -10,7 +10,20 @@ class Worker extends Model
     use HasFactory;
 
     protected $fillable = [
-        'full_name', 'id_number', 'job_category', 'work_type', 
-        'phone', 'email', 'details'
+        'full_name', 
+        'id_number', 
+        'job_category', 
+        'work_type', 
+        'phone', 
+        'email', 
+        'details', 
+        'project_id' 
     ];
+
+    // Define the relationship to Project
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
 }
+

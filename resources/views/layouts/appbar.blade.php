@@ -832,7 +832,7 @@ $businesses = \App\Models\Project::whereUserId(Auth::user()->id)->get();
                                         <td>{{ $business->name }}</td>
                                         <td>
 
-                                            <form action="#" method="POST"
+                                            <form action="{{ route('select_project') }}" method="POST"
                                                 style="display:inline;">
                                                 @csrf
                                                 <input type="hidden" name="id" value="{{ $business->id }}">

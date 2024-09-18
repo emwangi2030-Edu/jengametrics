@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\School;
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
@@ -18,8 +19,8 @@ class ProjectController extends Controller
     public function create()
     {
         $projects = Project::all(); // Fetch projects if needed for some reason in the create view
-        $schools = School::all();   // Fetch schools for dropdown or selection
-        $subjects = Subject::all(); // Fetch subjects if needed in the create view
+        // $schools = School::all();   // Fetch schools for dropdown or selection
+        // $subjects = Subject::all(); // Fetch subjects if needed in the create view
         return view('projects.create', compact('projects', 'schools', 'subjects'));
     }
 
@@ -40,7 +41,7 @@ class ProjectController extends Controller
 
     public function edit(Project $project)
     {
-        $project = Project::all();
+        // $project = Project::all();
         return view('projects.edit', compact('project'));
     }
     
@@ -64,4 +65,13 @@ class ProjectController extends Controller
         $project->delete();
         return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');
     }
+
+    public function selectProject(Request $request)
+    {
+        $user = Auth::user();
+        $user->project_id = $request->id;
+        $user->save();
+        return redirect()->route('dashboard')->with('success', 'Project selected successfully.');
+    }
+
 }
