@@ -19,7 +19,7 @@ use App\Http\Controllers\CostTrackingController;
 
 // Home Route
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.register');
 });
 
 
