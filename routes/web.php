@@ -13,6 +13,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\CostTrackingController;
+use App\Http\Controllers\DashboardController;
 
 
 
@@ -63,7 +64,11 @@ Route::middleware(['auth'])->group(function () {
     })->name('view_users');
 });
 
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
 Route::resource('projects', ProjectController::class);
+
+Route::post('select-project', [ProjectController::class, 'selectProject'])->name('select_project');
 
 
 // BoQ Documents Routes

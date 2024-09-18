@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Material;
 
 class CostTrackingController extends Controller
 {
     public function index()
     {
-        // Fetch all materials
+        // Retrieve all materials
         $materials = Material::all();
 
         // Calculate total cost of all materials
@@ -17,7 +16,10 @@ class CostTrackingController extends Controller
             return $material->unit_price * $material->quantity_in_stock;
         });
 
-        // Pass materials and total cost to the view
+        // Store the total in session for use on the dashboard
+        session(['totalMaterialCost' => $totalCost]);
+
         return view('cost-tracking.index', compact('materials', 'totalCost'));
     }
 }
+

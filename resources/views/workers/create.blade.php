@@ -12,6 +12,7 @@
                 <div class="card-body">
                     <form method="POST" action="{{ route('workers.store') }}">
                         @csrf
+                        <input type="hidden" name="project_id" value="{{ $projectId }}">
 
                         <div class="form-group">
                             <label for="full_name">Full Name</label>
