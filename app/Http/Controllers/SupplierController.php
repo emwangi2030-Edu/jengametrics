@@ -4,112 +4,112 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Supplier;
-use App\Models\Material;
+use Illuminate\Support\Facades\Auth;
 
 class SupplierController extends Controller
 {
-    /**
-     * Display a listing of the suppliers.
-     */
     public function index()
     {
-        // Retrieve paginated suppliers with their related materials
-        $suppliers = Supplier::with('materials')->paginate(10); // Adjust the number 10 to your desired pagination size
+        // Get the current project_id from the authenticated user
+        $projectId = Auth::user()->project_id;
+
+        // Retrieve paginated suppliers related to the current project with their materials
+        $suppliers = Supplier::whereHas('materials', function($query) use ($projectId) {
+            $query->where('project_id', $projectId);
+        })->with(['materials' => function($query) use ($projectId) {
+            $query->where('project_id', $projectId);
+        }])->paginate(10);
 
         return view('suppliers.index', compact('suppliers'));
     }
-
-    
-    /**
-     * Show the form for creating a new resource.
-     */
-    // public function create()
-    // {
-    //     return view('suppliers.create');
-    // }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    // public function store(Request $request)
-    // {
-    //     $validatedData = $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'contact_info' => 'nullable|string|max:255',
-    //         'address' => 'nullable|string|max:255',
-    //     ]);
-    
-    //     Supplier::create($validatedData);
-    
-    //     return redirect()->route('suppliers.index')->with('success', 'Supplier added successfully.');
-    // }
 
     /**
      * Display the specified supplier.
      */
     public function show($id)
     {
-        $supplier = Supplier::with('materials')->findOrFail($id);
+        $projectId = Auth::user()->project_id;
+
+        // Retrieve supplier with materials filtered by project
+        $supplier = Supplier::whereHas('materials', function($query) use ($projectId) {
+            $query->where('project_id', $projectId);
+        })->with(['materials' => function($query) use ($projectId) {
+            $query->where('project_id', $projectId);
+        }])->findOrFail($id);
+
         return view('suppliers.show', compact('supplier'));
     }
 
-    /**
-     * Show the form for editing the specified supplier.
-     */
-    // public function edit(string $id)
-    // {
-    //     $supplier = Supplier::findOrFail($id);
-    //     return view('suppliers.edit', compact('supplier'));
-    // }
+    public function store(Request $request)
+    {
+        // Validate request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'contact_info' => 'required|string|max:255',
+        ]);
 
-    /**
-     * Update the specified supplier in storage.
-     */
-    // public function update(Request $request, string $id)
-    // {
-    //     $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'contact_info' => 'nullable|string|max:255',
-    //         'address' => 'nullable|string|max:255',
-    //     ]);
+        // Create new supplier
+        $supplier = Supplier::create([
+            'name' => $request->name,
+            'contact_info' => $request->contact_info,
+        ]);
+
+        // Return supplier ID for dropdown population
+        return response()->json(['id' => $supplier->id]);
+    }
+
+    public function ajaxStore(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'contact_info' => 'required|string|max:255',
+        ]);
     
-    //     $supplier = Supplier::findOrFail($id);
-    //     $supplier->update($request->all());
+        // Ensure only one entry is created
+        $supplier = Supplier::firstOrCreate([
+            'name' => $request->name,
+            'contact_info' => $request->contact_info,
+        ]);
     
-    //     return redirect()->route('suppliers.index')->with('success', 'Supplier updated successfully.');
-    // }
+        return response()->json($supplier);
+    }
+    
 
-    /**
-     * Remove the specified supplier from storage.
-     */
-    // public function destroy(string $id)
+    // public function create()
     // {
-    //     $supplier = Supplier::findOrFail($id);
-    //     $supplier->delete();
-
-    //     return redirect()->route('suppliers.index')->with('success', 'Supplier deleted successfully.');
+    //     $suppliers = Supplier::all();
+    //     return view('materials.create', compact('suppliers'));
     // }
 
     // Method for supplier name autocomplete
     public function autocomplete(Request $request)
     {
         $term = $request->input('term');
-        $suppliers = Supplier::where('name', 'LIKE', '%' . $term . '%')->pluck('name');
-        
-        // $results = [];
-        // foreach ($suppliers as $supplier) {
-        //     $results[] = ['value' => $supplier->name, 'id' => $supplier->id];
-        // }
+        $projectId = Auth::user()->project_id;
+
+        // Filter suppliers by project
+        $suppliers = Supplier::where('name', 'LIKE', '%' . $term . '%')
+            ->whereHas('materials', function($query) use ($projectId) {
+                $query->where('project_id', $projectId);
+            })
+            ->pluck('name');
 
         return response()->json($suppliers);
     }
 
-//     // Method for supplier contact autocomplete
+    // Method for supplier contact autocomplete
     public function autocompleteContact(Request $request)
     {
         $term = $request->get('term');
-        $suppliers = Supplier::where('contact_info', 'LIKE', '%' . $term . '%')->get();
-        
+        $projectId = Auth::user()->project_id;
+
+        // Filter suppliers by project and contact info
+        $suppliers = Supplier::where('contact_info', 'LIKE', '%' . $term . '%')
+            ->whereHas('materials', function($query) use ($projectId) {
+                $query->where('project_id', $projectId);
+            })
+            ->get();
+
         $results = [];
         foreach ($suppliers as $supplier) {
             $results[] = ['value' => $supplier->contact_info, 'id' => $supplier->id];
