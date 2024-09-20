@@ -4,20 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Worker;
-use App\Models\Project; 
+use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
 
 class WorkerController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        // Get the project ID
-        $projectId = $request->session()->get('selected_project_id'); 
-        
-        // Retrieve workers only for the selected project
+        // Get the project ID from the authenticated user
+        $projectId = Auth::user()->project_id;
+
+        // Retrieve workers only for the user's current project
         $workers = Worker::where('project_id', $projectId)->get();
-        
+
         return view('workers.index', compact('workers'));
     }
+
 
     public function show($id)
     {
@@ -25,14 +27,10 @@ class WorkerController extends Controller
         return view('workers.show', compact('worker'));
     }
 
-    public function create(Request $request)
+    public function create()
     {
-        // Check if project_id is in session
-        $projectId = $request->session()->get('selected_project_id');
-        
-        if (!$projectId) {
-            return redirect()->route('projects.index')->with('error', 'Please select a project first.');
-        }
+        // Get the project ID from the authenticated user
+        $projectId = Auth::user()->project_id;
 
         return view('workers.create', compact('projectId'));
     }
@@ -40,7 +38,7 @@ class WorkerController extends Controller
 
     public function store(Request $request)
     {
-        // Validate the request except for project_id
+        // Validate the request
         $request->validate([
             'full_name' => 'required|string|max:255',
             'id_number' => 'required|integer',
@@ -50,10 +48,7 @@ class WorkerController extends Controller
             'email' => 'nullable|email|max:255',
         ]);
 
-        // Retrieve project_id from session
-        $projectId = $request->session()->get('selected_project_id');
-        
-        // Create and save the worker with the project ID from session
+        // Create and save the worker, using the project_id from the authenticated user
         $worker = new Worker;
         $worker->full_name = $request->input('full_name');
         $worker->id_number = $request->input('id_number');
@@ -61,10 +56,11 @@ class WorkerController extends Controller
         $worker->work_type = $request->input('work_type');
         $worker->phone = $request->input('phone');
         $worker->email = $request->input('email');
-        $worker->project_id = $projectId;  // Set project ID from session
+        $worker->project_id = Auth::user()->project_id; // Set the project_id from the authenticated user
         $worker->save();
 
         return redirect()->route('workers.index')->with('success', 'Worker added successfully');
     }
-
+    
 }
+

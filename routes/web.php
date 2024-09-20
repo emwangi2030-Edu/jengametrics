@@ -14,6 +14,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\CostTrackingController;
 use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -111,14 +112,6 @@ Route::post('/documents', [DocumentController::class, 'store'])->name('documents
 // Workers Table Route
 Route::resource('workers', WorkerController::class);
 
-// Routes to add workers to database
-Route::get('/workers/create', [WorkerController::class, 'create'])->name('workers.create');
-Route::post('/workers', [WorkerController::class, 'store'])->name('workers.store');
-
-// Route to show worker's details page
-Route::get('/workers/{id}', [WorkerController::class, 'show'])->name('workers.show');
-
-
 // Route to Suppliers page
 Route::resource('suppliers', SupplierController::class);
 
@@ -129,6 +122,8 @@ Route::resource('materials', MaterialController::class);
 Route::get('/suppliers/autocomplete', [SupplierController::class, 'autocomplete'])->name('suppliers.autocomplete');
 Route::get('/suppliers/autocompleteContact', [SupplierController::class, 'autocompleteContact'])->name('suppliers.autocompleteContact');
 
+// Route to store new supplier name and contact
+Route::post('/suppliers/ajax-store', [SupplierController::class, 'ajaxStore'])->name('suppliers.ajaxStore');
 
 Route::middleware(['web'])->group(function () {
     Route::resource('materials', MaterialController::class);

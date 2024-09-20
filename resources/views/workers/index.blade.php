@@ -1,7 +1,7 @@
 <!-- resources/views/workers/index.blade.php -->
 @extends('layouts.appbar')
-@section('content')
 
+@section('content')
 <div class="content">
     <h2 class="font-semibold text-xl text-gray-800 leading-tight">
         {{ __('Manage Labour') }}
@@ -11,8 +11,10 @@
         <div class="container mx-auto px-4">
             <div class="card shadow-sm">
                 <div class="card-body">
+                    <!-- Add Worker button -->
                     <a href="{{ route('workers.create') }}" class="btn btn-primary mb-4">Add Worker</a>
 
+                    <!-- Workers table -->
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead class="thead-dark">
@@ -36,7 +38,8 @@
                                         <td>{{ $worker->phone }}</td>
                                         <td>{{ $worker->email }}</td>
                                         <td>
-                                            <a href="{{ route('workers.show', $worker->id) }}" class="btn btn-link text-primary p-0">></a>
+                                            <!-- Link to the worker details page -->
+                                            <a href="{{ route('workers.show', $worker->id) }}" class="btn btn-info">View</a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -47,8 +50,5 @@
             </div>
         </div>
     </div>
-
-    </div>
-
-
+</div>
 @endsection
