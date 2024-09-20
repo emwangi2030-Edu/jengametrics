@@ -14,6 +14,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\CostTrackingController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SectionController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -140,6 +141,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// Admin Sections Routes
+Route::middleware('auth:admin')->group(function () {
+    Route::get('/admin/sections', [SectionController::class, 'index'])->name('sections.index');
+    Route::post('/admin/sections', [SectionController::class, 'store'])->name('sections.store');
 });
 
 // Auth Routes
