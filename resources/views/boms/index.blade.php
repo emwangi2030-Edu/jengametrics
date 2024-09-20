@@ -1,40 +1,50 @@
 @extends('layouts.appbar')
 
 @section('content')
-<div class="container">
+<div class="container mt-5">
     @if(session('success'))
-        <div class="alert alert-success" id="success-alert" style="display: block;">
+        <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
             {{ session('success') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
     @endif
-    
-    <h1>BOMs</h1>
 
-    <a href="{{ route('boms.create') }}" class="btn btn-primary mb-3">Create New Stage</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">{{ __('BOMs') }}</h1>
+        <a href="{{ route('boms.create') }}" class="btn btn-primary">{{ __('Create New Stage') }}</a>
+    </div>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>BOM Name</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($boms as $bom)
-                <tr>
-                    <td><span class="ml-4">{{ $bom->bom_name }}</span></td>
-                    <td>
-                        <a href="{{ route('boms.show', $bom->id) }}" class="btn btn-primary btn-sm">View</a>
-                        <form action="{{ route('boms.destroy', $bom->id) }}" method="POST" style="display:inline-block;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>{{ __('BOM Name') }}</th>
+                            <th class="text-center">{{ __('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($boms as $bom)
+                            <tr>
+                                <td class="align-middle"><span class="ml-4">{{ $bom->bom_name }}</span></td>
+                                <td class="text-center">
+                                    <a href="{{ route('boms.show', $bom->id) }}" class="btn btn-info btn-sm">{{ __('View') }}</a>
+                                    <form action="{{ route('boms.destroy', $bom->id) }}" method="POST" class="d-inline-block" onsubmit="return confirm('{{ __('Are you sure you want to delete this BOM?') }}');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm">{{ __('Delete') }}</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -42,13 +52,10 @@
     $(document).ready(function() {
         setTimeout(function() {
             if ($('#success-alert').length) {
-                console.log('Success alert found. It will fade out in 4 seconds.');
                 setTimeout(function() {
                     $('#success-alert').fadeOut('slow');
                 }, 4000);
-            } else {
-                console.log('No success alert found.');
             }
-        }, 1000); // Add a slight delay before checking for the alert
+        }, 1000); 
     });
 </script>

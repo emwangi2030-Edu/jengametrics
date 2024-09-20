@@ -448,7 +448,7 @@
 
                                                                         <li class="nav-item"><a
                                                                                 class="nav-link {{ request()->is('admin/listofusers') ? 'active' : '' }}"
-                                                                                href="{{ route('listofadmins') }}">
+                                                                                href="{{ url('listofadmins') }}">
                                                                                 <div class="d-flex align-items-center"><span
                                                                                         class="nav-link-text">Merchants</span></div>
                                                                             </a>
@@ -482,9 +482,7 @@
 
 
 
-                                                            <?php
-                                    $website = \App\Models\Website::find(1);
-                                ?>
+                           
 
 
 
@@ -503,10 +501,11 @@
                                                                     <ul class="nav collapse parent {{ request()->is('transactions') || request()->is('reconciliation') || request()->is('chart-of-accounts') ? 'show' : '' }}"
                                                                         data-bs-parent="#navbarVerticalCollapse" id="settings">
                                                                         <li class="nav-item"><a class="nav-link"
-                                                                                href="{{ route('website_info', $website->id)}}">
+                                                                                href="{{ url('website_info')}}">
                                                                                 <div class="d-flex align-items-center"><span
                                                                                         class="nav-link-text">Website setting</span></div>
-                                                                            </a></li>
+                                                                            </a>
+                                                                        </li>
                                                                         <li class="nav-item"><a class="nav-link" href="#">
                                                                                 <div class="d-flex align-items-center"><span
                                                                                         class="nav-link-text">Business category</span></div>
