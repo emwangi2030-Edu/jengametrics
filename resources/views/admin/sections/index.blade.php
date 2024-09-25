@@ -4,82 +4,88 @@
 <div class="container">
     <h1>Sections</h1>
 
-    <!-- List sections -->
-    <ul id="sections-list">
-        @foreach($sections as $section)
-            <li id="section-{{ $section->id }}">{{ $section->name }} - {{ $section->description }}</li>
-        @endforeach
-    </ul>
+    <!-- Form to add a new section -->
+    <div class="card">
+        <div class="card-header">Add New Section</div>
+        <div class="card-body">
+            <form action="{{ route('sections.store') }}" method="POST">
+                @csrf
+                <div class="form-group">
+                    <label for="sectionNameInput">Section Name</label>
+                    <input type="text" class="form-control" id="sectionNameInput" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="sectionDescriptionInput">Description</label>
+                    <textarea class="form-control" id="sectionDescriptionInput" name="description" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Save Section</button>
+            </form>
+        </div>
+    </div>
 
-    <!-- Button to add more sections -->
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSectionModal">Add Section</button>
+    <!-- List of sections -->
+    <div class="card my-4">
+        <div class="card-header">Sections</div>
+        <div class="card-body">
+            <ul class="list-group">
+                @forelse($sections as $section)
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ $section->name }}</strong><br>
+                            <small>{{ $section->description }}</small>
+                        </div>
+                        
+                        <div>
+                            <!-- Elements button (links to elements page for this section) -->
+                            <a href="{{ route('sections.elements', $section->id) }}" class="btn btn-info btn-sm">Elements</a>
 
-    <!-- Modal to add new section -->
-    <div class="modal fade" id="addSectionModal" tabindex="-1" aria-labelledby="addSectionModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="add-section-form">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addSectionModalLabel">Add New Section</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="sectionName" class="form-label">Section Name</label>
-                            <input type="text" class="form-control" id="sectionName" name="name" required>
+                            <!-- Edit button (opens edit form in a modal) -->
+                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editSectionModal{{ $section->id }}">
+                                Edit
+                            </button>
+
+                            <!-- Delete button (triggers delete action) -->
+                            <form action="{{ route('sections.destroy', $section->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this section?');">
+                                    Delete
+                                </button>
+                            </form>
                         </div>
-                        <div class="mb-3">
-                            <label for="sectionDescription" class="form-label">Description (Optional)</label>
-                            <textarea class="form-control" id="sectionDescription" name="description"></textarea>
+                    </li>
+
+                    <!-- Edit Section Modal -->
+                    <div class="modal fade" id="editSectionModal{{ $section->id }}" tabindex="-1" aria-labelledby="editSectionModalLabel{{ $section->id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editSectionModalLabel{{ $section->id }}">Edit Section</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{{ route('sections.update', $section->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="form-group">
+                                            <label for="editSectionNameInput{{ $section->id }}">Section Name</label>
+                                            <input type="text" class="form-control" id="editSectionNameInput{{ $section->id }}" name="name" value="{{ $section->name }}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editSectionDescriptionInput{{ $section->id }}">Description</label>
+                                            <textarea class="form-control" id="editSectionDescriptionInput{{ $section->id }}" name="description" rows="3">{{ $section->description }}</textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save Section</button>
-                    </div>
-                </form>
-            </div>
+                @empty
+                    <li class="list-group-item">No sections available.</li>
+                @endforelse
+            </ul>
         </div>
     </div>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-    $(document).ready(function() {
-        // Handle form submission via AJAX
-        $('#add-section-form').submit(function(e) {
-            e.preventDefault();
-            
-            let formData = {
-                name: $('#sectionName').val(),
-                description: $('#sectionDescription').val(),
-                _token: $('input[name="_token"]').val(),
-            };
-
-            $.ajax({
-                url: "{{ route('sections.store') }}",
-                method: 'POST',
-                data: formData,
-                success: function(response) {
-                    // Add the new section to the list without reloading
-                    $('#sections-list').append(
-                        `<li id="section-${response.section.id}">${response.section.name} - ${response.section.description ? response.section.description : ''}</li>`
-                    );
-
-                    // Clear the form
-                    $('#sectionName').val('');
-                    $('#sectionDescription').val('');
-
-                    // Close the modal
-                    $('#addSectionModal').modal('hide');
-                },
-                error: function(response) {
-                    alert('There was an error adding the section.');
-                }
-            });
-        });
-    });
-</script>
 @endsection

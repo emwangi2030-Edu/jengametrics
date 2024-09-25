@@ -5,17 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Section extends Model
+class Item extends Model
 {
     use HasFactory;
 
-    public function elements()
-    {
-        return $this->hasMany(Element::class);
-    }
-
     protected $fillable = [
-        'name', 
+        'sub_element_id',
+        'name',
         'description',
     ];
+
+    public function subElement()
+    {
+        return $this->belongsTo(SubElement::class);
+    }
 }

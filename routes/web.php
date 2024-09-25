@@ -15,6 +15,9 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\CostTrackingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\ElementController;
+use App\Http\Controllers\SubElementController;
+use App\Http\Controllers\ItemsController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -144,10 +147,27 @@ Route::middleware('auth')->group(function () {
 });
 
 // Admin Sections Routes
-Route::middleware('auth:admin')->group(function () {
-    Route::get('/admin/sections', [SectionController::class, 'index'])->name('sections.index');
-    Route::post('/admin/sections', [SectionController::class, 'store'])->name('sections.store');
-});
+Route::resource('sections', SectionController::class);
+Route::get('/sections/{section}/elements', [SectionController::class, 'elements'])->name('sections.elements');
+
+// Elements Routes
+Route::post('/elements', [ElementController::class, 'store'])->name('elements.store');
+Route::put('/elements/{element}', [ElementController::class, 'update'])->name('elements.update');
+Route::delete('/elements/{element}', [ElementController::class, 'destroy'])->name('elements.destroy');
+Route::get('sections/{section}/elements/{element}/subelements', [ElementController::class, 'subelements'])->name('elements.subelements');
+
+// Sub-Elements Routes
+Route::post('/subelements/store', [SubElementController::class, 'store'])->name('subelements.store');
+Route::put('/subelements/{id}', [SubElementController::class, 'update'])->name('subelements.update');
+Route::delete('/subelements/{id}', [SubElementController::class, 'destroy'])->name('subelements.destroy');
+Route::get('/elements/{element}/subelements', [SubElementController::class, 'subelements'])->name('elements.subelements');
+
+// Items Routes
+Route::get('subelements/{id}/items', [ItemsController::class, 'index'])->name('subelements.items');
+Route::post('/subelements/{id}/items', [ItemsController::class, 'store'])->name('subelements.items.store');
+Route::put('items/{id}', [ItemsController::class, 'update'])->name('items.update');
+Route::delete('items/{id}', [ItemsController::class, 'destroy'])->name('items.destroy');
+
 
 // Auth Routes
 require __DIR__.'/auth.php';
