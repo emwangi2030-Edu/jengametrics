@@ -84,7 +84,7 @@
         </div>
     </div>
 
-    <!-- Back to Sub-Elements button -->
-    <a href="" class="btn btn-secondary">Back to Sub-Elements</a>
+   <!-- Back to Sub-Elements button -->
+    <a href="{{ route('elements.subelements', ['element' => $subElement->element_id]) }}" class="btn btn-secondary">Back to Sub-Elements</a>
 </div>
 @endsection
