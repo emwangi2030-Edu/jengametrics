@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\BqDocument;
 use App\Models\BqSection;
+use App\Models\Section;
+use App\Models\Element;
+use App\Models\SubElement;
 use Illuminate\Http\Request;
 
 class BqDocumentController extends Controller
@@ -20,7 +23,7 @@ class BqDocumentController extends Controller
         // return view('bq_documents.index', compact('documents'));
 
         $bqDocument = get_project();
-        $sections = BqSection::whereProjectId(project_id())->get();
+        $sections = BqSection::whereProjectId(project_id())->orderBy('id', 'desc')->get();
 
         return view('bq_documents.show', compact('bqDocument', 'sections'));
     }
@@ -34,6 +37,24 @@ class BqDocumentController extends Controller
     {
         return view('bq_documents.create');
     }
+
+
+
+    // Method to get elements based on the selected section
+    public function getElements(Request $request)
+    {
+        $elements = Element::where('section_id', $request->section_id)->pluck('name', 'id');
+        return response()->json($elements);
+    }
+
+    // Method to get sub-elements based on the selected element
+    public function getSubElements(Request $request)
+    {
+        $subElements = SubElement::where('element_id', $request->element_id)->pluck('name', 'id');
+        return response()->json($subElements);
+    }
+
+
 
     /**
      * Store a newly created BQ document in storage.

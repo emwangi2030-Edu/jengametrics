@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\BqDocument;
 use App\Models\BqSection;
+use App\Models\Section;
+
 use Illuminate\Http\Request;
 
 class BqSectionController extends Controller
@@ -14,21 +16,20 @@ class BqSectionController extends Controller
 
         $bqDocument = get_project();
 
-        return view('bq_sections.create', compact('bqDocument'));
+        $sections = Section::all();
+
+        return view('bq_sections.create', compact('bqDocument', 'sections'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'section_name' => 'required|string|max:255',
-            'details' => 'nullable|string',
-        ]);
-
+       
 
 
         $data = [
-            'section_name' => $request->section_name,
-            'details' => $request->details,
+            'section_id' => $request->section_id,
+            'element_id' => $request->element_id,
+            'sub_element_id' => $request->sub_element_id,
             'project_id' => project_id(),
         ];
 

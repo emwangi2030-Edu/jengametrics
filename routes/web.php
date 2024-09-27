@@ -86,6 +86,13 @@ Route::get('bq_documents/{bqDocument}/sections/{bqSection}', [BqSectionControlle
 Route::get('bq_documents/{bqDocument}/sections/{bqSection}/edit', [BqSectionController::class, 'edit'])->name('bq_sections.edit');
 Route::put('bq_documents/{bqDocument}/sections/{bqSection}', [BqSectionController::class, 'update'])->name('bq_sections.update');
 
+
+Route::get('/get-elements', [BqDocumentController::class, 'getElements'])->name('get.elements');
+Route::get('/get-sub-elements', [BqDocumentController::class, 'getSubElements'])->name('get.sub_elements');
+
+
+
+
 // Items Routes
 Route::get('bq_documents/{bqDocument}/items/create', [BqItemController::class, 'create'])->name('bq_documents.items.create');
 Route::post('bq_documents/{bqDocument}/items', [BqItemController::class, 'store'])->name('bq_documents.items.store');
