@@ -19,4 +19,10 @@ class Item extends Model
     {
         return $this->belongsTo(SubElement::class);
     }
+
+    public function itemMaterials()
+    {
+        return $this->hasMany(ItemMaterial::class, 'item_id');
+    }
+
 }

@@ -18,6 +18,7 @@ use App\Http\Controllers\SectionController;
 use App\Http\Controllers\ElementController;
 use App\Http\Controllers\SubElementController;
 use App\Http\Controllers\ItemsController;
+use App\Http\Controllers\ItemMaterialController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -175,7 +176,11 @@ Route::post('/subelements/{id}/items', [ItemsController::class, 'store'])->name(
 Route::put('items/{id}', [ItemsController::class, 'update'])->name('items.update');
 Route::delete('items/{id}', [ItemsController::class, 'destroy'])->name('items.destroy');
 
+// Item Material Routes
+Route::get('items/{id}/materials', [ItemMaterialController::class, 'index'])->name('items.materials');
+Route::post('items/materials', [ItemMaterialController::class, 'store'])->name('materials.store');
+Route::put('materials/{id}', [ItemMaterialController::class, 'update'])->name('materials.update');
+Route::delete('items/materials/{id}', [ItemMaterialController::class, 'destroy'])->name('items.materials.destroy');
 
 // Auth Routes
 require __DIR__.'/auth.php';
-

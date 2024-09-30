@@ -36,6 +36,10 @@
                             <small>{{ $item->description }}</small>
                         </div>
                         <div>
+                            <a href="{{ route('items.materials', $item->id) }}" class="btn btn-info btn-sm">
+                                Materials
+                            </a>
+
                             <!-- Edit and Delete buttons -->
                             <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editItemModal{{ $item->id }}">
                                 Edit
