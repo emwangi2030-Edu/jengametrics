@@ -179,7 +179,7 @@ Route::delete('items/{id}', [ItemsController::class, 'destroy'])->name('items.de
 // Item Material Routes
 Route::get('items/{id}/materials', [ItemMaterialController::class, 'index'])->name('items.materials');
 Route::post('items/materials', [ItemMaterialController::class, 'store'])->name('materials.store');
-Route::put('materials/{id}', [ItemMaterialController::class, 'update'])->name('materials.update');
+Route::put('materials/items/{id}', [ItemMaterialController::class, 'update'])->name('materials.item.update');
 Route::delete('items/materials/{id}', [ItemMaterialController::class, 'destroy'])->name('items.materials.destroy');
 
 // Auth Routes
