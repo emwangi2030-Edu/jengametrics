@@ -16,7 +16,11 @@
                 </div>
                 <div class="form-group">
                     <label for="unitOfMeasurementInput">Unit of Measurement</label>
-                    <input type="text" class="form-control" id="unitOfMeasurementInput" name="unit_of_measurement" required>
+                    <select class="form-control" id="unitOfMeasurementInput" name="unit_of_measurement" required>
+                        @foreach($units as $unit)
+                            <option value="{{ $unit->name }}">{{ $unit->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="conversionFactorInput">Conversion Factor</label>
@@ -76,7 +80,13 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="editUnitOfMeasurementInput{{ $itemMaterial->id }}">Unit of Measurement</label>
-                                        <input type="text" class="form-control" id="editUnitOfMeasurementInput{{ $itemMaterial->id }}" name="unit_of_measurement" value="{{ $itemMaterial->unit_of_measurement }}" required>
+                                        <select class="form-control" id="editUnitOfMeasurementInput{{ $itemMaterial->id }}" name="unit_of_measurement" required>
+                                            @foreach($units as $unit)
+                                                <option value="{{ $unit->name }}" {{ $unit->name == $itemMaterial->unit_of_measurement ? 'selected' : '' }}>
+                                                    {{ $unit->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="editConversionFactorInput{{ $itemMaterial->id }}">Conversion Factor</label>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ItemMaterial;
 use App\Models\Item;
 use Illuminate\Http\Request;
+use App\Models\UnitOfMeasurement;
 
 class ItemMaterialController extends Controller
 {
@@ -12,9 +13,10 @@ class ItemMaterialController extends Controller
     public function index($itemId)
     {
         $item = Item::findOrFail($itemId);
-        $materials = $item->itemMaterials;
+        $materials = ItemMaterial::where('item_id', $itemId)->get();
+        $units = UnitOfMeasurement::all(); // Fetch all units of measurement
 
-        return view('admin.sections.materials', compact('item', 'materials'));
+        return view('admin.sections.materials', compact('item', 'materials', 'units'));
     }
 
     // Store a new material
@@ -23,7 +25,7 @@ class ItemMaterialController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'item_id' => 'required|exists:items,id',
-            'unit_of_measurement' => 'required|string|max:50',
+            'unit_of_measurement' => 'required|exists:units_of_measurement,name',
             'conversion_factor' => 'required|numeric',
         ]);
 
@@ -38,7 +40,7 @@ class ItemMaterialController extends Controller
         // Validate the incoming request
         $request->validate([
             'name' => 'required|string|max:255',
-            'unit_of_measurement' => 'required|string|max:255',
+            'unit_of_measurement' => 'required|exists:units_of_measurement,name',
             'conversion_factor' => 'required|numeric|min:0',
         ]);
 
@@ -55,7 +57,6 @@ class ItemMaterialController extends Controller
         // Redirect back with a success message
         return redirect()->back()->with('success', 'Material updated successfully.');
     }
-
 
     // Delete material
     public function destroy($id)
