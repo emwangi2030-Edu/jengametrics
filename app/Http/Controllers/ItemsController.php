@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\SubElement;
+use App\Models\ItemUnitOfMeasurement;
 use Illuminate\Http\Request;
 
 class ItemsController extends Controller
@@ -12,9 +13,10 @@ class ItemsController extends Controller
     public function index($subElementId)
     {
         $subElement = SubElement::findOrFail($subElementId);
-        $items = $subElement->items;
+        $items = Item::where('sub_element_id', $subElementId)->get();
+        $units = ItemUnitOfMeasurement::all();
 
-        return view('admin.sections.items', compact('subElement', 'items'));
+        return view('admin.sections.items', compact('subElement', 'items', 'units'));
     }
 
     // Store a new item
@@ -22,14 +24,13 @@ class ItemsController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'sub_element_id' => 'required|exists:sub_elements,id',
+            'unit_of_measurement' => 'required|string|max:50'
         ]);
+    
 
-        Item::create([
-            'sub_element_id' => $request->sub_element_id,
-            'name' => $request->name,
-            'description' => $request->description,
-        ]);
+        Item::create($request->all());
 
         return redirect()->route('subelements.items', $request->sub_element_id)->with('success', 'Item added successfully.');
     }
@@ -42,6 +43,7 @@ class ItemsController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'unit_of_measurement' => 'required|string|max:50'
         ]);
 
         $item->update($request->all());

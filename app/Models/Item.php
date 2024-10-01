@@ -13,6 +13,7 @@ class Item extends Model
         'sub_element_id',
         'name',
         'description',
+        'unit_of_measurement'
     ];
 
     public function subElement()

@@ -15,6 +15,15 @@
                     <input type="text" class="form-control" id="itemNameInput" name="name" required>
                 </div>
                 <div class="form-group">
+                    <label for="unitOfMeasurementInput">Unit of Measurement</label>
+                    <select class="form-control" id="unitOfMeasurementInput" name="unit_of_measurement" required>
+                        <option value="" disabled selected>Select unit</option>
+                        @foreach($units as $unit)
+                            <option value="{{ $unit->name }}">{{ $unit->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="itemDescriptionInput">Description</label>
                     <textarea class="form-control" id="itemDescriptionInput" name="description" rows="3"></textarea>
                 </div>
@@ -33,6 +42,7 @@
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
                             <strong>{{ $item->name }}</strong><br>
+                            <small>Unit: {{ $item->unit_of_measurement }}</small><br>
                             <small>{{ $item->description }}</small>
                         </div>
                         <div>
@@ -70,6 +80,16 @@
                                         <div class="form-group">
                                             <label for="editItemNameInput{{ $item->id }}">Item Name</label>
                                             <input type="text" class="form-control" id="editItemNameInput{{ $item->id }}" name="name" value="{{ $item->name }}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editUnitOfMeasurementInput{{ $item->id }}">Unit of Measurement</label>
+                                            <select class="form-control" id="editUnitOfMeasurementInput{{ $item->id }}" name="unit_of_measurement" required>
+                                                @foreach($units as $unit)
+                                                    <option value="{{ $unit->name }}" {{ $unit->name == $item->unit_of_measurement ? 'selected' : '' }}>
+                                                        {{ $unit->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="form-group">
                                             <label for="editItemDescriptionInput{{ $item->id }}">Description</label>
