@@ -12,10 +12,7 @@ class BqSectionController extends Controller
 {
     public function create(BqDocument $bqDocument)
     {
-
-
-        $bqDocument = get_project();
-
+        dd('Reached');
         $sections = Section::all();
 
         return view('bq_sections.create', compact('bqDocument', 'sections'));
@@ -24,8 +21,6 @@ class BqSectionController extends Controller
     public function store(Request $request)
     {
        
-
-
         $data = [
             'section_id' => $request->section_id,
             'element_id' => $request->element_id,

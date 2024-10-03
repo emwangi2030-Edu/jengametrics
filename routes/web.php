@@ -88,8 +88,8 @@ Route::get('bq_documents/{bqDocument}/sections/{bqSection}/edit', [BqSectionCont
 Route::put('bq_documents/{bqDocument}/sections/{bqSection}', [BqSectionController::class, 'update'])->name('bq_sections.update');
 
 
-Route::get('/get-elements', [BqDocumentController::class, 'getElements'])->name('get.elements');
-Route::get('/get-sub-elements', [BqDocumentController::class, 'getSubElements'])->name('get.sub_elements');
+Route::get('/get/elements', [BqDocumentController::class, 'getElements'])->name('get.elements');
+Route::get('/get/sub-elements', [BqDocumentController::class, 'getSubElements'])->name('get.sub_elements');
 
 
 
