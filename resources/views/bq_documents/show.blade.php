@@ -7,8 +7,6 @@
             <h2 class="font-weight-bold text-primary">
                 {{ __('Bill of Quantities: ') . $bqDocument->name }}
             </h2>
-
-            @include('flash_msg')
         </div>
     </div>
 
@@ -23,7 +21,7 @@
                         <p><strong>{{ __('Created At:') }}</strong> {{ $bqDocument->created_at->format('M d, Y') }}</p>
 
                         <!-- Link to create a new section -->
-                        <a href="{{ route('bq_sections.create', $bqDocument) }}" class="btn btn-primary mt-4">
+                        <a href="{{ route('bq_sections.add', $bqDocument) }}" class="btn btn-primary mt-4">
                             {{ __('Add New Section') }}
                         </a>
 
