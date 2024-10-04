@@ -25,7 +25,7 @@ class BqDocumentController extends Controller
         $bqDocument = get_project();
         $sections = BqSection::whereProjectId(project_id())->orderBy('id', 'desc')->get();
 
-        return view('bq_documents.show', compact('bqDocument', 'sections'));
+        //return view('bq_documents.show', compact('bqDocument', 'sections'));
     }
 
     /**
@@ -90,6 +90,9 @@ class BqDocumentController extends Controller
      */
     public function show(BqDocument $bqDocument)
     {
-        return view('bq_documents.show', compact('bqDocument'));
+        // Retrieve the sections associated with this BqDocument
+        $bqSections = BqSection::where('bq_document_id', $bqDocument->id)->get();
+
+        return view('bq_documents.show', compact('bqDocument', 'bqSections'));
     }
 }

@@ -22,6 +22,11 @@ class BqSectionController extends Controller
     {
        
         $data = [
+<<<<<<< Updated upstream
+=======
+            'section_name' => $section->name,  // Use Section name for section_name
+            'details' => $section->description,
+>>>>>>> Stashed changes
             'section_id' => $request->section_id,
             'element_id' => $request->element_id,
             'sub_element_id' => $request->sub_element_id,
@@ -62,5 +67,4 @@ class BqSectionController extends Controller
     
         return view('bq_sections.show', compact('bqDocument', 'bqSection', 'items'));
     }
-    
 }
