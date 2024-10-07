@@ -13,6 +13,7 @@ class BqSectionController extends Controller
     public function create(BqDocument $bqDocument)
     {
         dd('Reached');
+        dd('Reached');
         $sections = Section::all();
 
         return view('bq_sections.create', compact('bqDocument', 'sections'));
@@ -22,11 +23,8 @@ class BqSectionController extends Controller
     {
        
         $data = [
-<<<<<<< Updated upstream
-=======
-            'section_name' => $section->name,  // Use Section name for section_name
-            'details' => $section->description,
->>>>>>> Stashed changes
+            'section_name' => $request->name,  // Use Section name for section_name
+            'details' => $request->description,
             'section_id' => $request->section_id,
             'element_id' => $request->element_id,
             'sub_element_id' => $request->sub_element_id,
