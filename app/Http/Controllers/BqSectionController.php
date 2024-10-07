@@ -21,15 +21,11 @@ class BqSectionController extends Controller
     public function store(Request $request)
     {
        
-       
         $data = [
-            'section_name' => $request->name,  // Use Section name for section_name
-            'details' => $request->description,
             'section_id' => $request->section_id,
             'element_id' => $request->element_id,
             'sub_element_id' => $request->sub_element_id,
             'project_id' => project_id(),
-            'bq_document_id' => $bqDocument->id,
         ];
 
         BqSection::create($data);
