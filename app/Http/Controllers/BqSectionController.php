@@ -55,11 +55,13 @@ class BqSectionController extends Controller
         return redirect()->route('bq_documents.show', $bqDocument);
     }
 
-    public function show(BqDocument $bqDocument, BqSection $bqSection)
+    public function show(BqDocument $bqDocument)
     {
-        // Retrieve items related to the section
-        $items = $bqSection->items; // Ensure the `items` relationship is defined in BqSection model
-    
-        return view('bq_sections.show', compact('bqDocument', 'bqSection', 'items'));
+        // Fetch sections related to this BQ Document
+        $sections = $bqDocument->sections;
+
+        // Pass the document and its sections to the view
+        return view('bq_documents.show', compact('bqDocument', 'sections'));
     }
+
 }

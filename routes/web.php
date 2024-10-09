@@ -83,7 +83,7 @@ Route::resource('bq_documents', BqDocumentController::class);
 // Sections Routes
 Route::get('bq_documents/{bqDocument}/sections/create', [BqSectionController::class, 'create'])->name('bq_sections.create');
 Route::post('bq_documents/{bqDocument}/sections', [BqSectionController::class, 'store'])->name('bq_sections.store');
-Route::get('bq_documents/{bqDocument}/sections/{bqSection}', [BqSectionController::class, 'show'])->name('bq_sections.show');
+Route::get('bq_documents/{bqDocument}', [BqDocumentController::class, 'show'])->name('bq_documents.show');
 Route::get('bq_documents/{bqDocument}/sections/{bqSection}/edit', [BqSectionController::class, 'edit'])->name('bq_sections.edit');
 Route::put('bq_documents/{bqDocument}/sections/{bqSection}', [BqSectionController::class, 'update'])->name('bq_sections.update');
 

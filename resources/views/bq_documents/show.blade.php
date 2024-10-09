@@ -5,7 +5,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <h2 class="font-weight-bold text-primary">
-                {{ __('Bill of Quantities: ') . $bqDocument->name }}
+                {{ __('Bill of Quantities: ') . $bqDocument->title }}
             </h2>
 
             @include('flash_msg')
