@@ -169,6 +169,7 @@
 
                           
 <!-- Bills of Quantities (BQ) -->
+ 
 <div class="nav-item-wrapper">
     <a class="nav-link label-1" href="{{ route('bq_documents') }}" role="button" aria-expanded="false">
         <div class="d-flex align-items-center">
