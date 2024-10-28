@@ -183,6 +183,10 @@
     </a>
 </div>
 
+<div></div>
+
+
+
 <!-- Bills of Materials (BOM) -->
 <div class="nav-item-wrapper">
     <a class="nav-link label-1" href="{{ route('boms.index') }}" role="button" aria-expanded="false">
