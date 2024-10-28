@@ -9,8 +9,7 @@ class BqSection extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['section_name', 'details', 'bq_document_id', 'project_id'];
-
+    protected $guarded = [];
     public function bqDocument()
     {
         return $this->belongsTo(BqDocument::class);
@@ -19,6 +18,16 @@ class BqSection extends Model
     public function items()
     {
         return $this->hasMany(BqItem::class);
+    }
+
+    public function section()
+    {
+        return $this->belongsTo(Section::class);
+    }
+
+    public function item()
+    {
+        return $this->belongsTo(Item::class);
     }
 }
 

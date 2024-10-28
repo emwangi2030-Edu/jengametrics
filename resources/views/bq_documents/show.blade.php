@@ -1,3 +1,5 @@
+
+
 @extends('layouts.appbar')
 
 @section('content')
@@ -5,7 +7,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <h2 class="font-weight-bold text-primary">
-                {{ __('Bill of Quantities: ') . $bqDocument->title }}
+                {{ __('Bill of Quantities: ') . get_project()->name }}
             </h2>
 
             @include('flash_msg')
@@ -19,12 +21,11 @@
                     <!-- Document Details -->
                     <p class="font-weight-bold text-dark">{{ __('Document Details') }}</p>
                     <div class="mt-4">
-                        <p><strong>{{ __('Name:') }}</strong> {{ $bqDocument->name }}</p>
-                        <p><strong>{{ __('Created At:') }}</strong> {{ $bqDocument->created_at->format('M d, Y') }}</p>
+                      
 
                         <!-- Link to create a new section -->
-                        <a href="{{ route('bq_sections.create', $bqDocument) }}" class="btn btn-primary mt-4">
-                            {{ __('Add New Section') }}
+                        <a href="{{ route('bq_sections.create') }}" class="btn btn-primary mt-4">
+                            {{ __('Add New Item') }}
                         </a>
 
                         <!-- Sections List -->
@@ -38,12 +39,14 @@
                                         <li class="list-group-item">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <div>
-                                                    <p class="font-weight-bold mb-1">{{ __('Section Name:') }} {{ $section->section_name }}</p>
-                                                    <p class="mb-0 text-muted">{{ __('Details:') }} {{ $section->details }}</p>
+                                                    <p class="font-weight-bold mb-1">{{ $section->name }}</p>
+                                                
                                                 </div>
-                                                <a href="{{ route('bq_sections.show', [$bqDocument, $section]) }}" class="btn btn-outline-primary btn-sm">
+
+                                                <a href="{{ route('section.show',$section->id) }}" class="btn btn-outline-primary btn-sm">
                                                     {{ __('View Section') }}
                                                 </a>
+                                               
                                             </div>
                                         </li>
                                     @endforeach
@@ -58,3 +61,4 @@
     </div>
 </div>
 @endsection
+

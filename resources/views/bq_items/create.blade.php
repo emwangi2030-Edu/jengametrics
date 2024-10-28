@@ -69,4 +69,6 @@
             rateInput.addEventListener('input', calculateAmount);
         });
     </script>
+
+    
 </x-app-layout>

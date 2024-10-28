@@ -14,14 +14,13 @@ return new class extends Migration
 // Create a migration for BOM items
 Schema::create('bom_items', function (Blueprint $table) {
     $table->id();
-    $table->foreignId('bom_id')->constrained()->onDelete('cascade');
-    $table->foreignId('bq_section_id')->constrained('bq_sections')->onDelete('cascade');
-    $table->foreignId('bq_item_id')->constrained('bq_items')->onDelete('cascade');
-    $table->string('item_description');
-    $table->float('quantity');
-    $table->string('unit');
-    $table->float('rate');
-    $table->float('amount');
+    $table->unsignedBigInteger('section_id');
+    $table->unsignedBigInteger('item_id');
+    $table->unsignedBigInteger('item_material_id');
+    $table->decimal('quantity', 10, 2);
+    $table->decimal('rate', 10, 2);
+    $table->decimal('amount', 10, 2);
+    $table->unsignedBigInteger('project_id');
     $table->timestamps();
 });
 

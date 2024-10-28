@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('unit_of_measurement');
             $table->decimal('conversion_factor', 8, 2);
+            $table->decimal(column: 'rate', 15, 2)->nullable();
+            $table->decimal('amount', 15, 2)->nullable();
             $table->timestamps();
         });
     }

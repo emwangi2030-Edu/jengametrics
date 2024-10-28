@@ -7,6 +7,7 @@ use App\Models\BqSection;
 use App\Models\Section;
 use App\Models\Element;
 use App\Models\SubElement;
+use App\Models\Item;
 use Illuminate\Http\Request;
 
 class BqDocumentController extends Controller
@@ -22,10 +23,10 @@ class BqDocumentController extends Controller
         // $documents = BqDocument::with('sections')->get();
         // return view('bq_documents.index', compact('documents'));
 
-        $bqDocument = get_project();
-        $sections = BqSection::whereProjectId(project_id())->orderBy('id', 'desc')->get();
+        $bqDocument = get_project()->id;
+        $sections = Section::orderBy('id', 'desc')->get();
 
-        //return view('bq_documents.show', compact('bqDocument', 'sections'));
+        return view('bq_documents.show', compact('bqDocument', 'sections'));
     }
 
     /**
@@ -54,6 +55,13 @@ class BqDocumentController extends Controller
         return response()->json($subElements);
     }
 
+
+    public function getItems(Request $request)
+    {
+        $items = Item::where('sub_element_id', $request->sub_element_id)->pluck('name', 'id');
+        return response()->json($items);
+    }
+    
 
 
     /**

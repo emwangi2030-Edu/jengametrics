@@ -6,13 +6,18 @@ use Illuminate\Http\Request;
 use App\Models\BqDocument;
 use App\Models\Bom;
 use App\Models\BomItem;
+use App\Models\Section;
 
 class BOMController extends Controller
 {
     public function index()
     {
-        $boms = Bom::with('bqDocument')->get();
-        return view('boms.index', compact('boms'));
+        $bqDocument = get_project()->id;
+        $sections = Section::orderBy('id', 'desc')->get();
+
+        return view('boms.index', compact('bqDocument', 'sections'));
+    
+
     }
 
     public function create()
@@ -44,8 +49,16 @@ class BOMController extends Controller
 
     public function show($id)
     {
-        $bom = BOM::with('bqDocument', 'items')->findOrFail($id);
-        return view('boms.show', compact('bom'));
+
+                // Fetch sections related to this BQ Document
+                $bqSection = Section::find($id);
+                $items = BomItem::where('section_id', $id)->get();
+        
+                // Pass the document and its sections to the view
+                return view('boms.show', compact( 'bqSection', 'items'));
+
+
+
     }
 
     public function destroy($id)

@@ -9,10 +9,15 @@ class BomItem extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['bom_id', 'item_description', 'quantity', 'unit', 'rate', 'amount'];
+    protected $guarded = [];
 
     public function bom()
     {
         return $this->belongsTo(BOM::class);
+    }
+
+    public function item_material()
+    {
+        return $this->belongsTo(ItemMaterial::class);
     }
 }

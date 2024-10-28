@@ -15,18 +15,14 @@
                 <div class="card">
                     <div class="card-body">
                         <!-- Display Section Details -->
-                        <p><strong>{{ __('Section Name:') }}</strong> {{ $bqSection->section_name }}</p>
-                        <p><strong>{{ __('Details:') }}</strong> {{ $bqSection->details }}</p>
-                        <p><strong>{{ __('Unit:') }}</strong> {{ $bqSection->unit }}</p>
-                        <p><strong>{{ __('Quantity:') }}</strong> {{ $bqSection->quantity }}</p>
+                        <p><strong>{{ __('Section Name:') }}</strong> {{ $bqSection->name }}</p>
+                        <p><strong>{{ __('Details:') }}</strong> {{ $bqSection->description }}</p>
+                    
 
-                        <!-- Link to Edit Section -->
-                        <a href="{{ route('bq_sections.edit', [$bqDocument, $bqSection]) }}" class="btn btn-primary mt-4">
-                            {{ __('Edit Section') }}
-                        </a>
+                 
 
                         <!-- Link to Add New Item -->
-                        <a href="{{ route('create_bq_item', ['bqSection' => $bqSection]) }}" class="btn btn-success mt-4">
+                        <a href="{{ route('bq_sections.create') }}" class="btn btn-success mt-4">
                             {{ __('Add New Item') }}
                         </a>
 
@@ -46,9 +42,9 @@
                             <tbody>
                                 @forelse ($items as $item)
                                     <tr>
-                                        <td>{{ $item->item_description }}</td>
+                                        <td>{{ $item->item->name }}</td>
                                         <td>{{ $item->quantity }}</td>
-                                        <td>{{ $item->unit }}</td>
+                                        <td>{{ $item->item->unit_of_measurement }}</td>
                                         <td>{{ number_format($item->rate, 2) }}</td>
                                         <td>{{ number_format($item->amount, 2) }}</td>
                                         <td>
@@ -64,7 +60,7 @@
                         </table>
 
                         <!-- Link Back to Document -->
-                        <a href="{{ route('bq_documents.show', $bqDocument) }}" class="btn btn-secondary mt-4">
+                        <a href="#" class="btn btn-secondary mt-4">
                             {{ __('Back to Document') }}
                         </a>
                     </div>

@@ -1,61 +1,67 @@
+
+
+
+
 @extends('layouts.appbar')
 
 @section('content')
-<div class="container mt-5">
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
-            {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="font-weight-bold text-primary">
+                {{ __('Bill of Quantities: ') . get_project()->name }}
+            </h2>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3">{{ __('BOMs') }}</h1>
-        <a href="{{ route('boms.create') }}" class="btn btn-primary">{{ __('Create New Stage') }}</a>
+            @include('flash_msg')
+        </div>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>{{ __('BOM Name') }}</th>
-                            <th class="text-center">{{ __('Actions') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($boms as $bom)
-                            <tr>
-                                <td class="align-middle"><span class="ml-4">{{ $bom->bom_name }}</span></td>
-                                <td class="text-center">
-                                    <a href="{{ route('boms.show', $bom->id) }}" class="btn btn-info btn-sm">{{ __('View') }}</a>
-                                    <form action="{{ route('boms.destroy', $bom->id) }}" method="POST" class="d-inline-block" onsubmit="return confirm('{{ __('Are you sure you want to delete this BOM?') }}');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm">{{ __('Delete') }}</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <!-- Document Details -->
+                    <p class="font-weight-bold text-dark">{{ __('Document Details') }}</p>
+                    <div class="mt-4">
+                      
+
+                        <!-- Link to create a new section -->
+                        <a href="{{ route(name: 'boms.create') }}" class="btn btn-primary">{{ __('Create New Stage') }}</a>
+
+
+                        <!-- Sections List -->
+                        <div class="mt-5">
+                            <h3 class="h5 font-weight-bold text-dark">{{ __('Sections') }}</h3>
+                            @if($sections->isEmpty())
+                                <p class="text-muted">{{ __('No sections found.') }}</p>
+                            @else
+                                <ul class="list-group mt-3">
+                                    @foreach($sections as $section)
+                                        <li class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <p class="font-weight-bold mb-1">{{ $section->name }}</p>
+                                                
+                                                </div>
+
+                                                <a href="{{ route('boms.show', $section->id) }}" class="btn btn-outline-primary btn-sm">
+                                                    {{ __('View Section') }}
+                                                </a>
+                                               
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 @endsection
 
-<script>
-    $(document).ready(function() {
-        setTimeout(function() {
-            if ($('#success-alert').length) {
-                setTimeout(function() {
-                    $('#success-alert').fadeOut('slow');
-                }, 4000);
-            }
-        }, 1000); 
-    });
-</script>
+
+

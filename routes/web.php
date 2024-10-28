@@ -79,18 +79,19 @@ Route::post('select-project', [ProjectController::class, 'selectProject'])->name
 
 // BoQ Documents Routes
 Route::resource('bq_documents', BqDocumentController::class);
-
+Route::get('boq', [BqDocumentController::class, 'index'])->name('boq');
 // Sections Routes
-Route::get('bq_documents/{bqDocument}/sections/create', [BqSectionController::class, 'create'])->name('bq_sections.create');
-Route::post('bq_documents/{bqDocument}/sections', [BqSectionController::class, 'store'])->name('bq_sections.store');
-Route::get('bq_documents/{bqDocument}', [BqDocumentController::class, 'show'])->name('bq_documents.show');
-Route::get('bq_documents/{bqDocument}/sections/{bqSection}/edit', [BqSectionController::class, 'edit'])->name('bq_sections.edit');
+Route::get('bq_documents/sections/create', [BqSectionController::class, 'create'])->name('bq_sections.create');
+Route::post('bq_documents/sections', [BqSectionController::class, 'store'])->name('bq_sections.store');
+Route::get('section/{id}', [BqSectionController::class, 'show'])->name('section.show');
+
+Route::get('sections/{bqSection}/edit', [BqSectionController::class, 'edit'])->name('bq_sections.edit');
 Route::put('bq_documents/{bqDocument}/sections/{bqSection}', [BqSectionController::class, 'update'])->name('bq_sections.update');
 
 
 Route::get('/get/elements', [BqDocumentController::class, 'getElements'])->name('get.elements');
 Route::get('/get/sub-elements', [BqDocumentController::class, 'getSubElements'])->name('get.sub_elements');
-
+Route::get('/get/items', [BqDocumentController::class, 'getItems'])->name('get.items');
 
 
 
