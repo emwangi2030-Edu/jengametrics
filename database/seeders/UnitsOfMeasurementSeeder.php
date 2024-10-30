@@ -15,6 +15,7 @@ class UnitsOfMeasurementSeeder extends Seeder
             ['name' => 'Centimeter', 'type' => 'length'],
             ['name' => 'Meter', 'type' => 'length'],
             ['name' => 'Kilometer', 'type' => 'length'],
+            ['name' => 'Roll', 'type' => 'length'],
 
             // Area units
             ['name' => 'Square Centimeter', 'type' => 'area'],
@@ -32,7 +33,15 @@ class UnitsOfMeasurementSeeder extends Seeder
             ['name' => 'Gram', 'type' => 'weight'],
             ['name' => 'Kilogram', 'type' => 'weight'],
             ['name' => 'Metric Ton', 'type' => 'weight'],
-            ['name' => 'Milligram', 'type' => 'weight']
+            ['name' => 'Milligram', 'type' => 'weight'],
+
+            // Quantity units
+            ['name' => 'Each', 'type' => 'quantity'],
+            ['name' => 'Set', 'type' => 'quantity'],
+
+            // Time units
+            ['name' => 'Hour', 'type' => 'time']
+
         ];
 
         DB::table('units_of_measurement')->insert($units);
