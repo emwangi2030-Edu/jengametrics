@@ -6,11 +6,9 @@
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="font-weight-bold text-primary">
+            <h2 class="font-weight-bold text-success">
                 {{ __('Bill of Quantities: ') . get_project()->name }}
             </h2>
-
-            @include('flash_msg')
         </div>
     </div>
 
@@ -24,7 +22,7 @@
                       
 
                         <!-- Link to create a new section -->
-                        <a href="{{ route('bq_sections.create') }}" class="btn btn-primary mt-4">
+                        <a href="{{ route('bq_sections.create') }}" class="btn btn-success mt-4">
                             {{ __('Add New Item') }}
                         </a>
 

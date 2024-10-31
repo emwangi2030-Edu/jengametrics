@@ -61,7 +61,7 @@
 
                         <!-- Link Back to Document -->
                         <a href="#" class="btn btn-secondary mt-4">
-                            {{ __('Back to Document') }}
+                            {{ __('Back') }}
                         </a>
                     </div>
                 </div>

@@ -8,11 +8,9 @@
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="font-weight-bold text-primary">
-                {{ __('Bill of Quantities: ') . get_project()->name }}
+            <h2 class="font-weight-bold text-success">
+                {{ __('Bill of Materials: ') . get_project()->name }}
             </h2>
-
-            @include('flash_msg')
         </div>
     </div>
 

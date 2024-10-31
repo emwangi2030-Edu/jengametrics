@@ -520,7 +520,7 @@
                                                                         </li>
 
 
-                                                                        <li class="nav-item"><a class="nav-link" href="#">
+                                                                        <!-- <li class="nav-item"><a class="nav-link" href="#">
                                                                                 <div class="d-flex align-items-center"><span
                                                                                         class="nav-link-text">Elements</span></div>
                                                                             </a></li>
@@ -529,7 +529,7 @@
                                                                         <li class="nav-item"><a class="nav-link" href="#">
                                                                                 <div class="d-flex align-items-center"><span
                                                                                         class="nav-link-text">Sub Elements</span></div>
-                                                                            </a></li>
+                                                                            </a></li> -->
 
                                                                     </ul>
                                                                 </div>

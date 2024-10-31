@@ -4,8 +4,8 @@
     <div class="container py-4">
         <div class="row mb-4">
             <div class="col-12">
-                <h2 class="font-weight-bold text-dark">
-                    {{ __('Section: ') . $bqSection->section_name }}
+                <h2 class="font-weight-bold text-success">
+                    {{ __('Section: ') . $bqSection->name }}
                 </h2>
             </div>
         </div>
@@ -15,16 +15,15 @@
                 <div class="card">
                     <div class="card-body">
                         <!-- Display Section Details -->
-                        <p><strong>{{ __('Section Name:') }}</strong> {{ $bqSection->name }}</p>
                         <p><strong>{{ __('Details:') }}</strong> {{ $bqSection->description }}</p>
                     
 
                  
 
                         <!-- Link to Add New Item -->
-                        <a href="{{ route('boms.create') }}" class="btn btn-success mt-4">
+                        <!-- <a href="{{ route('boms.create') }}" class="btn btn-success mt-4">
                             {{ __('Add New Item') }}
-                        </a>
+                        </a> -->
 
                         <!-- Table to display items -->
                         <h3 class="text-lg font-weight-bold mt-6">{{ __('Items List') }}</h3>
