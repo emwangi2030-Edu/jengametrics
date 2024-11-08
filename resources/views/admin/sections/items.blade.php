@@ -86,7 +86,7 @@
                                             <select class="form-control" id="editUnitOfMeasurementInput{{ $item->id }}" name="unit_of_measurement" required>
                                                 @foreach($units as $unit)
                                                     <option value="{{ $unit->name }}" {{ $unit->name == $item->unit_of_measurement ? 'selected' : '' }}>
-                                                        {{ $unit->name }}
+                                                        {{ $unit->abbrev }}
                                                     </option>
                                                 @endforeach
                                             </select>

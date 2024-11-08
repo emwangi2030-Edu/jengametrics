@@ -22,15 +22,25 @@ class ItemsController extends Controller
     // Store a new item
     public function store(Request $request)
     {
+        // Validate and ensure unit_of_measurement uses abbrev from item_unit_of_measurements
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'sub_element_id' => 'required|exists:sub_elements,id',
-            'unit_of_measurement' => 'required|string|max:50'
+            'unit_of_measurement' => 'required|exists:item_unit_of_measurements,abbrev'
         ]);
-    
 
-        Item::create($request->all());
+        // Get the corresponding abbrev value for the selected unit of measurement
+        $unit = ItemUnitOfMeasurement::where('abbrev', $request->unit_of_measurement)->firstOrFail();
+
+        // Create the item with validated data, including the abbrev
+        Item::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'sub_element_id' => $request->sub_element_id,
+            'unit_of_measurement' => $unit->name,
+            'abbrev' => $unit->abbrev,
+        ]);
 
         return redirect()->route('subelements.items', $request->sub_element_id)->with('success', 'Item added successfully.');
     }
@@ -40,13 +50,23 @@ class ItemsController extends Controller
     {
         $item = Item::findOrFail($id);
 
+        // Validate the request and ensure unit_of_measurement uses abbrev from item_unit_of_measurements
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'unit_of_measurement' => 'required|string|max:50'
+            'unit_of_measurement' => 'required|exists:item_unit_of_measurements,abbrev'
         ]);
 
-        $item->update($request->all());
+        // Get the corresponding abbrev value for the selected unit of measurement
+        $unit = ItemUnitOfMeasurement::where('abbrev', $request->unit_of_measurement)->firstOrFail();
+
+        // Update the item with validated data, including the abbrev
+        $item->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'unit_of_measurement' => $unit->name,
+            'abbrev' => $unit->abbrev,
+        ]);
 
         return redirect()->back()->with('success', 'Item updated successfully.');
     }

@@ -11,9 +11,6 @@ class UnitOfMeasurement extends Model
 
     protected $table = 'units_of_measurement';
 
-    protected $fillable = [
-        'name',
-        'type',
-    ];
+    protected $guarded = [];
 
 }

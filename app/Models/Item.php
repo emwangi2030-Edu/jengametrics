@@ -9,12 +9,7 @@ class Item extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'sub_element_id',
-        'name',
-        'description',
-        'unit_of_measurement'
-    ];
+    protected $guarded = [];
 
     public function subElement()
     {

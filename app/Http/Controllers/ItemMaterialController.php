@@ -22,12 +22,7 @@ class ItemMaterialController extends Controller
     // Store a new material
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'item_id' => 'required|exists:items,id',
-            'unit_of_measurement' => 'required|exists:units_of_measurement,name',
-            'conversion_factor' => 'required|numeric',
-        ]);
+        $this->validateStoreRequest($request);
 
         ItemMaterial::create($request->all());
 
@@ -37,12 +32,7 @@ class ItemMaterialController extends Controller
     // Update material
     public function update(Request $request, $id)
     {
-        // Validate the incoming request
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'unit_of_measurement' => 'required|exists:units_of_measurement,name',
-            'conversion_factor' => 'required|numeric|min:0',
-        ]);
+        $this->validateUpdateRequest($request);
 
         // Find the item material by ID
         $itemMaterial = ItemMaterial::findOrFail($id);
@@ -65,5 +55,25 @@ class ItemMaterialController extends Controller
         $itemMaterial->delete();
     
         return redirect()->back()->with('success', 'Material deleted successfully.');
-    }    
+    }
+
+    // Private validation methods for store and update
+    private function validateStoreRequest(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'item_id' => 'required|exists:items,id',
+            'unit_of_measurement' => 'required|exists:units_of_measurement,abbrev',
+            'conversion_factor' => 'required|numeric',
+        ]);
+    }
+
+    private function validateUpdateRequest(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'unit_of_measurement' => 'required|exists:units_of_measurement,abbrev',
+            'conversion_factor' => 'required|numeric|min:0',
+        ]);
+    }
 }
