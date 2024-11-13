@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\BqDocument;
 use App\Models\BqSection;
 use App\Models\Section;
+use App\Models\BomLabour;
 use App\Models\BomItem;
+use App\Models\Item;
 use App\Models\ItemMaterial;
 
 use Illuminate\Http\Request;
@@ -40,17 +42,34 @@ class BqSectionController extends Controller
         if($section_created){
 
 $materials = ItemMaterial::where('item_id', $request->item_id)->get();
+
+$unit = Item::find($request->item_id);
+$labour = $unit->labour;
+$labour = $labour*$request->quantity;
+
+    BomLabour::create([
+        'section_id'       => $section_created->section_id,
+        'item_id'          => $section_created->item_id,
+        'quantity'         => $quantity,
+        'rate'             => $unit->labour,
+        'amount'           => $quantity*$unit->labour,
+        'project_id'       => project_id(),
+        'bq_section_id'    => $section_created->id,
+    ]);
+
+
  foreach($materials as $material) {
     $quantity = $request->quantity * $material->conversion_factor;
     $amount = $material->amount*$material->rate; 
     BomItem::create([
-        'section_id' => $section_created->section_id,
-        'item_id' => $section_created->item_id,
+        'section_id'       => $section_created->section_id,
+        'item_id'          => $section_created->item_id,
         'item_material_id' => $material->id,
-        'quantity' => $quantity,
-        'rate' => $material->rate,
-        'amount' => $amount,
-        'project_id' => project_id(),
+        'quantity'         => $quantity,
+        'rate'             => $material->rate,
+        'amount'           => $amount,
+        'project_id'       => project_id(),
+        'bq_section_id'    => $section_created->id,
     ]);
  }
            
@@ -63,6 +82,81 @@ $materials = ItemMaterial::where('item_id', $request->item_id)->get();
         return redirect()->route('bq_documents.index')->with('success', trans('Section added successfully.'));
 
     }
+
+
+               // Update the specified item in storage
+    public function updateItem(Request $request)
+    {
+
+      
+        $request->validate([
+            'rate' => 'required|numeric',
+            'quantity' => 'required|numeric',
+        ]);
+
+        $item = BqSection::find($request->id);
+        $item->quantity =$request->quantity;
+        $item->rate =$request->rate;
+        $item->amount =$request->rate*$request->quantity;
+        $item->save();
+
+        $boms = BomItem::where('bq_section_id', $request->id)->get();
+
+        foreach($boms as $bom){
+            $bom->delete();
+        }
+
+
+$materials = ItemMaterial::where('item_id', $item->item_id)->get();
+$unit = Item::find($item->item_id);
+$labour = $unit->labour;
+$labour = $labour*$request->quantity;
+
+$labours = BomLabour::where('bq_section_id', $request->id)->first();
+
+$labours_count = BomLabour::where('bq_section_id', $request->id)->count();
+if($labours_count>0){
+    $labours->delete();
+}
+
+
+
+    BomLabour::create([
+        'section_id'       => $item->section_id,
+        'item_id'          => $item->item_id,
+        'quantity'         => $request->quantity,
+        'rate'             => $unit->labour,
+        'amount'           => $request->quantity*$unit->labour,
+        'project_id'       => project_id(),
+        'bq_section_id'    => $item->id,
+    ]);
+
+
+ foreach($materials as $material) {
+    $quantity = $request->quantity * $material->conversion_factor;
+    $amount = $material->amount*$material->rate; 
+    BomItem::create([
+        'section_id'       => $item->section_id,
+        'item_id'          => $item->item_id,
+        'item_material_id' => $material->id,
+        'quantity'         => $quantity,
+        'rate'             => $material->rate,
+        'amount'           => $amount,
+        'project_id'       => project_id(),
+        'bq_section_id'    => $item->id,
+    ]);
+ }
+
+
+
+
+
+
+
+    return redirect()->back()->with('success', 'Item updated successfully.');
+    }
+
+
 
     public function edit(BqDocument $bqDocument, BqSection $bqSection)
     {
@@ -88,7 +182,7 @@ $materials = ItemMaterial::where('item_id', $request->item_id)->get();
     {
         // Fetch sections related to this BQ Document
         $bqSection = Section::find($id);
-        $items = BqSection::where('section_id', $id)->get();
+        $items = BqSection::where('section_id', $id)->whereProjectId(project_id())->get();
 
         // Pass the document and its sections to the view
         return view('bq_sections.show', compact( 'bqSection', 'items'));

@@ -3,46 +3,23 @@
 @section('content')
 <div class="container">
     <h1>Add New Material</h1>
-    <form action="{{ route('materials.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('m.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        @if(isset($material))
-            @method('PUT')
-        @endif
+     
 
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $material->name ?? '') }}" required>
-        </div>
+ <div class="form-group">
+    <label for="bom_item_id">Material</label>
+    <select class="form-control" id="bom_item_id" name="bom_item_id" required>
+        <option value="" disabled selected>Select Material</option>
+        @foreach($items as $item)
+            <option value="{{ $item->item_material->id }}">{{ $item->item_material->name ?? 'No Name Available' }}</option>
+        @endforeach
+    </select>
+    @if ($errors->has('bom_item_id'))
+        <div class="text-danger">{{ $errors->first('bom_item_id') }}</div>
+    @endif
+</div>
 
-        <div class="form-group">
-            <label for="unit_of_measure">Unit of Measurement</label>
-            <select class="form-control" id="unit_of_measure" name="unit_of_measure" required>
-                <option value="" disabled selected>Select Unit</option>
-                <option value="Cubic Meter" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Cubic Meter' ? 'selected' : '' }}>Cubic Meter</option>
-                <option value="Square Meter" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Square Meter' ? 'selected' : '' }}>Square Meter</option>
-                <option value="Square Foot" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Square Foot' ? 'selected' : '' }}>Square Foot</option>
-                <option value="Meter" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Meter' ? 'selected' : '' }}>Meter</option>
-                <option value="Inch" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Inch' ? 'selected' : '' }}>Inch</option>
-                <option value="Millimeter" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Millimeter' ? 'selected' : '' }}>Millimeter</option>
-                <option value="Ton" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Ton' ? 'selected' : '' }}>Ton</option>
-                <option value="Kilogram" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Kilogram' ? 'selected' : '' }}>Kilogram</option>
-                <option value="Bag" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Bag' ? 'selected' : '' }}>Bag</option>
-                <option value="Piece" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Piece' ? 'selected' : '' }}>Piece</option>
-                <option value="Foot" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Foot' ? 'selected' : '' }}>Foot</option>
-                <option value="Centimeter" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Centimeter' ? 'selected' : '' }}>Centimeter</option>
-                <option value="Litre" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Litre' ? 'selected' : '' }}>Litre</option>
-                <option value="Roll" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Roll' ? 'selected' : '' }}>Roll</option>
-                <option value="Packet" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Packet' ? 'selected' : '' }}>Packet</option>
-                <option value="carton" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Carton' ? 'selected' : '' }}>Carton</option>
-                <option value="Bucket" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Bucket' ? 'selected' : '' }}>Bucket</option>
-                <option value="Bundle" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Bundle' ? 'selected' : '' }}>Bundle</option>
-                <option value="Box" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Box' ? 'selected' : '' }}>Box</option>
-                <option value="Bale" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Bale' ? 'selected' : '' }}>Bale</option>
-                <option value="Gallon" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Gallon' ? 'selected' : '' }}>Gallon</option>
-                <option value="Ream" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Ream' ? 'selected' : '' }}>Ream</option>
-                <option value="Sheet" {{ old('unit_of_measure', $material->unit_of_measure ?? '') == 'Sheet' ? 'selected' : '' }}>Sheet</option>
-            </select>
-        </div>
 
         <div class="form-group">
             <label for="unit_price">Price per Unit</label>

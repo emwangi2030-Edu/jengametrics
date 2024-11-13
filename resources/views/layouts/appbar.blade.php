@@ -200,6 +200,26 @@
     </a>
 </div>
 
+<!-- Material Management -->
+<div class="nav-item-wrapper">
+    <div class="nav-link label-1" role="button" aria-expanded="false">
+        <div class="d-flex align-items-center">
+            <span class="nav-link-icon">
+                <span data-feather="box"></span>
+            </span>
+            <a href="{{ url(route('materials.index')) }}" title="Material Management">
+                <!-- <div class="d-flex align-items-center">   -->
+                    <span class="nav-link-text-wrapper">
+                        <span class="nav-link-text">Material Management</span>
+                    </span>
+                <!-- </div> -->
+            </a>
+            <span class="menu-arrow"></span>
+        </div>
+    </div>
+
+</div>
+
 <!-- Labour -->
 <div class="nav-item-wrapper">
     <div class="nav-link label-1" role="button" aria-expanded="false">
@@ -298,46 +318,7 @@
     </div> -->
 </div>
 
-<!-- Material Management -->
-<div class="nav-item-wrapper">
-    <div class="nav-link label-1" role="button" aria-expanded="false">
-        <div class="d-flex align-items-center">
-            <span class="nav-link-icon">
-                <span data-feather="box"></span>
-            </span>
-            <a href="{{ url(route('materials.index')) }}" title="Material Management">
-                <!-- <div class="d-flex align-items-center">   -->
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">Material Management</span>
-                    </span>
-                <!-- </div> -->
-            </a>
-            <span class="menu-arrow"></span>
-        </div>
-    </div>
-    <!-- <div class="menu-sub menu-sub-accordion"> -->
-        <!-- Materials Purchased -->
-        <!-- <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="{{ url(route('materials.index')) }}" title="Materials Purchased">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">Materials Purchased</span>
-                    </span>
-                </div>
-            </a>
-        </div> -->
-        <!-- List of Suppliers -->
-        <!-- <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="{{ url(route('suppliers.index')) }}" title="Procurement and supply chain management">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">List of Suppliers</span>
-                    </span>
-                </div>
-            </a>
-        </div>
-    </div> -->
-</div>
+
 
 <!-- Reporting -->
 <div class="nav-item-wrapper">

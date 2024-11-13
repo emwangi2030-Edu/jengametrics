@@ -10,7 +10,7 @@
             </div>
         </div>
 
-        <div class="row justify-content-center">
+        <div class="row">
             <div class="col-md-10">
                 <div class="card">
                     <div class="card-body">
@@ -27,44 +27,59 @@
 
                         <!-- Table to display items -->
                         <h3 class="text-lg font-weight-bold mt-6">{{ __('Items List') }}</h3>
-                        <table class="table table-striped mt-4">
-                            <thead>
-                                <tr>
-                                    <th scope="col">{{ __('Description') }}</th>
-                                    <th scope="col">{{ __('Quantity') }}</th>
-                                    <th scope="col">{{ __('Unit') }}</th>
-                                    <th scope="col">{{ __('Rate') }}</th>
-                                    <th scope="col">{{ __('Amount') }}</th>
-                                    <th scope="col">{{ __('Actions') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($items as $item)
-                                    <tr>
-                                        <td>{{ $item->item_material->name }}</td>
-                                        <td>{{ $item->quantity }}</td>
-                                        <td>{{ $item->item_material->unit_of_measurement }}</td>
-                                        <td>{{ number_format($item->rate, 2) }}</td>
-                                        <td>{{ number_format($item->amount, 2) }}</td>
-                                        <td>
-                                            <!-- Add Edit and Delete Links for Items Here if needed -->
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center">{{ __('No items found.') }}</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+<table class="table table-striped mt-4">
+    <thead>
+        <tr>
+            <th scope="col">{{ __('Description') }}</th>
+            <th scope="col">{{ __('Quantity') }}</th>
+            <th scope="col">{{ __('Unit') }}</th>
+            <th scope="col">{{ __('Rate') }}</th>
+            <th scope="col">{{ __('Amount') }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        @php
+            $totalQuantity = 0;
+            $totalAmount = 0;
+        @endphp
+        @forelse ($items as $item)
+            @php
+                $totalQuantity += $item->quantity;
+                $totalAmount += $item->amount;
+            @endphp
+            <tr>
+                <td>{{ $item->item_material->name }}</td>
+                <td>{{ $item->quantity }}</td>
+                <td>{{ $item->item_material->unit_of_measurement }}</td>
+                <td>{{ number_format($item->rate, 2) }}</td>
+                <td>{{ number_format($item->amount, 2) }}</td>
+             
+            </tr>
+        @empty
+            <tr>
+                <td colspan="6" class="text-center">{{ __('No items found.') }}</td>
+            </tr>
+        @endforelse
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="1">{{ __('Total') }}</th>
+            <td>{{ $totalQuantity }}</td>
+            <td></td> <!-- Leave unit column empty -->
+            <td></td> <!-- Leave rate column empty -->
+            <td>{{ number_format($totalAmount, 2) }}</td>
 
-                        <!-- Link Back to Document -->
-                        <a href="#" class="btn btn-secondary mt-4">
-                            {{ __('Back to Document') }}
-                        </a>
+        </tr>
+    </tfoot>
+</table>
+
+
+                
                     </div>
                 </div>
             </div>
         </div>
+
+        @include('boms.labours')
     </div>
 @endsection

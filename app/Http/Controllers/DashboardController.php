@@ -10,6 +10,14 @@ class DashboardController extends Controller
 {
     public function index()
     {
+
+
+           $user = Auth::user();
+        if (!$user->has_project) {
+            return redirect()->route('wizard.step1');
+        }
+
+
         // Get the current project ID the user is working on
         $currentProjectId = Auth::user()->project_id;
 

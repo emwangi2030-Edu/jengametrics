@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Material;
 use App\Models\Supplier;
+use App\Models\BomItem;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Log;
@@ -28,53 +29,52 @@ class MaterialController extends Controller
     public function create()
     {
         $suppliers = Supplier::all(); // Get all suppliers to populate the dropdown
-        return view('materials.create', compact('suppliers'));
+        $items = BomItem::where('project_id', project_id())
+               ->distinct()
+               ->get(['item_material_id']);
+
+        return view('materials.create', compact('suppliers', 'items'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'unit_price' => 'required|numeric',
-            'unit_of_measure' => 'required|string|max:255',
-            'quantity_in_stock' => 'required|integer',
-            'supplier_name' => 'required|string|max:255',
-            'supplier_contact' => 'nullable|string|max:255',
-            'document' => 'nullable|file|mimes:pdf,doc,docx,txt,jpg,jpeg,png|max:2048',
-        ]);
+public function store(Request $request)
+{
 
-        // Check if the supplier exists, or create a new one
-        $supplier = Supplier::firstOrCreate(
-            ['name' => $request->supplier_name],
-            ['contact_info' => $request->supplier_contact]
-        );
 
-        // Get the current user's project_id
-        $projectId = Auth::user()->project_id;
 
-        // Prepare the data for material creation
-        $validatedData = $request->only([
-            'name', 
-            'unit_price', 
-            'unit_of_measure', 
-            'quantity_in_stock'
-        ]);
 
-        // Assign supplier and project information
-        $validatedData['supplier_id'] = $supplier->id;
-        $validatedData['project_id'] = $projectId;
 
-        // Handle document upload
-        if ($request->hasFile('document')) {
-            $documentPath = $request->file('document')->store('documents', 'public');
-            $validatedData['document'] = $documentPath;
-        }
+    // Check if the supplier exists, or create a new one
+    $supplier = Supplier::firstOrCreate(
+        ['name' => $request->supplier_name],
+        ['contact_info' => $request->supplier_contact ?? ''] // Ensure contact_info is set even if it's null
+    );
 
-        // Create material
-        Material::create($validatedData);
 
-        return redirect()->route('materials.index')->with('success', 'Material added successfully!');
+
+    // Initialize the data array
+    $data = [
+        'bom_item_id' => $request->bom_item_id,
+        'unit_price' => $request->unit_price,
+        'quantity_in_stock' => $request->quantity_in_stock,
+        'supplier_id' => $supplier->id,
+        'supplier_contact' => $request->supplier_contact ?? '', // Ensure contact_info is included even if null
+        'project_id' => project_id(), // Assuming project_id() is a helper function
+    ];
+
+    // Handle document upload if it exists
+    if ($request->hasFile('document')) {
+        $documentPath = $request->file('document')->store('documents', 'public');
+        $data['document'] = $documentPath;
     }
+
+    // Create material
+    Material::create($data);
+
+    // Redirect with success message
+    return redirect()->route('materials.index')->with('success', 'Material added successfully!');
+}
+
+
 
     public function show($id)
     {

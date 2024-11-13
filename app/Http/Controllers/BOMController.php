@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\BqDocument;
 use App\Models\Bom;
+use App\Models\BomLabour;
 use App\Models\BomItem;
 use App\Models\Section;
 
@@ -52,10 +53,12 @@ class BOMController extends Controller
 
                 // Fetch sections related to this BQ Document
                 $bqSection = Section::find($id);
-                $items = BomItem::where('section_id', $id)->get();
+                $items = BomItem::whereProjectId(project_id())->where('section_id', $id)->get();
+
+    $labours = BomLabour::whereProjectId(project_id())->where('section_id', $id)->get();
         
                 // Pass the document and its sections to the view
-                return view('boms.show', compact( 'bqSection', 'items'));
+                return view('boms.show', compact( 'bqSection', 'items', 'labours'));
 
 
 

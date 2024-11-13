@@ -19,10 +19,17 @@
                     <select class="form-control" id="unitOfMeasurementInput" name="unit_of_measurement" required>
                         <option value="" disabled selected>Select unit</option>
                         @foreach($units as $unit)
-                            <option value="{{ $unit->name }}">{{ $unit->name }}</option>
+                            <option value="{{ $unit->abbrev }}">{{ $unit->abbrev }}</option>
                         @endforeach
                     </select>
                 </div>
+
+
+                  <div class="form-group">
+                                            <label for="editItemNameInput">Labour cost</label>
+                                            <input type="text" class="form-control" id="editItemNameInput" name="labour" value="0" >
+                                        </div>
+
                 <div class="form-group">
                     <label for="itemDescriptionInput">Description</label>
                     <textarea class="form-control" id="itemDescriptionInput" name="description" rows="3"></textarea>
@@ -43,6 +50,7 @@
                         <div>
                             <strong>{{ $item->name }}</strong><br>
                             <small>Unit: {{ $item->unit_of_measurement }}</small><br>
+                            <small>Labour: {{ $item->labour }}</small><br>
                             <small>{{ $item->description }}</small>
                         </div>
                         <div>
@@ -85,12 +93,17 @@
                                             <label for="editUnitOfMeasurementInput{{ $item->id }}">Unit of Measurement</label>
                                             <select class="form-control" id="editUnitOfMeasurementInput{{ $item->id }}" name="unit_of_measurement" required>
                                                 @foreach($units as $unit)
-                                                    <option value="{{ $unit->name }}" {{ $unit->name == $item->unit_of_measurement ? 'selected' : '' }}>
-                                                        {{ $unit->abbrev }}
-                                                    </option>
+   <option value="{{ $unit->abbrev }}" {{ $unit->name == $item->unit_of_measurement ? 'selected' : '' }}>{{ $unit->abbrev }}
+   </option>
                                                 @endforeach
                                             </select>
                                         </div>
+
+                           <div class="form-group">
+                                            <label for="editItemNameInput{{ $item->id }}">Labour</label>
+                                            <input type="text" class="form-control" id="editItemNameInput{{ $item->labour }}" name="labour" value="{{ $item->labour }}" >
+                                        </div>
+
                                         <div class="form-group">
                                             <label for="editItemDescriptionInput{{ $item->id }}">Description</label>
                                             <textarea class="form-control" id="editItemDescriptionInput{{ $item->id }}" name="description" rows="3">{{ $item->description }}</textarea>

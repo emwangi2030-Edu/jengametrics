@@ -9,15 +9,7 @@ class Material extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'unit_price',
-        'unit_of_measure',
-        'quantity_in_stock',
-        'supplier_id',
-        'document',
-        'project_id',
-    ];
+    protected $guarded = [];
 
     // A material belongs to one supplier
     public function supplier()

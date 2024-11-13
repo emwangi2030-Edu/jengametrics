@@ -87,6 +87,7 @@ Route::get('section/{id}', [BqSectionController::class, 'show'])->name('section.
 
 Route::get('sections/{bqSection}/edit', [BqSectionController::class, 'edit'])->name('bq_sections.edit');
 Route::put('bq_documents/{bqDocument}/sections/{bqSection}', [BqSectionController::class, 'update'])->name('bq_sections.update');
+Route::post('sections/bqitems', [BqSectionController::class, 'updateItem'])->name('bq_items.update');
 
 
 Route::get('/get/elements', [BqDocumentController::class, 'getElements'])->name('get.elements');
@@ -99,7 +100,10 @@ Route::get('/get/items', [BqDocumentController::class, 'getItems'])->name('get.i
 Route::get('bq_documents/{bqDocument}/items/create', [BqItemController::class, 'create'])->name('bq_documents.items.create');
 Route::post('bq_documents/{bqDocument}/items', [BqItemController::class, 'store'])->name('bq_documents.items.store');
 Route::get('bq_documents/{bqDocument}/items/{bqItem}/edit', [BqItemController::class, 'edit'])->name('bq_documents.items.edit');
-Route::put('bq_documents/{bqDocument}/items/{bqItem}', [BqItemController::class, 'update'])->name('bq_documents.items.update');
+
+
+
+
 Route::delete('bq_documents/{bqDocument}/items/{bqItem}', [BqItemController::class, 'destroy'])->name('bq_documents.items.destroy');
 
 
@@ -130,6 +134,7 @@ Route::resource('suppliers', SupplierController::class);
 
 // Route to Materials page
 Route::resource('materials', MaterialController::class);
+Route::post('/materials-store', [MaterialController::class, 'store'])->name('m.store');
 
 // Routes for Supplier Name and Contact Autocomplete Feature
 Route::get('/suppliers/autocomplete', [SupplierController::class, 'autocomplete'])->name('suppliers.autocomplete');

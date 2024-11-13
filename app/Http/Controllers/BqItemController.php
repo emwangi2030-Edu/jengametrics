@@ -53,15 +53,13 @@ $units = ['kg', 'litre', 'piece', 'meter', 'ton', 'gallon']; // Example units; r
     }
 
     // Update the specified item in storage
-    public function update(Request $request, BqDocument $bqDocument, BqItem $bqItem)
+    public function updateItem(Request $request)
     {
+
+      
         $request->validate([
-            'bq_section_id' => 'required|exists:bq_sections,id',
-            'item_description' => 'required|string|max:255',
-            'quantity' => 'required|integer',
-            'unit' => 'required|string',
             'rate' => 'required|numeric',
-            'amount' => 'required|numeric',
+            'quantity' => 'required|numeric',
         ]);
 
         $bqItem->update([

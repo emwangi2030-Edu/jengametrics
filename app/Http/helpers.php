@@ -321,9 +321,9 @@ function get_project(){
 function project_id(){
 
     $user = Auth::user();
-    $project = Project::find($user->project_id)->first()->id;
+    $project = $user->project_id;
 
- return $project;
+    return $project;
 
 }
 
