@@ -370,7 +370,7 @@
 </div> -->
 
 <!-- Communication -->
-<div class="nav-item-wrapper">
+<!-- <div class="nav-item-wrapper">
     <div class="nav-link label-1" role="button" aria-expanded="false">
         <div class="d-flex align-items-center">
             <span class="nav-link-icon">
@@ -383,7 +383,7 @@
             </a>
             <span class="menu-arrow"></span>
         </div>
-    </div>
+    </div> -->
     <!-- <div class="menu-sub menu-sub-accordion"> -->
         <!-- Document Sharing -->
         <!-- <div class="nav-item-wrapper">
@@ -501,16 +501,14 @@
                                                                         </li>
 
 
-                                                                        <!-- <li class="nav-item"><a class="nav-link" href="#">
-                                                                                <div class="d-flex align-items-center"><span
-                                                                                        class="nav-link-text">Elements</span></div>
-                                                                            </a></li>
+                                                                        <li class="nav-item">
+                                                                            <a class="nav-link" href="{{ route('admin.sections.products') }}">
+                                                                                <div class="d-flex align-items-center">
+                                                                                    <span class="nav-link-text">Products</span>
+                                                                                </div>
+                                                                            </a>
+                                                                        </li>
 
-
-                                                                        <li class="nav-item"><a class="nav-link" href="#">
-                                                                                <div class="d-flex align-items-center"><span
-                                                                                        class="nav-link-text">Sub Elements</span></div>
-                                                                            </a></li> -->
 
                                                                     </ul>
                                                                 </div>

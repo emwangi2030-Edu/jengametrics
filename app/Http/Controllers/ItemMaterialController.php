@@ -57,6 +57,14 @@ class ItemMaterialController extends Controller
         return redirect()->back()->with('success', 'Material deleted successfully.');
     }
 
+    // Index all materials
+    public function index_materials()
+    {
+        $materials = ItemMaterial::all(['name']);
+        return view('admin.sections.products', compact('materials'));
+    }
+
+
     // Private validation methods for store and update
     private function validateStoreRequest(Request $request)
     {

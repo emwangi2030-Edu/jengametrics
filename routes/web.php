@@ -188,5 +188,8 @@ Route::post('items/materials', [ItemMaterialController::class, 'store'])->name('
 Route::put('materials/items/{id}', [ItemMaterialController::class, 'update'])->name('materials.item.update');
 Route::delete('items/materials/{id}', [ItemMaterialController::class, 'destroy'])->name('items.materials.destroy');
 
+// Product Route
+Route::get('admin/sections/products', [ItemMaterialController::class, 'index_materials'])->name('admin.sections.products');
+
 // Auth Routes
 require __DIR__.'/auth.php';
