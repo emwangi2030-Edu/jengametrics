@@ -504,7 +504,7 @@
                                                                         <li class="nav-item">
                                                                             <a class="nav-link" href="{{ route('admin.sections.products') }}">
                                                                                 <div class="d-flex align-items-center">
-                                                                                    <span class="nav-link-text">Products</span>
+                                                                                    <span class="nav-link-text">Materials</span>
                                                                                 </div>
                                                                             </a>
                                                                         </li>
