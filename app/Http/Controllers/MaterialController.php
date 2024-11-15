@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Material;
+use App\Models\ItemMaterial;
 use App\Models\Supplier;
 use App\Models\BomItem;
 use Illuminate\Support\Facades\Storage;
@@ -41,8 +42,6 @@ public function store(Request $request)
 
 
 
-
-
     // Check if the supplier exists, or create a new one
     $supplier = Supplier::firstOrCreate(
         ['name' => $request->supplier_name],
@@ -50,10 +49,13 @@ public function store(Request $request)
     );
 
 
+   $bom_item = ItemMaterial::find($request->bom_item_id);
+
 
     // Initialize the data array
     $data = [
-        'bom_item_id' => $request->bom_item_id,
+        'product_id' => $bom_item->product_id,
+        'unit_of_measure' => $bom_item->unit_of_measurement,
         'unit_price' => $request->unit_price,
         'quantity_in_stock' => $request->quantity_in_stock,
         'supplier_id' => $supplier->id,

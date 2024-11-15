@@ -19,7 +19,7 @@
                 <th>Name</th>
                 <th>Unit Price</th>
                 <th>Unit of Measure</th>
-                <th>Amount Purchased</th>
+                <th>Quantity</th>
                 <th>Total Amount</th>
                 <th>Supplier Name</th>
                 <th>Date Added</th>
@@ -30,7 +30,7 @@
         <tbody>
             @foreach($materials as $material)
                 <tr>
-                    <td>{{ $material->name }}</td>
+                    <td>{{ $material->product->name ?? 'N/a' }}</td>
                     <td>{{ $material->unit_price }}</td>
                     <td>{{ $material->unit_of_measure }}</td>
                     <td>{{ $material->quantity_in_stock }}</td>

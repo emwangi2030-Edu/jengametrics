@@ -11,14 +11,20 @@
             <form action="{{ route('materials.store') }}" method="POST">
                 @csrf
                 <div class="form-group">
-                    <label for="materialNameInput">Material Name</label>
-                    <input type="text" class="form-control" id="materialNameInput" name="name" required>
+                    <label for="materialNameInput">Select Material</label>
+                    <select class="form-control" id="materialNameInput" name="product_id" required>
+                        <option value="" selected>Select material</option>
+                        @foreach($products as $product)
+ <option value="{{ $product->id }}">{{ $product->name }}</option>
+                        @endforeach
+                    </select>
+                   
                 </div>
                 <div class="form-group">
                     <label for="unitOfMeasurementInput">Unit of Measurement</label>
                     <select class="form-control" id="unitOfMeasurementInput" name="unit_of_measurement" required>
                         @foreach($units as $unit)
-                            <option value="{{ $unit->name }}">{{ $unit->abbrev }}</option>
+                            <option value="{{ $unit->abbrev }}">{{ $unit->abbrev }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -74,10 +80,22 @@
                                 <form action="{{ route('materials.item.update', $itemMaterial->id) }}" method="POST">
                                     @csrf
                                     @method('PUT')
-                                    <div class="form-group">
-                                        <label for="editMaterialNameInput{{ $itemMaterial->id }}">Material Name</label>
-                                        <input type="text" class="form-control" id="editMaterialNameInput{{ $itemMaterial->id }}" name="name" value="{{ $itemMaterial->name }}" required>
-                                    </div>
+
+                                                    <div class="form-group">
+                    <label for="materialNameInput">Select Material</label>
+                    <select class="form-control" id="materialNameInput" name="product_id" required>
+<option value="{{ $itemMaterial->product_id  }}" selected>{{ $itemMaterial->product_id  }}</option>
+                        @foreach($products as $product)
+ <option value="{{ $product->id }}">{{ $product->name }}</option>
+                        @endforeach
+                    </select>
+                   
+                </div>
+
+
+                         
+
+
                                     <div class="form-group">
                                         <label for="editUnitOfMeasurementInput{{ $itemMaterial->id }}">Unit of Measurement</label>
                                         <select class="form-control" id="editUnitOfMeasurementInput{{ $itemMaterial->id }}" name="unit_of_measurement" required>
