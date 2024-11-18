@@ -34,6 +34,9 @@
                             @else
                                 <ul class="list-group mt-3">
                                     @foreach($sections as $section)
+                                    @php
+                                    $items_count = \App\Models\BqSection::whereProjectId(project_id())->where('section_id', $section->id)->count();
+                                    @endphp
                                         <li class="list-group-item">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <div>
@@ -42,7 +45,7 @@
                                                 </div>
 
                                                 <a href="{{ route('section.show',$section->id) }}" class="btn btn-outline-primary btn-sm">
-                                                    {{ __('View Section') }}
+                                                    {{ __('View Section') }} ({{ $items_count }})
                                                 </a>
                                                
                                             </div>
