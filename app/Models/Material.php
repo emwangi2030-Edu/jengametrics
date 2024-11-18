@@ -28,4 +28,10 @@ class Material extends Model
     {
         return (float) $this->unit_price * (float) $this->quantity_in_stock;
     }
+
+    // Corrected relationship (a material belongs to one product)
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

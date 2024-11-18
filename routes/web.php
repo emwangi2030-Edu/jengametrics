@@ -19,6 +19,8 @@ use App\Http\Controllers\ElementController;
 use App\Http\Controllers\SubElementController;
 use App\Http\Controllers\ItemsController;
 use App\Http\Controllers\ItemMaterialController;
+use App\Http\Controllers\ProductController;
+
 use Illuminate\Support\Facades\Auth;
 
 
@@ -190,6 +192,11 @@ Route::delete('items/materials/{id}', [ItemMaterialController::class, 'destroy']
 
 // Product Route
 Route::get('admin/sections/products', [ItemMaterialController::class, 'index_materials'])->name('admin.sections.products');
+
+
+// routes/web.php
+Route::resource('products', ProductController::class);
+
 
 // Auth Routes
 require __DIR__.'/auth.php';

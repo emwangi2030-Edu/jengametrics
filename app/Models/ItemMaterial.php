@@ -10,7 +10,7 @@ class ItemMaterial extends Model
     use HasFactory;
 
     protected $fillable = [
-        'item_id', 'name', 'unit_of_measurement', 'conversion_factor',
+        'item_id', 'name',  'product_id', 'unit_of_measurement', 'conversion_factor',
     ];
 
     public function item()

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ItemMaterial;
 use App\Models\Item;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\UnitOfMeasurement;
 
@@ -15,16 +16,27 @@ class ItemMaterialController extends Controller
         $item = Item::findOrFail($itemId);
         $materials = ItemMaterial::where('item_id', $itemId)->get();
         $units = UnitOfMeasurement::all(); // Fetch all units of measurement
+        $products = Product::orderBy('name', 'asc')->get();
 
-        return view('admin.sections.materials', compact('item', 'materials', 'units'));
+        return view('admin.sections.materials', compact('item', 'materials', 'units', 'products'));
     }
+
 
     // Store a new material
     public function store(Request $request)
     {
-        $this->validateStoreRequest($request);
 
-        ItemMaterial::create($request->all());
+        $product = Product::find($request->product_id);
+
+        $data = [
+            'product_id' => $request->product_id,
+            'name' => $product->name,
+            'unit_of_measurement' => $request->unit_of_measurement,
+            'conversion_factor'    => $request->conversion_factor,
+            'item_id'              => $request->item_id,
+        ];
+
+        ItemMaterial::create($data);
 
         return redirect()->route('items.materials', $request->item_id)->with('success', 'Material added successfully.');
     }
@@ -32,14 +44,17 @@ class ItemMaterialController extends Controller
     // Update material
     public function update(Request $request, $id)
     {
-        $this->validateUpdateRequest($request);
+       
 
         // Find the item material by ID
         $itemMaterial = ItemMaterial::findOrFail($id);
-
+        $product = Product::find($request->product_id);
         // Update the item material with the validated data
+
+     
         $itemMaterial->update([
-            'name' => $request->name,
+            'product_id' => $request->product_id,
+            'name'       => $product->name,
             'unit_of_measurement' => $request->unit_of_measurement,
             'conversion_factor' => $request->conversion_factor,
         ]);
