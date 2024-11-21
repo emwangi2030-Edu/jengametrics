@@ -118,6 +118,7 @@ Route::get('create-bq-item', ['as'=>'create_bq_item', 'uses' => '\App\Http\Contr
 
 
 Route::resource('boms', BOMController::class);
+Route::get('/boms/report', [BOMController::class, 'report'])->name('boms.report');
 
 Route::resource('projects', ProjectController::class);
 

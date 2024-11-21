@@ -8,6 +8,7 @@ use App\Models\Bom;
 use App\Models\BomLabour;
 use App\Models\BomItem;
 use App\Models\Section;
+use App\Models\BqSection;
 
 class BOMController extends Controller
 {
@@ -50,18 +51,14 @@ class BOMController extends Controller
 
     public function show($id)
     {
+        // Fetch sections related to this BQ Document
+        $bqSection = Section::find($id);
+         $items = BomItem::whereProjectId(project_id())->where('section_id', $id)->get();
 
-                // Fetch sections related to this BQ Document
-                $bqSection = Section::find($id);
-                $items = BomItem::whereProjectId(project_id())->where('section_id', $id)->get();
-
-    $labours = BomLabour::whereProjectId(project_id())->where('section_id', $id)->get();
+        $labours = BomLabour::whereProjectId(project_id())->where('section_id', $id)->get();
         
-                // Pass the document and its sections to the view
-                return view('boms.show', compact( 'bqSection', 'items', 'labours'));
-
-
-
+        // Pass the document and its sections to the view
+         return view('boms.show', compact( 'bqSection', 'items', 'labours'));
     }
 
     public function destroy($id)
@@ -77,5 +74,18 @@ class BOMController extends Controller
 
         // Redirect back to the index page with a success message
         return redirect()->route('boms.index')->with('success', 'BOM deleted successfully.');
+    }
+
+    public function report()
+    {
+        // Calculate the total estimated cost across all sections
+        $totalEstimatedCost = BqSection::with('bomItems')
+            ->get()
+            ->reduce(function ($carry, $section) {
+                $sectionTotal = $section->bomItems->sum('amount');
+                return $carry + $sectionTotal;
+            }, 0);
+
+        return view('boms.report', compact('totalEstimatedCost'));
     }
 }

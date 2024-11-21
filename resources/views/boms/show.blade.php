@@ -48,9 +48,9 @@
                 $totalAmount += $item->amount;
             @endphp
             <tr>
-                <td>{{ $item->item_material->name }}</td>
+                <td>{{ $item->item_material->name ?? '' }}</td>
                 <td>{{ $item->quantity }}</td>
-                <td>{{ $item->item_material->unit_of_measurement }}</td>
+                <td>{{ $item->item_material->unit_of_measurement ?? '' }}</td>
                 <td>{{ number_format($item->rate, 2) }}</td>
                 <td>{{ number_format($item->amount, 2) }}</td>
              
@@ -64,10 +64,10 @@
     <tfoot>
         <tr>
             <th colspan="1">{{ __('Total') }}</th>
-            <td>{{ $totalQuantity }}</td>
-            <td></td> <!-- Leave unit column empty -->
-            <td></td> <!-- Leave rate column empty -->
-            <td>{{ number_format($totalAmount, 2) }}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><b>{{ number_format($totalAmount, 2) }}</b></td>
 
         </tr>
     </tfoot>

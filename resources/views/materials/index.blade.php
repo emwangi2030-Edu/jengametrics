@@ -2,12 +2,6 @@
 
 @section('content')
 <div class="container">
-    @if(session('success'))
-        <div class="alert alert-success" id="success-alert" style="display: block;">
-            {{ session('success') }}
-        </div>
-    @endif
-    
     <h1>Materials Purchased</h1>
 
     <a href="{{ route('materials.create') }}" class="btn btn-primary mb-3">Add New Material</a>

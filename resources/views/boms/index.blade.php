@@ -1,7 +1,3 @@
-
-
-
-
 @extends('layouts.appbar')
 
 @section('content')

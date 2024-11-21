@@ -12,7 +12,7 @@
     <select class="form-control" id="bom_item_id" name="bom_item_id" required>
         <option value="" disabled selected>Select Material</option>
         @foreach($items as $item)
-            <option value="{{ $item->item_material->id }}">{{ $item->item_material->name ?? 'No Name Available' }}</option>
+            <option value="{{ $item->item_material->id ?? '' }}">{{ $item->item_material->name ?? 'No Name Available' }}</option>
         @endforeach
     </select>
     @if ($errors->has('bom_item_id'))
