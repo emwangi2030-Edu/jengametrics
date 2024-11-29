@@ -9,7 +9,7 @@ class CostTrackingController extends Controller
     public function index()
     {
         // Retrieve all materials
-        $materials = Material::all();
+        $materials = Material::whereProjectId(project_id())->get();
 
         // Calculate total cost of all materials
         $totalCost = $materials->sum(function ($material) {

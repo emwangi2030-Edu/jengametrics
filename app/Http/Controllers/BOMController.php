@@ -9,6 +9,7 @@ use App\Models\BomLabour;
 use App\Models\BomItem;
 use App\Models\Section;
 use App\Models\BqSection;
+use App\Models\Material;
 
 class BOMController extends Controller
 {
@@ -78,14 +79,20 @@ class BOMController extends Controller
 
     public function report()
     {
-        // Calculate the total estimated cost across all sections
-        $totalEstimatedCost = BqSection::with('bomItems')
-            ->get()
-            ->reduce(function ($carry, $section) {
-                $sectionTotal = $section->bomItems->sum('amount');
-                return $carry + $sectionTotal;
-            }, 0);
 
-        return view('boms.report', compact('totalEstimatedCost'));
+        // Calculate the total estimated cost across all sections
+        $totalEstimatedCost = BomItem::whereProjectId(project_id())->sum('amount');
+
+        $totalEstimatedCost_labour = BomLabour::whereProjectId(project_id())->sum('amount');
+
+        $materials = Material::whereProjectId(project_id())->get();
+
+        // Calculate total cost of all materials
+        $total_actual_cost = $materials->sum(function ($material) {
+            return $material->unit_price * $material->quantity_in_stock;
+        });
+
+
+        return view('report.report', compact('totalEstimatedCost', 'totalEstimatedCost_labour', 'total_actual_cost'));
     }
 }

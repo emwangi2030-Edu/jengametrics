@@ -327,7 +327,7 @@
             <span class="nav-link-icon">
                 <span data-feather="file"></span>
             </span>
-            <a href="{{ route('boms.report') }}" title="Daily logs/reports">
+            <a href="{{ route('reports') }}" title="Daily logs/reports">
                 <span class="nav-link-text-wrapper">
                     <span class="nav-link-text">Reporting</span>
                 </span>
