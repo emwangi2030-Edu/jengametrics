@@ -8,6 +8,7 @@
         <thead>
             <tr>
                 <th>Material Name</th>
+                <th>Unit of Measure</th>
                 <th>Price per Unit</th>
                 <th>Quantity in Stock</th>
                 <th>Total Cost</th>
@@ -17,6 +18,7 @@
             @foreach($materials as $material)
             <tr>
                 <td>{{ $material->name }}</td>
+                <td>{{ $material->unit_of_measure }}</td>
                 <td>{{ number_format($material->unit_price, 2) }}</td>
                 <td>{{ $material->quantity_in_stock }}</td>
                 <td>{{ number_format($material->unit_price * $material->quantity_in_stock, 2) }}</td>

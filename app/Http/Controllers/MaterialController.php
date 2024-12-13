@@ -37,45 +37,42 @@ class MaterialController extends Controller
         return view('materials.create', compact('suppliers', 'items'));
     }
 
-public function store(Request $request)
-{
-
-
-
-    // Check if the supplier exists, or create a new one
-    $supplier = Supplier::firstOrCreate(
-        ['name' => $request->supplier_name],
-        ['contact_info' => $request->supplier_contact ?? ''] // Ensure contact_info is set even if it's null
-    );
-
-
-   $bom_item = ItemMaterial::find($request->bom_item_id);
-
-
-    // Initialize the data array
-    $data = [
-        'product_id' => $bom_item->product_id,
-        'unit_of_measure' => $bom_item->unit_of_measurement,
-        'unit_price' => $request->unit_price,
-        'quantity_in_stock' => $request->quantity_in_stock,
-        'supplier_id' => $supplier->id,
-        'supplier_contact' => $request->supplier_contact ?? '', // Ensure contact_info is included even if null
-        'project_id' => project_id(), // Assuming project_id() is a helper function
-    ];
-
-    // Handle document upload if it exists
-    if ($request->hasFile('document')) {
-        $documentPath = $request->file('document')->store('documents', 'public');
-        $data['document'] = $documentPath;
+    public function store(Request $request)
+    {
+        // Check if the supplier exists, or create a new one
+        $supplier = Supplier::firstOrCreate(
+            ['name' => $request->supplier_name],
+            ['contact_info' => $request->supplier_contact ?? '']
+        );
+    
+        // Find the selected item material
+        $bom_item = ItemMaterial::find($request->bom_item_id);
+    
+        // Initialize the data array with the material name
+        $data = [
+            'name' => $bom_item->name, // Retrieve the name from ItemMaterial
+            'product_id' => $bom_item->product_id,
+            'unit_of_measure' => $bom_item->unit_of_measurement,
+            'unit_price' => $request->unit_price,
+            'quantity_in_stock' => $request->quantity_in_stock,
+            'supplier_id' => $supplier->id,
+            'supplier_contact' => $request->supplier_contact ?? '',
+            'project_id' => Auth::user()->project_id, // Ensure this uses the logged-in user's project
+        ];
+    
+        // Handle document upload if it exists
+        if ($request->hasFile('document')) {
+            $documentPath = $request->file('document')->store('documents', 'public');
+            $data['document'] = $documentPath;
+        }
+    
+        // Create the material with the updated data array
+        Material::create($data);
+    
+        // Redirect with success message
+        return redirect()->route('materials.index')->with('success', 'Material added successfully!');
     }
-
-    // Create material
-    Material::create($data);
-
-    // Redirect with success message
-    return redirect()->route('materials.index')->with('success', 'Material added successfully!');
-}
-
+    
 
 
     public function show($id)
