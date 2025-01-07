@@ -2,13 +2,13 @@
 
 @section('content')
 <div class="container">
-    <h1>Items for Sub-Element: {{ $subElement->name }}</h1>
+    <h1>Items for Element: {{ $element->name }}</h1>
 
     <!-- Form to add a new item -->
     <div class="card">
         <div class="card-header">Add New Item</div>
         <div class="card-body">
-            <form action="{{ route('subelements.items.store', $subElement->id) }}" method="POST">
+            <form action="{{ route('subelements.items.store', $element->id) }}" method="POST">
                 @csrf
                 <div class="form-group">
                     <label for="itemNameInput">Item Name</label>
@@ -34,7 +34,7 @@
                     <label for="itemDescriptionInput">Description</label>
                     <textarea class="form-control" id="itemDescriptionInput" name="description" rows="3"></textarea>
                 </div>
-                <input type="hidden" name="sub_element_id" value="{{ $subElement->id }}">
+                <input type="hidden" name="element_id" value="{{ $element->id }}">
                 <button type="submit" class="btn btn-primary mt-3">Save Item</button>
             </form>
         </div>
@@ -122,6 +122,6 @@
     </div>
 
    <!-- Back to Sub-Elements button -->
-    <a href="{{ route('elements.subelements', ['element' => $subElement->element_id]) }}" class="btn btn-secondary">Back to Sub-Elements</a>
+    <a href="{{ route('sections.elements', $element->section_id) }}" class="btn btn-secondary">Back to Elements</a>
 </div>
 @endsection

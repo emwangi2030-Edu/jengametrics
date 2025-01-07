@@ -4,19 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\SubElement;
+use App\Models\Element;
 use App\Models\ItemUnitOfMeasurement;
 use Illuminate\Http\Request;
 
 class ItemsController extends Controller
 {
     // Show all items for a given sub-element
-    public function index($subElementId)
+    public function index($elementId)
     {
-        $subElement = SubElement::findOrFail($subElementId);
-        $items = Item::where('sub_element_id', $subElementId)->get();
+
+
+        $element = Element::findOrFail($elementId);
+        $items = Item::where('element_id', $elementId)->get();
+
         $units = ItemUnitOfMeasurement::all();
 
-        return view('admin.sections.items', compact('subElement', 'items', 'units'));
+        return view('admin.sections.items', compact('element', 'items', 'units'));
     }
 
     // Store a new item
@@ -31,11 +35,11 @@ class ItemsController extends Controller
             'name' => $request->name,
             'labour' => $request->labour,
             'description' => $request->description,
-            'sub_element_id' => $request->sub_element_id,
+            'element_id' => $request->element_id,
             'unit_of_measurement' => $request->unit_of_measurement,
         ]);
 
-        return redirect()->route('subelements.items', $request->sub_element_id)->with('success', 'Item added successfully.');
+        return redirect()->route('subelements.items', $request->element_id)->with('success', 'Item added successfully.');
     }
 
     // Update an item
