@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Create Product</h1>
+    <h1>Add Material</h1>
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -15,10 +15,18 @@
     <form action="{{ route('products.store') }}" method="POST">
         @csrf
         <div class="form-group">
-            <label for="name">Product Name</label>
+            <label for="name">Material</label>
             <input type="text" class="form-control" id="name" name="name" required>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Create</button>
+        <div class="form-group">
+            <label for="name">Select Unit</label>
+            <select class="form-control" name="unit" id="unit">
+                @foreach($units as $unit)
+                    <option value="{{ $unit->abbrev }}">{{ $unit->abbrev }}</option>
+                @endforeach
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Add</button>
     </form>
 </div>
 @endsection

@@ -501,18 +501,18 @@
         </li>
 
 
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.sections.products') }}">
                 <div class="d-flex align-items-center">
-                    <span class="nav-link-text">Materials</span>
+                    <span class="nav-link-text">Materials Selected</span>
                 </div>
             </a>
-        </li>
+        </li> -->
 
                 <li class="nav-item">
             <a class="nav-link" href="{{ route('products.index') }}">
                 <div class="d-flex align-items-center">
-                    <span class="nav-link-text">All Materials</span>
+                    <span class="nav-link-text">Materials Library</span>
                 </div>
             </a>
         </li>

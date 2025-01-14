@@ -31,7 +31,7 @@
 <table class="table table-striped mt-4">
     <thead>
         <tr>
-            <th scope="col">{{ __('Description') }}</th>
+            <!-- <th scope="col">{{ __('Description') }}</th> -->
             <th scope="col">{{ __('Quantity') }}</th>
             <th scope="col">{{ __('Unit') }}</th>
             <th scope="col">{{ __('Rate') }}</th>
@@ -50,7 +50,6 @@
                 $totalAmount += $item->amount;
             @endphp
             <tr>
-                <td>{{ $item->item->name }}</td>
                 <td>{{ $item->quantity }}</td>
                 <td>{{ $item->item->unit_of_measurement }}</td>
                 <td>{{ number_format($item->rate, 2) }}</td>

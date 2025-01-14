@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\UnitOfMeasurement;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -14,8 +15,9 @@ class ProductController extends Controller
      */
     public function index()
     {
+        $units = UnitOfMeasurement::all();
         $products = Product::all();
-        return view('products.index', compact('products'));
+        return view('products.index', compact('products', 'units'));
     }
 
     /**
@@ -25,7 +27,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('products.create');
+        $units = UnitOfMeasurement::all();
+        return view('products.create', compact('units'));
     }
 
     /**
@@ -38,12 +41,13 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'unit' => 'required|string|max:255'
         ]);
 
         Product::create($request->all());
 
         return redirect()->route('products.index')
-                         ->with('success', 'Product created successfully.');
+                         ->with('success', 'Material added successfully.');
     }
 
     /**
@@ -79,12 +83,13 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'unit' => 'required|string|max:255'
         ]);
 
         $product->update($request->all());
 
         return redirect()->route('products.index')
-                         ->with('success', 'Product updated successfully.');
+                         ->with('success', 'Material updated successfully.');
     }
 
     /**
@@ -98,6 +103,6 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect()->route('products.index')
-                         ->with('success', 'Product deleted successfully.');
+                         ->with('success', 'Material deleted successfully.');
     }
 }

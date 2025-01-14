@@ -33,7 +33,7 @@
                 @forelse($section->elements as $element)
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>{{ $element->name }} {{ $element->id }}</strong><br>
+                            <strong>{{ $element->name }}</strong><br>
                             <small>{{ $element->description }}</small>
                         </div>
                         <div>
@@ -44,10 +44,6 @@
                                 Items
                             </a>
 
-                            <!-- Sub-Elements button -->
-                            <a href="{{ route('elements.subelements', ['section' => $section->id, 'element' => $element->id]) }}" class="btn btn-info btn-sm">
-                                Sub-Elements
-                            </a>
 
                             <!-- Edit Element button -->
                             <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editElementModal{{ $element->id }}">

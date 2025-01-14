@@ -14,7 +14,7 @@ class Product extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'unit'];
 
         public function materials()
     {
