@@ -25,55 +25,55 @@ class BqSectionController extends Controller
     public function store(Request $request)
     {
 
-        
        
         $data = [
             'section_id' => $request->section_id,
             'element_id' => $request->element_id,
-            'sub_element_id' => $request->sub_element_id,
             'item_id' => $request->item_id,
             'rate' => $request->rate,
             'quantity' => $request->quantity,
             'amount' => $request->amount,
             'project_id' => project_id(),
+            'item_name' => Item::where('element_id', $request->element_id)->first()?->name,
+            'units' => Item::where('element_id', $request->element_id)->first()?->unit_of_measurement
         ];
 
         $section_created = BqSection::create($data);
         if($section_created){
 
-$materials = ItemMaterial::where('item_id', $request->item_id)->get();
+            $materials = ItemMaterial::where('item_id', $request->item_id)->get();
 
-$unit = Item::find($request->item_id);
-$labour = $unit->labour;
-$labour = $labour*$request->quantity;
+            $unit = Item::find($request->item_id);
+            $labour = $unit->labour;
+            $labour = $labour*$request->quantity;
 
-    BomLabour::create([
-        'section_id'       => $section_created->section_id,
-        'item_id'          => $section_created->item_id,
-        'quantity'         => $request->quantity,
-        'rate'             => $unit->labour,
-        'amount'           => $request->quantity*$unit->labour,
-        'project_id'       => project_id(),
-        'bq_section_id'    => $section_created->id,
-    ]);
+                BomLabour::create([
+                    'section_id'       => $section_created->section_id,
+                    'item_id'          => $section_created->item_id,
+                    'quantity'         => $request->quantity,
+                    'rate'             => $unit->labour,
+                    'amount'           => $request->quantity*$unit->labour,
+                    'project_id'       => project_id(),
+                    'bq_section_id'    => $section_created->id,
+                ]);
 
 
- foreach($materials as $material) {
-    $quantity = $request->quantity * $material->conversion_factor;
-    $amount = $material->amount*$material->rate; 
-    BomItem::create([
-        'section_id'       => $section_created->section_id,
-        'item_id'          => $section_created->item_id,
-        'item_material_id' => $material->id,
-        'product_id'       => $material->product_id,
-        'quantity'         => $request->quantity,
-        'rate'             => $material->rate,
-        'amount'           => $amount,
-        'project_id'       => project_id(),
-        'bq_section_id'    => $section_created->id,
-    ]);
- }
-           
+            foreach($materials as $material) {
+                $quantity = $request->quantity * $material->conversion_factor;
+                $amount = $material->amount*$material->rate; 
+                BomItem::create([
+                    'section_id'       => $section_created->section_id,
+                    'item_id'          => $section_created->item_id,
+                    'item_material_id' => $material->id,
+                    'product_id'       => $material->product_id,
+                    'quantity'         => $request->quantity,
+                    'rate'             => $material->rate,
+                    'amount'           => $amount,
+                    'project_id'       => project_id(),
+                    'bq_section_id'    => $section_created->id,
+                ]);
+            }
+                    
 
         }
 
@@ -91,11 +91,13 @@ $labour = $labour*$request->quantity;
 
       
         $request->validate([
+            'item_name' => 'required|string',
             'rate' => 'required|numeric',
             'quantity' => 'required|numeric',
         ]);
 
         $item = BqSection::find($request->id);
+        $item->item_name = $request->item_name;
         $item->quantity =$request->quantity;
         $item->rate =$request->rate;
         $item->amount =$request->rate*$request->quantity;
@@ -108,17 +110,17 @@ $labour = $labour*$request->quantity;
         }
 
 
-$materials = ItemMaterial::where('item_id', $item->item_id)->get();
-$unit = Item::find($item->item_id);
-$labour = $unit->labour;
-$labour = $labour*$request->quantity;
+        $materials = ItemMaterial::where('item_id', $item->item_id)->get();
+        $unit = Item::find($item->item_id);
+        $labour = $unit->labour;
+        $labour = $labour*$request->quantity;
 
-$labours = BomLabour::where('bq_section_id', $request->id)->first();
+        $labours = BomLabour::where('bq_section_id', $request->id)->first();
 
-$labours_count = BomLabour::where('bq_section_id', $request->id)->count();
-if($labours_count>0){
-    $labours->delete();
-}
+        $labours_count = BomLabour::where('bq_section_id', $request->id)->count();
+        if($labours_count>0){
+            $labours->delete();
+        }
 
 
 

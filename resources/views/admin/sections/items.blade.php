@@ -93,8 +93,8 @@
                                             <label for="editUnitOfMeasurementInput{{ $item->id }}">Unit of Measurement</label>
                                             <select class="form-control" id="editUnitOfMeasurementInput{{ $item->id }}" name="unit_of_measurement" required>
                                                 @foreach($units as $unit)
-   <option value="{{ $unit->abbrev }}" {{ $unit->name == $item->unit_of_measurement ? 'selected' : '' }}>{{ $unit->abbrev }}
-   </option>
+                                                    <option value="{{ $unit->abbrev }}" {{ $unit->name == $item->unit_of_measurement ? 'selected' : '' }}>{{ $unit->abbrev }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>

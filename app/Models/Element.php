@@ -17,9 +17,9 @@ class Element extends Model
         return $this->belongsTo(Section::class);
     }
 
-    public function subElements()
+    public function item()
     {
-        return $this->hasMany(SubElement::class);
+        return $this->hasMany(Item::class);
     }
 
 }

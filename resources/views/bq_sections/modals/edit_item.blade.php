@@ -12,16 +12,21 @@
                                    
 
                                         <input type="hidden" name="id" value="{{ $item->id }}">
-                                        <div class="form-group">
-                                            <label for="editItemNameInput{{ $item->id }}">Quantity</label>
-                                            <input type="text" class="form-control" id="editItemNameInput{{ $item->id }}" name="quantity" value="{{ $item->quantity }}" required>
-                                        </div>
 
+                                            <div class="form-group">
+                                                <label for="editItemNameInput{{ $item->id }}">Name</label>
+                                                <input type="text" class="form-control" id="editItemNameInput{{ $item->id }}" name="quantity" value="{{ $item->item_name }}" required>
+                                            </div>
 
-                                             <div class="form-group">
-                                            <label for="editItemNameInput{{ $item->id }}">Rate</label>
-                                            <input type="text" class="form-control" id="editItemNameInput{{ $item->id }}" name="rate" value="{{ $item->rate }}" required>
-                                        </div>
+                                            <div class="form-group">
+                                                <label for="editItemNameInput{{ $item->id }}">Quantity</label>
+                                                <input type="text" class="form-control" id="editItemNameInput{{ $item->id }}" name="quantity" value="{{ $item->quantity }}" required>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="editItemNameInput{{ $item->id }}">Rate</label>
+                                                <input type="text" class="form-control" id="editItemNameInput{{ $item->id }}" name="rate" value="{{ $item->rate }}" required>
+                                            </div>
                                   
 
                          

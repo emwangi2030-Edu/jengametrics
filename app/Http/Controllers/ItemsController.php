@@ -45,7 +45,7 @@ class ItemsController extends Controller
     // Update an item
    public function update(Request $request, $id)
     {
-        $subElement = Item::findOrFail($id);
+        $item = Item::findOrFail($id);
         $request->validate([
             'name' => 'required|string|max:255',
             'labour' => 'nullable|string|max:255',
@@ -53,7 +53,7 @@ class ItemsController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $subElement->update($request->all());
+        $item->update($request->all());
 
         return redirect()->back()->with('success', 'Item updated successfully.');
     }

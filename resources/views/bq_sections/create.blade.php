@@ -35,13 +35,13 @@
                             <label for="element">{{ __('Select Element') }}</label>
                         </div>
 
-                        {{-- Sub-element Dropdown --}}
+                        <!-- {{-- Sub-element Dropdown --}}
                         <div class="form-floating mb-4">
                             <select name="sub_element_id" id="sub_element" class="form-select" required>
                                 <option value="">{{ __('Choose Sub-element') }}</option>
                             </select>
                             <label for="sub_element">{{ __('Select Sub-element') }}</label>
-                        </div>
+                        </div> -->
 
                         {{-- Item Dropdown --}}
                         <div class="form-floating mb-4">
@@ -101,7 +101,7 @@
         // Load elements based on selected section
         $('#section').on('change', function () {
             let sectionId = $(this).val();
-            $('#element, #sub_element, #item_id').html('<option value="">{{ __("Choose") }}</option>');
+            $('#element, #item_id').html('<option value="">{{ __("Choose") }}</option>');
 
             if (sectionId) {
                 $.ajax({
@@ -125,42 +125,42 @@
         });
 
         // Load sub-elements based on selected element
+        // $('#element').on('change', function () {
+        //     let elementId = $(this).val();
+        //     $('#sub_element').html('<option value="">{{ __("Choose Sub-element") }}</option>');
+        //     $('#item_id').html('<option value="">{{ __("Choose Item") }}</option>');
+
+        //     if (elementId) {
+        //         $.ajax({
+        //             url: '{{ route('get.sub_elements') }}',
+        //             type: 'GET',
+        //             data: { element_id: elementId },
+        //             beforeSend: function() {
+        //                 $('#sub_element').html('<option>Loading...</option>');
+        //             },
+        //             success: function (data) {
+        //                 $('#sub_element').html('<option value="">{{ __("Choose Sub-element") }}</option>');
+        //                 $.each(data, function (key, value) {
+        //                     $('#sub_element').append('<option value="' + key + '">' + value + '</option>');
+        //                 });
+        //             },
+        //             error: function() {
+        //                 showError('Failed to load sub-elements. Please try again.');
+        //             }
+        //         });
+        //     }
+        // });
+
+        // Load items based on selected element
         $('#element').on('change', function () {
             let elementId = $(this).val();
-            $('#sub_element').html('<option value="">{{ __("Choose Sub-element") }}</option>');
             $('#item_id').html('<option value="">{{ __("Choose Item") }}</option>');
 
             if (elementId) {
                 $.ajax({
-                    url: '{{ route('get.sub_elements') }}',
-                    type: 'GET',
-                    data: { element_id: elementId },
-                    beforeSend: function() {
-                        $('#sub_element').html('<option>Loading...</option>');
-                    },
-                    success: function (data) {
-                        $('#sub_element').html('<option value="">{{ __("Choose Sub-element") }}</option>');
-                        $.each(data, function (key, value) {
-                            $('#sub_element').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    },
-                    error: function() {
-                        showError('Failed to load sub-elements. Please try again.');
-                    }
-                });
-            }
-        });
-
-        // Load items based on selected sub-element
-        $('#sub_element').on('change', function () {
-            let subelementId = $(this).val();
-            $('#item_id').html('<option value="">{{ __("Choose Item") }}</option>');
-
-            if (subelementId) {
-                $.ajax({
                     url: '{{ route('get.items') }}',
                     type: 'GET',
-                    data: { sub_element_id: subelementId },
+                    data: { element_id: elementId },
                     beforeSend: function() {
                         $('#item_id').html('<option>Loading...</option>');
                     },

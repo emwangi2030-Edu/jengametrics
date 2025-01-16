@@ -5,7 +5,7 @@
         <div class="row mb-4">
             <div class="col-12">
                 <h2 class="font-weight-bold text-dark">
-                    {{ __('Section: ') . $bqSection->section_name }}
+                    {{ __('Section: ') . $bqSection->name }}
                 </h2>
             </div>
         </div>
@@ -15,7 +15,7 @@
                 <div class="card">
                     <div class="card-body">
                         <!-- Display Section Details -->
-                        <p><strong>{{ __('Section Name:') }}</strong> {{ $bqSection->name }}</p>
+                        <!-- <p><strong>{{ __('Section Name:') }}</strong> {{ $bqSection->name }}</p> -->
                         <p><strong>{{ __('Details:') }}</strong> {{ $bqSection->description }}</p>
                     
 
@@ -31,9 +31,9 @@
 <table class="table table-striped mt-4">
     <thead>
         <tr>
-            <!-- <th scope="col">{{ __('Description') }}</th> -->
-            <th scope="col">{{ __('Quantity') }}</th>
+            <th scope="col">{{ __('Name') }}</th>
             <th scope="col">{{ __('Unit') }}</th>
+            <th scope="col">{{ __('Quantity') }}</th>
             <th scope="col">{{ __('Rate') }}</th>
             <th scope="col">{{ __('Amount') }}</th>
             <th scope="col">{{ __('Actions') }}</th>
@@ -50,8 +50,9 @@
                 $totalAmount += $item->amount;
             @endphp
             <tr>
+                <td>{{ $item->item_name }}</td>
+                <td>{{ $item->units }}</td>
                 <td>{{ $item->quantity }}</td>
-                <td>{{ $item->item->unit_of_measurement }}</td>
                 <td>{{ number_format($item->rate, 2) }}</td>
                 <td>{{ number_format($item->amount, 2) }}</td>
                 <td>
@@ -72,10 +73,10 @@
     <tfoot>
         <tr>
             <th colspan="1">{{ __('Total') }}</th>
-            <td>{{ $totalQuantity }}</td>
             <td></td> <!-- Leave unit column empty -->
+            <td class="fw-bold">{{ $totalQuantity }}</td>
             <td></td> <!-- Leave rate column empty -->
-            <td>{{ number_format($totalAmount, 2) }}</td>
+            <td class="fw-bold">{{ number_format($totalAmount, 2) }}</td>
             <td></td> <!-- Leave actions column empty -->
         </tr>
     </tfoot>

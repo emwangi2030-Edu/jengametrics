@@ -11,9 +11,9 @@ class Item extends Model
 
     protected $guarded = [];
 
-    public function subElement()
+    public function Element()
     {
-        return $this->belongsTo(SubElement::class);
+        return $this->belongsTo(Element::class);
     }
 
     public function itemMaterials()

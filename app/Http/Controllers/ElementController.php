@@ -49,13 +49,13 @@ class ElementController extends Controller
         return redirect()->back()->with('success', 'Element deleted successfully.'); 
     }
 
-    public function subelements($section_id, $element_id)
+    public function items($section_id, $element_id)
     {
         $section = Section::findOrFail($section_id);
         $element = Element::findOrFail($element_id);
-        $subElements = $element->subElements; // Retrieve sub-elements related to this element
+        $items = $element->items; // Retrieve items related to this element
     
-        return view('admin.sections.subelements', compact('section', 'element', 'subElements'));
+        return view('admin.sections.items', compact('section', 'element', 'items'));
     }
     
 }
