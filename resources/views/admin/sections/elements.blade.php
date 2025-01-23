@@ -14,10 +14,6 @@
                     <label for="elementNameInput">Element Name</label>
                     <input type="text" class="form-control" id="elementNameInput" name="name" required>
                 </div>
-                <div class="form-group">
-                    <label for="elementDescriptionInput">Description</label>
-                    <textarea class="form-control" id="elementDescriptionInput" name="description" rows="3"></textarea>
-                </div>
                 <!-- Store the section_id in the form (hidden input) -->
                 <input type="hidden" name="section_id" value="{{ $section->id }}">
                 <button type="submit" class="btn btn-primary mt-3">Save Element</button>
@@ -33,8 +29,8 @@
                 @forelse($section->elements as $element)
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>{{ $element->name }}</strong><br>
-                            <small>{{ $element->description }}</small>
+                            <strong>{{ $loop->iteration }}. </strong>
+                            <strong>{{ $element->name }}</strong>
                         </div>
                         <div>
 
@@ -76,10 +72,6 @@
                                         <div class="form-group">
                                             <label for="editElementNameInput{{ $element->id }}">Element Name</label>
                                             <input type="text" class="form-control" id="editElementNameInput{{ $element->id }}" name="name" value="{{ $element->name }}" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="editElementDescriptionInput{{ $element->id }}">Description</label>
-                                            <textarea class="form-control" id="editElementDescriptionInput{{ $element->id }}" name="description" rows="3">{{ $element->description }}</textarea>
                                         </div>
                                         <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
                                     </form>

@@ -23,16 +23,9 @@
                         @endforeach
                     </select>
                 </div>
-
-
-                  <div class="form-group">
-                                            <label for="editItemNameInput">Labour cost</label>
-                                            <input type="text" class="form-control" id="editItemNameInput" name="labour" value="0" >
-                                        </div>
-
                 <div class="form-group">
-                    <label for="itemDescriptionInput">Description</label>
-                    <textarea class="form-control" id="itemDescriptionInput" name="description" rows="3"></textarea>
+                    <label for="editItemNameInput">Labour cost</label>
+                    <input type="text" class="form-control" id="editItemNameInput" name="labour" value="0" >
                 </div>
                 <input type="hidden" name="element_id" value="{{ $element->id }}">
                 <button type="submit" class="btn btn-primary mt-3">Save Item</button>
@@ -48,6 +41,7 @@
                 @forelse($items as $item)
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
+                            <strong>{{ $loop->iteration }}. </strong>
                             <strong>{{ $item->name }}</strong><br>
                             <small>Unit: {{ $item->unit_of_measurement }}</small><br>
                             <small>Labour: {{ $item->labour }}</small><br>
@@ -99,14 +93,9 @@
                                             </select>
                                         </div>
 
-                           <div class="form-group">
+                                        <div class="form-group">
                                             <label for="editItemNameInput{{ $item->id }}">Labour</label>
                                             <input type="text" class="form-control" id="editItemNameInput{{ $item->labour }}" name="labour" value="{{ $item->labour }}" >
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="editItemDescriptionInput{{ $item->id }}">Description</label>
-                                            <textarea class="form-control" id="editItemDescriptionInput{{ $item->id }}" name="description" rows="3">{{ $item->description }}</textarea>
                                         </div>
                                         <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
                                     </form>
@@ -121,7 +110,7 @@
         </div>
     </div>
 
-   <!-- Back to Sub-Elements button -->
+   <!-- Back to Elements button -->
     <a href="{{ route('sections.elements', $element->section_id) }}" class="btn btn-secondary">Back to Elements</a>
 </div>
 @endsection

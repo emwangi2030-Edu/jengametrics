@@ -16,6 +16,7 @@ class UnitsOfMeasurementSeeder extends Seeder
              ['name' => 'Meter', 'abbrev' => 'm', 'type' => 'length'],
              ['name' => 'Kilometer', 'abbrev' => 'km', 'type' => 'length'],
              ['name' => 'Roll', 'abbrev' => 'roll', 'type' => 'length'],
+             ['name' => 'Foot', 'abbrev' => 'ft', 'type' => 'length'],
  
              // Area units
              ['name' => 'Square Centimeter', 'abbrev' => 'cm²', 'type' => 'area'],
@@ -36,8 +37,12 @@ class UnitsOfMeasurementSeeder extends Seeder
              ['name' => 'Milligram', 'abbrev' => 'mg', 'type' => 'weight'],
  
              // Quantity units
-             ['name' => 'Each', 'abbrev' => 'ea', 'type' => 'quantity'],
+             ['name' => 'Each', 'abbrev' => 'each', 'type' => 'quantity'],
              ['name' => 'Set', 'abbrev' => 'set', 'type' => 'quantity'],
+             ['name' => 'Bag', 'abbrev' => 'bag', 'type' => 'quantity'],
+             ['name' => 'Piece', 'abbrev' => 'pcs', 'type' => 'quantity'],
+             ['name' => 'Item', 'abbrev' => 'item', 'type' => 'quantity'],
+             ['name' => 'Packet', 'abbrev' => 'pkt', 'type' => 'quantity'],
  
              // Time units
              ['name' => 'Hour', 'abbrev' => 'hr', 'type' => 'time']

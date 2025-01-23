@@ -21,13 +21,11 @@ class SectionController extends Controller
         // Validate the inputs
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
         ]);
 
         // Create a new section
         Section::create([
             'name' => $request->name,
-            'description' => $request->description,
         ]);
 
         // Redirect back with a success message
@@ -49,12 +47,10 @@ class SectionController extends Controller
         // Validate the incoming request
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
         ]);
 
         // Update the section with the new data
         $section->name = $request->input('name');
-        $section->description = $request->input('description');
         $section->save();
 
         // Redirect back to the sections index page with a success message

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
-use App\Models\SubElement;
 use App\Models\Element;
 use App\Models\ItemUnitOfMeasurement;
 use Illuminate\Http\Request;
@@ -34,7 +33,6 @@ class ItemsController extends Controller
         Item::create([
             'name' => $request->name,
             'labour' => $request->labour,
-            'description' => $request->description,
             'element_id' => $request->element_id,
             'unit_of_measurement' => $request->unit_of_measurement,
         ]);
@@ -50,7 +48,6 @@ class ItemsController extends Controller
             'name' => 'required|string|max:255',
             'labour' => 'nullable|string|max:255',
             'unit_of_measurement' => 'required|string|max:255',
-            'description' => 'nullable|string',
         ]);
 
         $item->update($request->all());

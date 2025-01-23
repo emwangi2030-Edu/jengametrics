@@ -19,7 +19,6 @@ class ElementController extends Controller
         Element::create([
             'section_id' => $request->section_id,
             'name' => $request->name,
-            'description' => $request->description,
         ]);
 
         return redirect()->route('sections.elements', $request->section_id)->with('success', 'Element added successfully.');
@@ -32,7 +31,6 @@ class ElementController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
         ]);
 
         $element->update($request->all());

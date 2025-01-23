@@ -14,10 +14,6 @@
                     <label for="sectionNameInput">Section Name</label>
                     <input type="text" class="form-control" id="sectionNameInput" name="name" required>
                 </div>
-                <div class="form-group">
-                    <label for="sectionDescriptionInput">Description</label>
-                    <textarea class="form-control" id="sectionDescriptionInput" name="description" rows="3"></textarea>
-                </div>
                 <button type="submit" class="btn btn-primary mt-3">Save Section</button>
             </form>
         </div>
@@ -31,8 +27,8 @@
                 @forelse($sections as $section)
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>{{ $section->name }}</strong><br>
-                            <small>{{ $section->description }}</small>
+                            <strong>{{ $loop->iteration }}. </strong>
+                            <strong>{{ $section->name }}</strong>
                         </div>
                         
                         <div>
@@ -70,10 +66,6 @@
                                         <div class="form-group">
                                             <label for="editSectionNameInput{{ $section->id }}">Section Name</label>
                                             <input type="text" class="form-control" id="editSectionNameInput{{ $section->id }}" name="name" value="{{ $section->name }}" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="editSectionDescriptionInput{{ $section->id }}">Description</label>
-                                            <textarea class="form-control" id="editSectionDescriptionInput{{ $section->id }}" name="description" rows="3">{{ $section->description }}</textarea>
                                         </div>
                                         <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
                                     </form>
