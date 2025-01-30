@@ -1,38 +1,46 @@
 @extends('layouts.appbar')
 
 @section('content')
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h1 class="text-center mb-4">Step 3: Confirm and Submit</h1>
-            <div class="card">
-                <div class="card-body">
-                    <form action="{{ route('wizard.complete') }}" method="POST">
-                        @csrf
-                        <div class="form-group">
-                            <label for="name">Project Name:</label>
-                            <input type="text" id="name" name="name" class="form-control" value="{{ session('name') }}" readonly>
-                        </div>
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="col-md-6">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h2 class="text-center mb-4">Step 3: Confirm and Submit</h2>
 
-                        <div class="form-group">
-                            <label for="description">Project Description:</label>
-                            <input type="text" id="description" name="description" class="form-control" value="{{ session('description') }}" readonly>
-                        </div>
+                <form action="{{ route('wizard.complete') }}" method="POST">
+                    @csrf
 
+                    <!-- Project Name -->
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Project Name:</label>
+                        <input type="text" id="name" name="name" class="form-control-plaintext" value="{{ session('name') }}" readonly>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="address">Project Address:</label>
-                            <input type="text" id="address" name="address" class="form-control" value="{{ session('address') }}" readonly>
-                        </div>
+                    <!-- Project Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Project Description:</label>
+                        <input type="text" id="description" name="description" class="form-control-plaintext" value="{{ session('description') }}" readonly>
+                    </div>
 
+                    <!-- Project Address -->
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Project Address:</label>
+                        <input type="text" id="address" name="address" class="form-control-plaintext" value="{{ session('address') }}" readonly>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="budget">Budget:</label>
-                            <input type="text" id="budget" name="budget" class="form-control" value="{{ session('budget') }}" readonly>
-                        </div>
+                    <!-- Budget -->
+                    <div class="mb-3">
+                        <label for="budget" class="form-label">Budget:</label>
+                        <input type="text" id="budget" name="budget" class="form-control-plaintext" value="{{ session('budget') }}" readonly>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-flex justify-content-end">
                         <button type="submit" class="btn btn-success">Complete</button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
 @endsection
