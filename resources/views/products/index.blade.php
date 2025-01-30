@@ -9,6 +9,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Unit</th>
+                    <th>Rate</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -17,6 +18,7 @@
                     <tr>
                         <td><span class="fw-bold">{{ $loop->iteration }}</span>. {{ $product->name }}</td>
                         <td>{{ $product->unit }}</td>
+                        <td>{{ $product->rate }}</td>
                         <td>
                             <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ $product->id }}">Edit</a>
                             <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display:inline;">
@@ -44,12 +46,18 @@
                                             <input type="text" class="form-control" id="name{{ $product->id }}" name="name" value="{{ $product->name }}" required>
                                         </div>
                                         <div class="form-group">
-                                            <label for="name{{ $product->id }}">Unit</label>
-                                            <select class="form-control" name="unit" id="unit"{{ $product->id }}>
+                                            <label for="unit{{ $product->id }}">Unit</label>
+                                            <select class="form-control" name="unit" id="unit{{ $product->id }}">
                                                 @foreach($units as $unit)
-                                                    <option value="{{ $unit->abbrev }}">{{ $unit->abbrev }}</option>
+                                                    <option value="{{ $unit->abbrev }}" {{ $product->unit == $unit->abbrev ? 'selected' : '' }}>
+                                                        {{ $unit->abbrev }}
+                                                    </option>
                                                 @endforeach
                                             </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="rate{{ $product->id }}">Rate</label>
+                                            <input type="number" step="0.01" class="form-control" id="rate{{ $product->id }}" name="rate" value="{{ $product->rate }}" required>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -77,7 +85,7 @@
                     <form action="{{ route('products.store') }}" method="POST">
                         @csrf
                         <div class="form-group">
-                            <label for="name">Material</label>
+                            <label for="name">Material Name</label>
                             <input type="text" class="form-control" id="name" name="name" required>
                         </div>
                         <div class="form-group">
@@ -87,6 +95,10 @@
                                     <option value="{{ $unit->abbrev }}">{{ $unit->abbrev }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="rate">Rate</label>
+                            <input type="number" step="0.01" class="form-control" id="rate" name="rate" required>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
