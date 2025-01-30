@@ -33,7 +33,7 @@
                     <div class="card shadow border-0">
                         <div class="card-body text-center">
                             <h5 class="card-title text-success">Upcoming Projects</h5>
-                            <h3 class="text-dark">5</h3>
+                            <h3 class="text-dark">0</h3>
                         </div>
                     </div>
                 </div>
