@@ -311,7 +311,7 @@ function project(){
 function get_project(){
 
     $user = Auth::user();
-    $business = Project::find($user->project_id)->first();
+    $business = Project::find($user->project_id);
 
  return $business;
 

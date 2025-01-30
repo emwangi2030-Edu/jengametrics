@@ -24,7 +24,7 @@ class BqDocumentController extends Controller
         // return view('bq_documents.index', compact('documents'));
 
         $bqDocument = get_project()->id;
-        $sections = Section::orderBy('id', 'desc')->get();
+        $sections = Section::orderBy('id', 'asc')->get();
 
         return view('bq_documents.show', compact('bqDocument', 'sections'));
     }
