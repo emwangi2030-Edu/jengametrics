@@ -13,7 +13,7 @@
                     <div class="card shadow border-0">
                         <div class="card-body text-center">
                             <h5 class="card-title text-success">Total Workers</h5>
-                            <h3 class="text-dark">120</h3>
+                            <h3 class="text-dark">{{ $totalWorkers}}</h3>
                         </div>
                     </div>
                 </div>
@@ -23,7 +23,7 @@
                     <div class="card shadow border-0">
                         <div class="card-body text-center">
                             <h5 class="card-title text-success">Total Material Expenses</h5>
-                            <h3 class="text-dark">KES 5,200,000</h3>
+                            <h3 class="text-dark">KES {{ $totalMaterialExpenses }}</h3>
                         </div>
                     </div>
                 </div>
