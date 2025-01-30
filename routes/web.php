@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Auth;
 
 // Home Route
 Route::get('/', function () {
-    return view('auth.register');
+    return view('auth.login');
 });
 
 
