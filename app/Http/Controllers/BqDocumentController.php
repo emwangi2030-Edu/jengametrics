@@ -25,8 +25,9 @@ class BqDocumentController extends Controller
 
         $bqDocument = get_project()->id;
         $sections = Section::orderBy('id', 'asc')->get();
+        $totalAmount = BqSection::where('project_id', project_id())->sum('amount');
 
-        return view('bq_documents.show', compact('bqDocument', 'sections'));
+        return view('bq_documents.show', compact('bqDocument', 'sections', 'totalAmount'));
     }
 
     /**

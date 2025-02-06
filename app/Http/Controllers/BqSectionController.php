@@ -24,7 +24,8 @@ class BqSectionController extends Controller
 
     public function store(Request $request)
     {
-
+        // Retrieve the selected item
+        $selectedItem = Item::find($request->item_id);
        
         $data = [
             'section_id' => $request->section_id,
@@ -34,8 +35,8 @@ class BqSectionController extends Controller
             'quantity' => $request->quantity,
             'amount' => $request->amount,
             'project_id' => project_id(),
-            'item_name' => Item::where('element_id', $request->element_id)->first()?->name,
-            'units' => Item::where('element_id', $request->element_id)->first()?->unit_of_measurement
+            'item_name' => $selectedItem?->name,
+            'units' => $selectedItem?->unit_of_measurement
         ];
 
         $section_created = BqSection::create($data);
