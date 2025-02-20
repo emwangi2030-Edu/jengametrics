@@ -18,7 +18,7 @@
     <thead>
         <tr>
             <th scope="col">{{ __('Description') }}</th>
-            <th scope="col">{{ __('Quantity') }}</th>
+            <th scope="col">{{ __('No. of Labourers') }}</th>
             <th scope="col">{{ __('Rate') }}</th>
             <th scope="col">{{ __('Amount') }}</th>
        
@@ -51,9 +51,9 @@
     <tfoot>
         <tr>
             <th colspan="1">{{ __('Total') }}</th>
-            <td>{{ $totalQuantity }}</td>
+            <td><b>{{ $totalQuantity }}</b></td>
             <td></td> <!-- Leave rate column empty -->
-            <td>{{ number_format($totalAmount, 2) }}</td>
+            <td><b>{{ number_format($totalAmount, 2) }}</b></td>
        
         </tr>
     </tfoot>

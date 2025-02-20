@@ -20,7 +20,7 @@
                       
 
                         <!-- Link to create a new section -->
-                        <a href="{{ route(name: 'boms.create') }}" class="btn btn-primary">{{ __('Create New Stage') }}</a>
+                        <!-- <a href="{{ route(name: 'boms.create') }}" class="btn btn-primary">{{ __('Create New Stage') }}</a> -->
 
 
                         <!-- Sections List -->

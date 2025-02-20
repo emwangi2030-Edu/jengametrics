@@ -9,6 +9,7 @@ use App\Models\BomLabour;
 use App\Models\BomItem;
 use App\Models\Item;
 use App\Models\ItemMaterial;
+use App\Models\Product;
 
 use Illuminate\Http\Request;
 
@@ -60,6 +61,7 @@ class BqSectionController extends Controller
 
 
             foreach($materials as $material) {
+                $product = Product::find($material->product_id);
                 $quantity = $request->quantity * $material->conversion_factor;
                 $amount = $material->amount*$material->rate; 
                 BomItem::create([
@@ -68,7 +70,7 @@ class BqSectionController extends Controller
                     'item_material_id' => $material->id,
                     'product_id'       => $material->product_id,
                     'quantity'         => $request->quantity,
-                    'rate'             => $material->rate,
+                    'rate'             => $product->rate,
                     'amount'           => $amount,
                     'project_id'       => project_id(),
                     'bq_section_id'    => $section_created->id,
@@ -137,6 +139,7 @@ class BqSectionController extends Controller
 
 
  foreach($materials as $material) {
+    $product = Product::find($material->product_id);
     $quantity = $request->quantity * $material->conversion_factor;
     $amount = $material->amount*$material->rate; 
     BomItem::create([
@@ -145,7 +148,7 @@ class BqSectionController extends Controller
         'item_material_id' => $material->id,
         'product_id'       => $material->product_id,
         'quantity'         => $quantity,
-        'rate'             => $material->rate,
+        'rate'             => $product->rate,
         'amount'           => $amount,
         'project_id'       => project_id(),
         'bq_section_id'    => $item->id,

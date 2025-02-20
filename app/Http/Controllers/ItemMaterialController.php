@@ -34,6 +34,7 @@ class ItemMaterialController extends Controller
             'unit_of_measurement' => $request->unit_of_measurement,
             'conversion_factor'    => $request->conversion_factor,
             'item_id'              => $request->item_id,
+            'rate' => $request->rate
         ];
 
         ItemMaterial::create($data);
