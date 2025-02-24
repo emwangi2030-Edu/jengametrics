@@ -15,7 +15,6 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <!-- Document Details -->
-                    <p class="font-weight-bold text-dark">{{ __('Document Details') }}</p>
                     <div class="mt-4">
                         <!-- Sections List -->
                         <div class="mt-5">
