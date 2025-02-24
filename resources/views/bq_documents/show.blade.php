@@ -54,22 +54,24 @@
                                                 @endforeach
                                             </tbody>
                                         </table>
-                                        <table class="table table-borderless">
-                                            <thead class="p-0 m-0">
-                                                <tr class="p-0 m-0">
-                                                    <th class="p-0 m-0">{{ __('') }}</th>
-                                                    <th class="p-0 m-0">{{ __('') }}</th>
-                                                    <th class="p-0 m-0">{{ __('') }}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="fw-bold">{{ __('TOTAL AMOUNT') }}</td>
-                                                    <td></td>
-                                                    <td class="fw-bold text-center">{{ $totalAmount }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="bg-secondary bg-opacity-10 text-black border-0 rounded p-3">
+                                            <table class="table table-borderless">
+                                                <thead class="p-0 m-0">
+                                                    <tr class="p-0 m-0">
+                                                        <th class="p-0 m-0">{{ __('') }}</th>
+                                                        <th class="p-0 m-0">{{ __('') }}</th>
+                                                        <th class="p-0 m-0">{{ __('') }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="fw-bold">{{ __('TOTAL AMOUNT') }}</td>
+                                                        <td></td>
+                                                        <td class="fw-bold text-center">{{ $totalAmount }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 @endif
                             </div>

@@ -52,32 +52,34 @@
                                     </table>
                                 </div>
                             @endif
-                            <table class="table table-borderless">
-                                <thead class="p-0 m-0">
-                                    <tr class="p-0 m-0">
-                                        <th class="p-0 m-0">{{ __('') }}</th>
-                                        <th class="p-0 m-0">{{ __('') }}</th>
-                                        <th class="p-0 m-0">{{ __('') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="fw-bold">{{ __('TOTAL ESTIMATED MATERIAL COST') }}</td>
-                                        <td></td>
-                                        <td class="fw-bold text-center">{{ number_format($totalAmount, 2) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">{{ __('TOTAL ESTIMATED LABOUR COST') }}</td>
-                                        <td></td>
-                                        <td class="fw-bold text-center">{{ number_format($totalLabour, 2) }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">{{ __('TOTAL ESTIMATED COMBINED COST') }}</td>
-                                        <td></td>
-                                        <td class="fw-bold text-center">{{ number_format($totalAmount + $totalLabour, 2) }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="bg-secondary bg-opacity-10 text-black border-0 rounded p-3">
+                                <table class="table table-borderless">
+                                    <thead class="p-0 m-0">
+                                        <tr class="p-0 m-0">
+                                            <th class="p-0 m-0">{{ __('') }}</th>
+                                            <th class="p-0 m-0">{{ __('') }}</th>
+                                            <th class="p-0 m-0">{{ __('') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="fw-bold">{{ __('TOTAL ESTIMATED MATERIAL COST') }}</td>
+                                            <td></td>
+                                            <td class="fw-bold text-center">{{ number_format($totalAmount, 2) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">{{ __('TOTAL ESTIMATED LABOUR COST') }}</td>
+                                            <td></td>
+                                            <td class="fw-bold text-center">{{ number_format($totalLabour, 2) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">{{ __('TOTAL ESTIMATED COMBINED COST') }}</td>
+                                            <td></td>
+                                            <td class="fw-bold text-center">{{ number_format($totalAmount + $totalLabour, 2) }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
