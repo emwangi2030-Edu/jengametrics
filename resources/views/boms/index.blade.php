@@ -17,42 +17,69 @@
                     <!-- Document Details -->
                     <p class="font-weight-bold text-dark">{{ __('Document Details') }}</p>
                     <div class="mt-4">
-                      
-
-                        <!-- Link to create a new section -->
-                        <!-- <a href="{{ route(name: 'boms.create') }}" class="btn btn-primary">{{ __('Create New Stage') }}</a> -->
-
-
                         <!-- Sections List -->
                         <div class="mt-5">
-                            <h3 class="h5 font-weight-bold text-dark">{{ __('Sections') }}</h3>
                             @if($sections->isEmpty())
                                 <p class="text-muted">{{ __('No sections found.') }}</p>
                             @else
-                                <ul class="list-group mt-3">
-                                    @foreach($sections as $section)
-
-                                    @php
-                                    $items_count = \App\Models\BomItem::whereProjectId(project_id())->where('section_id', $section->id)->count();
-                                    @endphp
-                                        <li class="list-group-item">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <p class="font-weight-bold mb-1">{{ $section->name }}</p>
-                                                
-                                                </div>
-
-                                                <a href="{{ route('boms.show', $section->id) }}" class="btn btn-outline-primary btn-sm">
-                                                    {{ __('View Section') }} ({{ $items_count }})
-                                                </a>
-                                               
-                                            </div>
-                                        </li>
-                                    @endforeach
-                                </ul>
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-striped">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>{{ __('Section') }}</th>
+                                                <th>{{ __('') }}</th>
+                                                <th>{{ __('Material Cost') }}</th>
+                                                <th>{{ __('Labour Cost') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($sections as $section)
+                                                @php
+                                                $total_section_material = \App\Models\BomItem::whereProjectId(project_id())->where('section_id', $section->id)->selectRaw('SUM(quantity * rate) as total')->value('total');
+                                                $total_section_labour = \App\Models\BomLabour::whereProjectId(project_id())->where('section_id', $section->id)->sum('amount');
+                                                @endphp
+                                                <tr>
+                                                    <td class="fw-bold">{{ $section->name }}</td>
+                                                    <td>
+                                                        <a href="{{ route('boms.show', $section->id) }}" class="btn btn-outline-primary btn-sm">
+                                                            {{ __('View Section') }}
+                                                        </a>
+                                                    </td>
+                                                    <td class="fw-bold">{{ number_format($total_section_material, 2) }}</td>
+                                                    <td class="fw-bold">{{ number_format($total_section_labour, 2) }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             @endif
+                            <table class="table table-borderless">
+                                <thead class="p-0 m-0">
+                                    <tr class="p-0 m-0">
+                                        <th class="p-0 m-0">{{ __('') }}</th>
+                                        <th class="p-0 m-0">{{ __('') }}</th>
+                                        <th class="p-0 m-0">{{ __('') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-bold">{{ __('TOTAL ESTIMATED MATERIAL COST') }}</td>
+                                        <td></td>
+                                        <td class="fw-bold text-center">{{ number_format($totalAmount, 2) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">{{ __('TOTAL ESTIMATED LABOUR COST') }}</td>
+                                        <td></td>
+                                        <td class="fw-bold text-center">{{ number_format($totalLabour, 2) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">{{ __('TOTAL ESTIMATED COMBINED COST') }}</td>
+                                        <td></td>
+                                        <td class="fw-bold text-center">{{ number_format($totalAmount + $totalLabour, 2) }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-
                     </div>
                 </div>
             </div>

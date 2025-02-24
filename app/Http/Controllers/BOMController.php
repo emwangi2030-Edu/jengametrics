@@ -18,10 +18,15 @@ class BOMController extends Controller
     {
         $bqDocument = get_project()->id;
         $sections = Section::orderBy('id', 'asc')->get();
+        // $total_section_material_costs = BomItem::whereProjectId(project_id())
+        //                                     ->where('section_id', $sections->id)
+        //                                     ->selectRaw('SUM(quantity * rate) as total')
+        //                                     ->value('total');
+        $totalAmount = BomItem::selectRaw('SUM(quantity * rate) as total')->value('total');
+        $totalLabour = BomLabour::sum('amount');
 
-        return view('boms.index', compact('bqDocument', 'sections'));
-    
 
+        return view('boms.index', compact('bqDocument', 'sections', 'totalAmount', 'totalLabour'));
     }
 
     public function create()
@@ -40,16 +45,17 @@ class BOMController extends Controller
         foreach ($request->items as $item) {
              // Fetch the rate from the products table based on product_id
              $product = Product::where('id', $item['product_id'])->get();
-
              $rate = $product ? $product->rate : 0;
+             $quantity = $item['quantity'];
+             $amount = $rate * $quantity;
 
             BomItem::create([
                 'bom_id' => $bom->id,
                 'item_description' => $item['description'],
-                'quantity' => $item['quantity'],
+                'quantity' => $quantity,
                 'unit' => $item['unit'],
                 'rate' => $rate,
-                'amount' => $rate * $item['quantity'],
+                'amount' => $amount,
             ]);
         }
 
