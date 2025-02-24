@@ -54,7 +54,7 @@
                                                 @endforeach
                                             </tbody>
                                         </table>
-                                        <div class="bg-secondary bg-opacity-10 text-black border-0 rounded p-3">
+                                        <div class="bg-secondary bg-opacity-10 text-black border-0 rounded p-1">
                                             <table class="table table-borderless">
                                                 <thead class="p-0 m-0">
                                                     <tr class="p-0 m-0">
