@@ -12,5 +12,4 @@ Route::post('register', [UsersController::class, 'register']);
 Route::post('login', [UsersController::class, 'login']);
 
 // Route to get the authenticated user
-// The `auth:api` middleware ensures that only authenticated users can access this route
-Route::middleware('auth:api')->get('user', [UsersController::class, 'getAuthenticatedUser']);
+Route::middleware('auth:sanctum')->get('user', [UsersController::class, 'getAuthenticatedUser']);
