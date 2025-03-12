@@ -46,42 +46,50 @@ class UsersController extends Controller
     // User Login
     public function login(Request $request)
     {
-        // Validate the incoming request data
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
-            'password' => 'required|string|min:6',
+        // Validate input
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
         ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+    
+        // Find user by email
+        $user = User::where('email', $request->email)->first();
+    
+        // Verify user and password
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Invalid login credentials'], 401);
         }
-
-        // Attempt authentication
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            $user = Auth::user();
-            
-            // Generate token after login
-            $token = $user->createToken('appToken')->accessToken; // For Passport
-            // If using Sanctum, use: $token = $user->createToken('appToken')->plainTextToken;
-
-            return response()->json([
-                'success' => true,
-                'token' => $token,
-                'user' => $user
-            ]);
-        } else {
-            // Return error if authentication fails
-            return response()->json([
-                'success' => false,
-                'error' => 'Invalid Email or Password',
-            ], 401);
-        }
+    
+        // Generate API token
+        $token = $user->createToken('auth_token')->plainTextToken;
+    
+        // Return response with only necessary user details
+        return response()->json([
+            'success' => true,
+            'message' => 'Login successful',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ],
+            'token' => $token
+        ]);
     }
+    
 
     // Get Authenticated User
     public function getAuthenticatedUser(Request $request)
     {
-        // Return the authenticated user data
-        return response()->json($request->user());
+        $user = $request->user();
+    
+        return response()->json([
+            'success' => true,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ]
+        ]);
     }
+    
 }
