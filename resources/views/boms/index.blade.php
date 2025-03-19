@@ -65,17 +65,17 @@
                                         <tr>
                                             <td class="fw-bold">{{ __('TOTAL ESTIMATED MATERIAL COST') }}</td>
                                             <td></td>
-                                            <td class="fw-bold text-center">{{ number_format($totalAmount, 2) }}</td>
+                                            <td class="fw-bold text-center">KES {{ number_format($totalAmount, 2) }}</td>
                                         </tr>
                                         <tr>
                                             <td class="fw-bold">{{ __('TOTAL ESTIMATED LABOUR COST') }}</td>
                                             <td></td>
-                                            <td class="fw-bold text-center">{{ number_format($totalLabour, 2) }}</td>
+                                            <td class="fw-bold text-center">KES {{ number_format($totalLabour, 2) }}</td>
                                         </tr>
                                         <tr>
                                             <td class="fw-bold">{{ __('TOTAL ESTIMATED COMBINED COST') }}</td>
                                             <td></td>
-                                            <td class="fw-bold text-center">{{ number_format($totalAmount + $totalLabour, 2) }}</td>
+                                            <td class="fw-bold text-center">KES {{ number_format($totalAmount + $totalLabour, 2) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

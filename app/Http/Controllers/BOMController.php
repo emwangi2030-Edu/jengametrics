@@ -22,8 +22,11 @@ class BOMController extends Controller
         //                                     ->where('section_id', $sections->id)
         //                                     ->selectRaw('SUM(quantity * rate) as total')
         //                                     ->value('total');
-        $totalAmount = BomItem::selectRaw('SUM(quantity * rate) as total')->value('total');
-        $totalLabour = BomLabour::sum('amount');
+        $totalAmount = BomItem::where('project_id', project_id())
+                                ->selectRaw('SUM(quantity * rate) as total')
+                                ->value('total');
+        $totalLabour = BomLabour::where('project_id', project_id())
+                                ->sum('amount');
 
 
         return view('boms.index', compact('bqDocument', 'sections', 'totalAmount', 'totalLabour'));

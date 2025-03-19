@@ -7,7 +7,7 @@
   
             <h1 class="text-success my-4">Dashboard</h1>
 
-            <div class="row g-4">
+            <div class="row justify-content-center g-4">
                 <!-- Total Workers Card -->
                 <div class="col-md-4">
                     <div class="card shadow border-0">
@@ -24,16 +24,6 @@
                         <div class="card-body text-center">
                             <h5 class="card-title text-success">Total Material Expenses</h5>
                             <h3 class="text-dark">KES {{ $totalMaterialExpenses }}</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Upcoming Projects Card -->
-                <div class="col-md-4">
-                    <div class="card shadow border-0">
-                        <div class="card-body text-center">
-                            <h5 class="card-title text-success">Upcoming Projects</h5>
-                            <h3 class="text-dark">0</h3>
                         </div>
                     </div>
                 </div>

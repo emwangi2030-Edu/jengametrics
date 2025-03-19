@@ -94,8 +94,7 @@
                 <!-- scrollbar removed-->
                 <div class="navbar-vertical-content">
                     <ul class="navbar-nav flex-column" id="navbarVerticalNav">
-
-                        <li class="nav-item">
+                        <div class="nav-item">
                             <!-- label-->
                             <p class="navbar-vertical-label">Apps</p>
                             <hr class="navbar-vertical-line" /><!-- parent pages-->
@@ -149,8 +148,6 @@
                                 }
                             </style>
 
-
-                            <!-- Dashboard Item -->
                             <!-- Dashboard Item -->
                             <div class="nav-item-wrapper">
                                 <a class="nav-link label-1" href="{{ route('dashboard') }}" role="button" aria-expanded="false">
@@ -163,304 +160,176 @@
                                 </a>
                             </div>
 
-
-
                             @if(Auth::user()->is_client())
-
-
-                            <!-- Bills of Quantities (BQ) -->
-                            <div class="nav-item-wrapper">
-                                <a class="nav-link label-1" href="{{ route('boq') }}" role="button" aria-expanded="false">
-                                    <div class="d-flex align-items-center">
-                                        <span class="nav-link-icon">
-                                            <span data-feather="file-text"></span>
-                                        </span>
-                                        <span class="nav-link-text-wrapper">
-                                            <span class="nav-link-text">Bills of Quantities</span>
-                                        </span>
-                                    </div>
-                                </a>
-                            </div>
-
-                            <div></div>
-
-
-
-                            <!-- Bills of Materials (BOM) -->
-                            <div class="nav-item-wrapper">
-                                <a class="nav-link label-1" href="{{ route('boms.index') }}" role="button" aria-expanded="false">
-                                    <div class="d-flex align-items-center">
-                                        <span class="nav-link-icon">
-                                            <span data-feather="settings"></span>
-                                        </span>
-                                        <span class="nav-link-text-wrapper">
-                                            <span class="nav-link-text">Bills of Materials</span>
-                                        </span>
-                                    </div>
-                                </a>
-                            </div>
-
-                            <!-- Material Management -->
-                            <div class="nav-item-wrapper">
-                                <div class="nav-link label-1" role="button" aria-expanded="false">
-                                    <div class="d-flex align-items-center">
-                                        <span class="nav-link-icon">
-                                            <span data-feather="box"></span>
-                                        </span>
-                                        <a href="{{ url(route('materials.index')) }}" title="Material Management">
-                                            <!-- <div class="d-flex align-items-center">   -->
-                                                <span class="nav-link-text-wrapper">
-                                                    <span class="nav-link-text">Material Management</span>
-                                                </span>
-                                                <!-- </div> -->
-                                            </a>
-                                            <span class="menu-arrow"></span>
+                                <!-- Bills of Quantities (BQ) -->
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link label-1" href="{{ route('boq') }}" role="button" aria-expanded="false">
+                                        <div class="d-flex align-items-center">
+                                            <span class="nav-link-icon">
+                                                <span data-feather="file-text"></span>
+                                            </span>
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Bills of Quantities</span>
+                                            </span>
                                         </div>
-                                    </div>
+                                    </a>
+                                </div>
 
+                                <!-- Bills of Materials (BOM) -->
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link label-1" href="{{ route('boms.index') }}" role="button" aria-expanded="false">
+                                        <div class="d-flex align-items-center">
+                                            <span class="nav-link-icon">
+                                                <span data-feather="settings"></span>
+                                            </span>
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Bills of Materials</span>
+                                            </span>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Material Management -->
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link label-1" title="manage your materials" href="{{route('materials.index') }}" role="button" aria-expanded="false">
+                                        <div class="d-flex align-items-center">
+                                            <span class="nav-link-icon">
+                                                <span data-feather="box"></span>
+                                            </span>
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Material Management</span>
+                                            </span>
+                                        </div>
+                                    </a>
                                 </div>
 
                                 <!-- Labour -->
                                 <div class="nav-item-wrapper">
-                                    <div class="nav-link label-1" role="button" aria-expanded="false">
+                                    <a class="nav-link label-1" title="Manage your labour" href="{{ route('workers.index') }}" role="button" aria-expanded="false">
                                         <div class="d-flex align-items-center">
                                             <span class="nav-link-icon">
                                                 <span data-feather="users"></span>
                                             </span>
-                                            <a href="{{ url(route('workers.index')) }}" title="Manage existing labour">
-                                                <span class="nav-link-text-wrapper">
-                                                    <span class="nav-link-text">Labour</span>
-                                                </span>
-                                            </a>
-                                            <span class="menu-arrow"></span>
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Labour</span>
+                                            </span>
                                         </div>
+                                    </a>
+                                </div>
+
+                                <!-- Cost Tracking -->
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link label-1" title="track your costs" href="{{ route('cost-tracking.index') }}" role="button" aria-expanded="false">
+                                        <div class="d-flex align-items-center">
+                                            <span class="nav-link-icon">
+                                                <span data-feather="trending-up"></span>
+                                            </span>
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Cost Tracking</span>
+                                            </span>
+                                        </div>
+                                    </a>        
+                                </div>
+
+                                <!-- Reporting -->
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link label-1" title="Daily logs/reports" href="{{ route('reports') }}" role="button" aria-expanded="false">
+                                        <div class="d-flex align-items-center">
+                                            <span class="nav-link-icon">
+                                                <span data-feather="file"></span>
+                                            </span> 
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Reporting</span>
+                                            </span>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endif             
+
+                            @if(Auth::user()->is_admin())
+                                <!-- Sales & Payment Section -->
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link dropdown-indicator label-1" href="#sidebarSalesPayment" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="sidebarSalesPayment">
+                                        <div class="d-flex align-items-center">
+                                            <div class="dropdown-indicator-icon-wrapper">
+                                                <span class="fas fa-caret-right dropdown-indicator-icon"></span>
+                                            </div>
+                                            <span class="nav-link-icon"><span data-feather="credit-card"></span></span>
+                                            <span class="nav-link-text">Clients</span>
+                                        </div>
+                                    </a>
+                                    <div class="parent-wrapper label-1 ">
+                                        <ul class="nav collapse parent {{ request()->is('transactions') || request()->is('billings') || request()->is('recurring-invoices') || request()->is('admin/listofusers') || request()->is('products') ? 'show' : '' }}"
+                                            data-bs-parent="#navbarVerticalCollapse" id="sidebarSalesPayment">
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->is('admin/listofusers') ? 'active' : '' }}" href="{{ url('listofadmins') }}">
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="nav-link-text">Merchants</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->is('transactions') ? 'active' : '' }}" href="/transactions">
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="nav-link-text">Payments</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item"><a
+                                                class="nav-link {{ request()->is('billings') ? 'active' : '' }}"
+                                                href="/billings">
+                                                <div class="d-flex align-items-center"><span
+                                                    class="nav-link-text">Invoices</span></div>
+                                                </a>
+                                            </li>
+                                        </ul>
                                     </div>
-                                    <!-- <div class="menu-sub menu-sub-accordion"> -->
-                                        <!-- Manage Labour -->
-        <!-- <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="{{ url(route('workers.index')) }}" title="Manage existing labour resources">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">Manage Labour</span>
-                    </span>
-                </div>
-            </a>
-        </div> -->
-        <!-- Labour Costing -->
-        <!-- <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="labour-costing.html" title="Estimate and track labour costs">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">Labour Costing</span>
-                    </span>
-                </div>
-            </a>
-        </div> -->
-        <!-- Labour Reports -->
-        <!-- <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="labour-reports.html" title="Generate and view labour reports">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">Labour Reports</span>
-                    </span>
-                </div>
-            </a>
-        </div>
-    </div> -->
-</div>
+                                </div>
 
-<!-- Cost Tracking -->
-<div class="nav-item-wrapper">
-    <div class="nav-link label-1" role="button" aria-expanded="false">
-        <div class="d-flex align-items-center">
-            <span class="nav-link-icon">
-                <span data-feather="trending-up"></span>
-            </span>
-            <a href="{{ route('cost-tracking.index') }}" title="Cost-tracking">
-                <span class="nav-link-text-wrapper">
-                    <span class="nav-link-text">Cost Tracking</span>
-                </span>
-            </a>
-            <span class="menu-arrow"></span>
-        </div>
-    </div>
-    <!-- <div class="menu-sub menu-sub-accordion">
-        Real-Time Tracking -->
-        <!-- <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="real-time-cost.html" title="Real-time cost tracking">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">Real-Time Tracking</span>
-                    </span>
-                </div>
-            </a>
-        </div> -->
-        <!-- Cost Comparison -->
-        <!-- <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="input-output-comparison.html" title="Input vs. output cost comparison">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">Cost Comparison</span>
-                    </span>
-                </div>
-            </a>
-        </div> -->
-        <!-- Budget Tracking -->
-        <!-- <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="budget-tracking.html" title="Budget tracking for each project stage">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">Budget Tracking</span>
-                    </span>
-                </div>
-            </a>
-        </div>
-    </div> -->
-</div>
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link dropdown-indicator label-1" href="#settings" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="settings">
+                                        <div class="d-flex align-items-center">
+                                            <div class="dropdown-indicator-icon-wrapper">
+                                                <span class="fas fa-caret-right dropdown-indicator-icon"></span>
+                                            </div>
+                                            <span class="nav-link-icon"><span data-feather="settings"></span></span>
+                                            <span class="nav-link-text">Settings</span>
+                                        </div>
+                                    </a>
 
+                                    <div class="parent-wrapper label-1">
+                                        <ul class="nav collapse parent {{ request()->is('transactions') || request()->is('reconciliation') || request()->is('chart-of-accounts') ? 'show' : '' }}"
+                                            data-bs-parent="#navbarVerticalCollapse" id="settings">
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ url('website_info')}}">
+                                                    <div class="d-flex align-items-center"><span
+                                                        class="nav-link-text">Website setting</span>
+                                                    </div>
+                                                </a>
+                                            </li>
 
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->is('sections') ? 'active' : '' }}" href="{{ route('sections.index') }}">
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="nav-link-text">Sections</span>
+                                                    </div>
+                                                </a>
+                                            </li>
 
-<!-- Reporting -->
-<div class="nav-item-wrapper">
-    <div class="nav-link label-1" role="button" aria-expanded="false">
-        <div class="d-flex align-items-center">
-            <span class="nav-link-icon">
-                <span data-feather="file"></span>
-            </span>
-            <a href="{{ route('reports') }}" title="Daily logs/reports">
-                <span class="nav-link-text-wrapper">
-                    <span class="nav-link-text">Reporting</span>
-                </span>
-            </a>
-            <span class="menu-arrow"></span>
-        </div>
-    </div>
-    <!-- <div class="menu-sub menu-sub-accordion"> -->
-        <!-- Daily Logs -->
-        <!-- <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="daily-logs.html" title="Daily logs/reports">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">Daily Logs</span>
-                    </span>
-                </div>
-            </a>
-        </div> -->
-        <!-- Weekly Reports -->
-        <!-- <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="weekly-reports.html" title="Weekly performance reports">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">Weekly Reports</span>
-                    </span>
-                </div>
-            </a>
-        </div> -->
-        <!-- Cost vs. Work -->
-        <!-- <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="cost-vs-work.html" title="Graphs and charts for input costs vs. work done">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">Cost vs. Work</span>
-                    </span>
-                </div>
-            </a>
-        </div>
-    </div>
-</div> -->
-
-<!-- Communication -->
-<!-- <div class="nav-item-wrapper">
-    <div class="nav-link label-1" role="button" aria-expanded="false">
-        <div class="d-flex align-items-center">
-            <span class="nav-link-icon">
-                <span data-feather="message-circle"></span>
-            </span>
-            <a href="#" title="Document sharing">
-                <span class="nav-link-text-wrapper">
-                    <span class="nav-link-text">Communication</span>
-                </span>
-            </a>
-            <span class="menu-arrow"></span>
-        </div>
-    </div> -->
-    <!-- <div class="menu-sub menu-sub-accordion"> -->
-        <!-- Document Sharing -->
-        <!-- <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="document-sharing.html" title="Document sharing">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">Document Sharing</span>
-                    </span>
-                </div>
-            </a>
-        </div> -->
-        <!-- Meeting Scheduler -->
-        <!-- <div class="nav-item-wrapper">
-            <a class="nav-link label-1" href="meeting-scheduler.html" title="Scheduling meetings">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text-wrapper">
-                        <span class="nav-link-text">Meeting Scheduler</span>
-                    </span>
-                </div>
-            </a>
-        </div>
-    </div> -->
-</div>
-
-
-@endif
-
-
-
-@if(Auth::user()->is_admin())
-
-<!-- Sales & Payment Section -->
-<div class="nav-item-wrapper">
-    <a class="nav-link dropdown-indicator label-1" href="#sidebarSalesPayment" role="button"
-    data-bs-toggle="collapse" aria-expanded="false" aria-controls="sidebarSalesPayment">
-    <div class="d-flex align-items-center">
-        <div class="dropdown-indicator-icon-wrapper">
-            <span class="fas fa-caret-right dropdown-indicator-icon"></span>
-        </div>
-        <span class="nav-link-icon"><span data-feather="credit-card"></span></span>
-        <span class="nav-link-text">Clients</span>
-    </div>
-</a>
-<div class="parent-wrapper label-1 ">
-    <ul class="nav collapse parent {{ request()->is('transactions') || request()->is('billings') || request()->is('recurring-invoices') || request()->is('admin/listofusers') || request()->is('products') ? 'show' : '' }}"
-        data-bs-parent="#navbarVerticalCollapse" id="sidebarSalesPayment">
-
-        <li class="nav-item"><a
-            class="nav-link {{ request()->is('admin/listofusers') ? 'active' : '' }}"
-            href="{{ url('listofadmins') }}">
-            <div class="d-flex align-items-center"><span
-                class="nav-link-text">Merchants</span></div>
-            </a>
-        </li>
-
-        <li class="nav-item"><a
-            class="nav-link {{ request()->is('transactions') ? 'active' : '' }}"
-            href="/transactions">
-            <div class="d-flex align-items-center"><span
-                class="nav-link-text">Payments</span></div>
-            </a>
-        </li>
-
-        <li class="nav-item"><a
-            class="nav-link {{ request()->is('billings') ? 'active' : '' }}"
-            href="/billings">
-            <div class="d-flex align-items-center"><span
-                class="nav-link-text">Invoices</span></div>
-            </a>
-        </li>
-
-
-
-
-    </ul>
-</div>
-</div>
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ route('products.index') }}">
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="nav-link-text">Materials Library</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
 
 
 
@@ -471,60 +340,6 @@
 
 
 
-<div class="nav-item-wrapper">
-    <a class="nav-link dropdown-indicator label-1" href="#settings" role="button"
-    data-bs-toggle="collapse" aria-expanded="false" aria-controls="settings">
-    <div class="d-flex align-items-center">
-        <div class="dropdown-indicator-icon-wrapper">
-            <span class="fas fa-caret-right dropdown-indicator-icon"></span>
-        </div>
-        <span class="nav-link-icon"><span data-feather="settings"></span></span>
-        <span class="nav-link-text">Settings</span>
-    </div>
-</a>
-<div class="parent-wrapper label-1">
-    <ul class="nav collapse parent {{ request()->is('transactions') || request()->is('reconciliation') || request()->is('chart-of-accounts') ? 'show' : '' }}"
-        data-bs-parent="#navbarVerticalCollapse" id="settings">
-        <li class="nav-item"><a class="nav-link"
-            href="{{ url('website_info')}}">
-            <div class="d-flex align-items-center"><span
-                class="nav-link-text">Website setting</span></div>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link {{ request()->is('sections') ? 'active' : '' }}" href="{{ route('sections.index') }}">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text">Sections</span>
-                </div>
-            </a>
-        </li>
-
-
-        <!-- <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.sections.products') }}">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text">Materials Selected</span>
-                </div>
-            </a>
-        </li> -->
-
-                <li class="nav-item">
-            <a class="nav-link" href="{{ route('products.index') }}">
-                <div class="d-flex align-items-center">
-                    <span class="nav-link-text">Materials Library</span>
-                </div>
-            </a>
-        </li>
-
-
-    </ul>
-</div>
-</div>
-
-
-
-@endif
 
 
 
@@ -822,50 +637,44 @@
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">Switch businesses</h5>
+                            <h5 class="modal-title">Select project</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
                         <?php
-                        $businesses = \App\Models\Project::whereUserId(Auth::user()->id)->get();
+                        $projects = \App\Models\Project::whereUserId(Auth::user()->id)->get();
                         ?>
                         <div class="modal-body">
-
-
-                            <table class="table table-striped">
-
+                            <table class="table">
                                 <tbody>
-                                    @foreach ($businesses as $business)
+                                    @foreach ($projects as $project)
                                     <tr>
-                                        <td>{{ $business->name }}</td>
+                                        <td><b>{{ $loop->iteration }}. {{ $project->name }}</b></td>
                                         <td>
-
                                             <form action="{{ route('select_project') }}" method="POST"
-                                            style="display:inline;">
-                                            @csrf
-                                            <input type="hidden" name="id" value="{{ $business->id }}">
-                                            <button type="submit" class="btn btn-success btn-sm">Select</button>
-                                        </form>
-                                    </td>
-                                </tr>
-
-                                @endforeach
-
-
-                                <tr>
-                                    <td>
-                                        <a class="dropdown-item" href="{{ url('businesses') }}"><i
-                                            class="fa fa-users"></i> <span key="t-profile">Manage your
-                                            projects</span></a>
-                                            <br>
-                                            <a class="dropdown-item" href="{{ route('wizard.step1') }}"><i
-                                                class="fa fa-users"></i> <span key="t-profile">Create new
-                                                project</span></a>
-
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                                style="display:inline;">
+                                                @csrf
+                                                <input type="hidden" name="id" value="{{ $project->id }}">
+                                                <button type="submit" class="btn btn-success btn-sm">Select</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                    <tr>
+                                        <td>
+                                            <!-- <a class="dropdown-item" href="{{ url('businesses') }}">
+                                                <i class="fa fa-users"></i> 
+                                                <span key="t-profile">Manage your projects</span>
+                                            </a>
+                                            <br> -->
+                                            <a class="dropdown-item" href="{{ route('wizard.step1') }}">
+                                                <i class="fa fa-users"></i>
+                                                <span key="t-profile">Create new project</span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                                 <!-- Pagination Links -->
                             </div>
 
