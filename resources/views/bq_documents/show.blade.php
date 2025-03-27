@@ -67,7 +67,7 @@
                                                     <tr>
                                                         <td class="fw-bold">{{ __('TOTAL AMOUNT') }}</td>
                                                         <td></td>
-                                                        <td class="fw-bold text-center">{{ $totalAmount }}</td>
+                                                        <td class="fw-bold text-center">KES {{ $totalAmount }}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>

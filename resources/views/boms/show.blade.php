@@ -30,10 +30,10 @@
                                @forelse ($items as $item)
                                     <tr>
                                         <td>{{ $item->item_material->name ?? '' }}</td>
-                                        <td>{{ $item->total_quantity }}</td>  <!-- Updated: Summed quantity -->
+                                        <td>{{ $item->total_quantity }}</td>
                                         <td>{{ $item->item_material->unit_of_measurement ?? '' }}</td>
                                         <td>{{ number_format($item->rate, 2) }}</td>
-                                        <td>{{ number_format($item->total_quantity * $item->rate, 2) }}</td> <!-- Updated: Summed amount -->
+                                        <td>{{ number_format($item->total_quantity * $item->rate, 2) }}</td>
                                     </tr>
                                 @empty
                                     <tr>
