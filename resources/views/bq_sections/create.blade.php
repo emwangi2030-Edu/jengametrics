@@ -124,32 +124,6 @@
             }
         });
 
-        // Load sub-elements based on selected element
-        // $('#element').on('change', function () {
-        //     let elementId = $(this).val();
-        //     $('#sub_element').html('<option value="">{{ __("Choose Sub-element") }}</option>');
-        //     $('#item_id').html('<option value="">{{ __("Choose Item") }}</option>');
-
-        //     if (elementId) {
-        //         $.ajax({
-        //             url: '{{ route('get.sub_elements') }}',
-        //             type: 'GET',
-        //             data: { element_id: elementId },
-        //             beforeSend: function() {
-        //                 $('#sub_element').html('<option>Loading...</option>');
-        //             },
-        //             success: function (data) {
-        //                 $('#sub_element').html('<option value="">{{ __("Choose Sub-element") }}</option>');
-        //                 $.each(data, function (key, value) {
-        //                     $('#sub_element').append('<option value="' + key + '">' + value + '</option>');
-        //                 });
-        //             },
-        //             error: function() {
-        //                 showError('Failed to load sub-elements. Please try again.');
-        //             }
-        //         });
-        //     }
-        // });
 
         // Load items based on selected element
         $('#element').on('change', function () {

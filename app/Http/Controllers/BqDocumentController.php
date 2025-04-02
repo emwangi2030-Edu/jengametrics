@@ -49,22 +49,12 @@ class BqDocumentController extends Controller
         return response()->json($elements);
     }
 
-    // Method to get sub-elements based on the selected element
-    public function getSubElements(Request $request)
-    {
-        $subElements = SubElement::where('element_id', $request->element_id)->pluck('name', 'id');
-        return response()->json($subElements);
-    }
-
-
     public function getItems(Request $request)
     {
-        $items = Item::where('sub_element_id', $request->sub_element_id)->pluck('name', 'id');
+        $items = Item::where('element_id', $request->element_id)->pluck('name', 'id');
         return response()->json($items);
     }
     
-
-
     /**
      * Store a newly created BQ document in storage.
      *
