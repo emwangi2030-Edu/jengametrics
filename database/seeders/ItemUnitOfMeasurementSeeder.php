@@ -32,7 +32,8 @@ class ItemUnitOfMeasurementSeeder extends Seeder
             ['name' => 'piece', 'category' => 'quantity', 'abbrev' => 'pc'],
             ['name' => 'per tree', 'category' => 'quantity', 'abbrev' => 'tree'],
             ['name' => 'per stump', 'category' => 'quantity', 'abbrev' => 'stump'],
-            ['name' => 'each', 'category' => 'quantity', 'abbrev' => 'ea'],
+            ['name' => 'number', 'category' => 'quantity', 'abbrev' => 'no.'],
+            ['name' => 'bag', 'category' => 'quantity', 'abbrev' => 'bag'],
         ];
     
         foreach ($units as $unit) {
