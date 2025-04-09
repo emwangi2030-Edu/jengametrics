@@ -64,4 +64,18 @@ class ItemsController extends Controller
 
         return redirect()->back()->with('success', 'Item deleted successfully.');
     }
+
+    public function getItemsByElement(Request $request)
+    {
+        $elementId = $request->get('element_id');
+
+        if (!$elementId) {
+            return response()->json([], 400);
+        }
+
+        $items = Item::where('element_id', $elementId)->pluck('name', 'id');
+
+        return response()->json($items);
+    }
+
 }

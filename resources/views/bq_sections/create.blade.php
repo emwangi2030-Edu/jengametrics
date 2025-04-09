@@ -35,14 +35,6 @@
                             <label for="element">{{ __('Select Element') }}</label>
                         </div>
 
-                        <!-- {{-- Sub-element Dropdown --}}
-                        <div class="form-floating mb-4">
-                            <select name="sub_element_id" id="sub_element" class="form-select" required>
-                                <option value="">{{ __('Choose Sub-element') }}</option>
-                            </select>
-                            <label for="sub_element">{{ __('Select Sub-element') }}</label>
-                        </div> -->
-
                         {{-- Item Dropdown --}}
                         <div class="form-floating mb-4">
                             <select name="item_id" id="item_id" class="form-select" required>
@@ -69,8 +61,14 @@
                             <label for="amount">{{ __('Amount') }}</label>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 py-2">{{ __('Save BQ') }}</button>
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn btn-primary w-50 py-2">{{ __('Save to BQ') }}</button>
+                        </div>
                     </form>
+                    <br>
+                    <div class="d-flex justify-content-center">
+                        <a href="{{ route('boq') }}" class="btn btn-dark">Back</a>
+                    </div>
                 </div>
             </div>
         </div>

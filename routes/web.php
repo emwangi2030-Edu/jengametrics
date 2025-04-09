@@ -91,12 +91,8 @@ Route::get('sections/{bqSection}/edit', [BqSectionController::class, 'edit'])->n
 Route::put('bq_documents/{bqDocument}/sections/{bqSection}', [BqSectionController::class, 'update'])->name('bq_sections.update');
 Route::put('sections/bqitems/{id}', [BqSectionController::class, 'updateItem'])->name('bq_items.update');
 
-
 Route::get('/get/elements', [BqDocumentController::class, 'getElements'])->name('get.elements');
-Route::get('/get/sub-elements', [BqDocumentController::class, 'getSubElements'])->name('get.sub_elements');
 Route::get('/get/items', [BqDocumentController::class, 'getItems'])->name('get.items');
-
-
 
 // Items Routes
 Route::get('bq_documents/{bqDocument}/items/create', [BqItemController::class, 'create'])->name('bq_documents.items.create');
@@ -175,18 +171,14 @@ Route::post('/elements', [ElementController::class, 'store'])->name('elements.st
 Route::put('/elements/{element}', [ElementController::class, 'update'])->name('elements.update');
 Route::delete('/elements/{element}', [ElementController::class, 'destroy'])->name('elements.destroy');
 Route::get('sections/{section}/elements/{element}/subelements', [ElementController::class, 'subelements'])->name('elements.subelements');
-
-// Sub-Elements Routes
-Route::post('/subelements/store', [SubElementController::class, 'store'])->name('subelements.store');
-Route::put('/subelements/{id}', [SubElementController::class, 'update'])->name('subelements.update');
-Route::delete('/subelements/{id}', [SubElementController::class, 'destroy'])->name('subelements.destroy');
-Route::get('/elements/{element}/subelements', [SubElementController::class, 'subelements'])->name('elements.subelements');
+Route::get('/get-elements-by-section', [ElementController::class, 'getElementsBySection'])->name('get.elements.by.section');
 
 // Items Routes
 Route::get('subelements/{id}/items', [ItemsController::class, 'index'])->name('subelements.items');
 Route::post('/subelements/{id}/items', [ItemsController::class, 'store'])->name('subelements.items.store');
 Route::put('items/{id}', [ItemsController::class, 'update'])->name('items.update');
 Route::delete('items/{id}', [ItemsController::class, 'destroy'])->name('items.destroy');
+Route::get('/get-items-by-element', [ItemsController::class, 'getItemsByElement'])->name('get.items.by.elements');
 
 // Item Material Routes
 Route::get('items/{id}/materials', [ItemMaterialController::class, 'index'])->name('items.materials');

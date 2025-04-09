@@ -55,5 +55,17 @@ class ElementController extends Controller
     
         return view('admin.sections.items', compact('section', 'element', 'items'));
     }
-    
+
+    public function getElementsBySection(Request $request)
+    {
+        $sectionId = $request->get('section_id');
+
+        if (!$sectionId) {
+            return response()->json([], 400);
+        }
+
+        $elements = Element::where('section_id', $sectionId)->pluck('name', 'id');
+
+        return response()->json($elements);
+    }
 }

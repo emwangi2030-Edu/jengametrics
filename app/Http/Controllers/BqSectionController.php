@@ -10,6 +10,7 @@ use App\Models\BomItem;
 use App\Models\Item;
 use App\Models\ItemMaterial;
 use App\Models\Product;
+use App\Models\Element;
 
 use Illuminate\Http\Request;
 
@@ -76,74 +77,70 @@ class BqSectionController extends Controller
                     'bq_section_id'    => $section_created->id,
                 ]);
             }
-                    
-
         }
-
-
-
-
         return redirect()->route('bq_documents.index')->with('success', trans('Section added successfully.'));
-
     }
-
-
-               // Update the specified item in storage
-               public function updateItem(Request $request)
-               {
-                   $request->validate([
-                       'item_name' => 'required|string',
-                       'rate' => 'required|numeric',
-                       'quantity' => 'required|numeric',
-                   ]);
-               
-                   $item = BqSection::findOrFail($request->id);
-                   $item->item_name = $request->item_name;
-                   $item->quantity = $request->quantity;
-                   $item->rate = $request->rate;
-                   $item->amount = $request->rate * $request->quantity;
-                   $item->save();
-               
-                   // Delete old BOM items & labour records
-                   BomItem::where('bq_section_id', $request->id)->delete();
-                   BomLabour::where('bq_section_id', $request->id)->delete();
-               
-                   // Retrieve related materials and labour
-                   $materials = ItemMaterial::where('item_id', $item->item_id)->get();
-                   $unit = Item::findOrFail($item->item_id);
-                   
-                   // Create updated labour entry
-                   BomLabour::create([
-                       'section_id'    => $item->section_id,
-                       'item_id'       => $item->item_id,
-                       'quantity'      => $request->quantity,
-                       'rate'          => $unit->labour,
-                       'amount'        => $request->quantity * $unit->labour,
-                       'project_id'    => project_id(),
-                       'bq_section_id' => $item->id,
-                   ]);
-               
-                   // Process materials
-                   foreach ($materials as $material) {
-                       $product = Product::find($material->product_id);
-                       $quantity = $request->quantity * $material->conversion_factor;
-                       $amount = $quantity * $product->rate;
-               
-                       BomItem::create([
-                           'section_id'       => $item->section_id,
-                           'item_id'          => $item->item_id,
-                           'item_material_id' => $material->id,
-                           'product_id'       => $material->product_id,
-                           'quantity'         => $quantity,
-                           'rate'             => $product->rate,
-                           'amount'           => $amount,
-                           'project_id'       => project_id(),
-                           'bq_section_id'    => $item->id,
-                       ]);
-                   }
-               
-                   return redirect()->back()->with('success', 'Item updated successfully.');
-               }
+    
+    // Update the specified item in storage
+    public function updateItem(Request $request)
+    {
+        $request->validate([
+            'item_id' => 'required|exists:items,id',
+            'element_id' => 'required|exists:elements,id',
+            'rate' => 'required|numeric',
+            'quantity' => 'required|numeric',
+        ]);
+    
+        $item = BqSection::findOrFail($request->id);
+    
+        $item->element_id = $request->element_id;
+        $item->item_id = $request->item_id;
+        $item->item_name = Item::findOrFail($request->item_id)->name;
+        $item->rate = $request->rate;
+        $item->quantity = $request->quantity;
+        $item->amount = $request->rate * $request->quantity;
+        $item->save();
+    
+        // Clear old BOM records
+        BomItem::where('bq_section_id', $item->id)->delete();
+        BomLabour::where('bq_section_id', $item->id)->delete();
+    
+        // Fetch related data
+        $materials = ItemMaterial::where('item_id', $item->item_id)->get();
+        $unit = Item::findOrFail($item->item_id);
+    
+        // Create labour
+        BomLabour::create([
+            'section_id'    => $item->section_id,
+            'item_id'       => $item->item_id,
+            'quantity'      => $item->quantity,
+            'rate'          => $unit->labour,
+            'amount'        => $item->quantity * $unit->labour,
+            'project_id'    => project_id(),
+            'bq_section_id' => $item->id,
+        ]);
+    
+        // Create materials
+        foreach ($materials as $material) {
+            $product = Product::find($material->product_id);
+            $quantity = $item->quantity * $material->conversion_factor;
+            $amount = $quantity * $product->rate;
+    
+            BomItem::create([
+                'section_id'       => $item->section_id,
+                'item_id'          => $item->item_id,
+                'item_material_id' => $material->id,
+                'product_id'       => $material->product_id,
+                'quantity'         => $quantity,
+                'rate'             => $product->rate,
+                'amount'           => $amount,
+                'project_id'       => project_id(),
+                'bq_section_id'    => $item->id,
+            ]);
+        }
+    
+        return redirect()->back()->with('success', 'Item updated successfully.');
+    }
                
 
 
@@ -173,9 +170,10 @@ class BqSectionController extends Controller
         $bqSection = Section::find($id);
         $bq_sections = Item::all();
         $items = BqSection::where('section_id', $id)->whereProjectId(project_id())->get();
+        $elements = Element::where('section_id', $bqSection->id)->get();
 
         // Pass the document and its sections to the view
-        return view('bq_sections.show', compact( 'bqSection', 'items','bq_sections'));
+        return view('bq_sections.show', compact( 'bqSection', 'items','bq_sections','elements'));
     }
 
 }
