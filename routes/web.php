@@ -90,6 +90,7 @@ Route::get('section/{id}', [BqSectionController::class, 'show'])->name('section.
 Route::get('sections/{bqSection}/edit', [BqSectionController::class, 'edit'])->name('bq_sections.edit');
 Route::put('bq_documents/{bqDocument}/sections/{bqSection}', [BqSectionController::class, 'update'])->name('bq_sections.update');
 Route::put('sections/bqitems/{id}', [BqSectionController::class, 'updateItem'])->name('bq_items.update');
+Route::delete('/bq_sections/item/{id}', [BqSectionController::class, 'destroyItem'])->name('bq_sections.item.destroy');
 
 Route::get('/get/elements', [BqDocumentController::class, 'getElements'])->name('get.elements');
 Route::get('/get/items', [BqDocumentController::class, 'getItems'])->name('get.items');

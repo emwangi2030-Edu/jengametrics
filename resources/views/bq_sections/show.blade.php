@@ -16,7 +16,7 @@
                     <div class="card-body">
                         <!-- Display Section Details -->
                         <!-- <p><strong>{{ __('Section Name:') }}</strong> {{ $bqSection->name }}</p> -->
-                        <p><strong>{{ __('Details:') }}</strong> {{ $bqSection->description }}</p>
+                        <!-- <p><strong>{{ __('Details:') }}</strong> {{ $bqSection->description }}</p> -->
                     
                         <!-- Link to Add New Item -->
                         <a href="{{ route('bq_sections.create') }}" class="btn btn-success mt-4">
@@ -53,12 +53,19 @@
                                         <td>{{ number_format($item->rate, 2) }}</td>
                                         <td>{{ number_format($item->amount, 2) }}</td>
                                         <td>
-                                            <!-- Edit and Delete buttons -->
-                                                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editItemModal{{ $item->id }}">
-                                                        Edit
-                                                    </button>
+                                            <div class="d-flex gap-2">
+                                                <!-- Edit Button -->
+                                                <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editItemModal{{ $item->id }}">
+                                                    Edit
+                                                </button>
+                                                @include('bq_sections.modals.edit_item')
 
-                                                    @include('bq_sections.modals.edit_item')
+                                                <!-- Delete Button -->
+                                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteItemModal{{ $item->id }}">
+                                                    Delete
+                                                </button>
+                                                @include('bq_sections.modals.delete_item')
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty

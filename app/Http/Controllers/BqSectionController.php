@@ -80,7 +80,7 @@ class BqSectionController extends Controller
         }
         return redirect()->route('bq_documents.index')->with('success', trans('Section added successfully.'));
     }
-    
+
     // Update the specified item in storage
     public function updateItem(Request $request)
     {
@@ -96,6 +96,7 @@ class BqSectionController extends Controller
         $item->element_id = $request->element_id;
         $item->item_id = $request->item_id;
         $item->item_name = Item::findOrFail($request->item_id)->name;
+        $item->units = Item::findOrFail($request->item_id)->unit_of_measurement;
         $item->rate = $request->rate;
         $item->quantity = $request->quantity;
         $item->amount = $request->rate * $request->quantity;
@@ -175,5 +176,20 @@ class BqSectionController extends Controller
         // Pass the document and its sections to the view
         return view('bq_sections.show', compact( 'bqSection', 'items','bq_sections','elements'));
     }
+
+    public function destroyItem($id)
+    {
+        $item = BqSection::findOrFail($id);
+
+        // Delete associated BOM records
+        BomItem::where('bq_section_id', $item->id)->delete();
+        BomLabour::where('bq_section_id', $item->id)->delete();
+
+        // Delete the BQ section entry itself
+        $item->delete();
+
+        return redirect()->back()->with('success', 'Item deleted successfully.');
+    }
+
 
 }
