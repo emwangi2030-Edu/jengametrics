@@ -1,32 +1,41 @@
 @extends('layouts.appbar')
 
 @section('content')
-<div class="container">
-    <h1>Material Costs</h1>
+<div class="container py-4">
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Material Name</th>
-                <th>Unit of Measure</th>
-                <th>Price per Unit</th>
-                <th>Quantity in Stock</th>
-                <th>Total Cost</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($materials as $material)
-            <tr>
-                <td>{{ $material->name }}</td>
-                <td>{{ $material->unit_of_measure }}</td>
-                <td>{{ number_format($material->unit_price, 2) }}</td>
-                <td>{{ $material->quantity_in_stock }}</td>
-                <td>{{ number_format($material->unit_price * $material->quantity_in_stock, 2) }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <h2 class="font-weight-bold text-success mb-3">Material Costs</h2>
+    
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Material Name</th>
+                            <th>Unit of Measure</th>
+                            <th>Price per Unit (KES)</th>
+                            <th>Quantity in Stock</th>
+                            <th>Total Cost (KES)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($materials as $material)
+                        <tr>
+                            <td>{{ $material->name }}</td>
+                            <td>{{ $material->unit_of_measure }}</td>
+                            <td>{{ number_format($material->unit_price, 2) }}</td>
+                            <td>{{ $material->quantity_in_stock }}</td>
+                            <td>{{ number_format($material->unit_price * $material->quantity_in_stock, 2) }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
-    <h3>Total Material Cost: KES {{ number_format($totalCost, 2) }}</h3>
+            <div class="text-end mt-4">
+                <h5>Total Material Cost: <span class="text-success">KES {{ number_format($totalCost, 2) }}</span></h5>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

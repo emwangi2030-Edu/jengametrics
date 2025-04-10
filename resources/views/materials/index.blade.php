@@ -4,7 +4,7 @@
 <div class="container py-4">
     <div class="row mb-4">
         <div class="col-12 d-flex justify-content-between align-items-center">
-            <h2 class="font-weight-bold text-dark">{{ __('Materials Purchased') }}</h2>
+            <h2 class="font-weight-bold text-success">{{ __('Materials Purchased') }}</h2>
             <div>
                 <a href="{{ route('materials.create') }}" class="btn btn-success me-2">
                     {{ __('Add New Material') }}
@@ -27,7 +27,7 @@
                         </div>
                     @endif
 
-                    <table class="table table-striped mt-3">
+                    <table class="table mt-3">
                         <thead class="table-light">
                             <tr>
                                 <th>{{ __('Name') }}</th>
