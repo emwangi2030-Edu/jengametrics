@@ -4,7 +4,7 @@
     <div class="container py-4">
         <div class="row mb-4">
             <div class="col-12">
-                <h2 class="font-weight-bold text-dark">
+                <h2 class="font-weight-bold text-success">
                     {{ __('Section: ') . $bqSection->name }}
                 </h2>
             </div>
