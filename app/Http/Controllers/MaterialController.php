@@ -29,10 +29,17 @@ class MaterialController extends Controller
 
     public function create()
     {
-        $suppliers = Supplier::all(); // Get all suppliers to populate the dropdown
+        $suppliers = Supplier::all(); // Get all suppliers
+
         $items = BomItem::where('project_id', project_id())
-               ->distinct()
-               ->get(['item_material_id']);
+            ->whereIn('id', function ($query) {
+                $query->selectRaw('MIN(bom_items.id)')
+                    ->from('bom_items')
+                    ->join('item_materials', 'bom_items.item_material_id', '=', 'item_materials.id')
+                    ->where('bom_items.project_id', project_id())
+                    ->groupBy('item_materials.product_id');
+            })
+            ->get();
 
         return view('materials.create', compact('suppliers', 'items'));
     }

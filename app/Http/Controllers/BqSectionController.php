@@ -190,6 +190,4 @@ class BqSectionController extends Controller
 
         return redirect()->back()->with('success', 'Item deleted successfully.');
     }
-
-
 }

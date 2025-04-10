@@ -22,8 +22,8 @@
                                 <p class="text-muted">{{ __('No sections found.') }}</p>
                             @else
                                 <div class="table-responsive mt-3">
-                                    <table class="table table-striped">
-                                        <thead class="thead-dark">
+                                    <table class="table">
+                                        <thead class="table-light">
                                             <tr>
                                                 <th>{{ __('Section') }}</th>
                                                 <th>{{ __('') }}</th>
@@ -38,7 +38,7 @@
                                                 $total_section_labour = \App\Models\BomLabour::whereProjectId(project_id())->where('section_id', $section->id)->sum('amount');
                                                 @endphp
                                                 <tr>
-                                                    <td class="fw-bold">{{ $section->name }}</td>
+                                                    <td class="fw-bold p-2">{{ $section->name }}</td>
                                                     <td>
                                                         <a href="{{ route('boms.show', $section->id) }}" class="btn btn-outline-primary btn-sm">
                                                             {{ __('View Section') }}

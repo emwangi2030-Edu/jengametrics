@@ -17,7 +17,7 @@
                         <!-- Table to display items -->
                         <h3 class="text-lg font-weight-bold mt-6">{{ __('Items List') }}</h3>
                         <table class="table table-striped mt-4">
-                            <thead>
+                            <thead class="table-light">
                                 <tr>
                                     <th scope="col">{{ __('Description') }}</th>
                                     <th scope="col">{{ __('Quantity') }}</th>

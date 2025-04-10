@@ -25,8 +25,8 @@
 
                         <!-- Table to display items -->
                         <h3 class="text-lg font-weight-bold mt-6">{{ __('Items List') }}</h3>
-                        <table class="table table-striped mt-4">
-                            <thead>
+                        <table class="table mt-4">
+                            <thead class="table-light">
                                 <tr>
                                     <th scope="col">{{ __('Name') }}</th>
                                     <th scope="col">{{ __('Unit') }}</th>
@@ -47,7 +47,7 @@
                                         $totalAmount += $item->amount;
                                     @endphp
                                     <tr>
-                                        <td>{{ $item->item_name }}</td>
+                                        <td class="p-2">{{ $item->item_name }}</td>
                                         <td>{{ $item->units }}</td>
                                         <td>{{ $item->quantity }}</td>
                                         <td>{{ number_format($item->rate, 2) }}</td>
@@ -75,7 +75,7 @@
                                 @endforelse
                             </tbody>
                             <tfoot>
-                                <tr>
+                                <tr class="bg-secondary bg-opacity-10 border-0 rounded">
                                     <th colspan="1">{{ __('Total') }}</th>
                                     <td></td> <!-- Leave unit column empty -->
                                     <td class="fw-bold">{{ $totalQuantity }}</td>
@@ -86,7 +86,7 @@
                             </tfoot>
                         </table>
                         <!-- Link Back to Document -->
-                        <a href="#" class="btn btn-secondary mt-4">
+                        <a href="{{ route('boq') }}" class="btn btn-secondary mt-4">
                             {{ __('Back') }}
                         </a>
                     </div>

@@ -6,20 +6,18 @@
     <form action="{{ route('m.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
      
-
- <div class="form-group">
-    <label for="bom_item_id">Material</label>
-    <select class="form-control" id="bom_item_id" name="bom_item_id" required>
-        <option value="" disabled selected>Select Material</option>
-        @foreach($items as $item)
-            <option value="{{ $item->item_material->id ?? '' }}">{{ $item->item_material->name ?? 'No Name Available' }}</option>
-        @endforeach
-    </select>
-    @if ($errors->has('bom_item_id'))
-        <div class="text-danger">{{ $errors->first('bom_item_id') }}</div>
-    @endif
-</div>
-
+        <div class="form-group">
+            <label for="bom_item_id">Material</label>
+            <select class="form-control" id="bom_item_id" name="bom_item_id" required>
+                <option value="" disabled selected>Select Material</option>
+                @foreach($items as $item)
+                    <option value="{{ $item->item_material->id ?? '' }}">{{ $item->item_material->name ?? 'No Name Available' }}</option>
+                @endforeach
+            </select>
+            @if ($errors->has('bom_item_id'))
+                <div class="text-danger">{{ $errors->first('bom_item_id') }}</div>
+            @endif
+        </div>
 
         <div class="form-group">
             <label for="unit_price">Price per Unit</label>

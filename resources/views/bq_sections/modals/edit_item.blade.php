@@ -121,9 +121,6 @@ $(document).ready(function () {
                             itemDropdown.val(selectedItemId);
                         }
                     },
-                    error: function () {
-                        alert('Failed to load items.');
-                    }
                 });
             }
         });
