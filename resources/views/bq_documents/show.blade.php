@@ -4,13 +4,13 @@
     <div class="container mt-4">
         <div class="row mb-4">
             <div class="col-12">
-                <h2 class="font-weight-bold text-success">
-                    {{ __('Bill of Quantities: ') . get_project()->name }}
+                <h2 class="font-weight-bold" style="color:#027333">
+                    Bill of Quantities: <span class="text-black">{{ get_project()->name }}</span>
                 </h2>
             </div>
         </div>
 
-        <div class="row">
+        <div class="row justify-content-center">
             <div class="col-md-10">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
@@ -18,7 +18,7 @@
                         <div class="mt-4">
                         
                             <!-- Link to create a new section -->
-                            <a href="{{ route('bq_sections.create') }}" class="btn btn-success mt-4">
+                            <a href="{{ route('bq_sections.create') }}" class="btn mt-4 text-white" style="background-color:#027333">
                                 {{ __('Add New Item') }}
                             </a>
 
@@ -82,3 +82,6 @@
         </div>
     </div>
 @endsection
+
+
+

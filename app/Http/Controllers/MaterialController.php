@@ -7,6 +7,7 @@ use App\Models\Material;
 use App\Models\ItemMaterial;
 use App\Models\Supplier;
 use App\Models\BomItem;
+use App\Models\Project;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Log;
@@ -24,7 +25,9 @@ class MaterialController extends Controller
             ->where('project_id', $projectId)
             ->get();
 
-        return view('materials.index', compact('materials'));
+        $project = Project::find($projectId);
+
+        return view('materials.index', compact('materials', 'project'));
     }
 
     public function create()

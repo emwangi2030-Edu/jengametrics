@@ -5,14 +5,14 @@
 <div class="container-fluid">
   
   
-            <h1 class="text-success my-4">Dashboard</h1>
+            <h1 class="my-4" style="color:#027333">Dashboard</h1>
 
             <div class="row justify-content-center g-4">
                 <!-- Total Workers Card -->
                 <div class="col-md-4">
                     <div class="card shadow border-0">
                         <div class="card-body text-center">
-                            <h5 class="card-title text-success">Total Workers</h5>
+                            <h5 class="card-title" style="color:#027333">Total Workers</h5>
                             <h3 class="text-dark">{{ $totalWorkers}}</h3>
                         </div>
                     </div>
@@ -22,7 +22,7 @@
                 <div class="col-md-4">
                     <div class="card shadow border-0">
                         <div class="card-body text-center">
-                            <h5 class="card-title text-success">Total Material Expenses</h5>
+                            <h5 class="card-title" style="color:#027333">Total Material Expenses</h5>
                             <h3 class="text-dark">KES {{ $totalMaterialExpenses }}</h3>
                         </div>
                     </div>
@@ -34,7 +34,7 @@
             <!-- Chart Section (Placeholder for Chart.js) -->
             <div class="row mt-4">
                 <div class="col-md-12">
-                    <h3 class="text-success">Expense Trends</h3>
+                    <h3 style="color:#027333">Expense Trends</h3>
                     <canvas id="expenseChart"></canvas>
                 </div>
             </div>

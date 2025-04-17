@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Material;
+use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
 
 class CostTrackingController extends Controller
 {
@@ -19,7 +21,11 @@ class CostTrackingController extends Controller
         // Store the total in session for use on the dashboard
         session(['totalMaterialCost' => $totalCost]);
 
-        return view('cost-tracking.index', compact('materials', 'totalCost'));
+        $projectId = Auth::user()->project_id;
+
+        $project = Project::find($projectId);
+
+        return view('cost-tracking.index', compact('materials', 'totalCost','project'));
     }
 }
 

@@ -3,12 +3,14 @@
 @section('content')
 <div class="container py-4">
 
-    <h2 class="font-weight-bold text-success mb-3">Material Costs</h2>
+    <h2 class="font-weight-bold mb-3" style="color:#027333">
+        Material Costs: <span class="text-black">{{ $project->name }}</spanclass>
+    </h2>
     
     <div class="card shadow">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-bordered align-middle">
+                <table class="table table-bordered align-middle">
                     <thead class="table-light">
                         <tr>
                             <th>Material Name</th>

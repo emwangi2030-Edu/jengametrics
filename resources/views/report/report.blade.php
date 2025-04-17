@@ -5,8 +5,8 @@
     <!-- Header -->
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="font-weight-bold text-success">
-                {{ __('Total Cost Report') }}
+            <h2 class="font-weight-bold" style="color:#027333">
+                Total Costs: <span class="text-black">{{ $project->name }}</span>
             </h2>
         </div>
     </div>
@@ -17,7 +17,7 @@
         <div class="col-md-6 mb-4">
             <div class="card shadow">
                 <div class="card-body text-center">
-                    <h4 class="font-weight-bold text-primary">{{ __('Total Estimated Cost') }}</h4>
+                    <h4 class="font-weight-bold" style="color:#027333">{{ __('Total Estimated Cost') }}</h4>
                     <h2 class="text-dark">
                         {{ number_format(($totalEstimatedCost ?? 0) + ($totalEstimatedCost_labour ?? 0), 2) }}
                     </h2>
@@ -27,7 +27,7 @@
         <div class="col-md-6 mb-4">
             <div class="card shadow">
                 <div class="card-body text-center">
-                    <h4 class="font-weight-bold text-primary">{{ __('Total Actual Cost') }}</h4>
+                    <h4 class="font-weight-bold" style="color:#027333">{{ __('Total Actual Cost') }}</h4>
                     <h2 class="text-dark">
                         {{ number_format($total_actual_cost ?? 0, 2) }}
                     </h2>

@@ -11,6 +11,8 @@ use App\Models\Section;
 use App\Models\BqSection;
 use App\Models\Material;
 use App\Models\Product;
+use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
 
 class BOMController extends Controller
 {
@@ -133,7 +135,13 @@ class BOMController extends Controller
             return $material->unit_price * $material->quantity_in_stock;
         });
 
+        // Get the project details
+        $projectId = Auth::user()->project_id;
 
-        return view('report.report', compact('totalEstimatedCost', 'totalEstimatedCost_labour', 'total_actual_cost'));
+        $project = Project::find($projectId);
+
+
+
+        return view('report.report', compact('totalEstimatedCost', 'totalEstimatedCost_labour', 'total_actual_cost', 'project'));
     }
 }

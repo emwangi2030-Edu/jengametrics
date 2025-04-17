@@ -4,7 +4,9 @@
 <div class="container py-4">
     <div class="row mb-4">
         <div class="col-12 d-flex justify-content-between align-items-center">
-            <h2 class="font-weight-bold text-success">{{ __('Materials Purchased') }}</h2>
+            <h2 class="font-weight-bold" style="color:#027333">
+                Materials Purchased: <span class="text-black">{{ $project->name }}</span>
+            </h2>
             <div>
                 <a href="{{ route('materials.create') }}" class="btn btn-success me-2">
                     {{ __('Add New Material') }}

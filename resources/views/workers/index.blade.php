@@ -4,7 +4,9 @@
 <div class="container py-4">
     <div class="row mb-4">
         <div class="col-12 d-flex justify-content-between align-items-center">
-            <h2 class="font-weight-bold text-success">{{ __('Manage Labour') }}</h2>
+            <h2 class="font-weight-bold" style="color:#027333;">
+                Manage Labour: <span class="text-black">{{ $project->name }}</span>
+            </h2>
             <a href="{{ route('workers.create') }}" class="btn btn-success">
                 {{ __('Add Worker') }}
             </a>

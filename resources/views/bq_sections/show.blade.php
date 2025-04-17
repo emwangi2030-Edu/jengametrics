@@ -4,8 +4,8 @@
     <div class="container py-4">
         <div class="row mb-4">
             <div class="col-12">
-                <h2 class="font-weight-bold text-success">
-                    {{ __('Section: ') . $bqSection->name }}
+                <h2 class="font-weight-bold" style="color:#027333">
+                    Section: <span class="text-black">{{ $bqSection->name }}</span>
                 </h2>
             </div>
         </div>
@@ -19,7 +19,7 @@
                         <!-- <p><strong>{{ __('Details:') }}</strong> {{ $bqSection->description }}</p> -->
                     
                         <!-- Link to Add New Item -->
-                        <a href="{{ route('bq_sections.create') }}" class="btn btn-success mt-4">
+                        <a href="{{ route('bq_sections.create') }}" class="btn mt-4 text-white" style="background-color:#027333">
                             {{ __('Add New Item') }}
                         </a>
 

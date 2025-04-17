@@ -80,7 +80,15 @@
             z-index: 1040 !important;
             /* Ensure the backdrop is below the modal */
         }
+
+        a.btn:hover {
+            transform: scale(1.1);
+            transition: transform 0.2s ease-in-out;
+        }
+
     </style>
+    
+    
 </head>
 
 
@@ -125,6 +133,8 @@
                                     /* Light green background on hover */
                                     color: #000000;
                                     /* Darker green color on hover */
+                                    transform: scale(1.1);
+                                    transition: transform 0.2s ease-in-out
                                 }
 
                                 .nav-link-icon i {
@@ -434,7 +444,7 @@
 
                                 <p class="mb-3 mt-2 text-muted">
                                     <strong>{{ package(Auth::user()->package)->name }}</strong><br>
-                                    Upgrade your plan and get the most out of fedhatrac
+                                    Upgrade your plan and get the most out of JengaMetrics
                                 </p>
                                 <div class="mt-3">
                                     <a href="{{ route('subscribe') }}" class="btn btn-success"> Upgrade now</a>
@@ -667,7 +677,7 @@
                                                 <span key="t-profile">Manage your projects</span>
                                             </a>
                                             <br> -->
-                                            <a class="dropdown-item" href="{{ route('wizard.step1') }}">
+                                            <a class="btn btn-success btn-small" href="{{ route('wizard.step1') }}">
                                                 <i class="fa fa-users"></i>
                                                 <span key="t-profile">Create new project</span>
                                             </a>

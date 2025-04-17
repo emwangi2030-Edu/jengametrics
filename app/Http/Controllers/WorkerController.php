@@ -17,7 +17,9 @@ class WorkerController extends Controller
         // Retrieve workers only for the user's current project
         $workers = Worker::where('project_id', $projectId)->get();
 
-        return view('workers.index', compact('workers'));
+        $project = Project::find($projectId);
+
+        return view('workers.index', compact('workers', 'project'));
     }
 
 
