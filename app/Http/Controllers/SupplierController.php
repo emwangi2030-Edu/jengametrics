@@ -40,23 +40,23 @@ class SupplierController extends Controller
         return view('suppliers.show', compact('supplier'));
     }
 
-    public function store(Request $request)
-    {
-        // Validate request
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'contact_info' => 'required|string|max:255',
-        ]);
+    // public function store(Request $request)
+    // {
+    //     // Validate request
+    //     $request->validate([
+    //         'name' => 'required|string|max:255',
+    //         'contact_info' => 'required|string|max:255',
+    //     ]);
 
-        // Create new supplier
-        $supplier = Supplier::create([
-            'name' => $request->name,
-            'contact_info' => $request->contact_info,
-        ]);
+    //     // Create new supplier
+    //     $supplier = Supplier::create([
+    //         'name' => $request->name,
+    //         'contact_info' => $request->contact_info,
+    //     ]);
 
-        // Return supplier ID for dropdown population
-        return response()->json(['id' => $supplier->id]);
-    }
+    //     // Return supplier ID for dropdown population
+    //     return response()->json(['id' => $supplier->id]);
+    // }
 
     public function ajaxStore(Request $request)
     {

@@ -140,8 +140,6 @@ class BOMController extends Controller
 
         $project = Project::find($projectId);
 
-
-
         return view('report.report', compact('totalEstimatedCost', 'totalEstimatedCost_labour', 'total_actual_cost', 'project'));
     }
 }

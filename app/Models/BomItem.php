@@ -18,6 +18,6 @@ class BomItem extends Model
 
     public function item_material()
     {
-        return $this->belongsTo(ItemMaterial::class);
+        return $this->belongsTo(ItemMaterial::class, 'item_material_id');
     }
 }

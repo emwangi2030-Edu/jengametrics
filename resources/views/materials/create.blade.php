@@ -1,87 +1,114 @@
 @extends('layouts.appbar')
 
 @section('content')
-<div class="container">
-    <h1>Add New Material</h1>
-    <form action="{{ route('m.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-     
-        <div class="form-group">
-            <label for="bom_item_id">Material</label>
-            <select class="form-control" id="bom_item_id" name="bom_item_id" required>
-                <option value="" disabled selected>Select Material</option>
-                @foreach($items as $item)
-                    <option value="{{ $item->item_material->id ?? '' }}">{{ $item->item_material->name ?? 'No Name Available' }}</option>
-                @endforeach
-            </select>
-            @if ($errors->has('bom_item_id'))
-                <div class="text-danger">{{ $errors->first('bom_item_id') }}</div>
-            @endif
+<div class="container py-5">
+    <div class="row mb-5 text-center">
+        <div class="col-12">
+            <h2 class="display-6 fw-bold" style="color:#027333;">Add New Material</h2>
+            <p class="text-muted">Fill in the material details and supplier information below.</p>
         </div>
+    </div>
 
-        <div class="form-group">
-            <label for="unit_price">Price per Unit</label>
-            <input type="text" class="form-control" id="unit_price" name="unit_price" value="{{ old('unit_price', $material->unit_price ?? '') }}" required>
-        </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded">
+                <div class="card-body p-5">
+                    <form action="{{ route('m.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
 
-        <div class="form-group">
-            <label for="quantity_in_stock">Quantity</label>
-            <input type="number" class="form-control" id="quantity_in_stock" name="quantity_in_stock" value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}" required>
-        </div>
+                        {{-- Material Dropdown --}}
+                        <div class="form-floating mb-4">
+                            <select class="form-select" id="bom_item_id" name="bom_item_id" required>
+                                <option value="" disabled selected>Select Material</option>
+                                @foreach($items as $item)
+                                    <option value="{{ $item->item_material->id ?? '' }}" data-unit="{{ $item->item_material->unit_of_measurement ?? 'Unit' }}">
+                                        {{ $item->item_material->name ?? 'No Name Available' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <label for="bom_item_id">Material</label>
+                            @error('bom_item_id')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-        <div class="form-group">
-            <label for="supplier_name">Supplier Name</label>
-            <div class="input-group">
-                <select class="form-control" id="supplier_name" name="supplier_name" required>
-                    <option value="" disabled selected>Select Supplier</option>
-                    @foreach($suppliers as $supplier)
-                        <option value="{{ $supplier->id }}" data-contact="{{ $supplier->contact_info }}">{{ $supplier->name }}</option>
-                    @endforeach
-                </select>
-                <div class="input-group-append">
-                    <!-- Add New Supplier Button -->
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addSupplierModal">
-                        Add New Supplier
-                    </button>
+                        {{-- Unit Price --}}
+                        <div class="form-floating mb-4">
+                            <input type="text" class="form-control" id="unit_price" name="unit_price" value="{{ old('unit_price', $material->unit_price ?? '') }}" placeholder="Enter price" required>
+                            <label for="unit_price" id="unit_price_label">Price per Unit</label>
+                        </div>
+
+                        {{-- Quantity --}}
+                        <div class="form-floating mb-4">
+                            <input type="number" class="form-control" id="quantity_in_stock" name="quantity_in_stock" value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}" placeholder="Enter quantity" required>
+                            <label for="quantity_in_stock">Quantity</label>
+                        </div>
+
+                        {{-- Supplier Dropdown + Add Button --}}
+                        <div class="mb-4">
+                            <label class="form-label">Supplier</label>
+                            <div class="input-group">
+                                <select class="form-select" id="supplier_id" name="supplier_id" required>
+                                    <option value="" disabled selected>Select Supplier</option>
+                                    @foreach($suppliers as $supplier)
+                                        <option value="{{ $supplier->id }}" data-contact="{{ $supplier->contact_info }}">{{ $supplier->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="button" class="btn text-white" style="background-color: #027333;" data-bs-toggle="modal" data-bs-target="#addSupplierModal">Add Supplier</button>
+                            </div>
+                        </div>
+
+                        {{-- Supplier Contact --}}
+                        <div class="form-floating mb-4">
+                            <input type="text" class="form-control" id="supplier_contact" name="supplier_contact" placeholder="Supplier contact" readonly>
+                            <label for="supplier_contact">Supplier Contact</label>
+                        </div>
+
+                        {{-- Upload Document --}}
+                        <div class="mb-4">
+                            <label for="document" class="form-label">Upload Document (PDF, PNG, JPG)</label>
+                            <input type="file" name="document" id="document" class="form-control">
+                        </div>
+
+                        {{-- Submit Button --}}
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn w-50 py-2 text-white" style="background-color:#027333;">
+                                {{ isset($material) ? 'Update Material' : 'Add Material' }}
+                            </button>
+                        </div>
+
+                        {{-- Back Button --}}
+                        <div class="d-flex justify-content-center mt-3">
+                            <a href="{{ route('materials.index') }}" class="btn btn-dark">Back to Materials</a>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-
-        <div class="form-group">
-            <label for="supplier_contact">Supplier Contact</label>
-            <input type="text" class="form-control" id="supplier_contact" name="supplier_contact" readonly>
-        </div>
-
-        <div class="form-group">
-            <label for="document">Documents</label>
-            <input type="file" name="document" id="document" class="form-control" placeholder="PDFs, JPEGs, PNGs etc...">
-        </div>
-
-        <button type="submit" class="btn btn-success my-4">{{ isset($material) ? 'Update Material' : 'Add Material' }}</button>
-        <a href="{{ route('materials.index') }}"><button type="button" class="btn btn-secondary">Back to Materials</button></a>
-    </form>
+    </div>
 </div>
 
 <!-- Modal for Adding New Supplier -->
-<div class="modal fade" id="addSupplierModal" tabindex="-1" role="dialog" aria-labelledby="addSupplierModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="addSupplierModal" tabindex="-1" aria-labelledby="addSupplierModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addSupplierModalLabel">Add New Supplier</h5>
+                <h5 class="modal-title">Add New Supplier</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label for="new_supplier_name">Enter New Supplier Name</label>
-                    <input type="text" class="form-control" id="new_supplier_name">
+                <div class="form-floating mb-3">
+                    <input type="text" id="new_supplier_name" class="form-control" placeholder="Supplier Name">
+                    <label for="new_supplier_name">Supplier Name</label>
                 </div>
-                <div class="form-group">
-                    <label for="new_supplier_contact">Enter New Supplier Contact</label>
-                    <input type="text" class="form-control" id="new_supplier_contact">
+                <div class="form-floating mb-3">
+                    <input type="text" id="new_supplier_contact" class="form-control" placeholder="Supplier Contact">
+                    <label for="new_supplier_contact">Supplier Contact</label>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveNewSupplier">Save Supplier</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="saveNewSupplier" class="btn text-white" style="background-color:#027333">Save Supplier</button>
             </div>
         </div>
     </div>
@@ -90,70 +117,58 @@
 
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
 <script>
-    $(document).ready(function() {
-        // Populate supplier contact when supplier is selected
-        $('#supplier_name').on('change', function() {
-            var selectedOption = $(this).find('option:selected');
-            var contact = selectedOption.data('contact');
-            $('#supplier_contact').val(contact); // Populate supplier contact
+    $(document).ready(function () {
+        // Update supplier contact
+        $('#supplier_id').on('change', function () {
+            var contact = $(this).find('option:selected').data('contact');
+            $('#supplier_contact').val(contact);
         });
 
-        // Save new supplier using AJAX
-        $('#saveNewSupplier').on('click', function() {
-            var supplierName = $('#new_supplier_name').val();
-            var supplierContact = $('#new_supplier_contact').val();
+        // Save new supplier via AJAX
+        $('#saveNewSupplier').on('click', function () {
+            var name = $('#new_supplier_name').val();
+            var contact = $('#new_supplier_contact').val();
 
-            if (supplierName && supplierContact) {
+            if (name && contact) {
                 $.ajax({
-                    url: "{{ route('suppliers.ajaxStore') }}", // URL to send the request
+                    url: "{{ route('suppliers.ajaxStore') }}",
                     method: 'POST',
                     data: {
-                        _token: '{{ csrf_token() }}', // CSRF token for security
-                        name: supplierName,
-                        contact_info: supplierContact
+                        _token: '{{ csrf_token() }}',
+                        name: name,
+                        contact_info: contact
                     },
-                    success: function(response) {
-                        if(response.id && response.name) {
-                            // Add the new supplier to the dropdown
-                            var newOption = $('<option>', {
-                                value: response.id, // The newly created supplier's ID
+                    success: function (response) {
+                        if (response.id && response.name) {
+                            let newOption = $('<option>', {
+                                value: response.id,
                                 text: response.name,
                                 'data-contact': response.contact_info
                             });
-
-                            // Append the new supplier to the dropdown
-                            $('#supplier_name').append(newOption);
-
-                            // Select the newly added supplier
+                            $('#supplier_id').append(newOption);
                             newOption.prop('selected', true);
-
-                            // Populate the contact field with the new contact info
                             $('#supplier_contact').val(response.contact_info);
-
-                            // Close the modal
                             $('#addSupplierModal').modal('hide');
-
-                            // Clear modal inputs
-                            $('#new_supplier_name').val('');
-                            $('#new_supplier_contact').val('');
+                            $('#new_supplier_name, #new_supplier_contact').val('');
                         } else {
-                            alert('Error: Supplier could not be added.');
+                            alert('Failed to add supplier.');
                         }
                     },
-                    error: function(xhr, status, error) {
-                        // Log the error details
-                        console.log('AJAX Error:', xhr.responseText);
-
-                        // Display an alert with the error message
-                        alert('Failed to add new supplier: ' + xhr.responseText);
+                    error: function (xhr) {
+                        alert('Error: ' + xhr.responseText);
                     }
                 });
             } else {
-                alert('Please fill in both fields.');
+                alert('Please fill out both name and contact.');
             }
+        });
+
+        // Update "Price per Unit" label dynamically
+        $('#bom_item_id').on('change', function () {
+            var selectedOption = $(this).find('option:selected');
+            var unit = selectedOption.data('unit') || 'Unit';
+            $('#unit_price_label').text('Price per ' + unit);
         });
     });
 </script>

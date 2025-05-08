@@ -4,19 +4,19 @@
     <div class="container py-4">
         <div class="row mb-4">
             <div class="col-12">
-                <h2 class="font-weight-bold text-success">
-                    {{ __('Section: ') . $bqSection->name }}
+                <h2 class="font-weight-bold" style="color:#027333">
+                    Section: <span class="text-black">{{ $bqSection->name }}</span>
                 </h2>
             </div>
         </div>
 
-        <div class="row">
+        <div class="row justify-content-center">
             <div class="col-md-10">
                 <div class="card">
                     <div class="card-body">
                         <!-- Table to display items -->
                         <h3 class="text-lg font-weight-bold mt-6">{{ __('Items List') }}</h3>
-                        <table class="table table-striped mt-4">
+                        <table class="table mt-4">
                             <thead class="table-light">
                                 <tr>
                                     <th scope="col">{{ __('Description') }}</th>

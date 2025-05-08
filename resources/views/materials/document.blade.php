@@ -13,7 +13,7 @@
             @if(in_array($extension, ['pdf', 'jpg', 'jpeg', 'png', 'gif']))
                 <!-- Use standard iframe for PDFs and images -->
                 <iframe src="{{ asset($documentUrl) }}" width="100%" height="600px" frameborder="0">
-                    Your browser does not support viewing embedded documents. 
+                    Your browser does not support viewing embedded documents.
                     Please download the file instead: <a href="{{ asset($documentUrl) }}">Download Document</a>
                 </iframe>
             @else

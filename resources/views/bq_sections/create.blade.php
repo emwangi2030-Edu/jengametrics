@@ -4,7 +4,7 @@
 <div class="container py-5">
     <div class="row mb-5 text-center">
         <div class="col-12">
-            <h2 class="display-6 text-primary fw-bold">{{ __('Create New BQ Document') }}</h2>
+            <h2 class="display-6 fw-bold" style="color:#027333;">{{ __('Create New BQ Document') }}</h2>
             <p class="text-muted">Fill in the details to create a comprehensive Bill of Quantities document.</p>
         </div>
     </div>
@@ -62,7 +62,7 @@
                         </div>
 
                         <div class="d-flex justify-content-center">
-                            <button type="submit" class="btn btn-primary w-50 py-2">{{ __('Save to BQ') }}</button>
+                            <button type="submit" class="btn w-50 py-2 text-white" style="background-color:#027333;">{{ __('Save to BQ') }}</button>
                         </div>
                     </form>
                     <br>

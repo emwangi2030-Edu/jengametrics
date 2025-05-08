@@ -86,6 +86,10 @@
             transition: transform 0.2s ease-in-out;
         }
 
+        button:hover {
+            transform: scale(1.1);
+            transition: transform 0.2s ease-in-out;
+        }
     </style>
     
     
@@ -827,6 +831,7 @@
                 var toastr_options = {closeButton : true};
             </script>
             @yield('page-js')
+            @yield('scripts')
 
 
 

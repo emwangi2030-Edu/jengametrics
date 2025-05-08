@@ -22,13 +22,6 @@
         <div class="col-md-12">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    @if(session('success'))
-                        <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
                     <table class="table mt-3">
                         <thead class="table-light">
                             <tr>
@@ -38,8 +31,8 @@
                                 <th>{{ __('Quantity') }}</th>
                                 <th>{{ __('Total Amount') }}</th>
                                 <th>{{ __('Supplier Name') }}</th>
-                                <th>{{ __('Date Added') }}</th>
-                                <th>{{ __('Documents') }}</th>
+                                <th>{{ __('Date') }}</th>
+                                <th>{{ __('Receipt') }}</th>
                                 <th>{{ __('Actions') }}</th>
                             </tr>
                         </thead>
