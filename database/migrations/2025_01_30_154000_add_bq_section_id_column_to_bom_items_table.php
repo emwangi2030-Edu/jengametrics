@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bom_items', function (Blueprint $table) {
-            $table->unsignedBigInteger('bq_section_id')->nullable()->after('project_id');
-        });
+        // Schema::table('bom_items', function (Blueprint $table) {
+        //     $table->unsignedBigInteger('bq_section_id')->nullable()->after('project_id');
+        // });
     }
 
     /**
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bom_items', function (Blueprint $table) {
-            $table->dropColumn('bq_section_id');
-        });
+        // Schema::table('bom_items', function (Blueprint $table) {
+        //     $table->dropColumn('bq_section_id');
+        // });
     }
 };
