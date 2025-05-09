@@ -1,128 +1,187 @@
 @extends('layouts.appbar')
 
 @section('content')
-<div class="container">
-    <h1>Edit Material</h1>
-    <form action="{{ route('materials.update', $material->id) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $material->name ?? '') }}" required>
+<div class="container py-5">
+    <div class="row mb-5 text-center">
+        <div class="col-12">
+            <h2 class="display-6 fw-bold" style="color:#027333;">Edit Material</h2>
+            <p class="text-muted">Update the material details and supplier information below.</p>
         </div>
+    </div>
 
-        <div class="form-group">
-            <label for="unit_price">Price per Unit</label>
-            <input type="text" class="form-control" id="unit_price" name="unit_price" value="{{ old('unit_price', $material->unit_price ?? '') }}" required>
-        </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded">
+                <div class="card-body p-5">
+                    <form action="{{ route('materials.update', $material->id) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
 
-        <div class="form-group">
-            <label for="unit_of_measure">Unit of Measurement</label>
-            <select type="text" class="form-control" id="unit_of_measure" name="unit_of_measure" value="{{ old('unit_of_measure', $material->unit_of_measure ?? '') }}" required>
-                <option value="Square Meter">Square Meter</option>
-                <option value="Square Root">Square Foot</option>
-                <option value="Meter">Meter</option>
-                <option value="Inch">Inch</option>
-                <option value="Millimeter">Millimeter</option>
-                <option value="Ton">Ton</option>
-                <option value="Kilogram">Kilogram</option>
-                <option value="Bag">Bag</option>
-                <option value="Piece">Piece</option>
-                <option value="Foot">Foot</option>
-                <option value="Centimeter">Centimeter</option>
-                <option value="Litre">Litre</option>
-                <option value="Roll">Roll</option>
-                <option value="Packet">Packet</option>
-                <option value="carton">Carton</option>
-                <option value="Bucket">Bucket</option>
-                <option value="Bundle">Bundle</option>
-                <option value="Box">Box</option>
-                <option value="Bale">Bale</option>
-                <option value="Gallon">Gallon</option>
-                <option value="Ream">Ream</option>
-                <option value="Sheet">Sheet</option>
-            </select>
-        </div>
+                        {{-- Material Dropdown --}}
+                        <div class="form-floating mb-4">
+                            <select class="form-select" id="bom_item_id" name="bom_item_id" required>
+                                <option value="" disabled>Select Material</option>
+                                @foreach($items as $item)
+                                    @php
+                                        $itemMaterial = $item->item_material;
+                                    @endphp
+                                    <option value="{{ $itemMaterial->id }}"
+                                        data-unit="{{ $itemMaterial->unit_of_measurement }}"
+                                        {{ $material->product_id == $itemMaterial->product_id ? 'selected' : '' }}>
+                                        {{ $itemMaterial->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <label for="bom_item_id">Material</label>
+                            @error('bom_item_id')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-        <div class="form-group">
-            <label for="quantity_in_stock">Amount Purchased</label>
-            <input type="number" class="form-control" id="quantity_in_stock" name="quantity_in_stock" value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}" required>
-        </div>
+                        {{-- Unit Price --}}
+                        <div class="form-floating mb-4">
+                            <input type="text" class="form-control" id="unit_price" name="unit_price"
+                                   value="{{ old('unit_price', $material->unit_price) }}" placeholder="Enter price" required>
+                            <label for="unit_price" id="unit_price_label">Price per {{ $material->unit_of_measure }}</label>
+                        </div>
 
-        <div class="form-group">
-            <label for="supplier_name">Supplier Name</label>
-            <input type="text" class="form-control" id="supplier_name" name="supplier_name" value="{{ old('supplier_name', $material->supplier->name ?? '') }}" required>
-        </div>
+                        {{-- Quantity --}}
+                        <div class="form-floating mb-4">
+                            <input type="number" class="form-control" id="quantity_in_stock" name="quantity_in_stock"
+                                   value="{{ old('quantity_in_stock', $material->quantity_in_stock) }}" placeholder="Enter quantity" required>
+                            <label for="quantity_in_stock">Quantity</label>
+                        </div>
 
-        <div class="form-group">
-            <label for="supplier_contact">Supplier Contact</label>
-            <input type="text" class="form-control" id="supplier_contact" name="supplier_contact" value="{{ old('supplier_contact', $material->supplier->contact_info ?? '') }}" required>
-        </div>
+                        {{-- Supplier Dropdown --}}
+                        <div class="mb-4">
+                            <label class="form-label">Supplier</label>
+                            <div class="input-group">
+                                <select class="form-select" id="supplier_id" name="supplier_id" required>
+                                    <option value="" disabled>Select Supplier</option>
+                                    @foreach($suppliers as $supplier)
+                                        <option value="{{ $supplier->id }}"
+                                            data-contact="{{ $supplier->contact_info }}"
+                                            {{ $material->supplier_id == $supplier->id ? 'selected' : '' }}>
+                                            {{ $supplier->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <button type="button" class="btn text-white" style="background-color: #027333;" data-bs-toggle="modal" data-bs-target="#addSupplierModal">Add Supplier</button>
+                            </div>
+                        </div>
 
-        <!-- Read-Only Supplier ID Field -->
-        <input type="hidden" id="supplier_id" name="supplier_id" value="{{ old('supplier_id', $material->supplier_id ?? '') }}">
+                        {{-- Supplier Contact --}}
+                        <div class="form-floating mb-4">
+                            <input type="text" class="form-control" id="supplier_contact" name="supplier_contact"
+                                   value="{{ $material->supplier_contact }}" readonly placeholder="Supplier contact">
+                            <label for="supplier_contact">Supplier Contact</label>
+                        </div>
 
-        <div class="form-group">
-            <label for="document">Document</label>
-            <input type="file" class="form-control" id="document" name="document">
-            @if(isset($material) && $material->document)
-                <a href="{{ route('materials.viewDocument', $material->id) }}"><button type="button" class="btn btn-primary my-4">View Current Document</button></a>
-            @endif
-        </div>
-        <a href="{{ route('materials.index') }}"><button type="button" class="btn btn-secondary">Back to Materials</button></a>
-        <button type="submit" class="btn btn-success">Update Material</button>
-    </form>
-</div>
+                        {{-- Upload Document --}}
+                        <div class="mb-4">
+                            <label for="document" class="form-label">Upload Document (PDF, PNG, JPG)</label>
+                            <input type="file" name="document" id="document" class="form-control">
+                        </div>
 
-<!-- Modals -->
+                        {{-- Submit Button --}}
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn w-50 py-2 text-white" style="background-color:#027333;">
+                                Update Material
+                            </button>
+                        </div>
 
-<div class="modal fade" id="noDocumentModal" tabindex="-1" role="dialog" aria-labelledby="noDocumentModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="noDocumentModalLabel">Notification</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                No Document Uploaded.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        {{-- Back Button --}}
+                        <div class="d-flex justify-content-center mt-3">
+                            <a href="{{ route('materials.index') }}" class="btn btn-dark">Back to Materials</a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Supplier Modal -->
+<div class="modal fade" id="addSupplierModal" tabindex="-1" aria-labelledby="addSupplierModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header" style="background-color:#027333;">
+        <h5 class="modal-title text-white" id="addSupplierModalLabel">Add New Supplier</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-3">
+            <label for="new_supplier_name" class="form-label">Supplier Name</label>
+            <input type="text" class="form-control" id="new_supplier_name" placeholder="Enter supplier name">
+        </div>
+        <div class="mb-3">
+            <label for="new_supplier_contact" class="form-label">Contact Information</label>
+            <input type="text" class="form-control" id="new_supplier_contact" placeholder="Enter contact details">
+        </div>
+      </div>
+      <div class="modal-footer border-0 d-flex justify-content-between px-4 pb-4">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="saveNewSupplier" class="btn text-white" style="background-color:#027333;">Save Supplier</button>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 @push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $('#supplier_name').autocomplete({
-            source: function(request, response) {
+    $(document).ready(function () {
+        $('#supplier_id').on('change', function () {
+            var contact = $(this).find('option:selected').data('contact');
+            $('#supplier_contact').val(contact);
+        });
+
+        $('#saveNewSupplier').on('click', function () {
+            var name = $('#new_supplier_name').val();
+            var contact = $('#new_supplier_contact').val();
+
+            if (name && contact) {
                 $.ajax({
-                    url: "{{ route('suppliers.autocomplete') }}",
+                    url: "{{ route('suppliers.ajaxStore') }}",
+                    method: 'POST',
                     data: {
-                        term: request.term
+                        _token: '{{ csrf_token() }}',
+                        name: name,
+                        contact_info: contact
                     },
-                    success: function(data) {
-                        response($.map(data, function(item) {
-                            return {
-                                label: item.name,
-                                value: item.name,
-                                id: item.id
-                            };
-                        }));
+                    success: function (response) {
+                        let newOption = $('<option>', {
+                            value: response.id,
+                            text: response.name,
+                            'data-contact': response.contact_info
+                        });
+                        $('#supplier_id').append(newOption);
+                        newOption.prop('selected', true);
+                        $('#supplier_contact').val(response.contact_info);
+                        $('#addSupplierModal').modal('hide');
+                        $('#new_supplier_name, #new_supplier_contact').val('');
+                    },
+                    error: function (xhr) {
+                        alert('Error: ' + xhr.responseText);
                     }
                 });
-            },
-            minLength: 2,
-            select: function(event, ui) {
-                $('#supplier_id').val(ui.item.id);
+            } else {
+                alert('Please fill out both name and contact.');
             }
         });
+
+        $('#bom_item_id').on('change', function () {
+            var selectedOption = $(this).find('option:selected');
+            var unit = selectedOption.data('unit') || 'Unit';
+            $('#unit_price_label').text('Price per ' + unit);
+        });
+
+        // Set label on page load
+        let selectedUnit = $('#bom_item_id option:selected').data('unit');
+        if (selectedUnit) {
+            $('#unit_price_label').text('Price per ' + selectedUnit);
+        }
     });
 </script>
 @endpush

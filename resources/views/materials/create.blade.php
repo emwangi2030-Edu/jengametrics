@@ -88,30 +88,30 @@
     </div>
 </div>
 
-<!-- Modal for Adding New Supplier -->
+<!-- Supplier Modal -->
 <div class="modal fade" id="addSupplierModal" tabindex="-1" aria-labelledby="addSupplierModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add New Supplier</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="form-floating mb-3">
-                    <input type="text" id="new_supplier_name" class="form-control" placeholder="Supplier Name">
-                    <label for="new_supplier_name">Supplier Name</label>
-                </div>
-                <div class="form-floating mb-3">
-                    <input type="text" id="new_supplier_contact" class="form-control" placeholder="Supplier Contact">
-                    <label for="new_supplier_contact">Supplier Contact</label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" id="saveNewSupplier" class="btn text-white" style="background-color:#027333">Save Supplier</button>
-            </div>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header" style="background-color:#027333;">
+        <h5 class="modal-title text-white" id="addSupplierModalLabel">Add New Supplier</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-3">
+            <label for="new_supplier_name" class="form-label">Supplier Name</label>
+            <input type="text" class="form-control" id="new_supplier_name" placeholder="Enter supplier name">
         </div>
+        <div class="mb-3">
+            <label for="new_supplier_contact" class="form-label">Contact Information</label>
+            <input type="text" class="form-control" id="new_supplier_contact" placeholder="Enter contact details">
+        </div>
+      </div>
+      <div class="modal-footer border-0 d-flex justify-content-between px-4 pb-4">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="saveNewSupplier" class="btn text-white" style="background-color:#027333;">Save Supplier</button>
+      </div>
     </div>
+  </div>
 </div>
 @endsection
 

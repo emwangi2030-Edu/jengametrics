@@ -25,7 +25,6 @@
                             <th>Name</th>
                             <th>Contact Info</th>
                             <th>Materials Supplied</th>
-                            <th>Date Added</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -39,7 +38,6 @@
                                         echo $materialNames ? implode(', ', $materialNames) : 'N/A';
                                     @endphp
                                 </td>
-                                <td>{{ $supplier->created_at->format('Y-m-d') }}</td>
                             </tr>
                         @empty
                             <tr>
