@@ -17,13 +17,6 @@
         <div class="col-md-12">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    @if(session('success'))
-                        <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
                     <div class="table-responsive">
                         <table class="table mt-3">
                             <thead class="table-light">
@@ -40,7 +33,7 @@
                             <tbody>
                                 @foreach($workers as $worker)
                                     <tr>
-                                        <td>{{ $worker->full_name }}</td>
+                                        <td>{{ $loop->iteration }}. {{ $worker->full_name }}</td>
                                         <td>{{ $worker->id_number }}</td>
                                         <td>{{ $worker->job_category }}</td>
                                         <td>{{ $worker->work_type }}</td>
