@@ -39,11 +39,13 @@ class UnitsOfMeasurementSeeder extends Seeder
              // Quantity units
              ['name' => 'Each', 'abbrev' => 'each', 'type' => 'quantity'],
              ['name' => 'Set', 'abbrev' => 'set', 'type' => 'quantity'],
-             ['name' => 'Bag', 'abbrev' => 'bag', 'type' => 'quantity'],
+             ['name' => 'Bag', 'abbrev' => 'bags', 'type' => 'quantity'],
              ['name' => 'Piece', 'abbrev' => 'pcs', 'type' => 'quantity'],
              ['name' => 'Item', 'abbrev' => 'item', 'type' => 'quantity'],
              ['name' => 'Packet', 'abbrev' => 'pkt', 'type' => 'quantity'],
- 
+             ['name' => 'Number', 'abbrev' => 'nr', 'type' => 'quantity'],
+             ['name' => 'Boxes', 'abbrev' => 'boxes', 'type' => 'quantity'],
+            
              // Time units
              ['name' => 'Hour', 'abbrev' => 'hr', 'type' => 'time']
         ];
