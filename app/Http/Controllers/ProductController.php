@@ -17,7 +17,7 @@ class ProductController extends Controller
     {
         $units = UnitOfMeasurement::all();
         $products = Product::orderBy('name', 'asc')->get();
-        return view('products.index', compact('products', 'units'));
+        return response(view('products.index', compact('products', 'units')));
     }
 
     /**
@@ -28,7 +28,7 @@ class ProductController extends Controller
     public function create()
     {
         $units = UnitOfMeasurement::all();
-        return view('products.create', compact('units'));
+        return response(view('products.create', compact('units')));
     }
 
     /**
@@ -46,8 +46,8 @@ class ProductController extends Controller
 
         Product::create($request->all());
 
-        return redirect()->route('products.index')
-                         ->with('success', 'Material added successfully.');
+        return response(redirect()->route('products.index')
+                         ->with('success', 'Material added successfully.'));
     }
 
     /**
@@ -58,7 +58,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return view('products.show', compact('product'));
+        return response(view('products.show', compact('product')));
     }
 
     /**
@@ -69,7 +69,7 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        return view('products.edit', compact('product'));
+        return response(view('products.edit', compact('product')));
     }
 
     /**
@@ -88,8 +88,10 @@ class ProductController extends Controller
 
         $product->update($request->all());
 
-        return redirect()->route('products.index')
-                         ->with('success', 'Material updated successfully.');
+        return response(
+            redirect()->route('products.index')
+                      ->with('success', 'Material updated successfully.')
+        );
     }
 
     /**
@@ -102,7 +104,7 @@ class ProductController extends Controller
     {
         $product->delete();
 
-        return redirect()->route('products.index')
-                         ->with('success', 'Material deleted successfully.');
+        return response(redirect()->route('products.index')
+                         ->with('success', 'Material deleted successfully.'));
     }
 }
