@@ -50,6 +50,9 @@ class UnitsOfMeasurementSeeder extends Seeder
              ['name' => 'Tubes', 'abbrev' => 'tubes', 'type' => 'quantity'],
              ['name' => 'Cans', 'abbrev' => 'cans', 'type' => 'quantity'],
 
+             // Lumpsum units
+             ['name' => 'Lot', 'abbrev' => 'Lot', 'type' => 'lumpsum'],
+
         ];
 
         DB::table('units_of_measurement')->insert($units);
