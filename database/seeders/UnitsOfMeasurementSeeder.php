@@ -45,7 +45,7 @@ class UnitsOfMeasurementSeeder extends Seeder
              ['name' => 'Boxes', 'abbrev' => 'boxes', 'type' => 'quantity'],
              ['name' => 'Rolls', 'abbrev' => 'rolls', 'type' => 'quantity'],
              ['name' => 'Sheets', 'abbrev' => 'sheets', 'type' => 'quantity'],
-             ['name' => 'Pair', 'abbrev' => 'pair', 'type' => 'quantity'],
+             ['name' => 'Pairs', 'abbrev' => 'Prs', 'type' => 'quantity'],
              ['name' => 'Block', 'abbrev' => 'blocks', 'type' => 'quantity'],
              ['name' => 'Tubes', 'abbrev' => 'tubes', 'type' => 'quantity'],
              ['name' => 'Cans', 'abbrev' => 'cans', 'type' => 'quantity'],
