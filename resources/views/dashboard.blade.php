@@ -69,38 +69,50 @@
             }]
         },
         options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    stepSize: 20000, // Adjust this depending on your expense scale
-                    ticks: {
-                        stepSize: 20000, // Ensures evenly spaced grid lines
-                        callback: function(value) {
-                            return value.toLocaleString();
-                        }
-                    },
-                    title: {
-                        display: true,
-                        text: 'Expense (KES)',
-                        color: '#333',
-                        font: {
-                            size: 14,
-                            weight: 'bold'
-                        }
+        responsive: true,
+        animation: {
+            duration: 1000, // duration in ms
+            easing: 'easeOutQuart' // easing function
+        },
+        animations: {
+            tension: {
+                duration: 1000,
+                easing: 'easeOutQuart',
+                from: 0.5,
+                to: 0.3,
+                loop: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 20000,
+                    callback: function(value) {
+                        return 'KES ' + value.toLocaleString();
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Expense (KES)',
+                    color: '#333',
+                    font: {
+                        size: 14,
+                        weight: 'bold'
                     }
                 }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'KES ' + context.parsed.y.toLocaleString();
-                        }
+            }
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return 'KES ' + context.parsed.y.toLocaleString();
                     }
                 }
             }
         }
+    }
     });
 </script>
 @endsection
