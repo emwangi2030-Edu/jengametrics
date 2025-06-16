@@ -124,7 +124,9 @@ class BOMController extends Controller
     {
 
         // Calculate the total estimated cost across all sections
-        $totalEstimatedCost = BomItem::whereProjectId(project_id())->sum('amount');
+       $totalEstimatedCost = BomItem::whereProjectId(project_id())
+            ->selectRaw('SUM(quantity * rate) as total')
+            ->value('total');
 
         $totalEstimatedCost_labour = BomLabour::whereProjectId(project_id())->sum('amount');
 

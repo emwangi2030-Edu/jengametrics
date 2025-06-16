@@ -25,10 +25,6 @@ class ItemsController extends Controller
     // Store a new item
     public function store(Request $request)
     {
-        
-
-
-
         // Create the item with validated data, including the abbrev
         Item::create([
             'name' => $request->name,
