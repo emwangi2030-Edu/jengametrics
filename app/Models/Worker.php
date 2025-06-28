@@ -15,7 +15,9 @@ class Worker extends Model
         'job_category', 
         'work_type', 
         'phone', 
-        'email', 
+        'email',
+        'payment_amount', 
+        'payment_frequency',
         'details', 
         'project_id' 
     ];
@@ -24,6 +26,11 @@ class Worker extends Model
     public function project()
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
     }
 }
 

@@ -89,7 +89,7 @@
                 ticks: {
                     stepSize: 20000,
                     callback: function(value) {
-                        return 'KES ' + value.toLocaleString();
+                        return value.toLocaleString();
                     }
                 },
                 title: {

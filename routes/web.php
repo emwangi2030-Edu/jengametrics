@@ -19,6 +19,7 @@ use App\Http\Controllers\ElementController;
 use App\Http\Controllers\ItemsController;
 use App\Http\Controllers\ItemMaterialController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AttendanceController;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -130,6 +131,11 @@ Route::post('/documents', [DocumentController::class, 'store'])->name('documents
 
 // Workers Table Route
 Route::resource('workers', WorkerController::class);
+
+// Route to show the worker's attendance
+Route::get('/attendance', [App\Http\Controllers\AttendanceController::class, 'create'])->name('attendance.create');
+Route::post('/attendance', [App\Http\Controllers\AttendanceController::class, 'store'])->name('attendance.store');
+
 
 // Route to Suppliers page
 Route::resource('suppliers', SupplierController::class);

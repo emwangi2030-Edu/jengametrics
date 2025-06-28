@@ -7,13 +7,18 @@
             <h2 class="font-weight-bold" style="color:#027333;">
                 Manage Labour: <span class="text-black">{{ $project->name }}</span>
             </h2>
-            <a href="{{ route('workers.create') }}" class="btn btn-success">
-                {{ __('Add Worker') }}
-            </a>
+            <div class="d-flex gap-1">
+                <a href="{{ route('workers.create') }}" class="btn btn-success">
+                    {{ __('Add Worker') }}
+                </a>
+                <a href="{{ route('attendance.create') }}" class="btn btn-info">
+                    {{ __('Mark Attendance') }} 
+                </a>
+            </div>
         </div>
     </div>
 
-    <div class="row justify-content-center">
+    <div class="d-flex justify-content-center">
         <div class="col-md-12">
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -21,27 +26,36 @@
                         <table class="table mt-3">
                             <thead class="table-light">
                                 <tr>
+                                    <th></th>
                                     <th>{{ __('Full Name') }}</th>
                                     <th>{{ __('ID Number') }}</th>
                                     <th>{{ __('Job Category') }}</th>
                                     <th>{{ __('Work Type') }}</th>
                                     <th>{{ __('Phone') }}</th>
                                     <th>{{ __('Email') }}</th>
-                                    <th>{{ __('Details') }}</th>
+                                    <th>{{ __('Payment Amount') }}</th>
+                                    <th>{{ __('Payment Frequency') }}</th>
+                                    <th>{{ __('Actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($workers as $worker)
                                     <tr>
-                                        <td>{{ $loop->iteration }}. {{ $worker->full_name }}</td>
+                                        <td>{{ $loop->iteration }}. </td>
+                                        <td>{{ $worker->full_name }}</td>
                                         <td>{{ $worker->id_number }}</td>
                                         <td>{{ $worker->job_category }}</td>
                                         <td>{{ $worker->work_type }}</td>
                                         <td>{{ $worker->phone }}</td>
-                                        <td>{{ $worker->email }}</td>
-                                        <td>
+                                        <td>{{ $worker->email ?? 'null' }}</td>
+                                        <td>{{ $worker->payment_amount }}</td>
+                                        <td>{{ $worker->payment_frequency }}</td>
+                                        <td class="d-flex gap-1">
                                             <a href="{{ route('workers.show', $worker->id) }}" class="btn btn-info btn-sm">
-                                                {{ __('View') }}
+                                                View
+                                            </a>
+                                            <a href="{{ route('workers.edit', $worker->id) }}" class="btn btn-warning btn-sm">
+                                                Edit
                                             </a>
                                         </td>
                                     </tr>

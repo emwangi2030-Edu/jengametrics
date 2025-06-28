@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Worker;
 use App\Models\Project;
+use App\Models\Attendance;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class WorkerController extends Controller
@@ -23,10 +25,69 @@ class WorkerController extends Controller
     }
 
 
-    public function show($id)
+   public function show(Request $request, $id)
     {
         $worker = Worker::findOrFail($id);
-        return view('workers.show', compact('worker'));
+
+        // Selected or current month/year
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
+
+        // Get attendance records for selected month/year
+        $attendances = Attendance::where('worker_id', $worker->id)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->orderBy('date')
+            ->get()
+            ->keyBy(fn($att) => Carbon::parse($att->date)->format('Y-m-d'));
+
+        $labels = [];
+        $presentData = [];
+        $absentData = [];
+        $inactiveData = [];
+
+        $daysInMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
+        $today = Carbon::today();
+        $workerCreatedAt = $worker->created_at->startOfDay();
+
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $date = Carbon::createFromDate($year, $month, $day);
+            $formattedDate = $date->format('Y-m-d');
+            $labels[] = $date->format('M d');
+
+            // If before worker joined or after today, leave as null
+            if ($date->lt($workerCreatedAt) || $date->gt($today)) {
+                $presentData[] = 0;
+                $absentData[] = 0;
+                $inactiveData[] = 1;
+                continue;
+            }
+
+            $isPresent = $attendances->has($formattedDate) && (bool) $attendances[$formattedDate]->present;
+            $presentData[] = $isPresent ? 1 : 0;
+            $absentData[] = $isPresent ? 0 : 1;
+            $inactiveData[] = 0;
+        }
+
+        // Dropdown data
+        $availableYears = Attendance::where('worker_id', $worker->id)
+            ->selectRaw('YEAR(date) as year')->distinct()->pluck('year');
+
+        $availableMonths = collect(range(1, 12))->mapWithKeys(function ($m) {
+            return [$m => Carbon::create()->month($m)->format('F')];
+        });
+
+        return view('workers.show', compact(
+            'worker',
+            'labels',
+            'presentData',
+            'absentData',
+            'inactiveData',
+            'month',
+            'year',
+            'availableMonths',
+            'availableYears'
+        ));
     }
 
     public function create()
@@ -40,6 +101,41 @@ class WorkerController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'id_number' => 'required|integer',
+            'job_category' => 'required|string',
+            'work_type' => 'required|string',
+            'phone' => 'required|string|max:15',
+            'email' => 'nullable|email|max:255',
+        ]);
+
+        $worker = new Worker;
+        $worker->full_name = $request->input('full_name');
+        $worker->id_number = $request->input('id_number');
+        $worker->job_category = $request->input('job_category');
+        $worker->work_type = $request->input('work_type');
+        $worker->phone = $request->input('phone');
+        $worker->email = $request->input('email');
+        $worker->payment_amount = $request->input('payment_amount');
+        $worker->payment_frequency = $request->input('payment_frequency');
+        $worker->project_id = Auth::user()->project_id; // Set the project_id from the authenticated user
+        $worker->save();
+
+        return redirect()->route('workers.index')->with('success', 'Worker added successfully');
+    }
+
+    public function edit($id)
+    {
+        $worker = Worker::findOrFail($id);
+
+        return view('workers.edit', compact('worker'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $worker = Worker::findOrFail($id);
+
         // Validate the request
         $request->validate([
             'full_name' => 'required|string|max:255',
@@ -50,19 +146,20 @@ class WorkerController extends Controller
             'email' => 'nullable|email|max:255',
         ]);
 
-        // Create and save the worker, using the project_id from the authenticated user
-        $worker = new Worker;
-        $worker->full_name = $request->input('full_name');
-        $worker->id_number = $request->input('id_number');
-        $worker->job_category = $request->input('job_category');
-        $worker->work_type = $request->input('work_type');
-        $worker->phone = $request->input('phone');
-        $worker->email = $request->input('email');
-        $worker->project_id = Auth::user()->project_id; // Set the project_id from the authenticated user
-        $worker->save();
+        // Update the worker
+        $worker->update([
+            'full_name' => $request->input('full_name'),
+            'id_number' => $request->input('id_number'),
+            'job_category' => $request->input('job_category'),
+            'work_type' => $request->input('work_type'),
+            'phone' => $request->input('phone'),
+            'email' => $request->input('email'),
+            'payment_amount' => $request->input('payment_amount'),
+            'payment_frequency' => $request->input('payment_frequency'),
+        ]);
 
-        return redirect()->route('workers.index')->with('success', 'Worker added successfully');
+        return redirect()->route('workers.index')->with('success', 'Worker updated successfully.');
     }
-    
+  
 }
 
