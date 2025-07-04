@@ -20,7 +20,7 @@ use App\Http\Controllers\ItemsController;
 use App\Http\Controllers\ItemMaterialController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AttendanceController;
-
+use App\Http\Controllers\RequisitionController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -116,7 +116,15 @@ Route::get('create-bq-item', ['as'=>'create_bq_item', 'uses' => '\App\Http\Contr
 
 Route::resource('boms', BOMController::class);
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/requisitions', [RequisitionController::class, 'index'])->name('requisitions.index');
+    Route::get('/requisitions/create', [RequisitionController::class, 'create'])->name('requisitions.create');
+    Route::post('/requisitions', [RequisitionController::class, 'store'])->name('requisitions.store');
 
+    // Approve / Reject actions
+    Route::post('/requisitions/{id}/approve', [RequisitionController::class, 'approve'])->name('requisitions.approve');
+    Route::post('/requisitions/{id}/reject', [RequisitionController::class, 'reject'])->name('requisitions.reject');
+});
 
 Route::get('reports', ['as'=>'reports', 'uses' => '\App\Http\Controllers\BOMController@report']);
 
@@ -133,8 +141,8 @@ Route::post('/documents', [DocumentController::class, 'store'])->name('documents
 Route::resource('workers', WorkerController::class);
 
 // Route to show the worker's attendance
-Route::get('/attendance', [App\Http\Controllers\AttendanceController::class, 'create'])->name('attendance.create');
-Route::post('/attendance', [App\Http\Controllers\AttendanceController::class, 'store'])->name('attendance.store');
+Route::get('/attendance', [AttendanceController::class, 'create'])->name('attendance.create');
+Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
 
 
 // Route to Suppliers page

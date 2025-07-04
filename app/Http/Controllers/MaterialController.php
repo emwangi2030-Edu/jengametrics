@@ -8,6 +8,7 @@ use App\Models\ItemMaterial;
 use App\Models\Supplier;
 use App\Models\BomItem;
 use App\Models\Project;
+use App\Models\Requisition;
 use App\Models\UnitOfMeasurement;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
@@ -22,7 +23,7 @@ class MaterialController extends Controller
         $projectId = Auth::user()->project_id;
 
         // Retrieve materials associated with the project
-        $materials = Material::with('supplier')
+        $materials = Material::with('supplier', 'requisition')
             ->where('project_id', $projectId)
             ->get();
 
@@ -34,18 +35,21 @@ class MaterialController extends Controller
     public function create()
     {
         $suppliers = Supplier::all(); // Get all suppliers
+        $items = BomItem::whereIn('id', function ($query) {
+            $query->select('bom_item_id')
+                ->from('requisitions')
+                ->where('status', 'approved');
+        })->with(['item_material'])
+        ->where('project_id', project_id())
+        ->get();
 
-        $items = BomItem::where('project_id', project_id())
-            ->whereIn('id', function ($query) {
-                $query->selectRaw('MIN(bom_items.id)')
-                    ->from('bom_items')
-                    ->join('item_materials', 'bom_items.item_material_id', '=', 'item_materials.id')
-                    ->where('bom_items.project_id', project_id())
-                    ->groupBy('item_materials.product_id');
-            })
+        // Also pass approved requisitions with quantity
+        $requisitions = Requisition::where('status', 'approved')
+            ->doesntHave('material') // Exclude already-purchased ones
+            ->with('bomItem.item_material')
             ->get();
 
-        return view('materials.create', compact('suppliers', 'items'));
+        return view('materials.create', compact('suppliers', 'items', 'requisitions'));
     }
 
     public function store(Request $request)
@@ -55,6 +59,7 @@ class MaterialController extends Controller
             'unit_price' => 'required|numeric',
             'quantity_in_stock' => 'required|numeric',
             'supplier_id' => 'required|exists:suppliers,id',
+            'requisition_id' => 'required|exists:requisitions,id'
         ]);
 
         $supplier = Supplier::find($request->supplier_id);
@@ -69,6 +74,7 @@ class MaterialController extends Controller
             'supplier_id' => $supplier->id,
             'supplier_contact' => $supplier->contact_info,
             'project_id' => Auth::user()->project_id,
+            'requisition_id' => $request->requisition_id,
         ];
 
         if ($request->hasFile('document')) {

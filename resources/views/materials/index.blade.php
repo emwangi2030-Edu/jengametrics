@@ -25,6 +25,7 @@
                     <table class="table mt-3">
                         <thead class="table-light">
                             <tr>
+                                <th>{{ __('Requisition No.') }}</th>
                                 <th>{{ __('Name') }}</th>
                                 <th>{{ __('Unit Price') }}</th>
                                 <th>{{ __('Unit of Measure') }}</th>
@@ -39,6 +40,7 @@
                         <tbody>
                             @foreach($materials as $material)
                                 <tr>
+                                    <td>{{ $material->requisition->requisition_no }}</td>
                                     <td>{{ $material->product->name ?? 'N/A' }}</td>
                                     <td>{{ number_format($material->unit_price, 2) }}</td>
                                     <td>{{ $material->unit_of_measure }}</td>

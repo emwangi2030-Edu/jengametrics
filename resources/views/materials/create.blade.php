@@ -20,9 +20,13 @@
                         <div class="form-floating mb-4">
                             <select class="form-select" id="bom_item_id" name="bom_item_id" required>
                                 <option value="" disabled selected>Select Material</option>
-                                @foreach($items as $item)
-                                    <option value="{{ $item->item_material->id ?? '' }}" data-unit="{{ $item->item_material->unit_of_measurement ?? 'Unit' }}">
-                                        {{ $item->item_material->name ?? 'No Name Available' }}
+                                @foreach($requisitions as $req)
+                                    <option
+                                        value="{{ $req->bomItem->item_material->id ?? '' }}"
+                                        data-quantity="{{ (int) $req->quantity_requested }}"
+                                        data-unit="{{ $req->bomItem->item_material->unit_of_measurement ?? 'Unit' }}"
+                                        data-requisition-id="{{ $req->id }}">
+                                        {{ $req->bomItem->item_material->name ?? 'No Name Available' }}
                                     </option>
                                 @endforeach
                             </select>
@@ -32,6 +36,8 @@
                             @enderror
                         </div>
 
+                        <input type="hidden" name="requisition_id" id="requisition_id">
+
                         {{-- Unit Price --}}
                         <div class="form-floating mb-4">
                             <input type="text" class="form-control" id="unit_price" name="unit_price" value="{{ old('unit_price', $material->unit_price ?? '') }}" placeholder="Enter price" required>
@@ -40,8 +46,9 @@
 
                         {{-- Quantity --}}
                         <div class="form-floating mb-4">
-                            <input type="number" class="form-control" id="quantity_in_stock" name="quantity_in_stock" value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}" placeholder="Enter quantity" required>
-                            <label for="quantity_in_stock">Quantity</label>
+                            <input type="number" class="form-control" id="quantity_in_stock" name="quantity_in_stock"
+                                value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}" placeholder="Enter quantity" required>
+                            <label for="quantity_in_stock" id="quantity_label">Quantity</label>
                         </div>
 
                         {{-- Supplier Dropdown + Add Button --}}
@@ -164,11 +171,21 @@
             }
         });
 
-        // Update "Price per Unit" label dynamically
+        // Update "Price per Unit" and Quantity Label dynamically
         $('#bom_item_id').on('change', function () {
-            var selectedOption = $(this).find('option:selected');
-            var unit = selectedOption.data('unit') || 'Unit';
+            const selectedOption = $(this).find('option:selected');
+            const quantity = selectedOption.data('quantity');
+            const unit = selectedOption.data('unit');
+            const requisitionId = selectedOption.data('requisition-id');
+
+            console.log('Selected Option:', selectedOption.text());
+            console.log('Quantity:', quantity);
+            console.log('Unit:', unit);
+            console.log('Requisition ID:', requisitionId);
+
             $('#unit_price_label').text('Price per ' + unit);
+            $('#quantity_in_stock').val(quantity);
+            $('#requisition_id').val(requisitionId);
         });
     });
 </script>

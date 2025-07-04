@@ -58,6 +58,17 @@
                                 </tr>
                             </tfoot>
                         </table>
+                        <!-- Requisition Buttons -->
+                        <div class="d-flex justify-content-left">
+                            <div class="justify-content-between">
+                                <a href="{{ route('requisitions.create') }}" class="btn btn-primary mt-3">
+                                    Requisition Material
+                                </a>
+                                <a href="{{ route('requisitions.index', ['section_id' => $bqSection->id]) }}" class="btn btn-secondary mt-3">
+                                    Requisition List
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

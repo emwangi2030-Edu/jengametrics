@@ -6,7 +6,6 @@ use App\Models\BqDocument;
 use App\Models\BqSection;
 use App\Models\Section;
 use App\Models\Element;
-use App\Models\SubElement;
 use App\Models\Item;
 use Illuminate\Http\Request;
 
@@ -19,10 +18,7 @@ class BqDocumentController extends Controller
      */
     public function index()
     {
-        // Retrieve all BQ documents with their associated sections
-        // $documents = BqDocument::with('sections')->get();
-        // return view('bq_documents.index', compact('documents'));
-
+        // Retrieve BQ document with associated sections
         $bqDocument = get_project()->id;
         $sections = Section::orderBy('id', 'asc')->get();
         $totalAmount = BqSection::where('project_id', project_id())->sum('amount');

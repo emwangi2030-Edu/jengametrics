@@ -34,6 +34,6 @@ class AttendanceController extends Controller
             );
         }
 
-        return redirect()->route('attendance.create')->with('success', 'Attendance saved successfully.');
+        return redirect()->route('workers.index')->with('success', 'Attendance saved successfully.');
     }
 }
