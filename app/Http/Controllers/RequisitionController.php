@@ -27,30 +27,36 @@ class RequisitionController extends Controller
     {
         $bomItems = BomItem::whereProjectId(project_id())->get();
 
-        $items = collect(); // Initialize an empty collection to store unique items
+        // Group BOM items by product_id
+        $groupedItems = $bomItems->groupBy('product_id');
+        $items = collect();
+        $section_name = null;
 
-        foreach ($bomItems as $item) {
-            // Check if this product_id already exists in the collection
-            $existingItem = $items->firstWhere('product_id', $item->product_id);
+        foreach ($groupedItems as $product_id => $group) {
+            $sampleItem = $group->first();
+            $totalQty = $group->sum('quantity');
+            $totalAmt = $group->sum('amount');
 
-            if ($existingItem) {
-                // Add quantity and amount
-                $existingItem->total_quantity += $item->quantity;
-                $existingItem->total_amount += $item->amount;
-            } else {
-                // First time seeing this product_id
-                $item->total_quantity = $item->quantity;
-                $item->total_amount = $item->amount;
+            // Get all requisitions related to any of the BOM items in this group
+            $requisitionedQty = Requisition::whereIn('bom_item_id', $group->pluck('id'))
+                ->whereIn('status', ['pending', 'approved'])
+                ->sum('quantity_requested');
 
-                // Add unit from product table
-                $product = Product::find($item->product_id);
-                $item->unit = $product?->unit ?? 'N/A';
+            $product = Product::find($product_id);
+            $section = Section::find($sampleItem->section_id);
 
-                $items->push($item);
+            $sampleItem->total_quantity = $totalQty;
+            $sampleItem->total_amount = $totalAmt;
+            $sampleItem->remaining_quantity = max(0, $totalQty - $requisitionedQty);
+            $sampleItem->unit = $product?->unit ?? 'N/A';
 
-                // Add section
-                $section = Section::find($item?->section_id);
-                $section_name = $section?->name ?? null;
+            // ✅ Only push items with remaining_quantity >= 1
+            if ($sampleItem->remaining_quantity >= 1) {
+                $items->push($sampleItem);
+            }
+
+            if (!$section_name) {
+                $section_name = $section?->name;
             }
         }
 
@@ -63,6 +69,28 @@ class RequisitionController extends Controller
             'bom_item_id' => 'required|exists:bom_items,id',
             'quantity_requested' => 'required|numeric|min:0.01',
         ]);
+
+        $bomItem = BomItem::findOrFail($request->bom_item_id);
+        $productId = $bomItem->product_id;
+
+        // Total quantity of this material in the BOM for this project
+        $totalAvailable = BomItem::where('product_id', $productId)
+            ->whereProjectId(project_id())
+            ->sum('quantity');
+
+        // Total quantity already requisitioned (pending or approved)
+        $alreadyRequisitioned = Requisition::whereIn('bom_item_id', BomItem::where('product_id', $productId)->pluck('id'))
+            ->whereIn('status', ['pending', 'approved'])
+            ->sum('quantity_requested');
+
+        $remaining = $totalAvailable - $alreadyRequisitioned;
+
+        // Reject if user exceeds available quantity
+        if ($request->quantity_requested > $remaining) {
+            return back()->withErrors([
+                'quantity_requested' => "The quantity entered ({$request->quantity_requested}) exceeds the available limit of {$remaining}."
+            ])->withInput();
+        }
 
         // Generate a unique requisition number
         do {
@@ -81,7 +109,6 @@ class RequisitionController extends Controller
 
         return redirect()->route('requisitions.index')->with('success', 'Requisition submitted.');
     }
-
 
     public function approve($id)
     {
@@ -105,5 +132,23 @@ class RequisitionController extends Controller
         ]);
 
         return back()->with('info', 'Requisition rejected.');
+    }
+
+    public function toggleStatus(Requisition $requisition)
+    {
+        if ($requisition->status === 'pending') {
+            return redirect()->route('requisitions.index')->with('error', 'Pending requisitions cannot be toggled. Approve or reject first.');
+        }
+
+        if ($requisition->material) {
+            return redirect()->route('requisitions.index')->with('error', 'Cannot change status. Material already purchased.');
+        }
+
+        $requisition->status = $requisition->status === 'approved' ? 'rejected' : 'approved';
+        $requisition->approved_by = Auth::id();
+        $requisition->approved_at = now();
+        $requisition->save();
+
+        return redirect()->route('requisitions.index')->with('success', 'Requisition status updated.');
     }
 }

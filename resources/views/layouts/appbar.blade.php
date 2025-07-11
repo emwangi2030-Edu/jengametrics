@@ -800,21 +800,18 @@
 
 
 
-            </main><!-- ===============================================-->
-            <!--    End of Main Content-->
-            <!-- ===============================================-->
+            </main>
 
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+                    integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/5hb5g6Q2bj0Ib6W9crrxJKKo4qklqUhcHZCl1r"
+                    crossorigin="anonymous"></script>
 
-            <!-- ===============================================-->
-            <!--    JavaScripts-->
-            <!-- ===============================================-->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
             <script src="{{ asset('assets/metrics/vendors/popper/popper.min.js') }}"></script>
-            <script src="{{ asset('assets/metrics/vendors/bootstrap/bootstrap.min.js') }}"></script>
             <script src="{{ asset('assets/metrics/vendors/anchorjs/anchor.min.js') }}"></script>
             <script src="{{ asset('assets/metrics/vendors/is/is.min.js') }}"></script>
             <script src="{{ asset('assets/metrics/vendors/fontawesome/all.min.js') }}"></script>
-
-
             <script src="{{ asset('assets/metrics/vendors/lodash/lodash.min.js') }}"></script>
             <script src="{{ asset('assets/metrics/vendors/list.js/list.min.js') }}"></script>
             <script src="{{ asset('assets/metrics/vendors/feather-icons/feather.min.js') }}"></script>
@@ -827,22 +824,25 @@
             <script src="{{ asset('assets/metrics/assets/js/ecommerce-dashboard.js') }}"></script>
             <script src="{{ asset('assets/metrics/vendors/prism/prism.js') }}"></script>
 
+            <!-- SweetAlert -->
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+            <!-- Toast Options (if using toastr.js) -->
             <script>
-                var toastr_options = {closeButton : true};
+                var toastr_options = { closeButton: true };
             </script>
-            @yield('page-js')
-            @yield('scripts')
 
-
-
+            <!-- Custom Theme Script -->
             <script>
-                $(document).on('click', '.ghuranti', function(){
+                $(document).on('click', '.ghuranti', function () {
                     $('.themeqx-demo-chooser-wrap').toggleClass('open');
                 });
             </script>
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <!--JQuery CDN-->
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/5hb5g6Q2bj0Ib6W9crrxJKKo4qklqUhcHZCl1r" crossorigin="anonymous"></script>
+
+            <!-- Blade Yield Stacks -->
+            @yield('page-js')
+            @yield('scripts')
             @stack('scripts')
+
         </body>
         </html>

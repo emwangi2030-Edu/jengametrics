@@ -20,4 +20,9 @@ class BomItem extends Model
     {
         return $this->belongsTo(ItemMaterial::class, 'item_material_id');
     }
+
+    public function requisitions()
+    {
+        return $this->hasMany(Requisition::class, 'bom_item_id');
+    }
 }

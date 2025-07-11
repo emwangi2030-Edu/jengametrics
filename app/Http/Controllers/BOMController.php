@@ -12,6 +12,7 @@ use App\Models\BqSection;
 use App\Models\Material;
 use App\Models\Product;
 use App\Models\Project;
+use App\Models\Requisition;
 use Illuminate\Support\Facades\Auth;
 
 class BOMController extends Controller
@@ -69,41 +70,52 @@ class BOMController extends Controller
 
     public function show($id)
     {
-        // Fetch sections related to this BQ Document
         $bqSection = Section::find($id);
 
-        // Fetch all bom_items for the given section and project
         $rawItems = BomItem::whereProjectId(project_id())
             ->where('section_id', $id)
             ->get();
 
-        // Process items to combine entries with the same product_id
-        $items = collect(); // Initialize an empty collection to store unique items
+        $items = collect();
+        $requisitionableItems = collect(); // for modal
+        $section_name = $bqSection?->name;
 
-        foreach ($rawItems as $item) {
-            // Check if this product_id already exists in the collection
-            $existingItem = $items->firstWhere('product_id', $item->product_id);
+        $groupedItems = $rawItems->groupBy('product_id');
 
-            if ($existingItem) {
-                // If product_id already exists, add the quantity and amount to the first occurrence
-                $existingItem->total_quantity += $item->quantity;
-                $existingItem->total_amount += $item->amount;
+        foreach ($groupedItems as $product_id => $group) {
+            $sampleItem = $group->first();
+            $totalQty = $group->sum('quantity');
+            $totalAmt = $group->sum('amount');
 
-            } else {
-                // If not found, store this item as the first instance
-                $item->total_quantity = $item->quantity;
-                $item->total_amount = $item->amount;
-                $items->push($item);
+            $product = Product::find($product_id);
+
+            $sampleItem->total_quantity = $totalQty;
+            $sampleItem->total_amount = $totalAmt;
+            $sampleItem->unit = $product?->unit ?? 'N/A';
+
+            // Push for BoM table
+            $items->push($sampleItem);
+
+            // Calculate remaining quantity
+            $requisitionedQty = Requisition::whereIn('bom_item_id', $group->pluck('id'))
+                ->whereIn('status', ['pending', 'approved'])
+                ->sum('quantity_requested');
+
+            $remaining = max(0, $totalQty - $requisitionedQty);
+            $sampleItem->remaining_quantity = $remaining;
+
+            // Push for requisition modal only if remaining >= 1
+            if ($remaining >= 1) {
+                $requisitionableItems->push(clone $sampleItem);
             }
         }
 
-        // Fetch labour records
-        $labours = BomLabour::whereProjectId(project_id())->where('section_id', $id)->get();
-        
-        // Pass the processed collection to the view
-        return view('boms.show', compact('bqSection', 'items', 'labours'));
-    }
+        $labours = BomLabour::whereProjectId(project_id())
+            ->where('section_id', $id)
+            ->get();
 
+        return view('boms.show', compact('bqSection', 'items', 'requisitionableItems', 'labours', 'section_name'));
+    }
 
     public function destroy($id)
     {

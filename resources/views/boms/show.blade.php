@@ -59,15 +59,14 @@
                             </tfoot>
                         </table>
                         <!-- Requisition Buttons -->
-                        <div class="d-flex justify-content-left">
-                            <div class="justify-content-between">
-                                <a href="{{ route('requisitions.create') }}" class="btn btn-primary mt-3">
-                                    Requisition Material
-                                </a>
-                                <a href="{{ route('requisitions.index', ['section_id' => $bqSection->id]) }}" class="btn btn-secondary mt-3">
-                                    Requisition List
-                                </a>
-                            </div>
+                        <div class="d-flex gap-2 mt-3">
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#requisitionModal">
+                                Requisition Material
+                            </button>
+
+                            <a href="{{ route('requisitions.index', ['section_id' => $bqSection->id]) }}" class="btn btn-secondary">
+                                Requisition List
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -75,5 +74,45 @@
         </div>
 
         @include('boms.labours')
+        @include('requisitions.requisition_modal')
     </div>
 @endsection
+@push('scripts')
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let maxQty = 0;
+        let unit = 'unit';
+        const qtyInput = document.getElementById('quantity_requested');
+        const materialSelect = document.getElementById('bom_item_id');
+
+        function handleQtyInput(e) {
+            const value = parseFloat(e.target.value);
+            if (value > maxQty) {
+                e.target.value = '';
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Quantity Too High',
+                    text: `Limit is (${maxQty} ${unit}).`,
+                    confirmButtonColor: '#027333'
+                });
+            }
+        }
+
+        if (materialSelect) {
+            materialSelect.addEventListener('change', function () {
+                const selected = materialSelect.options[materialSelect.selectedIndex];
+                maxQty = parseFloat(selected.dataset.max) || 0;
+                unit = selected.dataset.unit || 'unit';
+
+                qtyInput.setAttribute('max', maxQty);
+                qtyInput.setAttribute('placeholder', `Max: ${maxQty} ${unit}`);
+                qtyInput.value = '';
+
+                qtyInput.removeEventListener('input', handleQtyInput);
+                qtyInput.addEventListener('input', handleQtyInput);
+            });
+        }
+    });
+</script>
+@endpush
+

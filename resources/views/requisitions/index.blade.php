@@ -32,7 +32,9 @@
                     <td>{{ $req->approver->name ?? '-' }}</td>
                     <td>{{ $req->approved_at ? \Carbon\Carbon::parse($req->approved_at)->format('Y-m-d') : '-' }}</td>
                     <td>
-                        @if($req->status === 'pending')
+                        @if($req->material)
+                            <span class="text-muted">Purchased</span>
+                        @elseif($req->status === 'pending')
                             <form action="{{ route('requisitions.approve', $req->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 <button class="btn btn-sm btn-success">Approve</button>
@@ -42,7 +44,13 @@
                                 <button class="btn btn-sm btn-danger">Reject</button>
                             </form>
                         @else
-                            <span class="text-muted">No actions</span>
+                            <form action="{{ route('requisitions.toggleStatus', $req->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="btn btn-sm {{ $req->status === 'approved' ? 'btn-danger' : 'btn-success' }}">
+                                    {{ $req->status === 'approved' ? 'Mark as Rejected' : 'Mark as Approved' }}
+                                </button>
+                            </form>
                         @endif
                     </td>
                 </tr>
@@ -54,9 +62,6 @@
         </tbody>
     </table>
     <div>
-        <a href="{{ route('requisitions.create') }}" class="btn btn-primary mt-3">
-            {{ __('New Requisition') }}
-        </a>
         <a href="{{ route('boms.index') }}" class="btn btn-secondary mt-3">
             {{ __('Back') }}
         </a>

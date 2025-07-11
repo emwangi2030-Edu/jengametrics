@@ -19,7 +19,7 @@
                         {{-- Material Dropdown --}}
                         <div class="form-floating mb-4">
                             <select class="form-select" id="bom_item_id" name="bom_item_id" required>
-                                <option value="" disabled selected>Select Material</option>
+                                <option value="" disabled selected>Select Approved Materials</option>
                                 @foreach($requisitions as $req)
                                     <option
                                         value="{{ $req->bomItem->item_material->id ?? '' }}"
@@ -30,10 +30,6 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <label for="bom_item_id">Material</label>
-                            @error('bom_item_id')
-                                <div class="text-danger mt-1">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <input type="hidden" name="requisition_id" id="requisition_id">

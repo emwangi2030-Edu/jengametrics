@@ -126,6 +126,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/requisitions/{id}/reject', [RequisitionController::class, 'reject'])->name('requisitions.reject');
 });
 
+Route::patch('/requisitions/{requisition}/toggle-status', [RequisitionController::class, 'toggleStatus'])
+    ->name('requisitions.toggleStatus');
+
 Route::get('reports', ['as'=>'reports', 'uses' => '\App\Http\Controllers\BOMController@report']);
 
 Route::resource('projects', ProjectController::class);
