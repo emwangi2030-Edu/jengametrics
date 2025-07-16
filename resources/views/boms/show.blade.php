@@ -58,15 +58,24 @@
                                 </tr>
                             </tfoot>
                         </table>
-                        <!-- Requisition Buttons -->
-                        <div class="d-flex gap-2 mt-3">
-                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#requisitionModal">
-                                Requisition Material
-                            </button>
+                       <!-- Requisition Buttons -->
+                        <div class="mt-4">
+                            @if ($requisitionableItems->isEmpty())
+                                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                    <strong>No materials available for requisition.</strong> All listed materials have already been fully requested or are pending approval.
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            @else
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#requisitionModal">
+                                        Requisition Material
+                                    </button>
 
-                            <a href="{{ route('requisitions.index', ['section_id' => $bqSection->id]) }}" class="btn btn-secondary">
-                                Requisition List
-                            </a>
+                                    <a href="{{ route('requisitions.index', ['section_id' => $bqSection->id]) }}" class="btn btn-secondary">
+                                        Requisition List
+                                    </a>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

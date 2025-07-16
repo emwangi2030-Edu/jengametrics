@@ -45,7 +45,7 @@ class MaterialController extends Controller
 
         // Also pass approved requisitions with quantity
         $requisitions = Requisition::where('status', 'approved')
-            ->doesntHave('material') // Exclude already-purchased ones
+            ->doesntHave('material')
             ->with('bomItem.item_material')
             ->get();
 

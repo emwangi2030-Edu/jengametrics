@@ -90,6 +90,10 @@
             transform: scale(1.1);
             transition: transform 0.2s ease-in-out;
         }
+
+        .green_text {
+            color: #027333;
+        }
     </style>
     
     

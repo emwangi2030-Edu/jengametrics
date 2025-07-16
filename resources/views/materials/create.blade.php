@@ -17,19 +17,22 @@
                         @csrf
 
                         {{-- Material Dropdown --}}
-                        <div class="form-floating mb-4">
-                            <select class="form-select" id="bom_item_id" name="bom_item_id" required>
-                                <option value="" disabled selected>Select Approved Materials</option>
-                                @foreach($requisitions as $req)
-                                    <option
-                                        value="{{ $req->bomItem->item_material->id ?? '' }}"
-                                        data-quantity="{{ (int) $req->quantity_requested }}"
-                                        data-unit="{{ $req->bomItem->item_material->unit_of_measurement ?? 'Unit' }}"
-                                        data-requisition-id="{{ $req->id }}">
-                                        {{ $req->bomItem->item_material->name ?? 'No Name Available' }}
-                                    </option>
-                                @endforeach
-                            </select>
+                        <div class="mb-4">
+                            <label class="form-label">Materials</label>
+                            <div class="input-group">
+                                <select class="form-select" id="bom_item_id" name="bom_item_id" required>
+                                    <option value="" disabled selected>Select Approved Materials</option>
+                                    @foreach($requisitions as $req)
+                                        <option
+                                            value="{{ $req->bomItem->item_material->id ?? '' }}"
+                                            data-quantity="{{ (int) $req->quantity_requested }}"
+                                            data-unit="{{ $req->bomItem->item_material->unit_of_measurement }}"
+                                            data-requisition-id="{{ $req->id }}">
+                                            {{ $req->bomItem->item_material->name ?? 'No Requisitioned Material Available' }} (Requisition ID: {{ $req->requisition_no ?? 'N/A' }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
 
                         <input type="hidden" name="requisition_id" id="requisition_id">
@@ -42,8 +45,8 @@
 
                         {{-- Quantity --}}
                         <div class="form-floating mb-4">
-                            <input type="number" class="form-control" id="quantity_in_stock" name="quantity_in_stock"
-                                value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}" placeholder="Enter quantity" required>
+                            <input type="number" class="form-control text-muted" id="quantity_in_stock" name="quantity_in_stock"
+                                value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}" placeholder="Enter quantity" required readonly>
                             <label for="quantity_in_stock" id="quantity_label">Quantity</label>
                         </div>
 
@@ -69,7 +72,7 @@
 
                         {{-- Upload Document --}}
                         <div class="mb-4">
-                            <label for="document" class="form-label">Upload Document (PDF, PNG, JPG)</label>
+                            <label for="document" class="form-label">Upload Receipt (PDF, PNG, JPG)</label>
                             <input type="file" name="document" id="document" class="form-control">
                         </div>
 
