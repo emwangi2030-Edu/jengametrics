@@ -4,7 +4,7 @@
 <div class="container py-5">
     <div class="row mb-5 text-center">
         <div class="col-12">
-            <h2 class="display-6 fw-bold" style="color:#027333;">Add New Material</h2>
+            <h2 class="display-6 fw-bold" style="color:#027333;">Record New Material Purchase</h2>
             <p class="text-muted">Fill in the material details and supplier information below.</p>
         </div>
     </div>
@@ -21,7 +21,7 @@
                             <label class="form-label">Materials</label>
                             <div class="input-group">
                                 <select class="form-select" id="bom_item_id" name="bom_item_id" required>
-                                    <option value="" disabled selected>Select Approved Materials</option>
+                                    <option value="" disabled selected>Select Materials</option>
                                     @foreach($requisitions as $req)
                                         <option
                                             value="{{ $req->bomItem->item_material->id ?? '' }}"
@@ -39,8 +39,8 @@
 
                         {{-- Unit Price --}}
                         <div class="form-floating mb-4">
-                            <input type="text" class="form-control" id="unit_price" name="unit_price" value="{{ old('unit_price', $material->unit_price ?? '') }}" placeholder="Enter price" required>
                             <label for="unit_price" id="unit_price_label">Price per Unit</label>
+                            <input type="text" class="form-control" id="unit_price" name="unit_price" value="{{ old('unit_price', $material->unit_price ?? '') }}" placeholder="Enter price" required>
                         </div>
 
                         {{-- Quantity --}}

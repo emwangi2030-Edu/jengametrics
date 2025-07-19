@@ -154,6 +154,7 @@ Route::resource('suppliers', SupplierController::class);
 // Route to Materials page
 Route::resource('materials', MaterialController::class);
 Route::post('/materials-store', [MaterialController::class, 'store'])->name('m.store');
+Route::post('/materials/{id}/use', [MaterialController::class, 'useMaterial'])->name('materials.use');
 
 // Routes for Supplier Name and Contact Autocomplete Feature
 Route::get('/suppliers/autocomplete', [SupplierController::class, 'autocomplete'])->name('suppliers.autocomplete');

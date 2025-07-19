@@ -9,6 +9,7 @@ use App\Models\Supplier;
 use App\Models\BomItem;
 use App\Models\Project;
 use App\Models\Requisition;
+use App\Models\StockUsage;
 use App\Models\UnitOfMeasurement;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
@@ -27,9 +28,15 @@ class MaterialController extends Controller
             ->where('project_id', $projectId)
             ->get();
 
+        $inventory = Material::select('product_id', 'name', 'unit_of_measure')
+        ->selectRaw('SUM(quantity_in_stock) as total_stock')
+        ->where('project_id', $projectId)
+        ->groupBy('product_id', 'name', 'unit_of_measure')
+        ->get();
+
         $project = Project::find($projectId);
 
-        return view('materials.index', compact('materials', 'project'));
+        return view('materials.index', compact('materials', 'project', 'inventory'));
     }
 
     public function create()
@@ -177,6 +184,36 @@ class MaterialController extends Controller
             return view('materials.document', compact('documentUrl'));
         }
 
-        return redirect()->route('materials.index')->with('error', 'Document not found.');
+        return redirect()->route('materials.index')->with('error', 'Receipt not found.');
+    }
+
+    public function useMaterial(Request $request, $id)
+    {
+        $request->validate([
+            'quantity_used' => 'required|numeric|min:0.01',
+            'used_for' => 'nullable|string|max:255',
+        ]);
+
+        $material = Material::where('product_id', $id)
+        ->where('quantity_in_stock', '>', 0)
+        ->orderBy('created_at', 'asc')
+        ->firstOrFail();
+
+        if ($material->quantity_in_stock < $request->quantity_used) {
+            return back()->with('error', 'Not enough stock available.');
+        }
+
+        // Deduct stock
+        $material->quantity_in_stock -= $request->quantity_used;
+        $material->save();
+
+        // Log usage
+        StockUsage::create([
+            'material_id' => $material->id,
+            'quantity_used' => $request->quantity_used,
+            'used_for' => $request->used_for,
+        ]);
+
+        return back()->with('success', 'Material usage recorded and stock updated.');
     }
 }
