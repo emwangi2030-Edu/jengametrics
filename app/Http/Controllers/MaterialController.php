@@ -18,14 +18,29 @@ use Illuminate\Support\Facades\Auth;
 
 class MaterialController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $projectId = Auth::user()->project_id;
+        $year = $request->input('year', now()->year);
 
-        $materials = Material::with('supplier', 'requisition')
-            ->where('project_id', $projectId)
-            ->get();
+        // Build materials query
+        $materialsQuery = Material::with('supplier', 'requisition')
+            ->where('project_id', $projectId);
 
+        // Apply time filters
+        if ($request->filter === 'week') {
+            $materialsQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+        } elseif ($request->filter === 'month') {
+            $materialsQuery->whereMonth('created_at', now()->month)
+                        ->whereYear('created_at', now()->year);
+        }
+
+        // Apply year filter
+        $materialsQuery->whereYear('created_at', $year);
+
+        $materials = $materialsQuery->get();
+
+        // Inventory (not filtered by time)
         $inventory = Material::select('product_id', 'name', 'unit_of_measure')
             ->selectRaw('SUM(quantity_in_stock) as total_stock')
             ->where('project_id', $projectId)
@@ -34,16 +49,43 @@ class MaterialController extends Controller
 
         $sections = Section::all();
 
-        $stockUsages = StockUsage::with(['material', 'section'])
+        // Stock usage history with filters
+        $stockUsageQuery = StockUsage::with(['material', 'section'])
             ->whereHas('material', function ($query) use ($projectId) {
                 $query->where('project_id', $projectId);
-            })
-            ->orderBy('created_at', 'desc')
-            ->get();
+            });
+
+        if ($request->filter === 'week') {
+            $stockUsageQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+        } elseif ($request->filter === 'month') {
+            $stockUsageQuery->whereMonth('created_at', now()->month)
+                            ->whereYear('created_at', now()->year);
+        }
+
+        if ($request->section_id) {
+            $stockUsageQuery->where('section_id', $request->section_id);
+        }
+
+        $stockUsageQuery->whereYear('created_at', $year);
+
+        $stockUsages = $stockUsageQuery->orderBy('created_at', 'desc')->get();
 
         $project = Project::find($projectId);
 
-        return view('materials.index', compact('materials', 'project', 'inventory', 'sections', 'stockUsages'));
+        // Get available years for filtering
+        $availableYears = Material::selectRaw('DISTINCT YEAR(created_at) as year')
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        return view('materials.index', compact(
+            'materials',
+            'project',
+            'inventory',
+            'sections',
+            'stockUsages',
+            'availableYears',
+            'year'
+        ));
     }
 
     public function create()

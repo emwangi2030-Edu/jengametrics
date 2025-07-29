@@ -1,8 +1,8 @@
 @extends('layouts.appbar')
 
 @section('content')
-<div class="container py-4">
-    <div class="row mb-4">
+    <div class="container py-4">
+        <div class="row mb-4">
         <div class="col-12 d-flex justify-content-between align-items-center">
             <h2 class="font-weight-bold" style="color:#027333">
                 Materials Purchased: <span class="text-black">{{ $project->name }}</span>
@@ -21,8 +21,27 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card shadow-sm">
+                <form method="GET" action="{{ route('materials.index') }}" class="row g-2 mt-2 justify-content-center">
+                    <div class="col-md-3">
+                        <select name="filter" class="form-select">
+                            <option value="">All Time</option>
+                            <option value="week" {{ request('filter') == 'week' ? 'selected' : '' }}>This Week</option>
+                            <option value="month" {{ request('filter') == 'month' ? 'selected' : '' }}>This Month</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="year" class="form-select" onchange="this.form.submit()">
+                            @foreach($availableYears as $y)
+                                <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    </div>
+                </form>
                 <div class="card-body">
-                    <table class="table mt-3">
+                    <table class="table table-bordered mt-3">
                         <thead class="table-light">
                             <tr>
                                 <th>{{ __('Name') }}</th>
@@ -33,7 +52,6 @@
                                 <th>{{ __('Supplier Name') }}</th>
                                 <th>{{ __('Date') }}</th>
                                 <th>{{ __('Receipt') }}</th>
-                                <!-- <th>{{ __('Actions') }}</th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -55,18 +73,6 @@
                                             <span class="text-muted">None</span>
                                         @endif
                                     </td>
-                                    <!-- <td class="d-flex gap-1">
-                                        <a href="{{ route('materials.edit', $material->id) }}" class="btn btn-warning btn-sm">
-                                            {{ __('Edit') }}
-                                        </a>
-                                        <form action="{{ route('materials.destroy', $material->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this material?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm">
-                                                {{ __('Delete') }}
-                                            </button>
-                                        </form>
-                                    </td> -->
                                 </tr>
                             @endforeach
                         </tbody>
@@ -79,6 +85,7 @@
             </div>
         </div>
     </div>
+
     <div class="row mt-5">
     <div class="col-12">
         <h3 class="font-weight-bold" style="color:#027333;">Inventory Management</h3>
@@ -124,34 +131,64 @@
         </div>
     </div>
     <div class="row mt-5">
-    <div class="col-12">
-        <h3 class="font-weight-bold" style="color:#027333;">Stock Usage History</h3>
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <table class="table table-bordered mt-3">
-                    <thead class="table-light">
-                        <tr>
-                            <th>{{ __('Date Issued') }}</th>
-                            <th>{{ __('Material') }}</th>
-                            <th>{{ __('Section') }}</th>
-                            <th>{{ __('Quantity Used') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($stockUsages as $usage)
+        <div class="col-12">
+            <h3 class="font-weight-bold" style="color:#027333;">Stock Usage History</h3>
+            <div class="card shadow-sm">
+                <form method="GET" action="{{ route('materials.index') }}" class="row g-2 mt-2 justify-content-center">
+                    <div class="col-md-3">
+                        <select name="filter" class="form-select">
+                            <option value="">All Time</option>
+                            <option value="week" {{ request('filter') == 'week' ? 'selected' : '' }}>This Week</option>
+                            <option value="month" {{ request('filter') == 'month' ? 'selected' : '' }}>This Month</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="section_id" class="form-select">
+                            <option value="">All Sections</option>
+                            @foreach($sections as $section)
+                                <option value="{{ $section->id }}" {{ request('section_id') == $section->id ? 'selected' : '' }}>
+                                    {{ $section->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="year" class="form-select" onchange="this.form.submit()">
+                            @foreach($availableYears as $y)
+                                <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    </div>
+                </form>
+                <div class="card-body">
+                    <table class="table table-bordered mt-2">
+                        <thead class="table-light">
                             <tr>
-                                <td>{{ $usage->created_at->format('Y-m-d') }}</td>
-                                <td>{{ $usage->material->name ?? 'N/A' }}</td>
-                                <td>{{ $usage->section->name ?? 'N/A' }}</td>
-                                <td>{{ $usage->quantity_used }}</td>
+                                <th>{{ __('Date Issued') }}</th>
+                                <th>{{ __('Material') }}</th>
+                                <th>{{ __('Section') }}</th>
+                                <th>{{ __('Quantity Used') }}</th>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="text-center text-muted">{{ __('No stock usage history found.') }}</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @forelse($stockUsages as $usage)
+                                <tr>
+                                    <td>{{ $usage->created_at->format('Y-m-d') }}</td>
+                                    <td>{{ $usage->material->name ?? 'N/A' }}</td>
+                                    <td>{{ $usage->section->name ?? 'N/A' }}</td>
+                                    <td>{{ $usage->quantity_used }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">{{ __('No stock usage history found.') }}</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

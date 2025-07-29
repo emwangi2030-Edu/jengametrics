@@ -36,8 +36,8 @@
 
                         {{-- Unit Price --}}
                         <div class="form-floating mb-4">
-                            <label for="unit_price" id="unit_price_label">Price per Unit</label>
                             <input type="text" class="form-control" id="unit_price" name="unit_price" value="{{ old('unit_price', $material->unit_price ?? '') }}" placeholder="Enter price" required>
+                            <label for="unit_price" id="unit_price_label">Price per Unit</label>
                         </div>
 
                         {{-- Quantity --}}
