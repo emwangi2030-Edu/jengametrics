@@ -19,9 +19,15 @@ class RequisitionController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        return view('requisitions.index', compact('requisitions'));
-    }
+        $approvedSummary = Requisition::select('bom_item_id')
+            ->selectRaw('SUM(quantity_requested) as total_quantity')
+            ->where('status', 'approved')
+            ->groupBy('bom_item_id')
+            ->with('bomItem.item_material')
+            ->get();
 
+        return view('requisitions.index', compact('requisitions', 'approvedSummary'));
+    }
 
     public function create()
     {

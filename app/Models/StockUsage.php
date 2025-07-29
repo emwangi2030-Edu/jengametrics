@@ -10,10 +10,8 @@ class StockUsage extends Model
     use HasFactory;
     protected $fillable = [
         'material_id',
-        'user_id',
         'quantity_used',
-        'purpose',
-        'used_on',
+        'section_id',
     ];
 
     public function material()
@@ -24,5 +22,10 @@ class StockUsage extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    
+    public function section()
+    {
+        return $this->belongsTo(Section::class);
     }
 }

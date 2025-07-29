@@ -25,17 +25,14 @@
                                     @foreach($requisitions as $req)
                                         <option
                                             value="{{ $req->bomItem->item_material->id ?? '' }}"
-                                            data-quantity="{{ (int) $req->quantity_requested }}"
-                                            data-unit="{{ $req->bomItem->item_material->unit_of_measurement }}"
-                                            data-requisition-id="{{ $req->id }}">
-                                            {{ $req->bomItem->item_material->name ?? 'No Requisitioned Material Available' }} (Requisition ID: {{ $req->requisition_no ?? 'N/A' }})
+                                            data-quantity="{{ (int) $req->total_quantity }}"
+                                            data-unit="{{ $req->bomItem->item_material->unit_of_measurement }}">
+                                            {{ $req->bomItem->item_material->name ?? 'Material Not Found' }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
-
-                        <input type="hidden" name="requisition_id" id="requisition_id">
 
                         {{-- Unit Price --}}
                         <div class="form-floating mb-4">

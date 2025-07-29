@@ -4,7 +4,7 @@
 <div class="container mt-4">
     <h2 class="mb-4" style="color:#027333">Material Requisitions</h2>
 
-    <table class="table table-striped table-bordered">
+    <table class="table table-bordered">
         <thead class="table-light">
             <tr>
                 <th>Requisition No.</th>
@@ -57,6 +57,29 @@
             @empty
                 <tr>
                     <td colspan="8" class="text-center">No requisitions found.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+    <h3 class="mt-5" style="color:#027333">Summary of Approved Requisitions</h3>
+    <table class="table table-bordered mt-3">
+        <thead class="table-light">
+            <tr>
+                <th>Material</th>
+                <th>Total Quantity Requested</th>
+                <th>Unit of Measure</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($approvedSummary as $summary)
+                <tr>
+                    <td>{{ $summary->bomItem->item_material->name ?? 'N/A' }}</td>
+                    <td>{{ (int) $summary->total_quantity }}</td>
+                    <td>{{ $summary->bomItem->item_material->unit_of_measurement ?? 'N/A' }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="3" class="text-center">No approved requisitions found.</td>
                 </tr>
             @endforelse
         </tbody>
