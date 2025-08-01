@@ -20,14 +20,15 @@
                         <div class="mb-4">
                             <label class="form-label">Materials</label>
                             <div class="input-group">
-                                <select class="form-select" id="bom_item_id" name="bom_item_id" required>
-                                    <option value="" disabled selected>Select Materials</option>
+                                <select class="form-select" id="product_id" name="product_id" required>
+                                    <option value="" disabled selected>Select Material</option>
                                     @foreach($requisitions as $req)
                                         <option
-                                            value="{{ $req->bomItem->item_material->id ?? '' }}"
-                                            data-quantity="{{ (int) $req->total_quantity }}"
-                                            data-unit="{{ $req->bomItem->item_material->unit_of_measurement }}">
-                                            {{ $req->bomItem->item_material->name ?? 'Material Not Found' }}
+                                            value="{{ $req->product_id }}"
+                                            data-quantity="{{ (int) $req->remaining_quantity }}"
+                                            data-unit="{{ $req->material->unit_of_measurement }}"
+                                        >
+                                            {{ $req->material->name }} (Max Qty: {{ (int) $req->remaining_quantity }} {{ $req->material->unit_of_measurement }})
                                         </option>
                                     @endforeach
                                 </select>
@@ -42,8 +43,8 @@
 
                         {{-- Quantity --}}
                         <div class="form-floating mb-4">
-                            <input type="number" class="form-control text-muted" id="quantity_in_stock" name="quantity_in_stock"
-                                value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}" placeholder="Enter quantity" required readonly>
+                            <input type="number" step="0.01" class="form-control text-muted" id="quantity_in_stock" name="quantity_in_stock"
+                                value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}" placeholder="Enter quantity" required>
                             <label for="quantity_in_stock" id="quantity_label">Quantity</label>
                         </div>
 
@@ -57,6 +58,7 @@
                                         <option value="{{ $supplier->id }}" data-contact="{{ $supplier->contact_info }}">{{ $supplier->name }}</option>
                                     @endforeach
                                 </select>
+                                <br>
                                 <button type="button" class="btn text-white" style="background-color: #027333;" data-bs-toggle="modal" data-bs-target="#addSupplierModal">Add Supplier</button>
                             </div>
                         </div>
@@ -82,7 +84,7 @@
 
                         {{-- Back Button --}}
                         <div class="d-flex justify-content-center mt-3">
-                            <a href="{{ route('materials.index') }}" class="btn btn-dark">Back to Materials</a>
+                            <a href="{{ route('materials.index') }}" class="btn btn-dark">Back</a>
                         </div>
                     </form>
                 </div>
@@ -167,21 +169,31 @@
             }
         });
 
-        // Update "Price per Unit" and Quantity Label dynamically
-        $('#bom_item_id').on('change', function () {
+        $('#product_id').on('change', function () {
             const selectedOption = $(this).find('option:selected');
-            const quantity = selectedOption.data('quantity');
+            const maxQty = parseFloat(selectedOption.data('quantity'));
             const unit = selectedOption.data('unit');
-            const requisitionId = selectedOption.data('requisition-id');
-
-            console.log('Selected Option:', selectedOption.text());
-            console.log('Quantity:', quantity);
-            console.log('Unit:', unit);
-            console.log('Requisition ID:', requisitionId);
 
             $('#unit_price_label').text('Price per ' + unit);
-            $('#quantity_in_stock').val(quantity);
-            $('#requisition_id').val(requisitionId);
+            $('#quantity_in_stock')
+                .val('')
+                .attr('max', maxQty)
+                .attr('placeholder', `Max approved quantity: ${maxQty} ${unit}`);
+        });
+
+        $('#quantity_in_stock').on('input', function () {
+            const max = parseFloat($(this).attr('max'));
+            const entered = parseFloat($(this).val());
+
+            if (entered > max) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Quantity Too High',
+                    text: `Maximum allowed: ${max}`,
+                    confirmButtonColor: '#027333'
+                });
+                $(this).val('');
+            }
         });
     });
 </script>

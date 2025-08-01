@@ -69,7 +69,6 @@ class MaterialController extends Controller
         $stockUsageQuery->whereYear('created_at', $year);
         $stockUsages = $stockUsageQuery->orderBy('created_at', 'desc')->get();
 
-        // --- Requisitionable BoM Items logic (migrated from BOMController::show) ---
         $rawItems = BomItem::whereProjectId($projectId)->get();
         $groupedItems = $rawItems->groupBy('product_id');
 
@@ -116,49 +115,95 @@ class MaterialController extends Controller
     public function create()
     {
         $suppliers = Supplier::all();
-        $items = BomItem::whereIn('id', function ($query) {
-            $query->select('bom_item_id')
-                ->from('requisitions')
-                ->where('status', 'approved');
-        })->with(['item_material'])
-        ->where('project_id', project_id())
-        ->get();
 
-        // Also pass approved requisitions with quantity
-        $requisitions = Requisition::select('bom_item_id')
-            ->selectRaw('SUM(quantity_requested) as total_quantity')
-            ->where('status', 'approved')
-            ->groupBy('bom_item_id')
+        // Group all approved requisitions by product_id and sum quantity_requested
+        $groupedRequisitions = Requisition::where('status', 'approved')
             ->with('bomItem.item_material')
-            ->get();
+            ->get()
+            ->groupBy(fn($req) => $req->bomItem->product_id)
+            ->map(function ($group) {
+                $first = $group->first();
+                return (object) [
+                    'product_id' => $first->bomItem->product_id,
+                    'material' => $first->bomItem->item_material,
+                    'total_requested' => $group->sum('quantity_requested'),
+                    'bom_item_ids' => $group->pluck('bom_item_id')->unique(),
+                ];
+            });
 
-        return view('materials.create', compact('suppliers', 'items', 'requisitions'));
+        // Get purchased quantities grouped by product_id
+        $purchasedQuantities = Material::select('product_id')
+            ->selectRaw('SUM(quantity_purchased) as total_purchased')
+            ->where('project_id', project_id())
+            ->groupBy('product_id')
+            ->pluck('total_purchased', 'product_id');
+
+        // Filter to only those with remaining quantity > 0
+        $requisitions = $groupedRequisitions->filter(function ($item) use ($purchasedQuantities) {
+            $purchased = $purchasedQuantities[$item->product_id] ?? 0;
+            return $item->total_requested > $purchased;
+        })->map(function ($item) use ($purchasedQuantities) {
+            $purchased = $purchasedQuantities[$item->product_id] ?? 0;
+            $item->remaining_quantity = $item->total_requested - $purchased;
+            return $item;
+        });
+
+        return view('materials.create', compact('suppliers', 'requisitions'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'bom_item_id' => 'required|exists:item_materials,id',
+            'product_id' => 'required|exists:products,id',
             'unit_price' => 'required|numeric',
-            'quantity_in_stock' => 'required|numeric',
+            'quantity_in_stock' => 'required|numeric|min:0.01',
             'supplier_id' => 'required|exists:suppliers,id',
         ]);
 
-        $supplier = Supplier::findOrFail($request->input('supplier_id'));
-        $bom_item = ItemMaterial::findOrFail($request->input('bom_item_id'));
+        $productId = $request->input('product_id');
+        $quantityEntered = $request->input('quantity_in_stock');
 
+        // Get all approved requisitions for this product
+        $approvedRequisitions = Requisition::where('status', 'approved')
+            ->whereHas('bomItem', function ($query) use ($productId) {
+                $query->where('product_id', $productId);
+            })
+            ->get();
+
+        $totalApproved = $approvedRequisitions->sum('quantity_requested');
+
+        // Get total purchased so far
+        $totalPurchased = Material::where('product_id', $productId)
+            ->where('project_id', project_id())
+            ->sum('quantity_purchased');
+
+        $remainingQty = $totalApproved - $totalPurchased;
+
+        if ($quantityEntered > $remainingQty) {
+            return back()->withErrors(['quantity_in_stock' => "The quantity entered exceeds the remaining approved amount of {$remainingQty}."])
+                        ->withInput();
+        }
+
+        // Get product details
+        $product = Product::findOrFail($productId);
+
+        // Get supplier info
+        $supplier = Supplier::findOrFail($request->input('supplier_id'));
+
+        // Prepare data for saving
         $data = [
-            'name' => $bom_item->name,
-            'product_id' => $bom_item->product_id,
-            'unit_of_measure' => $bom_item->unit_of_measurement,
+            'name' => $product->name,
+            'product_id' => $product->id,
+            'unit_of_measure' => $product->unit, // Assuming your `products` table has a `unit` column
             'unit_price' => $request->unit_price,
-            'quantity_purchased' => $request->quantity_in_stock,
-            'quantity_in_stock' => $request->quantity_in_stock,
+            'quantity_purchased' => $quantityEntered,
+            'quantity_in_stock' => $quantityEntered,
             'supplier_id' => $supplier->id,
             'supplier_contact' => $supplier->contact_info,
             'project_id' => Auth::user()->project_id,
         ];
 
+        // Handle optional document upload
         if ($request->hasFile('document')) {
             $documentPath = $request->file('document')->store('documents', 'public');
             $data['document'] = $documentPath;
@@ -166,10 +211,8 @@ class MaterialController extends Controller
 
         Material::create($data);
 
-        return redirect()->route('materials.index')->with('success', 'Material added successfully!');
+        return redirect()->route('materials.index')->with('success', 'Material recorded successfully!');
     }
-
-
 
     public function show($id)
     {

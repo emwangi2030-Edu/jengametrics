@@ -73,9 +73,9 @@
         <tbody>
             @forelse($approvedSummary as $summary)
                 <tr>
-                    <td>{{ $summary->bomItem->item_material->name ?? 'N/A' }}</td>
+                    <td>{{ $summary->bomItem->item_material->name }}</td>
                     <td>{{ (int) $summary->total_quantity }}</td>
-                    <td>{{ $summary->bomItem->item_material->unit_of_measurement ?? 'N/A' }}</td>
+                    <td>{{ $summary->bomItem->item_material->unit_of_measurement }}</td>
                 </tr>
             @empty
                 <tr>
