@@ -22,7 +22,7 @@ class DashboardController extends Controller
         $projectId = $user->project_id;
         $totalWorkers = Worker::where('project_id', $projectId)->count();
         $totalMaterialExpenses = Material::where('project_id', $projectId)
-                                        ->sum(DB::raw('unit_price * quantity_in_stock'));
+                                        ->sum(DB::raw('unit_price * quantity_purchased'));
 
         // Get selected year or default to current year
         $selectedYear = $request->input('year', now()->year);
@@ -30,7 +30,7 @@ class DashboardController extends Controller
         $rawExpenses = Material::select(
             DB::raw("MONTH(created_at) as month_num"),
             DB::raw("DATE_FORMAT(created_at, '%b') as month"),
-            DB::raw("SUM(quantity_in_stock * unit_price) as total")
+            DB::raw("SUM(quantity_purchased * unit_price) as total")
         )
         ->where('project_id', $projectId)
         ->whereYear('created_at', $selectedYear)

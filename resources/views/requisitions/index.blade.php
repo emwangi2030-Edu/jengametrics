@@ -85,7 +85,7 @@
         </tbody>
     </table>
     <div>
-        <a href="{{ route('boms.index') }}" class="btn btn-secondary mt-3">
+        <a href="{{ route('materials.index') }}" class="btn btn-secondary mt-3">
             {{ __('Back') }}
         </a>
     </div>

@@ -68,7 +68,7 @@ class BOMController extends Controller
         return redirect()->route('boms.index');
     }
 
-    public function show($id)
+   public function show($id)
     {
         $bqSection = Section::find($id);
 
@@ -77,7 +77,6 @@ class BOMController extends Controller
             ->get();
 
         $items = collect();
-        $requisitionableItems = collect(); // for modal
         $section_name = $bqSection?->name;
 
         $groupedItems = $rawItems->groupBy('product_id');
@@ -95,26 +94,13 @@ class BOMController extends Controller
 
             // Push for BoM table
             $items->push($sampleItem);
-
-            // Calculate remaining quantity
-            $requisitionedQty = Requisition::whereIn('bom_item_id', $group->pluck('id'))
-                ->whereIn('status', ['pending', 'approved'])
-                ->sum('quantity_requested');
-
-            $remaining = max(0, $totalQty - $requisitionedQty);
-            $sampleItem->remaining_quantity = $remaining;
-
-            // Push for requisition modal only if remaining >= 1
-            if ($remaining >= 1) {
-                $requisitionableItems->push(clone $sampleItem);
-            }
         }
 
         $labours = BomLabour::whereProjectId(project_id())
             ->where('section_id', $id)
             ->get();
 
-        return view('boms.show', compact('bqSection', 'items', 'requisitionableItems', 'labours', 'section_name'));
+        return view('boms.show', compact('bqSection', 'items', 'labours', 'section_name'));
     }
 
     public function destroy($id)
@@ -146,7 +132,7 @@ class BOMController extends Controller
 
         // Calculate total cost of all materials
         $total_actual_cost = $materials->sum(function ($material) {
-            return $material->unit_price * $material->quantity_in_stock;
+            return $material->unit_price * $material->quantity_purchased;
         });
 
         // Get the project details

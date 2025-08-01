@@ -10,8 +10,6 @@
                 </div>
 
                 <div class="modal-body">
-                    <p class="fw-semibold">Section: {{ $section_name }}</p>
-
                     <div class="mb-3">
                         <label for="bom_item_id" class="form-label">Select Material</label>
                        <select name="bom_item_id" id="bom_item_id" class="form-select" required {{ $requisitionableItems->isEmpty() ? 'disabled' : '' }}>

@@ -129,10 +129,9 @@ Route::middleware(['auth'])->group(function () {
 Route::patch('/requisitions/{requisition}/toggle-status', [RequisitionController::class, 'toggleStatus'])
     ->name('requisitions.toggleStatus');
 
-Route::get('reports', ['as'=>'reports', 'uses' => '\App\Http\Controllers\BOMController@report']);
+Route::get('reports', [BOMController::class, 'report'])->name('reports');
 
 Route::resource('projects', ProjectController::class);
-
 
 // Document Upload & List Route
 Route::get('/documents/upload', [DocumentController::class, 'index'])->name('documents.upload');

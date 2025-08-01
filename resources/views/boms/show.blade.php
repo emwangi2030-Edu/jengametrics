@@ -15,7 +15,7 @@
                 <div class="card">
                     <div class="card-body">
                         <!-- Table to display items -->
-                        <h3 class="text-lg font-weight-bold mt-6">{{ __('Items List') }}</h3>
+                        <h3 class="text-lg font-weight-bold mt-6" style="color:#027333">{{ __('Items List') }}</h3>
                         <table class="table mt-4">
                             <thead class="table-light">
                                 <tr>
@@ -29,7 +29,7 @@
                             <tbody>
                                @forelse ($items as $item)
                                     <tr>
-                                        <td>{{ $item->item_material->name ?? '' }}</td>
+                                        <td class="px-2">{{ $item->item_material->name ?? '' }}</td>
                                         <td>{{ $item->total_quantity }}</td>
                                         <td>{{ $item->item_material->unit_of_measurement ?? '' }}</td>
                                         <td>{{ number_format($item->rate, 2) }}</td>
@@ -58,32 +58,12 @@
                                 </tr>
                             </tfoot>
                         </table>
-                       <!-- Requisition Buttons -->
-                        <div class="mt-4">
-                            @if ($requisitionableItems->isEmpty())
-                                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                    <strong>No materials available for requisition.</strong> All listed materials have already been fully requested or are pending approval.
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            @else
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#requisitionModal">
-                                        Requisition Material
-                                    </button>
-
-                                    <a href="{{ route('requisitions.index', ['section_id' => $bqSection->id]) }}" class="btn btn-secondary">
-                                        Requisition List
-                                    </a>
-                                </div>
-                            @endif
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         @include('boms.labours')
-        @include('requisitions.requisition_modal')
     </div>
 @endsection
 @push('scripts')

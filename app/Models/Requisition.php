@@ -34,9 +34,4 @@ class Requisition extends Model
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
-
-    public function material()
-    {
-        return $this->hasOne(Material::class);
-    }
 }

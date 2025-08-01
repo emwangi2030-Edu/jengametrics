@@ -11,6 +11,7 @@ use App\Models\Project;
 use App\Models\Requisition;
 use App\Models\StockUsage;
 use App\Models\Section;
+use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Log;
@@ -37,7 +38,6 @@ class MaterialController extends Controller
 
         // Apply year filter
         $materialsQuery->whereYear('created_at', $year);
-
         $materials = $materialsQuery->get();
 
         // Inventory (not filtered by time)
@@ -49,7 +49,7 @@ class MaterialController extends Controller
 
         $sections = Section::all();
 
-        // Stock usage history with filters
+        // Stock usage history
         $stockUsageQuery = StockUsage::with(['material', 'section'])
             ->whereHas('material', function ($query) use ($projectId) {
                 $query->where('project_id', $projectId);
@@ -67,15 +67,39 @@ class MaterialController extends Controller
         }
 
         $stockUsageQuery->whereYear('created_at', $year);
-
         $stockUsages = $stockUsageQuery->orderBy('created_at', 'desc')->get();
 
-        $project = Project::find($projectId);
+        // --- Requisitionable BoM Items logic (migrated from BOMController::show) ---
+        $rawItems = BomItem::whereProjectId($projectId)->get();
+        $groupedItems = $rawItems->groupBy('product_id');
 
-        // Get available years for filtering
+        $requisitionableItems = collect();
+
+        foreach ($groupedItems as $product_id => $group) {
+            $sampleItem = $group->first();
+            $totalQty = $group->sum('quantity');
+            $product = Product::find($product_id);
+            $sampleItem->unit = $product?->unit ?? 'unit';
+            $sampleItem->total_quantity = $totalQty;
+
+            $requisitionedQty = Requisition::whereIn('bom_item_id', $group->pluck('id'))
+                ->whereIn('status', ['pending', 'approved'])
+                ->sum('quantity_requested');
+
+            $remaining = max(0, $totalQty - $requisitionedQty);
+            $sampleItem->remaining_quantity = $remaining;
+
+            if ($remaining >= 1) {
+                $requisitionableItems->push(clone $sampleItem);
+            }
+        }
+
+        // Get available years
         $availableYears = Material::selectRaw('DISTINCT YEAR(created_at) as year')
             ->orderBy('year', 'desc')
             ->pluck('year');
+
+        $project = Project::find($projectId);
 
         return view('materials.index', compact(
             'materials',
@@ -84,7 +108,8 @@ class MaterialController extends Controller
             'sections',
             'stockUsages',
             'availableYears',
-            'year'
+            'year',
+            'requisitionableItems'
         ));
     }
 

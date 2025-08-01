@@ -3,7 +3,7 @@
         <div class="card">
             <div class="card-body">
                 <!-- Table to display items -->
-                <h3 class="text-lg font-weight-bold mt-6">{{ __('Labour cost') }}</h3>
+                <h3 class="text-lg font-weight-bold mt-6" style="color:#027333">{{ __('Labour cost') }}</h3>
                     <table class="table mt-4">
                         <thead class="table-light">
                             <tr>
@@ -24,7 +24,7 @@
                                     $totalAmount += $item->amount;
                                 @endphp
                                 <tr>
-                                    <td>{{ $item->item->name }}</td>
+                                    <td><div class="px-2">{{ $item->item->name }}</div></td>
                                     <td>{{ $item->quantity }}</td>
                                     <td>{{ number_format($item->rate, 2) }}</td>
                                     <td>{{ number_format($item->amount, 2) }}</td>
@@ -47,7 +47,7 @@
                     </table>
                 <!-- Link Back to Document -->
                 <a href="{{ route('boms.index') }}" class="btn btn-secondary mt-4">
-                    {{ __('Back to Document') }}
+                    {{ __('Back') }}
                 </a>
             </div>
         </div>

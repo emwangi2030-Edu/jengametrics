@@ -1,17 +1,24 @@
 @extends('layouts.appbar')
 
 @section('content')
-    <div class="container py-4">
-        <div class="row mb-4">
-        <div class="col-12 d-flex justify-content-between align-items-center">
-            <h2 class="font-weight-bold" style="color:#027333">
-                Materials Purchased: <span class="text-black">{{ $project->name }}</span>
-            </h2>
+    <div class="row py-4">
+        <h2 class="font-weight-bold" style="color:#027333">
+            Material Management: <span class="text-black">{{ $project->name }}</span>
+        </h2>
+        <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
+            <div>
+                <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#requisitionModal">
+                    Requisition Material
+                </button>
+                <a href="{{ route('requisitions.index') }}" class="btn btn-secondary">
+                    Requisition List
+                </a>
+            </div>
             <div>
                 <a href="{{ route('materials.create') }}" class="btn btn-success me-2">
                     {{ __('Receive Approved Materials') }}
                 </a>
-                <a href="{{ route('suppliers.index') }}" class="btn btn-outline-secondary">
+                <a href="{{ route('suppliers.index') }}" class="btn btn-warning">
                     {{ __('Suppliers List') }}
                 </a>
             </div>
@@ -20,6 +27,7 @@
 
     <div class="row justify-content-center">
         <div class="col-md-12">
+            <h3 class="font-weight-bold" style="color:#027333">Materials Purchased</h3>
             <div class="card shadow-sm">
                 <form method="GET" action="{{ route('materials.index') }}" class="row g-2 mt-2 justify-content-center">
                     <div class="col-md-3">
@@ -41,7 +49,7 @@
                     </div>
                 </form>
                 <div class="card-body">
-                    <table class="table table-bordered mt-3">
+                    <table class="table table-bordered mt-1">
                         <thead class="table-light">
                             <tr>
                                 <th>{{ __('Name') }}</th>
@@ -57,12 +65,12 @@
                         <tbody>
                             @foreach($materials as $material)
                                 <tr>
-                                    <td>{{ $material->product->name ?? 'N/A' }}</td>
+                                    <td><div class="px-2">{{ $material->product->name }}</div></td>
                                     <td>{{ number_format($material->unit_price, 2) }}</td>
                                     <td>{{ $material->unit_of_measure }}</td>
                                     <td>{{ (int) $material->quantity_purchased }}</td>
                                     <td>{{ number_format($material->unit_price * $material->quantity_purchased, 2) }}</td>
-                                    <td>{{ $material->supplier->name ?? 'N/A' }}</td>
+                                    <td>{{ $material->supplier->name }}</td>
                                     <td>{{ $material->created_at->format('Y-m-d') }}</td>
                                     <td>
                                         @if($material->document)
@@ -103,21 +111,23 @@
                     <tbody>
                         @forelse($inventory as $item)
                             <tr>
-                                <td>{{ $item->name }}</td>
+                                <td><div class="px-2">{{ $item->name }}</div></td>
                                 <td>{{ $item->unit_of_measure }}</td>
                                 <td>{{ $item->total_stock }}</td>
                                 <td>
-                                    <form action="{{ route('materials.use', $item->product_id) }}" method="POST" class="d-flex gap-2">
-                                        @csrf
-                                        <input type="number" name="quantity_used" class="form-control form-control-sm quantity-used" placeholder="Qty" step="0.01" required data-total-stock="{{ $item->total_stock }}">
-                                        <select name="section_id" class="form-select form-select-sm" required>
-                                            <option value="" disabled selected>Select Section</option>
-                                            @foreach($sections as $section)
-                                                <option value="{{ $section->id }}">{{ $section->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <button type="submit" class="btn btn-warning btn-sm">Issue</button>
-                                    </form>
+                                    <div class="px-2">
+                                        <form action="{{ route('materials.use', $item->product_id) }}" method="POST" class="d-flex gap-2">
+                                            @csrf
+                                            <input type="number" name="quantity_used" class="form-control form-control-sm quantity-used" placeholder="Qty" step="0.01" required data-total-stock="{{ $item->total_stock }}">
+                                            <select name="section_id" class="form-select form-select-sm" required>
+                                                <option value="" disabled selected>Select Section</option>
+                                                @foreach($sections as $section)
+                                                    <option value="{{ $section->id }}">{{ $section->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <button type="submit" class="btn btn-warning btn-sm">Issue</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -176,7 +186,7 @@
                         <tbody>
                             @forelse($stockUsages as $usage)
                                 <tr>
-                                    <td>{{ $usage->created_at->format('Y-m-d') }}</td>
+                                    <td><div class="px-2">{{ $usage->created_at->format('Y-m-d') }}</div></td>
                                     <td>{{ $usage->material->name ?? 'N/A' }}</td>
                                     <td>{{ $usage->section->name ?? 'N/A' }}</td>
                                     <td>{{ $usage->quantity_used }}</td>
@@ -192,6 +202,7 @@
             </div>
         </div>
     </div>
+     @include('requisitions.requisition_modal')
 </div>
 
 </div>
