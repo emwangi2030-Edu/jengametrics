@@ -43,9 +43,17 @@
 
                         {{-- Quantity --}}
                         <div class="form-floating mb-4">
-                            <input type="number" step="0.01" class="form-control text-muted" id="quantity_in_stock" name="quantity_in_stock"
-                                value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}" placeholder="Enter quantity" required>
+                            <input type="number" step="0.01" class="form-control text-muted" 
+                                id="quantity_in_stock" name="quantity_in_stock"
+                                value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}"
+                                placeholder="Enter quantity" required>
                             <label for="quantity_in_stock" id="quantity_label">Quantity</label>
+                        </div>
+
+                        {{-- Variance --}}
+                        <div class="form-floating mb-4">
+                            <input type="text" class="form-control" id="variance" name="variance" placeholder="Variance" readonly>
+                            <label for="variance">Variance</label>
                         </div>
 
                         {{-- Supplier Dropdown + Add Button --}}
@@ -177,22 +185,31 @@
             $('#unit_price_label').text('Price per ' + unit);
             $('#quantity_in_stock')
                 .val('')
-                .attr('max', maxQty)
-                .attr('placeholder', `Max approved quantity: ${maxQty} ${unit}`);
+                .attr('placeholder', `Max approved quantity: ${maxQty} ${unit}`)
+                .data('max', maxQty)
+                .data('unit', unit);
+
+            $('#variance').val('');
         });
 
         $('#quantity_in_stock').on('input', function () {
-            const max = parseFloat($(this).attr('max'));
+            const max = parseFloat($(this).data('max'));
+            const unit = $(this).data('unit');
             const entered = parseFloat($(this).val());
 
-            if (entered > max) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Quantity Too High',
-                    text: `Maximum allowed: ${max}`,
-                    confirmButtonColor: '#027333'
-                });
-                $(this).val('');
+            if (!max || isNaN(entered)) {
+                $('#variance').val('');
+                return;
+            }
+
+            let difference = entered - max;
+
+            if (difference > 0) {
+                $('#variance').val(`excess: ${difference} ${unit}`);
+            } else if (difference < 0) {
+                $('#variance').val(`remaining balance: ${Math.abs(difference)} ${unit}`);
+            } else {
+                $('#variance').val(0);
             }
         });
     });

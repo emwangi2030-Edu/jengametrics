@@ -53,9 +53,11 @@
                         <thead class="table-light">
                             <tr>
                                 <th>{{ __('Name') }}</th>
-                                <th>{{ __('Unit Price') }}</th>
+                                <th>{{ __('Requisitioned Quantity') }}</th>
+                                <th>{{ __('Quantity Received') }}</th>
+                                <th>{{ __('Variance') }}</th>
                                 <th>{{ __('Unit of Measure') }}</th>
-                                <th>{{ __('Quantity') }}</th>
+                                <th>{{ __('Unit Price') }}</th>
                                 <th>{{ __('Total Amount') }}</th>
                                 <th>{{ __('Supplier Name') }}</th>
                                 <th>{{ __('Date') }}</th>
@@ -66,9 +68,11 @@
                             @foreach($materials as $material)
                                 <tr>
                                     <td><div class="px-2">{{ $material->product->name }}</div></td>
-                                    <td>{{ number_format($material->unit_price, 2) }}</td>
-                                    <td>{{ $material->unit_of_measure }}</td>
+                                    <td>{{ (int) $material->quantity_in_stock }}</td>
                                     <td>{{ (int) $material->quantity_purchased }}</td>
+                                    <td>{{ (int) $material->variance }}</td>
+                                    <td>{{ $material->unit_of_measure }}</td>
+                                    <td>{{ number_format($material->unit_price, 2) }}</td>
                                     <td>{{ number_format($material->unit_price * $material->quantity_purchased, 2) }}</td>
                                     <td>{{ $material->supplier->name }}</td>
                                     <td>{{ $material->created_at->format('Y-m-d') }}</td>

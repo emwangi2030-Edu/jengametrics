@@ -179,10 +179,7 @@ class MaterialController extends Controller
 
         $remainingQty = $totalApproved - $totalPurchased;
 
-        if ($quantityEntered > $remainingQty) {
-            return back()->withErrors(['quantity_in_stock' => "The quantity entered exceeds the remaining approved amount of {$remainingQty}."])
-                        ->withInput();
-        }
+        $variance = $quantityEntered - $remainingQty;
 
         // Get product details
         $product = Product::findOrFail($productId);
@@ -194,10 +191,11 @@ class MaterialController extends Controller
         $data = [
             'name' => $product->name,
             'product_id' => $product->id,
-            'unit_of_measure' => $product->unit, // Assuming your `products` table has a `unit` column
+            'unit_of_measure' => $product->unit,
             'unit_price' => $request->unit_price,
             'quantity_purchased' => $quantityEntered,
             'quantity_in_stock' => $quantityEntered,
+            'variance' => $variance,
             'supplier_id' => $supplier->id,
             'supplier_contact' => $supplier->contact_info,
             'project_id' => Auth::user()->project_id,
