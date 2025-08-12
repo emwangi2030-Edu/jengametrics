@@ -27,7 +27,7 @@
 
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <h3 class="font-weight-bold" style="color:#027333">Materials Purchased</h3>
+            <h3 class="font-weight-bold" style="color:#027333">Materials Delivered</h3>
             <div class="card shadow-sm">
                 <form method="GET" action="{{ route('materials.index') }}" class="row g-2 mt-2 justify-content-center">
                     <div class="col-md-3">
@@ -49,14 +49,14 @@
                     </div>
                 </form>
                 <div class="card-body">
-                    <table class="table table-bordered mt-1">
+                    <table class="table table-bordered mt-3 text-center">
                         <thead class="table-light">
                             <tr>
                                 <th>{{ __('Name') }}</th>
                                 <th>{{ __('Requisitioned Quantity') }}</th>
                                 <th>{{ __('Quantity Received') }}</th>
                                 <th>{{ __('Variance') }}</th>
-                                <th>{{ __('Unit of Measure') }}</th>
+                                <th>{{ __('UoM') }}</th>
                                 <th>{{ __('Unit Price') }}</th>
                                 <th>{{ __('Total Amount') }}</th>
                                 <th>{{ __('Supplier Name') }}</th>
@@ -68,9 +68,9 @@
                             @foreach($materials as $material)
                                 <tr>
                                     <td><div class="px-2">{{ $material->product->name }}</div></td>
-                                    <td>{{ (int) $material->quantity_in_stock }}</td>
+                                    <td>{{ (int) $material->requisitioned_quantity }}</td>
                                     <td>{{ (int) $material->quantity_purchased }}</td>
-                                    <td>{{ (int) $material->variance }}</td>
+                                    <td>{{ $material->variance > 0 ? '+' . (int) $material->variance : (int) $material->variance }}</td>
                                     <td>{{ $material->unit_of_measure }}</td>
                                     <td>{{ number_format($material->unit_price, 2) }}</td>
                                     <td>{{ number_format($material->unit_price * $material->quantity_purchased, 2) }}</td>
@@ -103,7 +103,7 @@
         <h3 class="font-weight-bold" style="color:#027333;">Inventory Management</h3>
         <div class="card shadow-sm">
             <div class="card-body">
-                <table class="table table-bordered mt-3">
+                <table class="table table-bordered mt-3 text-center">
                     <thead class="table-light">
                         <tr>
                             <th>{{ __('Name') }}</th>
@@ -178,7 +178,7 @@
                     </div>
                 </form>
                 <div class="card-body">
-                    <table class="table table-bordered mt-2">
+                    <table class="table table-bordered mt-3 text-center">
                         <thead class="table-light">
                             <tr>
                                 <th>{{ __('Date Issued') }}</th>

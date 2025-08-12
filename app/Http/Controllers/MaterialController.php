@@ -158,6 +158,7 @@ class MaterialController extends Controller
             'unit_price' => 'required|numeric',
             'quantity_in_stock' => 'required|numeric|min:0.01',
             'supplier_id' => 'required|exists:suppliers,id',
+            'requisitioned_quantity' => 'nullable|numeric',
         ]);
 
         $productId = $request->input('product_id');
@@ -196,6 +197,7 @@ class MaterialController extends Controller
             'quantity_purchased' => $quantityEntered,
             'quantity_in_stock' => $quantityEntered,
             'variance' => $variance,
+            'requisitioned_quantity' => $request->requisitioned_quantity,
             'supplier_id' => $supplier->id,
             'supplier_contact' => $supplier->contact_info,
             'project_id' => Auth::user()->project_id,

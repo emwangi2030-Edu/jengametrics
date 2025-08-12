@@ -56,6 +56,8 @@
                             <label for="variance">Variance</label>
                         </div>
 
+                        <input type="text" class="form-control" id="requisitioned_quantity" name="requisitioned_quantity" hidden>
+
                         {{-- Supplier Dropdown + Add Button --}}
                         <div class="mb-4">
                             <label class="form-label">Supplier</label>
@@ -179,7 +181,7 @@
 
         $('#product_id').on('change', function () {
             const selectedOption = $(this).find('option:selected');
-            const maxQty = parseFloat(selectedOption.data('quantity'));
+            const maxQty = parseFloat(selectedOption.data('quantity')) || 0;
             const unit = selectedOption.data('unit');
 
             $('#unit_price_label').text('Price per ' + unit);
@@ -189,8 +191,11 @@
                 .data('max', maxQty)
                 .data('unit', unit);
 
+            $('#requisitioned_quantity').val(maxQty);
+
             $('#variance').val('');
         });
+
 
         $('#quantity_in_stock').on('input', function () {
             const max = parseFloat($(this).data('max'));

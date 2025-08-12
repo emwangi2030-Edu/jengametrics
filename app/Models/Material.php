@@ -11,7 +11,7 @@ class Material extends Model
 
     protected $fillable = [
         'product_id', 'bom_item_id', 'name', 'description', 'unit_price', 'unit_of_measure',
-        'quantity_purchased', 'quantity_in_stock', 'variance', 'supplier_id', 'supplier_contact',
+        'quantity_purchased', 'quantity_in_stock', 'variance', 'requisitioned_quantity', 'supplier_id', 'supplier_contact',
         'document', 'project_id'
     ];
 
