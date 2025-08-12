@@ -70,7 +70,10 @@
                                     <td><div class="px-2">{{ $material->product->name }}</div></td>
                                     <td>{{ (int) $material->requisitioned_quantity }}</td>
                                     <td>{{ (int) $material->quantity_purchased }}</td>
-                                    <td>{{ $material->variance > 0 ? '+' . (int) $material->variance : (int) $material->variance }}</td>
+                                    @php $variance = (int) $material->variance; @endphp
+                                    <td class="{{ $variance > 0 ? 'text-success' : ($variance < 0 ? 'text-danger' : 'text-secondary') }}">
+                                        {{ $variance > 0 ? '+' . $variance : $variance }}
+                                    </td>
                                     <td>{{ $material->unit_of_measure }}</td>
                                     <td>{{ number_format($material->unit_price, 2) }}</td>
                                     <td>{{ number_format($material->unit_price * $material->quantity_purchased, 2) }}</td>
