@@ -133,7 +133,7 @@ class MaterialController extends Controller
 
         // Get purchased quantities grouped by product_id
         $purchasedQuantities = Material::select('product_id')
-            ->selectRaw('SUM(quantity_purchased) as total_purchased')
+            ->selectRaw('SUM(requisitioned_quantity) as total_purchased')
             ->where('project_id', project_id())
             ->groupBy('product_id')
             ->pluck('total_purchased', 'product_id');

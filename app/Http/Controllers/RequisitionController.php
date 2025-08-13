@@ -139,22 +139,4 @@ class RequisitionController extends Controller
 
         return back()->with('info', 'Requisition rejected.');
     }
-
-    public function toggleStatus(Requisition $requisition)
-    {
-        if ($requisition->status === 'pending') {
-            return redirect()->route('requisitions.index')->with('error', 'Pending requisitions cannot be toggled. Approve or reject first.');
-        }
-
-        if ($requisition->material) {
-            return redirect()->route('requisitions.index')->with('error', 'Cannot change status. Material already purchased.');
-        }
-
-        $requisition->status = $requisition->status === 'approved' ? 'rejected' : 'approved';
-        $requisition->approved_by = Auth::id();
-        $requisition->approved_at = now();
-        $requisition->save();
-
-        return redirect()->route('requisitions.index')->with('success', 'Requisition status updated.');
-    }
 }

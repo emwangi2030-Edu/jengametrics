@@ -11,7 +11,7 @@
 
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="bom_item_id" class="form-label">Select Material</label>
+                        <label for="bom_item_id" class="form-label">Select Material</label> 
                        <select name="bom_item_id" id="bom_item_id" class="form-select" required {{ $requisitionableItems->isEmpty() ? 'disabled' : '' }}>
                             @if ($requisitionableItems->isEmpty())
                                 <option disabled selected>No materials available for requisition</option>
