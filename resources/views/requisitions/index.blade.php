@@ -5,13 +5,14 @@
     <h2 class="mb-4" style="color:#027333">Material Requisitions</h2>
     <div class="card shadow-sm">
         <div class="card-body">
-            <table class="table table-bordered text-center">
+            <table class="table table-bordered">
                 <thead class="table-light">
                     <tr>
                         <th>Requisition No.</th>
                         <th>Material</th>
                         <th>Quantity Requested</th>
                         <th>Status</th>
+                        <th>Section</th>
                         <th>Requested By</th>
                         <th>Requested At</th>
                         <th>Approved By</th>
@@ -25,9 +26,12 @@
                             <td>{{ $req->requisition_no }}</td>
                             <td>{{ $req->bomItem->item_material->name }}</td>
                             <td>{{ (int) $req->quantity_requested }} {{ $req->bomItem->item_material->unit_of_measurement }}</td>
-                            <td><span class="badge bg-{{ $req->status == 'approved' ? 'success' : ($req->status == 'rejected' ? 'danger' : 'secondary') }}">
+                            <td>
+                                <span class="badge bg-{{ $req->status == 'approved' ? 'success' : ($req->status == 'rejected' ? 'danger' : 'secondary') }}">
                                 {{ ucfirst($req->status) }}
-                            </span></td>
+                                </span>
+                            </td>
+                            <td>{{ $req->section->name }}</td>
                             <td>{{ $req->requester->name ?? 'N/A' }}</td>
                             <td>{{ $req->requested_at ? \Carbon\Carbon::parse($req->requested_at)->format('Y-m-d') : '-' }}</td>
                             <td>{{ $req->approver->name ?? '-' }}</td>

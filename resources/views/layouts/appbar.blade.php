@@ -220,6 +220,19 @@
                                         </div>
                                     </a>
                                 </div>
+                                <!-- Material Management -->
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link label-1" title="manage your materials" href="{{route('materials.delivered') }}" role="button" aria-expanded="false">
+                                        <div class="d-flex align-items-center">
+                                            <span class="nav-link-icon">
+                                                <span data-feather="box"></span>
+                                            </span>
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Material Delivered</span>
+                                            </span>
+                                        </div>
+                                    </a>
+                                </div>
 
                                 <!-- Labour -->
                                 <div class="nav-item-wrapper">

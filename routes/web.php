@@ -154,6 +154,9 @@ Route::resource('suppliers', SupplierController::class);
 Route::resource('materials', MaterialController::class);
 Route::post('/materials-store', [MaterialController::class, 'store'])->name('m.store');
 Route::post('/materials/{id}/use', [MaterialController::class, 'useMaterial'])->name('materials.use');
+Route::get('/materials/delivered', [MaterialController::class, 'materialsDelivered'])->name('materials.delivered');
+Route::get('/materials/inventory', [MaterialController::class, 'inventoryManagement'])->name('materials.inventory');
+Route::get('/materials/usage', [MaterialController::class, 'stockUsageHistory'])->name('materials.usage');
 
 // Routes for Supplier Name and Contact Autocomplete Feature
 Route::get('/suppliers/autocomplete', [SupplierController::class, 'autocomplete'])->name('suppliers.autocomplete');

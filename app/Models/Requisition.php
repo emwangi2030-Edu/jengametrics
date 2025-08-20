@@ -13,6 +13,7 @@ class Requisition extends Model
         'requisition_no',
         'bom_item_id',
         'quantity_requested',
+        'section_id',
         'status',
         'requested_by',
         'approved_by',
@@ -33,5 +34,10 @@ class Requisition extends Model
     public function approver()
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function section()
+    {
+        return $this->belongsTo(Section::class);
     }
 }

@@ -15,7 +15,7 @@ class RequisitionController extends Controller
 {
    public function index(Request $request)
     {
-        $requisitions = Requisition::with('bomItem', 'requester', 'approver')
+        $requisitions = Requisition::with('bomItem', 'requester', 'approver', 'section')
             ->orderByDesc('created_at')
             ->get();
 
@@ -69,7 +69,7 @@ class RequisitionController extends Controller
         return view('requisitions.create', compact('items', 'section_name'));
     }
 
-   public function store(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'bom_item_id' => 'required|exists:bom_items,id',
@@ -108,6 +108,7 @@ class RequisitionController extends Controller
             'requisition_no' => $requisitionNo,
             'bom_item_id' => $request->bom_item_id,
             'quantity_requested' => $request->quantity_requested,
+            'section_id' => $request->section,
             'requested_by' => Auth::id(),
             'requested_at' => now(),
             'status' => 'pending',

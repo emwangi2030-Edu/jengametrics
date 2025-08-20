@@ -14,7 +14,7 @@ use App\Models\Section;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class MaterialController extends Controller
@@ -112,6 +112,115 @@ class MaterialController extends Controller
         ));
     }
 
+    public function materialsDelivered(Request $request)
+    {
+        $projectId = Auth::user()->project_id;
+        $year = $request->input('year', now()->year);
+
+        // Get delivered materials
+        $materialsQuery = Material::with('supplier', 'requisition')
+            ->where('project_id', $projectId);
+
+        if ($request->filter === 'week') {
+            $materialsQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+        } elseif ($request->filter === 'month') {
+            $materialsQuery->whereMonth('created_at', now()->month)
+                        ->whereYear('created_at', now()->year);
+        }
+
+        $materialsQuery->whereYear('created_at', $year);
+        $materials = $materialsQuery->get();
+
+        // Available years for filter dropdown
+        $availableYears = Material::selectRaw('DISTINCT YEAR(created_at) as year')
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        $project = Project::find($projectId);
+
+        $bomItems = BomItem::select('product_id', 'name', 'unit_of_measure', DB::raw('SUM(quantity) as total_quantity'))
+            ->whereHas('bom', function ($q) use ($projectId) {
+                $q->where('project_id', $projectId);
+            })
+            ->groupBy('product_id', 'name', 'unit_of_measure')
+            ->get();
+
+        foreach ($bomItems as $item) {
+            $approvedQty = Requisition::where('product_id', $item->product_id)
+                ->whereIn('status', ['approved', 'pending'])
+                ->sum('quantity');
+
+            $item->remaining_quantity = $item->total_quantity - $approvedQty;
+        }
+
+        // Only items with stock still available for requisition
+        $requisitionableItems = $bomItems->filter(fn($item) => $item->remaining_quantity > 0);
+
+        return view('materials.materials_delivered', compact(
+            'materials',
+            'project',
+            'availableYears',
+            'year',
+            'requisitionableItems'
+        ));
+    }
+
+    public function inventoryManagement()
+    {
+        $projectId = Auth::user()->project_id;
+
+        $inventory = Material::select('product_id', 'name', 'unit_of_measure')
+            ->selectRaw('SUM(quantity_in_stock) as total_stock')
+            ->where('project_id', $projectId)
+            ->groupBy('product_id', 'name', 'unit_of_measure')
+            ->get();
+
+        $sections = Section::all();
+
+        return view('materials.inventory_management', compact(
+            'inventory',
+            'sections'
+        ));
+    }
+
+    public function stockUsageHistory(Request $request)
+    {
+        $projectId = Auth::user()->project_id;
+        $year = $request->input('year', now()->year);
+
+        $stockUsageQuery = StockUsage::with(['material', 'section'])
+            ->whereHas('material', function ($query) use ($projectId) {
+                $query->where('project_id', $projectId);
+            });
+
+        if ($request->filter === 'week') {
+            $stockUsageQuery->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+        } elseif ($request->filter === 'month') {
+            $stockUsageQuery->whereMonth('created_at', now()->month)
+                            ->whereYear('created_at', now()->year);
+        }
+
+        if ($request->section_id) {
+            $stockUsageQuery->where('section_id', $request->section_id);
+        }
+
+        $stockUsageQuery->whereYear('created_at', $year);
+        $stockUsages = $stockUsageQuery->orderBy('created_at', 'desc')->get();
+
+        $sections = Section::all();
+
+        $availableYears = StockUsage::selectRaw('DISTINCT YEAR(created_at) as year')
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        return view('materials.stock_usage_history', compact(
+            'stockUsages',
+            'sections',
+            'availableYears',
+            'year'
+        ));
+    }
+
     public function create()
     {
         $suppliers = Supplier::all();
@@ -133,7 +242,7 @@ class MaterialController extends Controller
 
         // Get purchased quantities grouped by product_id
         $purchasedQuantities = Material::select('product_id')
-            ->selectRaw('SUM(requisitioned_quantity) as total_purchased')
+            ->selectRaw('SUM(quantity_purchased) as total_purchased')
             ->where('project_id', project_id())
             ->groupBy('product_id')
             ->pluck('total_purchased', 'product_id');

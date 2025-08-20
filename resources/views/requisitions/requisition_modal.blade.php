@@ -11,8 +11,18 @@
 
                 <div class="modal-body">
                     <div class="mb-3">
+                        <label for="section" class="form-label">Section</label>
+                        <select name="section" id="section" class="form-select" required>
+                            <option value="" disabled selected>Select Section</option>
+                            @foreach ($sections as $section)
+                                <option value="{{ $section->id }}">{{ $section->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="bom_item_id" class="form-label">Select Material</label> 
-                       <select name="bom_item_id" id="bom_item_id" class="form-select" required {{ $requisitionableItems->isEmpty() ? 'disabled' : '' }}>
+                        <select name="bom_item_id" id="bom_item_id" class="form-select" required {{ $requisitionableItems->isEmpty() ? 'disabled' : '' }}>
                             @if ($requisitionableItems->isEmpty())
                                 <option disabled selected>No materials available for requisition</option>
                             @else
