@@ -51,4 +51,25 @@
     </div>
 </div>
 @endsection
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.quantity-used').forEach(function(input) {
+            input.addEventListener('input', function () {
+                const totalStock = parseFloat(this.getAttribute('data-total-stock')) || 0;
+                const entered = parseFloat(this.value) || 0;
+                if (entered > totalStock) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Insufficient Stock',
+                        text: `You cannot issue more than ${totalStock} units.`,
+                        confirmButtonColor: '#027333'
+                    }).then(() => {
+                        this.value = totalStock;
+                    });
+                }
+            });
+        });
+    });
+</script>
 

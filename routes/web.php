@@ -99,10 +99,6 @@ Route::get('/get/items', [BqDocumentController::class, 'getItems'])->name('get.i
 Route::get('bq_documents/{bqDocument}/items/create', [BqItemController::class, 'create'])->name('bq_documents.items.create');
 Route::post('bq_documents/{bqDocument}/items', [BqItemController::class, 'store'])->name('bq_documents.items.store');
 Route::get('bq_documents/{bqDocument}/items/{bqItem}/edit', [BqItemController::class, 'edit'])->name('bq_documents.items.edit');
-
-
-
-
 Route::delete('bq_documents/{bqDocument}/items/{bqItem}', [BqItemController::class, 'destroy'])->name('bq_documents.items.destroy');
 
 
@@ -151,12 +147,12 @@ Route::post('/attendance', [AttendanceController::class, 'store'])->name('attend
 Route::resource('suppliers', SupplierController::class);
 
 // Route to Materials page
-Route::resource('materials', MaterialController::class);
-Route::post('/materials-store', [MaterialController::class, 'store'])->name('m.store');
 Route::post('/materials/{id}/use', [MaterialController::class, 'useMaterial'])->name('materials.use');
 Route::get('/materials/delivered', [MaterialController::class, 'materialsDelivered'])->name('materials.delivered');
 Route::get('/materials/inventory', [MaterialController::class, 'inventoryManagement'])->name('materials.inventory');
 Route::get('/materials/usage', [MaterialController::class, 'stockUsageHistory'])->name('materials.usage');
+Route::get('/materials/view-document/{id}', [MaterialController::class, 'viewDocument'])->name('materials.viewDocument');
+Route::resource('materials', MaterialController::class);
 
 // Routes for Supplier Name and Contact Autocomplete Feature
 Route::get('/suppliers/autocomplete', [SupplierController::class, 'autocomplete'])->name('suppliers.autocomplete');
@@ -164,13 +160,6 @@ Route::get('/suppliers/autocompleteContact', [SupplierController::class, 'autoco
 
 // Route to store new supplier name and contact
 Route::post('/suppliers/ajax-store', [SupplierController::class, 'ajaxStore'])->name('suppliers.ajaxStore');
-
-Route::middleware(['web'])->group(function () {
-    Route::resource('materials', MaterialController::class);
-});
-
-// Route to serve document
-Route::get('/materials/view-document/{id}', [MaterialController::class, 'viewDocument'])->name('materials.viewDocument');
 
 // Cost Tracking Route
 Route::get('/cost-tracking', [CostTrackingController::class, 'index'])->name('cost-tracking.index');
@@ -202,7 +191,7 @@ Route::get('/get-items-by-element', [ItemsController::class, 'getItemsByElement'
 
 // Item Material Routes
 Route::get('items/{id}/materials', [ItemMaterialController::class, 'index'])->name('items.materials');
-Route::post('items/materials', [ItemMaterialController::class, 'store'])->name('materials.store');
+Route::post('items/materials', [ItemMaterialController::class, 'store'])->name('item_materials.store');
 Route::put('materials/items/{id}', [ItemMaterialController::class, 'update'])->name('materials.item.update');
 Route::delete('items/materials/{id}', [ItemMaterialController::class, 'destroy'])->name('items.materials.destroy');
 

@@ -117,7 +117,6 @@ class MaterialController extends Controller
         $projectId = Auth::user()->project_id;
         $year = $request->input('year', now()->year);
 
-        // Get delivered materials
         $materialsQuery = Material::with('supplier', 'requisition')
             ->where('project_id', $projectId);
 
@@ -131,19 +130,23 @@ class MaterialController extends Controller
         $materialsQuery->whereYear('created_at', $year);
         $materials = $materialsQuery->get();
 
-        // Available years for filter dropdown
         $availableYears = Material::selectRaw('DISTINCT YEAR(created_at) as year')
             ->orderBy('year', 'desc')
             ->pluck('year');
 
         $project = Project::find($projectId);
 
-        $bomItems = BomItem::select('product_id', 'name', 'unit_of_measure', DB::raw('SUM(quantity) as total_quantity'))
+        $bomItems = BomItem::select(
+                'product_id',
+                DB::raw('SUM(quantity) as total_quantity')
+            )
             ->whereHas('bom', function ($q) use ($projectId) {
                 $q->where('project_id', $projectId);
             })
-            ->groupBy('product_id', 'name', 'unit_of_measure')
+            ->groupBy('product_id')
+            ->with('product:id,name,unit_of_measure')
             ->get();
+
 
         foreach ($bomItems as $item) {
             $approvedQty = Requisition::where('product_id', $item->product_id)
@@ -153,15 +156,17 @@ class MaterialController extends Controller
             $item->remaining_quantity = $item->total_quantity - $approvedQty;
         }
 
-        // Only items with stock still available for requisition
         $requisitionableItems = $bomItems->filter(fn($item) => $item->remaining_quantity > 0);
+
+        $sections = Section::all();
 
         return view('materials.materials_delivered', compact(
             'materials',
             'project',
             'availableYears',
             'year',
-            'requisitionableItems'
+            'requisitionableItems',
+            'sections'
         ));
     }
 
@@ -320,7 +325,7 @@ class MaterialController extends Controller
 
         Material::create($data);
 
-        return redirect()->route('materials.index')->with('success', 'Material recorded successfully!');
+        return redirect()->route('materials.delivered')->with('success', 'Material recorded successfully!');
     }
 
     public function show($id)
@@ -425,8 +430,8 @@ class MaterialController extends Controller
         // Find the first available material batch for this product
         $material = Material::where('product_id', $id)
             ->where('quantity_in_stock', '>', 0)
-            ->orderBy('created_at', 'asc')
-            ->firstOrFail();
+            ->oldest()
+            ->first();
 
         // Check if stock is sufficient
         if ($request->quantity_used > $material->quantity_in_stock) {

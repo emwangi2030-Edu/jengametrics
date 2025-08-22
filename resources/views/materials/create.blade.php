@@ -13,7 +13,7 @@
         <div class="col-md-8">
             <div class="card shadow-sm border-0 rounded">
                 <div class="card-body p-5">
-                    <form action="{{ route('m.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('materials.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         {{-- Material Dropdown --}}

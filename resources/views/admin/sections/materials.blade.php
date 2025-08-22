@@ -8,7 +8,7 @@
     <div class="card">
         <div class="card-header">Add New Material</div>
         <div class="card-body">
-            <form action="{{ route('materials.store') }}" method="POST">
+            <form action="{{ route('item_materials.store') }}" method="POST">
                 @csrf
                 <div class="form-group">
                     <label for="materialNameInput">Select Material</label>

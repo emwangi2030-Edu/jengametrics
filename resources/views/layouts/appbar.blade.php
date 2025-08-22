@@ -1,3 +1,6 @@
+<?php
+use Illuminate\Support\Facades\Auth;
+?>
 <!DOCTYPE html>
 <html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default">
 
@@ -115,56 +118,82 @@
                             <p class="navbar-vertical-label">Apps</p>
                             <hr class="navbar-vertical-line" /><!-- parent pages-->
 
-
                             <style>
                                 /* Navigation Item Styles */
                                 .nav-item-wrapper {
-                                    margin-bottom: 1rem;
-                                    /* Add spacing between navigation items */
+                                    margin-bottom: 0.5rem; /* spacing between items */
+                                    position: relative;
                                 }
 
+                                /* Dropdown menu styling (accordion style) */
+                                .nav-item-wrapper .dropdown-menu {
+                                    border: none;
+                                    background: #f8f9fa; /* sidebar-like gray */
+                                    box-shadow: none;
+                                    display: none; /* hidden by default */
+                                    position: static; /* stack under parent */
+                                    padding-left: 1rem; /* indent children */
+                                }
+
+                                /* Show dropdown on hover */
+                                .nav-item-wrapper:hover > .dropdown-menu {
+                                    display: block;
+                                }
+
+                                .nav-item-wrapper .dropdown-item {
+                                    font-size: 15px;
+                                    color: #333;
+                                    white-space: nowrap;
+                                    padding: 0.5rem 1rem;
+                                }
+
+                                .nav-item-wrapper .dropdown-item:hover {
+                                    background-color: #e0f2f1; /* light green hover */
+                                    color: #027333;
+                                }
+
+                                /* Nav link base */
                                 .nav-link {
+                                    display: flex;
+                                    align-items: center;
                                     padding: 0.75rem 1rem;
-                                    /* Add padding for better touch target size */
                                     border-radius: 0.375rem;
-                                    /* Add rounded corners */
                                     transition: background-color 0.3s ease, color 0.3s ease;
-                                    /* Smooth transition effects */
-                                    color: #000000;
-                                    /* Default text color in green */
+                                    color: #027333;
                                     text-decoration: none;
-                                    /* Remove underline from links */
                                 }
 
+                                /* Hover state */
                                 .nav-link:hover {
                                     background-color: #e0f2f1;
-                                    /* Light green background on hover */
-                                    color: #000000;
-                                    /* Darker green color on hover */
-                                    transform: scale(1.1);
-                                    transition: transform 0.2s ease-in-out
+                                    color: #014d22;
                                 }
 
+                                /* Optional: subtle scaling only on text/icon */
+                                .nav-link:hover .nav-link-text,
+                                .nav-link:hover .nav-link-icon {
+                                    transform: scale(1.05);
+                                    transition: transform 0.2s ease-in-out;
+                                }
+
+                                /* Icon styling */
                                 .nav-link-icon i {
                                     font-size: 20px;
-                                    /* Adjust the font size for a balanced size */
-                                    color: #000000;
-                                    /* Green icon color */
+                                    color: #027333;
                                     margin-right: 0.5rem;
-                                    /* Add spacing between icon and text */
                                 }
 
+                                /* Text styling */
                                 .nav-link-text {
                                     font-size: 16px;
-                                    /* Set a professional font size */
                                     font-weight: 500;
-                                    /* Slightly bolder text */
                                     margin-left: 0.5rem;
-                                    /* Add spacing between icon and text */
                                     color: #027333;
-                                    /* Ensure text color matches the nav-link color */
                                 }
                             </style>
+
+
+
 
                             <!-- Dashboard Item -->
                             <div class="nav-item-wrapper">
@@ -207,9 +236,14 @@
                                     </a>
                                 </div>
 
-                                <!-- Material Management -->
-                                <div class="nav-item-wrapper">
-                                    <a class="nav-link label-1" title="manage your materials" href="{{route('materials.index') }}" role="button" aria-expanded="false">
+                               <!-- Material Management (Dropdown Parent) -->
+                                <div class="nav-item-wrapper dropdown">
+                                    <a class="nav-link label-1 dropdown-toggle" 
+                                    href="#" 
+                                    id="materialDropdown" 
+                                    role="button" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false">
                                         <div class="d-flex align-items-center">
                                             <span class="nav-link-icon">
                                                 <span data-feather="box"></span>
@@ -219,19 +253,25 @@
                                             </span>
                                         </div>
                                     </a>
-                                </div>
-                                <!-- Material Management -->
-                                <div class="nav-item-wrapper">
-                                    <a class="nav-link label-1" title="manage your materials" href="{{route('materials.delivered') }}" role="button" aria-expanded="false">
-                                        <div class="d-flex align-items-center">
-                                            <span class="nav-link-icon">
-                                                <span data-feather="box"></span>
-                                            </span>
-                                            <span class="nav-link-text-wrapper">
-                                                <span class="nav-link-text">Material Delivered</span>
-                                            </span>
-                                        </div>
-                                    </a>
+
+                                    <!-- Dropdown Menu -->
+                                    <ul class="dropdown-menu" aria-labelledby="materialDropdown">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('materials.delivered') }}">
+                                                Material Delivered
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('materials.inventory') }}">
+                                                Inventory Management
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('materials.usage') }}">
+                                                Stock Usage
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </div>
 
                                 <!-- Labour -->
