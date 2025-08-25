@@ -45,8 +45,6 @@ use Illuminate\Support\Facades\Auth;
     id="user-style-default">
     <link href="{{ asset('assets/metrics/vendors/prism/prism-okaidia.css') }}" rel="stylesheet">
 
-
-
     <!-- ===============================================-->
     <!--    Additional Scripts and Styles-->
     <!-- ===============================================-->
@@ -71,7 +69,6 @@ use Illuminate\Support\Facades\Auth;
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
 
     @yield('page-css')
-
 
     <style>
         .modal {
@@ -98,10 +95,7 @@ use Illuminate\Support\Facades\Auth;
             color: #027333;
         }
     </style>
-    
-    
 </head>
-
 
 <body>
     <!-- ===============================================-->
@@ -121,38 +115,74 @@ use Illuminate\Support\Facades\Auth;
                             <style>
                                 /* Navigation Item Styles */
                                 .nav-item-wrapper {
-                                    margin-bottom: 0.5rem; /* spacing between items */
+                                    margin-bottom: 0.5rem;
                                     position: relative;
                                 }
 
-                                /* Dropdown menu styling (accordion style) */
+                                /* Dropdown menu */
                                 .nav-item-wrapper .dropdown-menu {
+                                    position: static !important;
+                                    display: none;
+                                    margin: 0;
+                                    padding: 0 0 0 1.5rem;
+                                    background: transparent;
                                     border: none;
-                                    background: #f8f9fa; /* sidebar-like gray */
                                     box-shadow: none;
-                                    display: none; /* hidden by default */
-                                    position: static; /* stack under parent */
-                                    padding-left: 1rem; /* indent children */
+                                    list-style: none;
                                 }
 
-                                /* Show dropdown on hover */
-                                .nav-item-wrapper:hover > .dropdown-menu {
+                                /* Show submenu on hover */
+                                .nav-item-wrapper.open > .dropdown-menu {
                                     display: block;
                                 }
 
-                                .nav-item-wrapper .dropdown-item {
-                                    font-size: 15px;
+                                /* Submenu items */
+                                .nav-item-wrapper .dropdown-menu .dropdown-item {
+                                    display: flex;
+                                    align-items: center;
+                                    padding: 0.65rem 1rem 0.65rem 2.5rem;
                                     color: #333;
-                                    white-space: nowrap;
-                                    padding: 0.5rem 1rem;
+                                    text-decoration: none;
+                                    font-size: 0.9rem;
+                                    border-radius: 0.5rem;
+                                    transition: background 0.2s, color 0.2s;
+                                    position: relative;
                                 }
 
-                                .nav-item-wrapper .dropdown-item:hover {
-                                    background-color: #e0f2f1; /* light green hover */
+                                /* Parent nav links that have a submenu */
+                                .nav-item-wrapper.has-submenu > .nav-link {
+                                    position: relative;
+                                    padding-right: 2rem;
+                                }
+
+                                /* Chevron arrow for parent links */
+                                .nav-item-wrapper.has-submenu > .nav-link::after {
+                                    content: "▾";
+                                    position: absolute;
+                                    right: 1rem;
+                                    font-size: 14px;
                                     color: #027333;
+                                    transition: transform 0.3s ease, color 0.3s ease;
                                 }
 
-                                /* Nav link base */
+                                /* Rotate chevron when submenu is expanded */
+                                .nav-item-wrapper.has-submenu.open > .nav-link::after {
+                                    transform: rotate(180deg);
+                                    color: #014d22;
+                                }
+
+                                /* Hover state for submenu items */
+                                .nav-item-wrapper .dropdown-menu .dropdown-item:hover {
+                                    background-color: #e0f2f1;
+                                    color: #014d22;
+                                }
+
+                                .nav-item-wrapper .dropdown-menu .dropdown-item.active {
+                                    background-color: #e9ecef;
+                                    font-weight: 500;
+                                }
+
+                                /* Main nav link */
                                 .nav-link {
                                     display: flex;
                                     align-items: center;
@@ -169,7 +199,7 @@ use Illuminate\Support\Facades\Auth;
                                     color: #014d22;
                                 }
 
-                                /* Optional: subtle scaling only on text/icon */
+                                /* Subtle scaling only on text/icon */
                                 .nav-link:hover .nav-link-text,
                                 .nav-link:hover .nav-link-icon {
                                     transform: scale(1.05);
@@ -190,10 +220,8 @@ use Illuminate\Support\Facades\Auth;
                                     margin-left: 0.5rem;
                                     color: #027333;
                                 }
+
                             </style>
-
-
-
 
                             <!-- Dashboard Item -->
                             <div class="nav-item-wrapper">
@@ -227,7 +255,7 @@ use Illuminate\Support\Facades\Auth;
                                     <a class="nav-link label-1" href="{{ route('boms.index') }}" role="button" aria-expanded="false">
                                         <div class="d-flex align-items-center">
                                             <span class="nav-link-icon">
-                                                <span data-feather="settings"></span>
+                                                <span data-feather="file-text"></span>
                                             </span>
                                             <span class="nav-link-text-wrapper">
                                                 <span class="nav-link-text">Bills of Materials</span>
@@ -236,26 +264,23 @@ use Illuminate\Support\Facades\Auth;
                                     </a>
                                 </div>
 
-                               <!-- Material Management (Dropdown Parent) -->
-                                <div class="nav-item-wrapper dropdown">
-                                    <a class="nav-link label-1 dropdown-toggle" 
-                                    href="#" 
-                                    id="materialDropdown" 
-                                    role="button" 
-                                    data-bs-toggle="dropdown" 
-                                    aria-expanded="false">
+                              <!-- Material Management (Dropdown Parent) -->
+                                <div class="nav-item-wrapper has-submenu">
+                                    <a class="nav-link label-1" 
+                                    href="javascript:void(0)" 
+                                    onclick="toggleDropdown(this)">
                                         <div class="d-flex align-items-center">
                                             <span class="nav-link-icon">
                                                 <span data-feather="box"></span>
                                             </span>
                                             <span class="nav-link-text-wrapper">
-                                                <span class="nav-link-text">Material Management</span>
+                                                <span class="nav-link-text">Manage Material</span>
                                             </span>
                                         </div>
                                     </a>
 
                                     <!-- Dropdown Menu -->
-                                    <ul class="dropdown-menu" aria-labelledby="materialDropdown">
+                                    <ul class="dropdown-menu">
                                         <li>
                                             <a class="dropdown-item" href="{{ route('materials.delivered') }}">
                                                 Material Delivered
@@ -401,203 +426,166 @@ use Illuminate\Support\Facades\Auth;
                                 </div>
                             @endif
                         </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</li>
-
-
-
-</ul>
-</div>
-</div>
-<div class="navbar-vertical-footer"><button
-    class="btn navbar-vertical-toggle border-0 fw-semibold w-100 white-space-nowrap d-flex align-items-center"><span
-    class="uil uil-left-arrow-to-left fs-8"></span><span
-    class="uil uil-arrow-from-right fs-8"></span><span
-    class="navbar-vertical-footer-text ms-2">Collapsed View</span></button></div>
-</nav>
-
-<nav class="navbar navbar-top fixed-top navbar-expand" id="navbarDefault" style="display:none;">
-    <div class="collapse navbar-collapse justify-content-between">
-        <div class="navbar-logo">
-            <button class="btn navbar-toggler navbar-toggler-humburger-icon hover-bg-transparent" type="button"
-            data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse"
-            aria-controls="navbarVerticalCollapse" aria-expanded="false"
-            aria-label="Toggle Navigation"><span class="navbar-toggle-icon"><span
-                class="toggle-line"></span></span></button>
-                <a class="navbar-brand me-1 me-sm-3" href="{{ url('/') }}">
-                    <div class="d-flex align-items-center">
-                        <div class="d-flex align-items-center"><img src="{{ favicon_url() }}" alt="b2b"
-                            width="27" />
-                            <h5 class="logo-text ms-2 d-none d-sm-block" style="color: #027333;">JengaMetrics</h5>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-
-            <ul class="navbar-nav navbar-nav-icons flex-row">
-
-
-                <li class="nav-item">
-                    <div class="theme-control-toggle fa-icon-wait px-2"><input
-                        class="form-check-input ms-0 theme-control-toggle-input" type="checkbox"
-                        data-theme-control="phoenixTheme" value="dark" id="themeControlToggle" /><label
-                        class="mb-0 theme-control-toggle-label theme-control-toggle-light"
-                        for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
-                        data-bs-title="Switch theme" style="height:32px;width:32px;"><span class="icon"
-                        data-feather="moon"></span></label><label
-                        class="mb-0 theme-control-toggle-label theme-control-toggle-dark"
-                        for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
-                        data-bs-title="Switch theme" style="height:32px;width:32px;"><span class="icon"
-                        data-feather="sun"></span></label></div>
-                    </li>
-
-
-
-                    <li class="nav-item dropdown">
-
-                        <a class="nav-link lh-1 pe-0" id="navbarDropdownUser" href="#!" role="button"
-                        data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true"
-                        aria-expanded="false">
-                        <span class="fs-8">{{ project() }}</span>
-                        <i class="fas fa-angle-down"></i>
-                    </a>
-
-
-                    <div class="dropdown-menu dropdown-menu-end navbar-dropdown-caret py-0 dropdown-profile shadow border"
-                    aria-labelledby="navbarDropdownUser">
-                    <div class="card position-relative border-0">
-                        <div class="card-body p-0">
-                            <div class="text-center pt-4 pb-3">
-                                <div class="avatar avatar-xl ">
-                                    <img class="rounded-circle " src="{{ Auth::user()->get_gravatar(150) }}"
-                                    alt="" />
-                                </div>
-                                <h6 class="mt-2 text-body-emphasis">{{ project() }}</h6>
-                            </div>
-
-                        </div>
-                        <div>
-
-                            @if(Auth::user()->is_client())
-                            @if(Auth::user()->package)
-                            @if(package(Auth::user()->package)->name == "Basic")
-
-                            <div class="help-box text-center">
-
-                                <p class="mb-3 mt-2 text-muted">
-                                    <strong>{{ package(Auth::user()->package)->name }}</strong><br>
-                                    Upgrade your plan and get the most out of JengaMetrics
-                                </p>
-                                <div class="mt-3">
-                                    <a href="{{ route('subscribe') }}" class="btn btn-success"> Upgrade now</a>
-                                </div>
-                            </div>
-                            @endif
-                            @endif
-                            @endif
-
-
-
-                            <ul class="nav d-flex flex-column mb-2 pb-1">
-                                @if(Auth::user()->is_client())
-                                @if(Auth::user()->project_id)
-                                <li class="nav-item"><a class="nav-link px-3 d-block"
-                                    href="/admin/settings"><span class="me-2 text-body align-bottom"
-                                    data-feather="pie-chart"></span>Project settings</a></li>
-                                    <li class="nav-item">
-
-
-                                        <a class="nav-link px-3 d-block" href="#" data-bs-toggle="modal"
-                                        data-bs-target="#switchbusinesses">
-                                        <span class="me-2 text-body align-bottom" data-feather="pie-chart">
-
-                                        </span>Switch Projects
-                                    </a>
-
-
-
-
-
-
-
-                                </li>
-                                @endif 
-
-                                @endif
-                            </ul>
-                        </div>
-                        <div class="card-footer p-0 border-top border-translucent">
-                            <ul class="nav d-flex flex-column my-3">
-
-
-
-
-
-
-                                <!-- item--> @if(Auth::user()->is_client())
-                                <a class="dropdown-item" href="{{ url('account') }}"><i
-                                    class="fa fa-user"></i> <span key="t-profile">Profile</span></a>
-                                    <a class="dropdown-item" href="{{ url('businesses') }}"><i
-                                        class="fa fa-users"></i> <span key="t-profile">Manage your
-                                        projects</span></a>
-                                        <a class="dropdown-item" href="{{ url('billings') }}"><i
-                                            class="fa fa-users"></i> <span key="t-profile">Manage your
-                                            billings</span></a>
-                                            <a class="dropdown-item" href="{{ url('subscribe') }}"><i
-                                                class="fa fa-users"></i> <span key="t-profile">Manage your
-                                                subscriptions</span></a>
-                                                @endif
-
-
-                                            </ul>
-                                            <hr />
-                                            <div class="px-3"> 
-
-
-                                             <form method="POST" action="{{ route('logout') }}">
-                                                @csrf
-
-                                                <x-responsive-nav-link :href="route('logout')" class="btn btn-phoenix-secondary d-flex flex-center w-100"
-                                                onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                                <span class="me-2" data-feather="log-out">
-                                                </span>Sign out</a>
-                                            </x-responsive-nav-link>
-                                        </form>
-                                    </div>
-
-
-
-                                    <div class="my-2 text-center fw-bold fs-10 text-body-quaternary"><a
-                                        class="text-body-quaternary me-1" href="#!">Privacy policy</a>&bull;<a
-                                        class="text-body-quaternary mx-1" href="#!">Terms</a>&bull;<a
-                                        class="text-body-quaternary ms-1" href="#!">Cookies</a></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
                     </ul>
                 </div>
-            </nav>
+            </div>
+            <div class="navbar-vertical-footer">
+                <button class="btn navbar-vertical-toggle border-0 fw-semibold w-100 white-space-nowrap d-flex align-items-center">
+                    <span class="uil uil-left-arrow-to-left fs-8"></span>
+                    <span class="uil uil-arrow-from-right fs-8"></span>
+                    <span class="navbar-vertical-footer-text ms-2">Collapsed View</span>
+                </button>
+            </div>
+        </nav>
+        <nav class="navbar navbar-top fixed-top navbar-expand" id="navbarDefault" style="display:none;">
+            <div class="collapse navbar-collapse justify-content-between">
+                <div class="navbar-logo">
+                    <button class="btn navbar-toggler navbar-toggler-humburger-icon hover-bg-transparent" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse"
+                    aria-controls="navbarVerticalCollapse" aria-expanded="false"
+                    aria-label="Toggle Navigation">
+                        <span class="navbar-toggle-icon">
+                            <span class="toggle-line"></span>
+                        </span>
+                    </button>
+                    <a class="navbar-brand me-1 me-sm-3" href="{{ url('/') }}">
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center"><img src="{{ favicon_url() }}" alt="b2b"
+                                width="27" />
+                                <h5 class="logo-text ms-2 d-none d-sm-block" style="color: #027333;">JengaMetrics</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <ul class="navbar-nav navbar-nav-icons flex-row">
+                    <li class="nav-item">
+                        <div class="theme-control-toggle fa-icon-wait px-2">
+                            <input class="form-check-input ms-0 theme-control-toggle-input" type="checkbox" data-theme-control="phoenixTheme" value="dark" id="themeControlToggle" />
+                            <label class="mb-0 theme-control-toggle-label theme-control-toggle-light" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
+                                data-bs-title="Switch theme" style="height:32px;width:32px;">
+                                <span class="icon" data-feather="moon"></span>
+                            </label>
+                            <label class="mb-0 theme-control-toggle-label theme-control-toggle-dark" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
+                                data-bs-title="Switch theme" style="height:32px;width:32px;">
+                                <span class="icon" data-feather="sun"></span>
+                            </label>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link lh-1 pe-0" id="navbarDropdownUser" href="#!" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true"
+                            aria-expanded="false">
+                            <span class="fs-8">{{ project() }}</span>
+                            <i class="fas fa-angle-down"></i>
+                        </a>
+
+
+                        <div class="dropdown-menu dropdown-menu-end navbar-dropdown-caret py-0 dropdown-profile shadow border" aria-labelledby="navbarDropdownUser">
+                        <div class="card position-relative border-0">
+                            <div class="card-body p-0">
+                                <div class="text-center pt-4 pb-3">
+                                    <div class="avatar avatar-xl ">
+                                        <img class="rounded-circle " src="{{ Auth::user()->get_gravatar(150) }}"
+                                        alt="" />
+                                    </div>
+                                    <h6 class="mt-2 text-body-emphasis">{{ project() }}</h6>
+                                </div>
+                            </div>
+                            <div>
+                                @if(Auth::user()->is_client())
+                                    @if(Auth::user()->package)
+                                        @if(package(Auth::user()->package)->name == "Basic")
+                                            <div class="help-box text-center">
+                                                <p class="mb-3 mt-2 text-muted">
+                                                    <strong>{{ package(Auth::user()->package)->name }}</strong><br>
+                                                    Upgrade your plan and get the most out of JengaMetrics
+                                                </p>
+                                                <div class="mt-3">
+                                                    <a href="{{ route('subscribe') }}" class="btn btn-success"> Upgrade now</a>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @endif
+                                @endif
+
+
+
+                                <ul class="nav d-flex flex-column mb-2 pb-1">
+                                    @if(Auth::user()->is_client())
+                                    @if(Auth::user()->project_id)
+                                    <li class="nav-item"><a class="nav-link px-3 d-block"
+                                        href="/admin/settings"><span class="me-2 text-body align-bottom"
+                                        data-feather="pie-chart"></span>Project settings</a></li>
+                                        <li class="nav-item">
+
+
+                                            <a class="nav-link px-3 d-block" href="#" data-bs-toggle="modal"
+                                            data-bs-target="#switchbusinesses">
+                                            <span class="me-2 text-body align-bottom" data-feather="pie-chart">
+
+                                            </span>Switch Projects
+                                        </a>
+
+
+
+
+
+
+
+                                    </li>
+                                    @endif 
+
+                                    @endif
+                                </ul>
+                            </div>
+                            <div class="card-footer p-0 border-top border-translucent">
+                                <ul class="nav d-flex flex-column my-3">
+                                    @if(Auth::user()->is_client())
+                                        <a class="dropdown-item" href="{{ url('account') }}">
+                                            <i class="fa fa-user"></i> 
+                                            <span key="t-profile">Profile</span>
+                                        </a>
+                                        <a class="dropdown-item" href="{{ url('businesses') }}">
+                                            <i class="fa fa-users"></i> 
+                                            <span key="t-profile">Manage your projects</span>
+                                        </a>
+                                        <a class="dropdown-item" href="{{ url('billings') }}">
+                                            <i class="fa fa-users"></i>
+                                            <span key="t-profile">Manage your billings</span>
+                                        </a>
+                                        <a class="dropdown-item" href="{{ url('subscribe') }}">
+                                            <i class="fa fa-users"></i>
+                                            <span key="t-profile">Manage your subscriptions</span>
+                                        </a>
+                                    @endif
+
+
+                                                </ul>
+                                                <hr />
+                                                <div class="px-3"> 
+
+
+                                                <form method="POST" action="{{ route('logout') }}">
+                                                    @csrf
+
+                                                    <x-responsive-nav-link :href="route('logout')" class="btn btn-phoenix-secondary d-flex flex-center w-100"
+                                                    onclick="event.preventDefault();
+                                                    this.closest('form').submit();">
+                                                    <span class="me-2" data-feather="log-out">
+                                                    </span>Sign out</a>
+                                                </x-responsive-nav-link>
+                                            </form>
+                                        </div>
+                                        <div class="my-2 text-center fw-bold fs-10 text-body-quaternary"><a
+                                            class="text-body-quaternary me-1" href="#!">Privacy policy</a>&bull;<a
+                                            class="text-body-quaternary mx-1" href="#!">Terms</a>&bull;<a
+                                            class="text-body-quaternary ms-1" href="#!">Cookies</a></div>
+                                        </div>
+                        </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
 
 
 
@@ -719,17 +707,17 @@ use Illuminate\Support\Facades\Auth;
                             <table class="table">
                                 <tbody>
                                     @foreach ($projects as $project)
-                                    <tr>
-                                        <td><b>{{ $loop->iteration }}. {{ $project->name }}</b></td>
-                                        <td>
-                                            <form action="{{ route('select_project') }}" method="POST"
-                                                style="display:inline;">
-                                                @csrf
-                                                <input type="hidden" name="id" value="{{ $project->id }}">
-                                                <button type="submit" class="btn btn-success btn-sm">Select</button>
-                                            </form>
-                                        </td>
-                                    </tr>
+                                        <tr>
+                                            <td><b>{{ $loop->iteration }}. {{ $project->name }}</b></td>
+                                            <td>
+                                                <form action="{{ route('select_project') }}" method="POST"
+                                                    style="display:inline;">
+                                                    @csrf
+                                                    <input type="hidden" name="id" value="{{ $project->id }}">
+                                                    <button type="submit" class="btn btn-success btn-sm">Select</button>
+                                                </form>
+                                            </td>
+                                        </tr>
                                     @endforeach
                                     <tr>
                                         <td>
@@ -753,9 +741,7 @@ use Illuminate\Support\Facades\Auth;
                     </div>
                 </div>
                 <div class="content">
-
                     @yield('content')
-
                 </div>
                 <style>
                     #toast-container {
@@ -799,107 +785,109 @@ use Illuminate\Support\Facades\Auth;
                             opacity: 1;
                         }
                     }
-
-
                 </style>
                 <div id="toast-container">
                     @if (\Session::has('success'))
-                    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
-                        <div class="toast-header">
-                            <span class="avatar avatar-xs me-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon text-success" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /><path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727" /><path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" /></svg>
-                            </span>
-                            <strong class="me-auto">System</strong>
-                            <small>Just now</small>
-                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                            <div class="toast-header">
+                                <span class="avatar avatar-xs me-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-success" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /><path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727" /><path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" /></svg>
+                                </span>
+                                <strong class="me-auto">System</strong>
+                                <small>Just now</small>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                <span class="badge bg-success">Success</span>
+                                {!! \Session::get('success') !!}
+                            </div>
                         </div>
-                        <div class="toast-body">
-                            <span class="badge bg-success">Success</span>
-                            {!! \Session::get('success') !!}
-                        </div>
-                    </div>
                     @endif 
 
                     @if (\Session::has('warning'))
-                    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
-                        <div class="toast-header">
-                            <span class="avatar avatar-xs me-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon text-warning" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /><path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727" /><path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" /></svg>
-                            </span>
-                            <strong class="me-auto">System</strong>
-                            <small>Just now</small>
-                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                            <div class="toast-header">
+                                <span class="avatar avatar-xs me-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-warning" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /><path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727" /><path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" /></svg>
+                                </span>
+                                <strong class="me-auto">System</strong>
+                                <small>Just now</small>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                <span class="badge bg-warning">Warning</span>
+                                {!! \Session::get('warning') !!}
+                            </div>
                         </div>
-                        <div class="toast-body">
-                            <span class="badge bg-warning">Warning</span>
-                            {!! \Session::get('warning') !!}
-                        </div>
-                    </div>
                     @endif 
 
                     @if (\Session::has('danger'))
-                    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
-                        <div class="toast-header">
-                            <span class="avatar avatar-xs me-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon text-danger" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /><path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727" /><path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" /></svg>
-                            </span>
-                            <strong class="me-auto">System</strong>
-                            <small>Just now</small>
-                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                            <div class="toast-header">
+                                <span class="avatar avatar-xs me-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-danger" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /><path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727" /><path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" /></svg>
+                                </span>
+                                <strong class="me-auto">System</strong>
+                                <small>Just now</small>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                <span class="badge bg-danger">Error</span>
+                                {!! \Session::get('danger') !!}
+                            </div>
                         </div>
-                        <div class="toast-body">
-                            <span class="badge bg-danger">Error</span>
-                            {!! \Session::get('danger') !!}
-                        </div>
-                    </div>
                     @endif 
                 </div>
 
 
 
-            </main>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/5hb5g6Q2bj0Ib6W9crrxJKKo4qklqUhcHZCl1r"
+            crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('assets/metrics/vendors/popper/popper.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/anchorjs/anchor.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/is/is.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/lodash/lodash.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/list.js/list.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/feather-icons/feather.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/dayjs/dayjs.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/leaflet/leaflet.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/leaflet.markercluster/leaflet.markercluster.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/leaflet.tilelayer.colorfilter/leaflet-tilelayer-colorfilter.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/assets/js/phoenix.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/echarts/echarts.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/assets/js/ecommerce-dashboard.js') }}"></script>
+    <script src="{{ asset('assets/metrics/vendors/prism/prism.js') }}"></script>
 
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-                    integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/5hb5g6Q2bj0Ib6W9crrxJKKo4qklqUhcHZCl1r"
-                    crossorigin="anonymous"></script>
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Toast Options (if using toastr.js) -->
+    <script>
+        var toastr_options = { closeButton: true };
+    </script>
 
-            <script src="{{ asset('assets/metrics/vendors/popper/popper.min.js') }}"></script>
-            <script src="{{ asset('assets/metrics/vendors/anchorjs/anchor.min.js') }}"></script>
-            <script src="{{ asset('assets/metrics/vendors/is/is.min.js') }}"></script>
-            <script src="{{ asset('assets/metrics/vendors/fontawesome/all.min.js') }}"></script>
-            <script src="{{ asset('assets/metrics/vendors/lodash/lodash.min.js') }}"></script>
-            <script src="{{ asset('assets/metrics/vendors/list.js/list.min.js') }}"></script>
-            <script src="{{ asset('assets/metrics/vendors/feather-icons/feather.min.js') }}"></script>
-            <script src="{{ asset('assets/metrics/vendors/dayjs/dayjs.min.js') }}"></script>
-            <script src="{{ asset('assets/metrics/vendors/leaflet/leaflet.js') }}"></script>
-            <script src="{{ asset('assets/metrics/vendors/leaflet.markercluster/leaflet.markercluster.js') }}"></script>
-            <script src="{{ asset('assets/metrics/vendors/leaflet.tilelayer.colorfilter/leaflet-tilelayer-colorfilter.min.js') }}"></script>
-            <script src="{{ asset('assets/metrics/assets/js/phoenix.js') }}"></script>
-            <script src="{{ asset('assets/metrics/vendors/echarts/echarts.min.js') }}"></script>
-            <script src="{{ asset('assets/metrics/assets/js/ecommerce-dashboard.js') }}"></script>
-            <script src="{{ asset('assets/metrics/vendors/prism/prism.js') }}"></script>
+    <!-- Custom Theme Script -->
+    <script>
+        $(document).on('click', '.ghuranti', function () {
+            $('.themeqx-demo-chooser-wrap').toggleClass('open');
+        });
+    </script>
 
-            <!-- SweetAlert -->
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    function toggleDropdown(element) {
+        const parent = element.closest('.nav-item-wrapper');
+        parent.classList.toggle('open');
+    }
+    </script>
 
-            <!-- Toast Options (if using toastr.js) -->
-            <script>
-                var toastr_options = { closeButton: true };
-            </script>
-
-            <!-- Custom Theme Script -->
-            <script>
-                $(document).on('click', '.ghuranti', function () {
-                    $('.themeqx-demo-chooser-wrap').toggleClass('open');
-                });
-            </script>
-
-            <!-- Blade Yield Stacks -->
-            @yield('page-js')
-            @yield('scripts')
-            @stack('scripts')
-
-        </body>
-        </html>
+    <!-- Blade Yield Stacks -->
+    @yield('page-js')
+    @yield('scripts')
+    @stack('scripts')
+</body>
+</html>
