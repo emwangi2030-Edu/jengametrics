@@ -13,8 +13,10 @@ use Carbon\Carbon;
 
 class RequisitionController extends Controller
 {
-   public function index(Request $request)
+    public function index(Request $request)
     {
+        $projectId = Auth::user()->project_id;
+
         $requisitions = Requisition::with('bomItem', 'requester', 'approver', 'section')
             ->orderByDesc('created_at')
             ->get();
@@ -26,7 +28,35 @@ class RequisitionController extends Controller
             ->with('bomItem.item_material')
             ->get();
 
-        return view('requisitions.index', compact('requisitions', 'approvedSummary'));
+        $sections = Section::all();
+
+        $rawItems = BomItem::whereProjectId($projectId)->get();
+        $groupedItems = $rawItems->groupBy('product_id');
+
+        $requisitionableItems = collect();
+
+        $products = Product::query()->whereIn('id', $groupedItems->keys()->toArray())->pluck('unit', 'id');
+
+        foreach ($groupedItems as $product_id => $group) {
+            $sampleItem = $group->first();
+            $totalQty = $group->sum('quantity');
+            $sampleItem->unit = $products[$product_id] ?? 'unit';
+            $sampleItem->total_quantity = $totalQty;
+
+            $requisitionedQty = Requisition::whereIn('bom_item_id', $group->pluck('id'))
+                ->whereIn('status', ['pending', 'approved'])
+                ->sum('quantity_requested');
+
+            $remaining = max(0, $totalQty - $requisitionedQty);
+            $sampleItem->remaining_quantity = $remaining;
+
+            if ($remaining >= 1) {
+                $requisitionableItems->push(clone $sampleItem);
+            }
+        }
+
+
+        return view('requisitions.index', compact('requisitions', 'approvedSummary', 'sections', 'requisitionableItems'));
     }
 
     public function create()

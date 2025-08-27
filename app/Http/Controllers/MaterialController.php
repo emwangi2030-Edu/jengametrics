@@ -424,18 +424,20 @@ class MaterialController extends Controller
     {
         $request->validate([
             'quantity_used' => 'required|numeric|min:0.01',
-            'section_id' => 'required|exists:sections,id', // must match a section
+            'section_id' => 'required|exists:sections,id',
         ]);
 
-        // Find the first available material batch for this product
         $material = Material::where('product_id', $id)
             ->where('quantity_in_stock', '>', 0)
             ->oldest()
             ->first();
 
-        // Check if stock is sufficient
+        if (!$material) {
+            return response()->json(['error' => 'No material found in stock.'], 400);
+        }
+
         if ($request->quantity_used > $material->quantity_in_stock) {
-            return back()->withErrors(['quantity_used' => 'Not enough stock available.']);
+            return response()->json(['error' => 'Not enough stock available.'], 400);
         }
 
         // Deduct stock
@@ -449,6 +451,9 @@ class MaterialController extends Controller
             'section_id' => $request->section_id,
         ]);
 
-        return back()->with('success', 'Material usage recorded and stock updated.');
+        return response()->json([
+            'success' => 'Material usage recorded and stock updated.',
+            'remaining_stock' => $material->quantity_in_stock
+        ]);
     }
 }

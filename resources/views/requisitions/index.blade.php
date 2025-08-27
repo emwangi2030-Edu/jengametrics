@@ -1,6 +1,19 @@
 @extends('layouts.appbar')
 
 @section('content')
+<div class="row py-4">
+    <h2 class="font-weight-bold" style="color:#027333">
+        Requisition List: <span class="text-black">{{ get_project()->name }}</span>
+    </h2>
+    <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
+        <div>
+            <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#requisitionModal">
+                Requisition Material
+            </button>
+        </div>
+    </div>
+</div>
+
 <div class="container mt-4">
     <h2 class="mb-4" style="color:#027333">Material Requisitions</h2>
     <div class="card shadow-sm">
@@ -87,10 +100,7 @@
             </table>
         </div>
     </div>
-    <div>
-        <a href="{{ route('materials.index') }}" class="btn btn-secondary mt-3">
-            {{ __('Back') }}
-        </a>
-    </div>
 </div>
+
+@include('requisitions.requisition_modal')
 @endsection

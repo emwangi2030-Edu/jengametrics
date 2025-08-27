@@ -10,9 +10,6 @@
             <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#requisitionModal">
                 Requisition Material
             </button>
-            <a href="{{ route('requisitions.index') }}" class="btn btn-secondary">
-                Requisition List
-            </a>
         </div>
         <div>
             <a href="{{ route('materials.create') }}" class="btn btn-success me-2">

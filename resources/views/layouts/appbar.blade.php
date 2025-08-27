@@ -280,10 +280,15 @@ use Illuminate\Support\Facades\Auth;
                                     </a>
 
                                     <!-- Dropdown Menu -->
-                                    <ul class="dropdown-menu">
+                                    <ul class="dropdown-menu" style="margin-right: 17px; padding-top: 1px;">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('requisitions.index') }}">
+                                                Requisitions
+                                            </a>
+                                        </li>
                                         <li>
                                             <a class="dropdown-item" href="{{ route('materials.delivered') }}">
-                                                Material Delivered
+                                                Materials Delivered
                                             </a>
                                         </li>
                                         <li>
