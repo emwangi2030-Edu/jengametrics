@@ -141,6 +141,9 @@ Route::resource('workers', WorkerController::class);
 // Route to show the worker's attendance
 Route::get('/attendance', [AttendanceController::class, 'create'])->name('attendance.create');
 Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
+Route::get('/attendance/fetch', [AttendanceController::class, 'fetchAttendance'])
+    ->name('attendance.fetch');
+
 
 
 // Route to Suppliers page

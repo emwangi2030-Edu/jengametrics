@@ -51,4 +51,18 @@ class AttendanceController extends Controller
 
         return redirect()->route('workers.index')->with('success', 'Attendance saved successfully.');
     }
+
+    public function fetchAttendance(Request $request)
+    {
+        $projectId = Auth::user()->project_id;
+        $date = $request->input('date') ?? now()->toDateString();
+
+        $workers = Worker::where('project_id', $projectId)->get();
+        $existingAttendances = Attendance::whereDate('date', $date)->get()
+            ->keyBy('worker_id');
+
+        // return only the table HTML
+        return view('attendance.partials.table', compact('workers', 'date', 'existingAttendances'));
+    }
+
 }
