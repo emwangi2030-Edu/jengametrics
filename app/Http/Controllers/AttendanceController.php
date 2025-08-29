@@ -10,12 +10,19 @@ use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
         $projectId = Auth::user()->project_id;
+        $date = $request->input('date') ?? $request->input('selected_date') ?? now()->toDateString();
+
         $workers = Worker::where('project_id', $projectId)->get();
-        return view('attendance.create', compact('workers'));
+
+        $existingAttendances = Attendance::whereDate('date', $date)->get()
+            ->keyBy('worker_id');
+
+        return view('attendance.create', compact('workers', 'date', 'existingAttendances'));
     }
+
 
     public function store(Request $request)
     {
@@ -28,10 +35,18 @@ class AttendanceController extends Controller
         $presentIds = $request->input('present', []);
 
         foreach ($request->input('worker_ids') as $workerId) {
-            Attendance::updateOrCreate(
-                ['worker_id' => $workerId, 'date' => $date],
-                ['present' => in_array($workerId, $presentIds)]
-            );
+            if (in_array($workerId, $presentIds)) {
+                // Mark as present (update or create)
+                Attendance::updateOrCreate(
+                    ['worker_id' => $workerId, 'date' => $date],
+                    ['present' => true]
+                );
+            } else {
+                // If unchecked, remove attendance record
+                Attendance::where('worker_id', $workerId)
+                        ->whereDate('date', $date)
+                        ->delete();
+            }
         }
 
         return redirect()->route('workers.index')->with('success', 'Attendance saved successfully.');

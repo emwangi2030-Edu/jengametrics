@@ -21,7 +21,7 @@
             <div class="card shadow border-0">
                 <div class="card-body text-center">
                     <h5 class="card-title" style="color:#027333">Total Material Expenses</h5>
-                    <h3 class="text-dark">KES {{ $totalMaterialExpenses }}</h3>
+                    <h3 class="text-dark">KES {{ number_format($totalMaterialExpenses, 2) }}</h3>
                 </div>
             </div>
         </div>
@@ -40,7 +40,6 @@
         </select>
     </form>
 
-    <!-- Chart Section (Placeholder for Chart.js) -->
     <div class="row mt-4">
         <div class="col-md-12">
             <h3 style="color:#027333">Material Expense Trends</h3>
@@ -57,10 +56,10 @@
     const expenseChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: {!! json_encode($labels) !!},
+            labels: @json($labels),
             datasets: [{
                 label: 'Material Expenses',
-                data: {!! json_encode($data) !!},
+                data: @json($data),
                 borderColor: 'rgba(75, 192, 192, 1)',
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderWidth: 2,
@@ -71,8 +70,8 @@
         options: {
         responsive: true,
         animation: {
-            duration: 1000, // duration in ms
-            easing: 'easeOutQuart' // easing function
+            duration: 1000,
+            easing: 'easeOutQuart'
         },
         animations: {
             tension: {

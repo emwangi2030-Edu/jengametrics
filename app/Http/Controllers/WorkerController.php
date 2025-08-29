@@ -17,7 +17,9 @@ class WorkerController extends Controller
         $projectId = Auth::user()->project_id;
 
         // Retrieve workers only for the user's current project
-        $workers = Worker::where('project_id', $projectId)->get();
+         $workers = Worker::withCount('attendances')
+            ->where('project_id', $projectId)
+            ->get();
 
         $project = Project::find($projectId);
 
@@ -110,17 +112,19 @@ class WorkerController extends Controller
             'email' => 'nullable|email|max:255',
         ]);
 
-        $worker = new Worker;
-        $worker->full_name = $request->input('full_name');
-        $worker->id_number = $request->input('id_number');
-        $worker->job_category = $request->input('job_category');
-        $worker->work_type = $request->input('work_type');
-        $worker->phone = $request->input('phone');
-        $worker->email = $request->input('email');
-        $worker->payment_amount = $request->input('payment_amount');
-        $worker->payment_frequency = $request->input('payment_frequency');
-        $worker->project_id = Auth::user()->project_id; // Set the project_id from the authenticated user
-        $worker->save();
+        Worker::create([
+            'full_name' => $request->input('full_name'),
+            'id_number' => $request->input('id_number'),
+            'job_category' => $request->input('job_category'),
+            'work_type' => $request->input('work_type'),
+            'phone' => $request->input('phone'),
+            'email' => $request->input('email'),
+            'payment_amount' => $request->input('payment_amount'),
+            'payment_frequency' => $request->input('payment_frequency'),
+            'mode_of_payment' => $request->input('mode_of_payment'),
+            'project_id' => Auth::user()->project_id,
+        ]);
+
 
         return redirect()->route('workers.index')->with('success', 'Worker added successfully');
     }

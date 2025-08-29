@@ -12,7 +12,7 @@
                     {{ __('Add Worker') }}
                 </a>
                 <a href="{{ route('attendance.create') }}" class="btn btn-info">
-                    {{ __('Mark Attendance') }} 
+                    {{ __('Daily Attendance') }} 
                 </a>
             </div>
         </div>
@@ -35,6 +35,8 @@
                                     <th>{{ __('Email') }}</th>
                                     <th>{{ __('Payment Amount') }}</th>
                                     <th>{{ __('Payment Frequency') }}</th>
+                                    <th>{{ __('Mode of Payment') }}</th>
+                                    <th>{{ __('Attended Days') }}</th>
                                     <th>{{ __('Actions') }}</th>
                                 </tr>
                             </thead>
@@ -50,6 +52,8 @@
                                         <td>{{ $worker->email ?? 'null' }}</td>
                                         <td>{{ $worker->payment_amount }}</td>
                                         <td>{{ $worker->payment_frequency }}</td>
+                                        <td>{{ $worker->mode_of_payment }}</td>
+                                        <td>{{ $worker->attendances_count }}</td>
                                         <td class="d-flex gap-1">
                                             <a href="{{ route('workers.show', $worker->id) }}" class="btn btn-info btn-sm">
                                                 View

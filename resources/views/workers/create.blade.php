@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-4 text-success">Add Worker</h2>
+    <h2 class="mb-4" style="color:#027333;">Add Worker</h2>
 
     <div class="card shadow-sm w-75 m-auto">
         <div class="card-body">
@@ -54,7 +54,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="payment_amount" class="form-label">Payment Amount (KES)</label>
+                    <label for="payment_amount" class="form-label">Payment Rate (KES)</label>
                     <input type="number" name="payment_amount" class="form-control" step="0.01" value="{{ old('payment_amount') }}">
                 </div>
 
@@ -65,6 +65,18 @@
                         <option value="per_day">Per Day</option>
                         <option value="per_week">Per Week</option>
                         <option value="per_month">Per Month</option>
+                        <option value="one_time_payment">One-Time Payment</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="mode_of_payment" class="form-label">Mode of Payment</label>
+                    <select name="mode_of_payment" id="mode_of_payment" class="form-select" required>
+                        <option value="">Select Mode</option>
+                        <option value="MPESA" {{ old('mode_of_payment') == 'MPESA' ? 'selected' : '' }}>MPESA</option>
+                        <option value="Airtel Money" {{ old('mode_of_payment') == 'Airtel Money' ? 'selected' : '' }}>Airtel Money</option>
+                        <option value="Bank" {{ old('mode_of_payment') == 'Bank' ? 'selected' : '' }}>Bank</option>
+                        <option value="Cash" {{ old('mode_of_payment') == 'Cash' ? 'selected' : '' }}>Cash</option>
                     </select>
                 </div>
 

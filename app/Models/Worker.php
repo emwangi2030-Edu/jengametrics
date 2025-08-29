@@ -18,6 +18,7 @@ class Worker extends Model
         'email',
         'payment_amount', 
         'payment_frequency',
+        'mode_of_payment',
         'details', 
         'project_id' 
     ];
