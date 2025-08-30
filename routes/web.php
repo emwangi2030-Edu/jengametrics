@@ -21,6 +21,7 @@ use App\Http\Controllers\ItemMaterialController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\RequisitionController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -141,10 +142,9 @@ Route::resource('workers', WorkerController::class);
 // Route to show the worker's attendance
 Route::get('/attendance', [AttendanceController::class, 'create'])->name('attendance.create');
 Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
-Route::get('/attendance/fetch', [AttendanceController::class, 'fetchAttendance'])
-    ->name('attendance.fetch');
-
-
+Route::get('/attendance/fetch', [AttendanceController::class, 'fetchAttendance'])->name('attendance.fetch');
+Route::post('/workers/{worker}/payments', [PaymentController::class, 'store'])->name('payments.store');
+Route::get('/workers/{worker}/payments', [PaymentController::class, 'index'])->name('payments.index');
 
 // Route to Suppliers page
 Route::resource('suppliers', SupplierController::class);

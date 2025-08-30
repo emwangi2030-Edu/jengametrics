@@ -5,39 +5,41 @@
 @extends('layouts.appbar')
 
 @section('content')
-    <div class="container mt-4">
-        <h2 class="mb-4" style="color:#027333">Daily Attendance</h2>
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <h2 class="mb-4" style="color:#027333">Daily Attendance</h2>
 
-        {{-- Navigation --}}
-        <div class="mb-3 d-flex align-items-center">
-            <button type="button" id="prevBtn" class="btn btn-outline-secondary me-2">&laquo;</button>
+            {{-- Navigation --}}
+            <div class="mb-3 d-flex align-items-center">
+                <button type="button" id="prevBtn" class="btn btn-outline-secondary me-2">&laquo;</button>
 
-            <input type="date" id="datePicker" class="form-control w-auto me-2"
-                value="{{ $date }}" onchange="loadAttendance(this.value)" required>
+                <input type="date" id="datePicker" class="form-control w-auto me-2"
+                    value="{{ $date }}" onchange="loadAttendance(this.value)" required>
 
-            <button type="button" id="nextBtn" class="btn btn-outline-secondary me-2">&raquo;</button>
-            <button type="button" id="todayBtn" class="btn btn-success">Today</button>
+                <button type="button" id="nextBtn" class="btn btn-outline-secondary me-2">&raquo;</button>
+                <button type="button" id="todayBtn" class="btn btn-success">Today</button>
+            </div>
+
+            {{-- Attendance form --}}
+            <form method="POST" action="{{ route('attendance.store') }}">
+                @csrf
+
+                <div id="attendance-container">
+                    {{-- Initial attendance table loads here --}}
+                    @include('attendance.partials.table', [
+                        'workers' => $workers,
+                        'date' => $date,
+                        'existingAttendances' => $existingAttendances
+                    ])
+                </div>
+
+                <br>
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">Save Attendance</button>
+                    <a href="{{ route('workers.index') }}" class="btn btn-secondary">Back</a>
+                </div>
+            </form>
         </div>
-
-        {{-- Attendance form --}}
-        <form method="POST" action="{{ route('attendance.store') }}">
-            @csrf
-
-            <div id="attendance-container">
-                {{-- Initial attendance table loads here --}}
-                @include('attendance.partials.table', [
-                    'workers' => $workers,
-                    'date' => $date,
-                    'existingAttendances' => $existingAttendances
-                ])
-            </div>
-
-            <br>
-            <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-primary">Save Attendance</button>
-                <a href="{{ route('workers.index') }}" class="btn btn-secondary">Back</a>
-            </div>
-        </form>
     </div>
 @endsection
 

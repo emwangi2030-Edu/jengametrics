@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container py-4">
-    <h2 class="text-success mb-4">Worker Profile</h2>
+    <h2 class="mb-4" style="color:#027333;">Worker Profile</h2>
 
     <div class="row">
         <div class="col-md-6">
@@ -14,8 +14,26 @@
                     <p><strong>Work Type:</strong> {{ $worker->work_type }}</p>
                     <p><strong>Phone:</strong> {{ $worker->phone }}</p>
                     <p><strong>Email:</strong> {{ $worker->email ?? 'N/A' }}</p>
-                    <p><strong>Payment Amount:</strong> {{ $worker->payment_amount }}</p>
+                    <p><strong>Start Date:</strong> {{ $worker->created_at->format('d F, Y') }}</p>
+                    <p><strong>Payment Rate:</strong> {{ $worker->payment_amount }}</p>
                     <p><strong>Payment Frequency:</strong> {{ $worker->payment_frequency }}</p>
+                    <p><strong>Mode of Payment:</strong> {{ $worker->mode_of_payment }}</p>
+                    @if ($worker->mode_of_payment == 'Bank')
+                        <p><strong>Bank Name:</strong> {{ $worker->bank_name }}</p>
+                        <p><strong>Bank Account:</strong> {{ $worker->bank_account }}</p>
+                    @endif
+                    <p><strong>Amount Owed:</strong> {{ number_format($amountOwed, 2) }}</p>
+                    <a href="{{ route('payments.index', $worker->id) }}" class="btn btn-primary mb-3">
+                        View Payment History
+                    </a>
+                    <form action="{{ route('payments.store', $worker->id) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="amount" value="{{ $amountOwed }}">
+                        <button type="submit" class="btn btn-success"
+                            @if($amountOwed <= 0) disabled @endif>
+                            Record Payment
+                        </button>
+                    </form>
                     <a href="{{ route('workers.index') }}" class="btn btn-secondary mt-3">Back</a>
                 </div>
             </div>

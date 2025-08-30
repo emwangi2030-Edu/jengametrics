@@ -4,6 +4,16 @@
 <div class="container mt-4">
     <h2 class="mb-4 text-success">Edit Worker</h2>
 
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="card shadow-sm w-75 m-auto">
         <div class="card-body">
             <form method="POST" action="{{ route('workers.update', $worker->id) }}">
@@ -56,7 +66,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="payment_amount" class="form-label">Payment Amount (KES)</label>
+                    <label for="payment_amount" class="form-label">Payment Rate (KES)</label>
                     <input type="number" name="payment_amount" class="form-control" step="0.01" value="{{ old('payment_amount', $worker->payment_amount) }}">
                 </div>
 
@@ -64,10 +74,34 @@
                     <label for="payment_frequency" class="form-label">Payment Frequency</label>
                     <select name="payment_frequency" id="payment_frequency" class="form-select">
                         <option value="">Select Frequency</option>
-                        <option value="per day" {{ old('payment_frequency', $worker->payment_frequency) == 'Per Day' ? 'selected' : '' }}>Per Day</option>
-                        <option value="per week" {{ old('payment_frequency', $worker->payment_frequency) == 'Per Week' ? 'selected' : '' }}>Per Week</option>
-                        <option value="per month" {{ old('payment_frequency', $worker->payment_frequency) == 'Per Month' ? 'selected' : '' }}>Per Month</option>
+                        <option value="per day" {{ old('payment_frequency', $worker->payment_frequency) == 'per day' ? 'selected' : '' }}>Per Day</option>
+                        <option value="per month" {{ old('payment_frequency', $worker->payment_frequency) == 'per month' ? 'selected' : '' }}>Per Month</option>
+                        <option value="one-time payment" {{ old('payment_frequency', $worker->payment_frequency) == 'one-time payment' ? 'selected' : '' }}>One-time Payment</option>
                     </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="mode_of_payment" class="form-label">Mode of Payment</label>
+                    <select name="mode_of_payment" id="mode_of_payment" class="form-select" required>
+                        <option value="">Select Mode</option>
+                        <option value="MPESA" {{ old('mode_of_payment', $worker->mode_of_payment) == 'MPESA' ? 'selected' : '' }}>MPESA</option>
+                        <option value="Airtel Money" {{ old('mode_of_payment', $worker->mode_of_payment) == 'Airtel Money' ? 'selected' : '' }}>Airtel Money</option>
+                        <option value="Bank" {{ old('mode_of_payment', $worker->mode_of_payment) == 'Bank' ? 'selected' : '' }}>Bank</option>
+                        <option value="Cash" {{ old('mode_of_payment', $worker->mode_of_payment) == 'Cash' ? 'selected' : '' }}>Cash</option>
+                    </select>
+                </div>
+
+                <div id="bankFields" style="display: none;">
+                    <div class="mb-3">
+                        <label for="bank_name" class="form-label">Bank Name</label>
+                        <input type="text" name="bank_name" id="bank_name"
+                            value="{{ old('bank_name', $worker->bank_name) }}" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="bank_account" class="form-label">Bank Account</label>
+                        <input type="text" name="bank_account" id="bank_account"
+                            value="{{ old('bank_account', $worker->bank_account) }}" class="form-control">
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-between">
@@ -82,27 +116,27 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const workType = document.querySelector('select[name="work_type"]');
-        const frequency = document.querySelector('select[name="payment_frequency"]');
+        const modeSelect = document.getElementById('mode_of_payment');
+        const bankFields = document.getElementById('bankFields');
+        const bankName = document.getElementById('bank_name');
+        const bankAccount = document.getElementById('bank_account');
 
-        const updateFrequencyOptions = () => {
-            const selected = workType.value;
-            frequency.innerHTML = ''; // Clear all options
-
-            if (selected === 'Casual') {
-                frequency.innerHTML += `<option value="per day">Per Day</option>`;
-                frequency.innerHTML += `<option value="per week">Per Week</option>`;
-            } else if (selected === 'Under Contract') {
-                frequency.innerHTML += `<option value="per month">Per Month</option>`;
+        function toggleBankFields() {
+            if (modeSelect.value === 'Bank') {
+                bankFields.style.display = 'block';
+                bankName.required = true;
+                bankAccount.required = true;
             } else {
-                frequency.innerHTML += `<option value="">Select Frequency</option>`;
+                bankFields.style.display = 'none';
+                bankName.required = false;
+                bankAccount.required = false;
             }
-        };
+        }
 
-        workType.addEventListener('change', updateFrequencyOptions);
+        // Run on page load (handles old values after validation errors)
+        toggleBankFields();
 
-        // Initialize on load
-        updateFrequencyOptions();
+        // Run on change
+        modeSelect.addEventListener('change', toggleBankFields);
     });
 </script>
-@endpush

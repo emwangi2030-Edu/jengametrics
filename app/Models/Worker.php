@@ -19,6 +19,8 @@ class Worker extends Model
         'payment_amount', 
         'payment_frequency',
         'mode_of_payment',
+        'bank_name', 
+        'bank_account',
         'details', 
         'project_id' 
     ];
@@ -32,6 +34,11 @@ class Worker extends Model
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
+    }
+
+     public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 }
 

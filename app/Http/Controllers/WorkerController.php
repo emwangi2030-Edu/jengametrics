@@ -27,7 +27,7 @@ class WorkerController extends Controller
     }
 
 
-   public function show(Request $request, $id)
+    public function show(Request $request, $id)
     {
         $worker = Worker::findOrFail($id);
 
@@ -57,7 +57,7 @@ class WorkerController extends Controller
             $formattedDate = $date->format('Y-m-d');
             $labels[] = $date->format('M d');
 
-            // If before worker joined or after today, leave as null
+            // If before worker joined or after today, leave as inactive
             if ($date->lt($workerCreatedAt) || $date->gt($today)) {
                 $presentData[] = 0;
                 $absentData[] = 0;
@@ -79,6 +79,29 @@ class WorkerController extends Controller
             return [$m => Carbon::create()->month($m)->format('F')];
         });
 
+        // 💰 Calculate Amount Owed
+        $attendanceCount = $attendances->where('present', true)->count();
+        $totalOwed = 0;
+
+        if ($worker->payment_frequency === 'per day') {
+            $totalOwed = $attendanceCount * $worker->payment_amount;
+
+        } elseif ($worker->payment_frequency === 'per month') {
+            $monthsCount = Attendance::where('worker_id', $worker->id)
+                ->selectRaw('COUNT(DISTINCT DATE_FORMAT(date, "%Y-%m")) as months_count')
+                ->value('months_count');
+            
+            $totalOwed = $monthsCount * $worker->payment_amount;
+
+        } elseif ($worker->payment_frequency === 'one-time payment') {
+            $totalOwed = $worker->payment_amount;
+        }
+
+        // Subtract what has already been paid
+        $alreadyPaid = $worker->payments()->sum('amount');
+        $amountOwed = max($totalOwed - $alreadyPaid, 0);
+
+
         return view('workers.show', compact(
             'worker',
             'labels',
@@ -88,7 +111,8 @@ class WorkerController extends Controller
             'month',
             'year',
             'availableMonths',
-            'availableYears'
+            'availableYears',
+            'amountOwed'
         ));
     }
 
@@ -104,29 +128,37 @@ class WorkerController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'full_name' => 'required|string|max:255',
-            'id_number' => 'required|integer',
-            'job_category' => 'required|string',
-            'work_type' => 'required|string',
-            'phone' => 'required|string|max:15',
-            'email' => 'nullable|email|max:255',
+            'full_name'         => 'required|string|max:255',
+            'id_number'         => 'required|integer',
+            'job_category'      => 'required|string',
+            'work_type'         => 'required|string',
+            'phone'             => 'required|string|max:15',
+            'email'             => 'nullable|email|max:255',
+            'payment_amount'    => 'nullable|numeric|min:0',
+            'payment_frequency' => 'nullable|string|in:per day,per month,one-time payment',
+            'mode_of_payment'   => 'required|string',
+            'bank_name'         => 'required_if:mode_of_payment,Bank|string|max:255',
+            'bank_account'      => 'required_if:mode_of_payment,Bank|string|max:255',
         ]);
 
         Worker::create([
-            'full_name' => $request->input('full_name'),
-            'id_number' => $request->input('id_number'),
-            'job_category' => $request->input('job_category'),
-            'work_type' => $request->input('work_type'),
-            'phone' => $request->input('phone'),
-            'email' => $request->input('email'),
-            'payment_amount' => $request->input('payment_amount'),
+            'full_name'         => $request->input('full_name'),
+            'id_number'         => $request->input('id_number'),
+            'job_category'      => $request->input('job_category'),
+            'work_type'         => $request->input('work_type'),
+            'phone'             => $request->input('phone'),
+            'email'             => $request->input('email'),
+            'payment_amount'    => $request->input('payment_amount'),
             'payment_frequency' => $request->input('payment_frequency'),
-            'mode_of_payment' => $request->input('mode_of_payment'),
-            'project_id' => Auth::user()->project_id,
+            'mode_of_payment'   => $request->input('mode_of_payment'),
+            'bank_name'         => $request->input('bank_name'),
+            'bank_account'      => $request->input('bank_account'),
+            'project_id'        => Auth::user()->project_id,
         ]);
 
-
-        return redirect()->route('workers.index')->with('success', 'Worker added successfully');
+        return redirect()
+            ->route('workers.index')
+            ->with('success', 'Worker added successfully');
     }
 
     public function edit($id)
@@ -140,30 +172,37 @@ class WorkerController extends Controller
     {
         $worker = Worker::findOrFail($id);
 
-        // Validate the request
         $request->validate([
-            'full_name' => 'required|string|max:255',
-            'id_number' => 'required|integer',
-            'job_category' => 'required|string',
-            'work_type' => 'required|string',
-            'phone' => 'required|string|max:15',
-            'email' => 'nullable|email|max:255',
+            'full_name'         => 'required|string|max:255',
+            'id_number'         => 'required|integer',
+            'job_category'      => 'required|string',
+            'work_type'         => 'required|string',
+            'phone'             => 'required|string|max:15',
+            'email'             => 'nullable|email|max:255',
+            'payment_amount'    => 'nullable|numeric|min:0',
+            'payment_frequency' => 'nullable|string|in:per day,per month,one-time payment',
+            'mode_of_payment'   => 'required|string',
+            'bank_name'         => 'required_if:mode_of_payment,Bank|string|max:255',
+            'bank_account'      => 'required_if:mode_of_payment,Bank|string|max:255',
         ]);
 
-        // Update the worker
         $worker->update([
-            'full_name' => $request->input('full_name'),
-            'id_number' => $request->input('id_number'),
-            'job_category' => $request->input('job_category'),
-            'work_type' => $request->input('work_type'),
-            'phone' => $request->input('phone'),
-            'email' => $request->input('email'),
-            'payment_amount' => $request->input('payment_amount'),
+            'full_name'         => $request->input('full_name'),
+            'id_number'         => $request->input('id_number'),
+            'job_category'      => $request->input('job_category'),
+            'work_type'         => $request->input('work_type'),
+            'phone'             => $request->input('phone'),
+            'email'             => $request->input('email'),
+            'payment_amount'    => $request->input('payment_amount'),
             'payment_frequency' => $request->input('payment_frequency'),
+            'mode_of_payment'   => $request->input('mode_of_payment'),
+            'bank_name'         => $request->input('bank_name'),
+            'bank_account'      => $request->input('bank_account'),
         ]);
 
-        return redirect()->route('workers.index')->with('success', 'Worker updated successfully.');
+        return redirect()
+            ->route('workers.index')
+            ->with('success', 'Worker updated successfully.');
     }
-  
 }
 

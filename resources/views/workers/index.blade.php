@@ -23,7 +23,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table mt-3">
+                        <table class="table mt-3 text-center">
                             <thead class="table-light">
                                 <tr>
                                     <th></th>

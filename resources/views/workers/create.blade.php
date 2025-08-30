@@ -61,11 +61,10 @@
                 <div class="mb-3">
                     <label for="payment_frequency" class="form-label">Payment Frequency</label>
                     <select name="payment_frequency" id="payment_frequency" class="form-select">
-                        <option value="">Select Frequency</option>
-                        <option value="per_day">Per Day</option>
-                        <option value="per_week">Per Week</option>
-                        <option value="per_month">Per Month</option>
-                        <option value="one_time_payment">One-Time Payment</option>
+                        <option value="" selected>Select Frequency</option>
+                        <option value="per day">Per Day</option>
+                        <option value="per month">Per Month</option>
+                        <option value="one-time payment">One-time Payment</option>
                     </select>
                 </div>
 
@@ -80,6 +79,19 @@
                     </select>
                 </div>
 
+                <div id="bankFields" style="display: none;">
+                    <div class="mb-3">
+                        <label for="bank_name" class="form-label">Bank Name</label>
+                        <input type="text" name="bank_name" id="bank_name"
+                            value="{{ old('bank_name') }}" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="bank_account" class="form-label">Bank Account</label>
+                        <input type="text" name="bank_account" id="bank_account"
+                            value="{{ old('bank_account') }}" class="form-control">
+                    </div>
+                </div>
+
                 <div class="d-flex justify-content-between">
                     <a href="{{ route('workers.index') }}" class="btn btn-secondary">Back</a>
                     <button type="submit" class="btn btn-primary">Save</button>
@@ -92,27 +104,27 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const workType = document.querySelector('select[name="work_type"]');
-        const frequency = document.querySelector('select[name="payment_frequency"]');
+        const modeSelect = document.getElementById('mode_of_payment');
+        const bankFields = document.getElementById('bankFields');
+        const bankName = document.getElementById('bank_name');
+        const bankAccount = document.getElementById('bank_account');
 
-        const updateFrequencyOptions = () => {
-            const selected = workType.value;
-            frequency.innerHTML = ''; // Clear all options
-
-            if (selected === 'Casual') {
-                frequency.innerHTML += `<option value="per day">Per Day</option>`;
-                frequency.innerHTML += `<option value="per week">Per Week</option>`;
-            } else if (selected === 'Under Contract') {
-                frequency.innerHTML += `<option value="per month">Per Month</option>`;
+        function toggleBankFields() {
+            if (modeSelect.value === 'Bank') {
+                bankFields.style.display = 'block';
+                bankName.required = true;
+                bankAccount.required = true;
             } else {
-                frequency.innerHTML += `<option value="">Select Frequency</option>`;
+                bankFields.style.display = 'none';
+                bankName.required = false;
+                bankAccount.required = false;
             }
-        };
+        }
 
-        workType.addEventListener('change', updateFrequencyOptions);
+        // Run on page load (handles old values after validation errors)
+        toggleBankFields();
 
-        // Initialize on load
-        updateFrequencyOptions();
+        // Run on change
+        modeSelect.addEventListener('change', toggleBankFields);
     });
 </script>
-@endpush
