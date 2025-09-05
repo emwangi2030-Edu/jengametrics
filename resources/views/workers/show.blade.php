@@ -45,10 +45,10 @@
                     <h4 class="text-dark mb-3">Attendance Chart</h4>
 
                     <!-- Filter Form -->
-                    <form method="GET" action="{{ route('workers.show', $worker->id) }}" class="row mb-4 g-2">
+                    <div class="row mb-4 g-2">
                         <div class="col-md-6">
                             <label for="month">Month</label>
-                            <select name="month" class="form-select" onchange="this.form.submit()">
+                            <select id="month" class="form-select">
                                 @foreach($availableMonths as $num => $name)
                                     <option value="{{ $num }}" {{ $month == $num ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
@@ -57,13 +57,14 @@
 
                         <div class="col-md-6">
                             <label for="year">Year</label>
-                            <select name="year" class="form-select" onchange="this.form.submit()">
+                            <select id="year" class="form-select">
                                 @foreach($availableYears as $yr)
                                     <option value="{{ $yr }}" {{ $year == $yr ? 'selected' : '' }}>{{ $yr }}</option>
                                 @endforeach
                             </select>
                         </div>
-                    </form>
+                    </div>
+
 
                     <!-- Chart Canvas -->
                     <canvas id="attendanceChart" height="300"></canvas>
@@ -81,96 +82,80 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('attendanceChart').getContext('2d');
-    const attendanceChart = new Chart(ctx, {
+    let attendanceChart = new Chart(ctx, {
         type: 'bar',
-        data: {
-            labels: {!! json_encode($labels) !!},
-            datasets: [
-                {
-                    label: 'Present',
-                    data: {!! json_encode($presentData) !!},
-                    backgroundColor: {!! json_encode(
-                        collect($presentData)->map(function($v, $i) use ($inactiveData) {
-                            return !$inactiveData[$i] && $v ? 'rgba(40, 167, 69, 0.6)' : 'rgba(0,0,0,0)';
-                        })
-                    ) !!},
-                    borderColor: {!! json_encode(
-                        collect($presentData)->map(function($v, $i) use ($inactiveData) {
-                            return !$inactiveData[$i] && $v ? 'rgba(40, 167, 69, 1)' : 'rgba(0,0,0,0)';
-                        })
-                    ) !!},
-                    backgroundColorLegend: 'rgba(40, 167, 69, 0.6)', // fallback for legend (custom)
-                    borderColorLegend: 'rgba(40, 167, 69, 1)',       // fallback for legend (custom)
-                    borderWidth: 1
-                },
-                {
-                    label: 'Absent',
-                    data: {!! json_encode($absentData) !!},
-                    backgroundColor: {!! json_encode(
-                        collect($absentData)->map(function($v, $i) use ($inactiveData) {
-                            return !$inactiveData[$i] && $v ? 'rgba(220, 53, 69, 0.6)' : 'rgba(0,0,0,0)';
-                        })
-                    ) !!},
-                    borderColor: {!! json_encode(
-                        collect($absentData)->map(function($v, $i) use ($inactiveData) {
-                            return !$inactiveData[$i] && $v ? 'rgba(220, 53, 69, 1)' : 'rgba(0,0,0,0)';
-                        })
-                    ) !!},
-                    backgroundColorLegend: 'rgba(220, 53, 69, 0.6)',
-                    borderColorLegend: 'rgba(220, 53, 69, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Inactive',
-                    data: {!! json_encode($inactiveData) !!},
-                    backgroundColor: {!! json_encode(
-                        collect($inactiveData)->map(function($v) {
-                            return $v ? 'rgba(200,200,200,0.5)' : 'rgba(0,0,0,0)';
-                        })
-                    ) !!},
-                    borderColor: {!! json_encode(
-                        collect($inactiveData)->map(function($v) {
-                            return $v ? 'rgba(200,200,200,0.8)' : 'rgba(0,0,0,0)';
-                        })
-                    ) !!},
-                    backgroundColorLegend: 'rgba(200,200,200,0.5)',
-                    borderColorLegend: 'rgba(200,200,200,0.8)',
-                    borderWidth: 1
-                }
-            ]
-        },
+        data: { labels: [], datasets: [] },
         options: {
-            responsive: true,
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Attendance for {{ \Carbon\Carbon::create()->month((int) $month)->format('F') }} {{ $year }}'
-                },
-                legend: {
-                    display: true,
-                    position: 'top'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.dataset.label + ': ' + (context.raw ? '✓' : '');
-                        }
-                    }
-                }
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Attendance for ...'
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1,
-                        callback: function(value) {
-                            return value === 1 ? '✓' : '';
-                        }
+            legend: {
+                display: true,
+                position: 'top'
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        if (context.dataset.label === "Present") return "Present ✓";
+                        if (context.dataset.label === "Absent") return "Absent ✗";
+                        if (context.dataset.label === "Inactive") return "Inactive";
+                        return "";
                     }
                 }
             }
+        },
+        scales: {
+            y: {
+                display: false
+            }
         }
+    }
+    
     });
+
+    function loadAttendanceData() {
+        const month = document.getElementById('month').value;
+        const year = document.getElementById('year').value;
+
+        fetch(`/workers/{{ $worker->id }}/attendance-data?month=${month}&year=${year}`)
+            .then(res => res.json())
+            .then(data => {
+                attendanceChart.data.labels = data.labels;
+                attendanceChart.data.datasets = [
+                    {
+                        label: 'Present',
+                        data: data.presentData,
+                        backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Absent',
+                        data: data.absentData,
+                        backgroundColor: 'rgba(220, 53, 69, 0.6)',
+                        borderColor: 'rgba(220, 53, 69, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Inactive',
+                        data: data.inactiveData,
+                        backgroundColor: 'rgba(200,200,200,0.5)',
+                        borderColor: 'rgba(200,200,200,0.8)',
+                        borderWidth: 1
+                    }
+                ];
+                attendanceChart.options.plugins.title = { display: true, text: data.title };
+                attendanceChart.update();
+            });
+    }
+
+    // trigger on page load & dropdown changes
+    document.getElementById('month').addEventListener('change', loadAttendanceData);
+    document.getElementById('year').addEventListener('change', loadAttendanceData);
+    window.addEventListener('load', loadAttendanceData);
 </script>
 <script>
     function downloadChart() {

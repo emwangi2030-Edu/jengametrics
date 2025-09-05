@@ -22,7 +22,7 @@ class Worker extends Model
         'bank_name', 
         'bank_account',
         'details', 
-        'project_id' 
+        'project_id'
     ];
 
     // Define the relationship to Project

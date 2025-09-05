@@ -137,6 +137,7 @@ Route::get('/documents/upload', [DocumentController::class, 'index'])->name('doc
 Route::post('/documents', [DocumentController::class, 'store'])->name('documents.store');
 
 // Workers Table Route
+Route::get('/workers/{id}/attendance-data', [WorkerController::class, 'attendanceData'])->name('workers.attendanceData');
 Route::resource('workers', WorkerController::class);
 
 // Route to show the worker's attendance

@@ -47,17 +47,21 @@ class WorkerController extends Controller
         $presentData = [];
         $absentData = [];
         $inactiveData = [];
+        $weekendIndexes = [];
 
         $daysInMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
         $today = Carbon::today();
         $workerCreatedAt = $worker->created_at->startOfDay();
 
-        for ($day = 1; $day <= $daysInMonth; $day++) {
+       for ($day = 1; $day <= $daysInMonth; $day++) {
             $date = Carbon::createFromDate($year, $month, $day);
             $formattedDate = $date->format('Y-m-d');
             $labels[] = $date->format('M d');
 
-            // If before worker joined or after today, leave as inactive
+            if ($date->isSaturday() || $date->isSunday()) {
+                $weekendIndexes[] = $day - 1; // zero-based index
+            }
+
             if ($date->lt($workerCreatedAt) || $date->gt($today)) {
                 $presentData[] = 0;
                 $absentData[] = 0;
@@ -112,7 +116,8 @@ class WorkerController extends Controller
             'year',
             'availableMonths',
             'availableYears',
-            'amountOwed'
+            'amountOwed',
+            'weekendIndexes'
         ));
     }
 
@@ -203,6 +208,56 @@ class WorkerController extends Controller
         return redirect()
             ->route('workers.index')
             ->with('success', 'Worker updated successfully.');
+    }
+
+    public function attendanceData(Request $request, $id)
+    {
+        $worker = Worker::findOrFail($id);
+
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
+
+        $attendances = Attendance::where('worker_id', $worker->id)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->orderBy('date')
+            ->get()
+            ->keyBy(fn($att) => Carbon::parse($att->date)->format('Y-m-d'));
+
+        $labels = [];
+        $presentData = [];
+        $absentData = [];
+        $inactiveData = [];
+
+        $daysInMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
+        $today = Carbon::today();
+        $workerCreatedAt = $worker->created_at->startOfDay();
+
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $date = Carbon::createFromDate($year, $month, $day);
+            $formattedDate = $date->format('Y-m-d');
+            $labels[] = $date->format('M d');
+
+            if ($date->lt($workerCreatedAt) || $date->gt($today)) {
+                $presentData[] = 0;
+                $absentData[] = 0;
+                $inactiveData[] = 1;
+                continue;
+            }
+
+            $isPresent = $attendances->has($formattedDate) && (bool) $attendances[$formattedDate]->present;
+            $presentData[] = $isPresent ? 1 : 0;
+            $absentData[] = $isPresent ? 0 : 1;
+            $inactiveData[] = 0;
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'presentData' => $presentData,
+            'absentData' => $absentData,
+            'inactiveData' => $inactiveData,
+            'title' => "Attendance for " . Carbon::create()->month((int) $month)->format('F') . " $year"
+        ]);
     }
 }
 
