@@ -16,4 +16,9 @@ class Payment extends Model
         'period_start',
         'period_end',
     ];
+
+    public function worker()
+    {
+        return $this->belongsTo(Worker::class);
+    }
 }

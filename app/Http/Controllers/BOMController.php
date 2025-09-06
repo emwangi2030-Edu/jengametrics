@@ -10,6 +10,7 @@ use App\Models\BomItem;
 use App\Models\Section;
 use App\Models\BqSection;
 use App\Models\Material;
+use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Project;
 use App\Models\Requisition;
@@ -130,16 +131,20 @@ class BOMController extends Controller
 
         $materials = Material::whereProjectId(project_id())->get();
 
-        // Calculate total cost of all materials
+        $payments = Payment::whereProjectId(project_id())->get();
+
+        // Calculate total cost of all materials and labour
         $total_actual_cost = $materials->sum(function ($material) {
             return $material->unit_price * $material->quantity_purchased;
         });
 
+        $total_actual_payments = $payments->sum('amount');
+        
         // Get the project details
         $projectId = Auth::user()->project_id;
 
         $project = Project::find($projectId);
 
-        return view('report.report', compact('totalEstimatedCost', 'totalEstimatedCost_labour', 'total_actual_cost', 'project'));
+        return view('report.report', compact('totalEstimatedCost', 'totalEstimatedCost_labour', 'total_actual_cost', 'total_actual_payments','project'));
     }
 }

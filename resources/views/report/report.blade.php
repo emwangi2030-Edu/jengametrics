@@ -29,7 +29,7 @@
                 <div class="card-body text-center">
                     <h4 class="font-weight-bold" style="color:#027333">{{ __('Total Actual Cost') }}</h4>
                     <h2 class="text-dark">
-                        {{ number_format($total_actual_cost ?? 0, 2) }}
+                        {{ number_format(($total_actual_cost ?? 0) + ($total_actual_payments ?? 0), 2) }}
                     </h2>
                 </div>
             </div>
@@ -104,7 +104,7 @@
                             </tr>
                             <tr>
                                 <td>{{ __('Labour') }}</td>
-                                <td>{{ number_format(0, 2) }}</td> <!-- Replace with actual labour cost if available -->
+                                <td>{{ number_format($total_actual_payments, 2) }}</td> <!-- Replace with actual labour cost if available -->
                             </tr>
                         </tbody>
                     </table>
@@ -146,7 +146,7 @@
             data: {
                 labels: ['Materials', 'Labour'],
                 datasets: [{
-                    data: [{{ $total_actual_cost ?? 0 }}, 0], // Adjust this if actual labour cost exists
+                    data: [{{ $total_actual_cost ?? 0 }}, {{ $total_actual_payments ?? 0 }}], // Adjust this if actual labour cost exists
                     backgroundColor: ['#6f42c1', '#e83e8c'],
                 }]
             },

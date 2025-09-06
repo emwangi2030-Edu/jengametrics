@@ -47,21 +47,17 @@ class WorkerController extends Controller
         $presentData = [];
         $absentData = [];
         $inactiveData = [];
-        $weekendIndexes = [];
 
         $daysInMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
         $today = Carbon::today();
         $workerCreatedAt = $worker->created_at->startOfDay();
 
-       for ($day = 1; $day <= $daysInMonth; $day++) {
+        for ($day = 1; $day <= $daysInMonth; $day++) {
             $date = Carbon::createFromDate($year, $month, $day);
             $formattedDate = $date->format('Y-m-d');
             $labels[] = $date->format('M d');
 
-            if ($date->isSaturday() || $date->isSunday()) {
-                $weekendIndexes[] = $day - 1; // zero-based index
-            }
-
+            // If before worker joined or after today, leave as inactive
             if ($date->lt($workerCreatedAt) || $date->gt($today)) {
                 $presentData[] = 0;
                 $absentData[] = 0;
@@ -91,10 +87,16 @@ class WorkerController extends Controller
             $totalOwed = $attendanceCount * $worker->payment_amount;
 
         } elseif ($worker->payment_frequency === 'per month') {
-            $monthsCount = Attendance::where('worker_id', $worker->id)
-                ->selectRaw('COUNT(DISTINCT DATE_FORMAT(date, "%Y-%m")) as months_count')
-                ->value('months_count');
-            
+            // Worker start date
+            $startDate = $worker->created_at->startOfDay();
+            $today = now()->startOfDay();
+
+            // Total days worked since start
+            $daysWorked = $startDate->diffInDays($today);
+
+            // Count full 30-day periods as "months"
+            $monthsCount = floor($daysWorked / 30);
+
             $totalOwed = $monthsCount * $worker->payment_amount;
 
         } elseif ($worker->payment_frequency === 'one-time payment') {
@@ -116,8 +118,7 @@ class WorkerController extends Controller
             'year',
             'availableMonths',
             'availableYears',
-            'amountOwed',
-            'weekendIndexes'
+            'amountOwed'
         ));
     }
 
@@ -228,6 +229,7 @@ class WorkerController extends Controller
         $presentData = [];
         $absentData = [];
         $inactiveData = [];
+        $weekendIndexes = [];
 
         $daysInMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
         $today = Carbon::today();

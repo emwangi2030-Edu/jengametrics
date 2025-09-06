@@ -29,6 +29,7 @@ class PaymentController extends Controller
                 'payment_date' => now(),
                 'period_start' => now()->startOfMonth()->toDateString(),
                 'period_end' => now()->endOfMonth()->toDateString(),
+                'project_id' => $worker->project_id,
             ]);
         }
 
