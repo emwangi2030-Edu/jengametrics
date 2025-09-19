@@ -242,6 +242,15 @@ class MaterialController extends Controller
             ->orderBy('year', 'desc')
             ->pluck('year');
 
+        if ($request->ajax()) {
+            $table = view('materials.partials.stock_usage_table', compact('stockUsages'))
+                ->render();
+
+            return response()->json([
+                'table' => $table,
+            ]);
+        }
+
         return view('materials.stock_usage_history', compact(
             'stockUsages',
             'sections',

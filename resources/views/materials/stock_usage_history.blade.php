@@ -5,7 +5,7 @@
     <div class="col-12">
         <h3 class="font-weight-bold" style="color:#027333;">Stock Usage History</h3>
         <div class="card shadow-sm">
-            <form method="GET" action="{{ route('materials.index') }}" class="row g-2 mt-2 justify-content-center">
+            <form method="GET" action="{{ route('materials.usage') }}" class="row g-2 mt-2 justify-content-center" id="stock-usage-filters">
                 <div class="col-md-3">
                     <select name="filter" class="form-select">
                         <option value="">All Time</option>
@@ -24,43 +24,60 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <select name="year" class="form-select" onchange="this.form.submit()">
+                    <select name="year" class="form-select">
                         @foreach($availableYears as $y)
                             <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Filter</button>
-                </div>
             </form>
-            <div class="card-body">
-                <table class="table table-bordered mt-3 text-center">
-                    <thead class="table-light">
-                        <tr>
-                            <th>{{ __('Date Issued') }}</th>
-                            <th>{{ __('Material') }}</th>
-                            <th>{{ __('Section') }}</th>
-                            <th>{{ __('Quantity Used') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($stockUsages as $usage)
-                            <tr>
-                                    <td><div class="px-2">{{ $usage->created_at->format('d-m-Y') }}</div></td>
-                                <td>{{ $usage->material->name ?? 'N/A' }}</td>
-                                <td>{{ $usage->section->name ?? 'N/A' }}</td>
-                                <td>{{ $usage->quantity_used }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="text-center text-muted">{{ __('No stock usage history found.') }}</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+            <div class="card-body" id="stock-usage-results">
+                @include('materials.partials.stock_usage_table', ['stockUsages' => $stockUsages])
             </div>
         </div>
     </div>
 </div>
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('stock-usage-filters');
+        const results = document.getElementById('stock-usage-results');
+
+        if (!form || !results) {
+            return;
+        }
+
+        const fetchUsage = () => {
+            const params = new URLSearchParams(new FormData(form));
+            const url = `${form.action}?${params.toString()}`;
+
+            results.innerHTML = '<div class="py-5 text-center text-muted">{{ __('Loading usage data...') }}</div>';
+
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    results.innerHTML = data.table ?? '';
+                })
+                .catch(() => {
+                    results.innerHTML = '<div class="alert alert-danger" role="alert">{{ __('Failed to load usage data. Please try again.') }}</div>';
+                });
+        };
+
+        form.addEventListener('change', fetchUsage);
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            fetchUsage();
+        });
+    });
+</script>
+@endpush
 @endsection
