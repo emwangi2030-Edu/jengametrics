@@ -12,6 +12,8 @@ class Requisition extends Model
     protected $fillable = [
         'requisition_no',
         'bom_item_id',
+        'extra_material_name',
+        'extra_unit',
         'quantity_requested',
         'section_id',
         'status',

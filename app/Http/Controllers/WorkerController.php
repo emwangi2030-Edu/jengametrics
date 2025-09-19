@@ -41,7 +41,7 @@ class WorkerController extends Controller
             ->whereMonth('date', $month)
             ->orderBy('date')
             ->get()
-            ->keyBy(fn($att) => Carbon::parse($att->date)->format('Y-m-d'));
+            ->keyBy(fn($att) => Carbon::parse($att->date)->format('d-m-Y'));
 
         $labels = [];
         $presentData = [];
@@ -54,7 +54,7 @@ class WorkerController extends Controller
 
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $date = Carbon::createFromDate($year, $month, $day);
-            $formattedDate = $date->format('Y-m-d');
+            $formattedDate = $date->format('d-m-Y');
             $labels[] = $date->format('M d');
 
             // If before worker joined or after today, leave as inactive
@@ -223,7 +223,7 @@ class WorkerController extends Controller
             ->whereMonth('date', $month)
             ->orderBy('date')
             ->get()
-            ->keyBy(fn($att) => Carbon::parse($att->date)->format('Y-m-d'));
+            ->keyBy(fn($att) => Carbon::parse($att->date)->format('d-m-Y'));
 
         $labels = [];
         $presentData = [];
@@ -237,7 +237,7 @@ class WorkerController extends Controller
 
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $date = Carbon::createFromDate($year, $month, $day);
-            $formattedDate = $date->format('Y-m-d');
+            $formattedDate = $date->format('d-m-Y');
             $labels[] = $date->format('M d');
 
             if ($date->lt($workerCreatedAt) || $date->gt($today)) {
@@ -262,4 +262,3 @@ class WorkerController extends Controller
         ]);
     }
 }
-

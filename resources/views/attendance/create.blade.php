@@ -25,7 +25,6 @@
                 @csrf
 
                 <div id="attendance-container">
-                    {{-- Initial attendance table loads here --}}
                     @include('attendance.partials.table', [
                         'workers' => $workers,
                         'date' => $date,

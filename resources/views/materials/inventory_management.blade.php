@@ -18,14 +18,24 @@
                         </thead>
                         <tbody>
                             @forelse($inventory as $item)
+                                @php
+                                    $inventoryIsAdhoc = empty($item->product_id);
+                                    $inventoryRouteKey = $inventoryIsAdhoc
+                                        ? 'adhoc-' . md5($item->name . '|' . $item->unit_of_measure)
+                                        : $item->product_id;
+                                @endphp
                                 <tr>
                                     <td><div class="px-2">{{ $item->name }}</div></td>
                                     <td>{{ $item->unit_of_measure }}</td>
                                     <td>{{ $item->total_stock }}</td>
                                     <td>
                                         <div class="px-2">
-                                            <form action="{{ route('materials.use', $item->product_id) }}" method="POST" class="issue-form d-flex gap-2">
+                                            <form action="{{ route('materials.use', $inventoryRouteKey) }}" method="POST" class="issue-form d-flex gap-2">
                                                 @csrf
+                                                @if($inventoryIsAdhoc)
+                                                    <input type="hidden" name="adhoc_name" value="{{ $item->name }}">
+                                                    <input type="hidden" name="adhoc_unit" value="{{ $item->unit_of_measure }}">
+                                                @endif
                                                 <input type="number" name="quantity_used" class="form-control form-control-sm quantity-used" 
                                                     placeholder="Qty" step="0.01" required 
                                                     total-stock="{{ $item->total_stock }}"
@@ -67,7 +77,6 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Insufficient Stock',
-                        text: `You cannot issue more than ${totalStock} ${unitOfMeasure}.`,
                         confirmButtonColor: '#027333'
                     }).then(() => {
                         this.value = totalStock;
@@ -112,6 +121,11 @@
                         const stockCell = form.closest('tr').querySelector('td:nth-child(3)');
                         stockCell.textContent = data.remaining_stock;
 
+                        const qtyInput = form.querySelector('.quantity-used');
+                        if (qtyInput) {
+                            qtyInput.setAttribute('total-stock', data.remaining_stock);
+                        }
+
                         // Reset form
                         form.reset();
                     }
@@ -128,5 +142,3 @@
         });
     });
 </script>
-
-

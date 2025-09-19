@@ -7,9 +7,10 @@ use App\Models\Requisition;
 use App\Models\BomItem;
 use App\Models\Product;
 use App\Models\Section;
+use App\Models\UnitOfMeasurement;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Carbon\Unit;
 
 class RequisitionController extends Controller
 {
@@ -17,16 +18,46 @@ class RequisitionController extends Controller
     {
         $projectId = Auth::user()->project_id;
 
-        $requisitions = Requisition::with('bomItem', 'requester', 'approver', 'section')
+        $projectScope = function ($query) use ($projectId) {
+            $query->whereHas('bomItem', function ($bomQuery) use ($projectId) {
+                $bomQuery->where('project_id', $projectId);
+            })->orWhere(function ($adhocQuery) use ($projectId) {
+                $adhocQuery->whereNull('bom_item_id')
+                    ->whereHas('requester', function ($userQuery) use ($projectId) {
+                        $userQuery->where('project_id', $projectId);
+                    });
+            });
+        };
+
+        $baseQuery = Requisition::query()->where(function ($query) use ($projectScope) {
+            $projectScope($query);
+        });
+
+        $requisitions = (clone $baseQuery)
+            ->with('bomItem', 'requester', 'approver', 'section')
             ->orderByDesc('created_at')
             ->get();
 
-        $approvedSummary = Requisition::select('bom_item_id')
-            ->selectRaw('SUM(quantity_requested) as total_quantity')
+        $approvedSummary = (clone $baseQuery)
             ->where('status', 'approved')
-            ->groupBy('bom_item_id')
             ->with('bomItem.item_material')
-            ->get();
+            ->get()
+            ->groupBy(function ($req) {
+                return $req->bom_item_id ?: $req->extra_material_name . '|' . $req->extra_unit;
+            })
+            ->map(function ($group) {
+                $first = $group->first();
+                $bomItem = $first->bomItem;
+                $itemMaterial = optional($bomItem)->item_material;
+
+                return (object) [
+                    'bom_item' => $bomItem,
+                    'material' => optional($itemMaterial)->name ?? $first->extra_material_name,
+                    'unit' => optional($itemMaterial)->unit_of_measurement ?? $first->extra_unit,
+                    'total_quantity' => $group->sum('quantity_requested'),
+                ];
+            })
+            ->values();
 
         $sections = Section::all();
 
@@ -55,49 +86,11 @@ class RequisitionController extends Controller
             }
         }
 
+        $units = UnitOfMeasurement::all();
 
-        return view('requisitions.index', compact('requisitions', 'approvedSummary', 'sections', 'requisitionableItems'));
+        return view('requisitions.index', compact('requisitions', 'approvedSummary', 'sections', 'requisitionableItems', 'units'));
     }
 
-    public function create()
-    {
-        $bomItems = BomItem::whereProjectId(project_id())->get();
-
-        // Group BOM items by product_id
-        $groupedItems = $bomItems->groupBy('product_id');
-        $items = collect();
-        $section_name = null;
-
-        foreach ($groupedItems as $product_id => $group) {
-            $sampleItem = $group->first();
-            $totalQty = $group->sum('quantity');
-            $totalAmt = $group->sum('amount');
-
-            // Get all requisitions related to any of the BOM items in this group
-            $requisitionedQty = Requisition::whereIn('bom_item_id', $group->pluck('id'))
-                ->whereIn('status', ['pending', 'approved'])
-                ->sum('quantity_requested');
-
-            $product = Product::find($product_id);
-            $section = Section::find($sampleItem->section_id);
-
-            $sampleItem->total_quantity = $totalQty;
-            $sampleItem->total_amount = $totalAmt;
-            $sampleItem->remaining_quantity = max(0, $totalQty - $requisitionedQty);
-            $sampleItem->unit = $product?->unit ?? 'N/A';
-
-            // ✅ Only push items with remaining_quantity >= 1
-            if ($sampleItem->remaining_quantity >= 1) {
-                $items->push($sampleItem);
-            }
-
-            if (!$section_name) {
-                $section_name = $section?->name;
-            }
-        }
-
-        return view('requisitions.create', compact('items', 'section_name'));
-    }
 
     public function store(Request $request)
     {
@@ -110,12 +103,15 @@ class RequisitionController extends Controller
         $productId = $bomItem->product_id;
 
         // Total quantity of this material in the BOM for this project
-        $totalAvailable = BomItem::where('product_id', $productId)
+        $projectBomItemIds = BomItem::where('product_id', $productId)
             ->whereProjectId(project_id())
+            ->pluck('id');
+
+        $totalAvailable = BomItem::whereIn('id', $projectBomItemIds)
             ->sum('quantity');
 
         // Total quantity already requisitioned (pending or approved)
-        $alreadyRequisitioned = Requisition::whereIn('bom_item_id', BomItem::where('product_id', $productId)->pluck('id'))
+        $alreadyRequisitioned = Requisition::whereIn('bom_item_id', $projectBomItemIds)
             ->whereIn('status', ['pending', 'approved'])
             ->sum('quantity_requested');
 
@@ -169,5 +165,34 @@ class RequisitionController extends Controller
         ]);
 
         return back()->with('info', 'Requisition rejected.');
+    }
+
+    public function storeAdhoc(Request $request)
+    {
+        $request->validate([
+            'material_name' => 'required|string|max:255',
+            'unit_of_measurement' => 'required|string|max:50',
+            'quantity_requested' => 'required|numeric|min:0.01',
+            'section' => 'required|exists:sections,id',
+        ]);
+
+        // Generate a requisition number
+        do {
+            $requisitionNo = rand(1000000, 9999999) . '-RQS';
+        } while (Requisition::where('requisition_no', $requisitionNo)->exists());
+
+        Requisition::create([
+            'requisition_no' => $requisitionNo,
+            'bom_item_id' => null,
+            'extra_material_name' => $request->material_name,
+            'extra_unit' => $request->unit_of_measurement,
+            'quantity_requested' => $request->quantity_requested,
+            'section_id' => $request->section,
+            'requested_by' => Auth::id(),
+            'requested_at' => now(),
+            'status' => 'pending',
+        ]);
+
+        return redirect()->route('requisitions.index')->with('success', 'Ad-hoc requisition submitted.');
     }
 }

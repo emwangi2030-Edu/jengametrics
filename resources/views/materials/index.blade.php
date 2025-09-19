@@ -49,6 +49,19 @@
                     </div>
                 </form>
                 <div class="card-body">
+                    @php
+                        $formatNumeric = function ($value) {
+                            if ($value === null) {
+                                return null;
+                            }
+
+                            $numeric = round((float) $value, 2);
+
+                            return abs($numeric - round($numeric)) < 0.005
+                                ? (int) round($numeric)
+                                : number_format($numeric, 2);
+                        };
+                    @endphp
                     <table class="table table-bordered mt-3 text-center">
                         <thead class="table-light">
                             <tr>
@@ -66,19 +79,28 @@
                         </thead>
                         <tbody>
                             @foreach($materials as $material)
+                                @php
+                                    $requisitionedQty = $material->requisitioned_quantity;
+                                    if ($requisitionedQty === null && $material->variance !== null && $material->quantity_purchased !== null) {
+                                        $requisitionedQty = (float) $material->quantity_purchased - (float) $material->variance;
+                                    }
+                                    $variance = (float) ($material->variance ?? 0);
+                                    $displayRequisitioned = $requisitionedQty !== null ? $formatNumeric($requisitionedQty) : null;
+                                    $displayQuantity = $formatNumeric($material->quantity_purchased);
+                                    $displayVariance = $formatNumeric($variance);
+                                @endphp
                                 <tr>
-                                    <td><div class="px-2">{{ $material->product->name }}</div></td>
-                                    <td>{{ (int) $material->requisitioned_quantity }}</td>
-                                    <td>{{ (int) $material->quantity_purchased }}</td>
-                                    @php $variance = (int) $material->variance; @endphp
+                                    <td><div class="px-2">{{ $material->product->name ?? $material->name }}</div></td>
+                                    <td>{{ $displayRequisitioned !== null ? $displayRequisitioned : 'N/A' }}</td>
+                                    <td>{{ $displayQuantity }}</td>
                                     <td class="{{ $variance > 0 ? 'text-success' : ($variance < 0 ? 'text-danger' : 'text-secondary') }}">
-                                        {{ $variance > 0 ? '+' . $variance : $variance }}
+                                        {{ $variance > 0 ? '+' : '' }}{{ $displayVariance }}
                                     </td>
                                     <td>{{ $material->unit_of_measure }}</td>
                                     <td>{{ number_format($material->unit_price, 2) }}</td>
                                     <td>{{ number_format($material->unit_price * $material->quantity_purchased, 2) }}</td>
                                     <td>{{ $material->supplier->name }}</td>
-                                    <td>{{ $material->created_at->format('Y-m-d') }}</td>
+                                    <td>{{ $material->created_at->format('d-m-Y') }}</td>
                                     <td>
                                         @if($material->document)
                                             <a href="{{ route('materials.viewDocument', $material->id) }}" class="text-decoration-underline">
@@ -117,14 +139,24 @@
                         </thead>
                         <tbody>
                             @forelse($inventory as $item)
+                                @php
+                                    $inventoryIsAdhoc = empty($item->product_id);
+                                    $inventoryRouteKey = $inventoryIsAdhoc
+                                        ? 'adhoc-' . md5($item->name . '|' . $item->unit_of_measure)
+                                        : $item->product_id;
+                                @endphp
                                 <tr>
                                     <td><div class="px-2">{{ $item->name }}</div></td>
                                     <td>{{ $item->unit_of_measure }}</td>
                                     <td>{{ $item->total_stock }}</td>
                                     <td>
                                         <div class="px-2">
-                                            <form action="{{ route('materials.use', $item->product_id) }}" method="POST" class="d-flex gap-2">
+                                            <form action="{{ route('materials.use', $inventoryRouteKey) }}" method="POST" class="d-flex gap-2">
                                                 @csrf
+                                                @if($inventoryIsAdhoc)
+                                                    <input type="hidden" name="adhoc_name" value="{{ $item->name }}">
+                                                    <input type="hidden" name="adhoc_unit" value="{{ $item->unit_of_measure }}">
+                                                @endif
                                                 <input type="number" name="quantity_used" class="form-control form-control-sm quantity-used" placeholder="Qty" step="0.01" required data-total-stock="{{ $item->total_stock }}">
                                                 <select name="section_id" class="form-select form-select-sm" required>
                                                     <option value="" disabled selected>Select Section</option>
@@ -195,7 +227,7 @@
                         <tbody>
                             @forelse($stockUsages as $usage)
                                 <tr>
-                                    <td><div class="px-2">{{ $usage->created_at->format('Y-m-d') }}</div></td>
+                                    <td><div class="px-2">{{ $usage->created_at->format('d-m-Y') }}</div></td>
                                     <td>{{ $usage->material->name ?? 'N/A' }}</td>
                                     <td>{{ $usage->section->name ?? 'N/A' }}</td>
                                     <td>{{ $usage->quantity_used }}</td>

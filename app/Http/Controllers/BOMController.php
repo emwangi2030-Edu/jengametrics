@@ -50,11 +50,11 @@ class BOMController extends Controller
         ]);
 
         foreach ($request->items as $item) {
-             // Fetch the rate from the products table based on product_id
-             $product = Product::where('id', $item['product_id'])->get();
-             $rate = $product ? $product->rate : 0;
-             $quantity = $item['quantity'];
-             $amount = $rate * $quantity;
+            // Fetch the rate from the products table based on product_id
+            $product = Product::find($item['product_id']);
+            $rate = optional($product)->rate ?? 0;
+            $quantity = $item['quantity'];
+            $amount = $rate * $quantity;
 
             BomItem::create([
                 'bom_id' => $bom->id,
@@ -69,7 +69,7 @@ class BOMController extends Controller
         return redirect()->route('boms.index');
     }
 
-   public function show($id)
+    public function show($id)
     {
         $bqSection = Section::find($id);
 
@@ -148,3 +148,9 @@ class BOMController extends Controller
         return view('report.report', compact('totalEstimatedCost', 'totalEstimatedCost_labour', 'total_actual_cost', 'total_actual_payments','project'));
     }
 }
+
+
+
+
+
+

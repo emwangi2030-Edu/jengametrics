@@ -15,6 +15,14 @@ class Material extends Model
         'document', 'project_id'
     ];
 
+    protected $casts = [
+        'unit_price' => 'decimal:2',
+        'quantity_purchased' => 'decimal:2',
+        'quantity_in_stock' => 'decimal:2',
+        'variance' => 'decimal:2',
+        'requisitioned_quantity' => 'decimal:2',
+    ];
+
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);

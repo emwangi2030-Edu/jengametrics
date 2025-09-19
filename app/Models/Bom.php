@@ -13,11 +13,12 @@ class Bom extends Model
 
     public function bqDocument()
     {
-        return $this->belongsTo(BQDocument::class, 'bq_document_id');
+        return $this->belongsTo(BqDocument::class, 'bq_document_id');
     }
 
     public function items()
     {
-        return $this->hasMany(BOMItem::class);
+        return $this->hasMany(BomItem::class);
     }
 }
+

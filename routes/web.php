@@ -125,6 +125,7 @@ Route::middleware(['auth'])->group(function () {
 
 Route::patch('/requisitions/{requisition}/toggle-status', [RequisitionController::class, 'toggleStatus'])
     ->name('requisitions.toggleStatus');
+Route::post('/requisitions/store-adhoc', [RequisitionController::class, 'storeAdhoc'])->name('requisitions.storeAdhoc');
 
 Route::get('reports', [BOMController::class, 'report'])->name('reports');
 

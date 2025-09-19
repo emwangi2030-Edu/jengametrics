@@ -42,6 +42,12 @@
                         <label for="quantity_requested" class="form-label">Quantity</label>
                         <input type="number" name="quantity_requested" id="quantity_requested" step="0.01" class="form-control" required>
                     </div>
+
+                    <div class="mb-3 text-center">
+                        <button type="button" class="btn btn-outline-secondary" id="request-adhoc-material">
+                            Request Material Not in BOM
+                        </button>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -52,3 +58,30 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const trigger = document.getElementById('request-adhoc-material');
+        const requisitionModalEl = document.getElementById('requisitionModal');
+        const adhocModalEl = document.getElementById('adhocRequisitionModal');
+
+        if (!trigger || !requisitionModalEl || !adhocModalEl || typeof bootstrap === 'undefined') {
+            return;
+        }
+
+        const requisitionModal = bootstrap.Modal.getOrCreateInstance(requisitionModalEl);
+        const adhocModal = bootstrap.Modal.getOrCreateInstance(adhocModalEl);
+
+        trigger.addEventListener('click', () => {
+            const showAdhoc = () => {
+                adhocModal.show();
+                requisitionModalEl.removeEventListener('hidden.bs.modal', showAdhoc);
+            };
+
+            requisitionModalEl.addEventListener('hidden.bs.modal', showAdhoc);
+            requisitionModal.hide();
+        });
+    });
+</script>
+@endpush

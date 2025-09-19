@@ -2,9 +2,8 @@
 
 @section('content')
 <div class="row py-4">
-    <h2 class="font-weight-bold" style="color:#027333">
-        Requisition List: <span class="text-black">{{ get_project()->name }}</span>
-    </h2>
+    <h2 class="font-weight-bold" style="color:#027333">Requisition List</h2>
+
     <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
         <div>
             <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#requisitionModal">
@@ -37,8 +36,10 @@
                     @forelse($requisitions as $req)
                         <tr>
                             <td>{{ $req->requisition_no }}</td>
-                            <td>{{ $req->bomItem->item_material->name }}</td>
-                            <td>{{ (int) $req->quantity_requested }} {{ $req->bomItem->item_material->unit_of_measurement }}</td>
+                            <td>{{ $req->bomItem->item_material->name ?? $req->extra_material_name }}</td>
+                            <td>
+                                {{ (int) $req->quantity_requested }} {{ $req->bomItem->item_material->unit_of_measurement ?? $req->extra_unit }}
+                            </td>
                             <td>
                                 <span class="badge bg-{{ $req->status == 'approved' ? 'success' : ($req->status == 'rejected' ? 'danger' : 'secondary') }}">
                                 {{ ucfirst($req->status) }}
@@ -46,9 +47,9 @@
                             </td>
                             <td>{{ $req->section->name }}</td>
                             <td>{{ $req->requester->name ?? 'N/A' }}</td>
-                            <td>{{ $req->requested_at ? \Carbon\Carbon::parse($req->requested_at)->format('Y-m-d') : '-' }}</td>
+                            <td>{{ $req->requested_at ? \Carbon\Carbon::parse($req->requested_at)->format('d-m-Y') : '-' }}</td>
                             <td>{{ $req->approver->name ?? '-' }}</td>
-                            <td>{{ $req->approved_at ? \Carbon\Carbon::parse($req->approved_at)->format('Y-m-d') : '-' }}</td>
+                            <td>{{ $req->approved_at ? \Carbon\Carbon::parse($req->approved_at)->format('d-m-Y') : '-' }}</td>
                             <td>
                                 @if($req->status === 'pending')
                                     <form action="{{ route('requisitions.approve', $req->id) }}" method="POST" class="d-inline">
@@ -87,9 +88,9 @@
                 <tbody>
                     @forelse($approvedSummary as $summary)
                         <tr>
-                            <td>{{ $summary->bomItem->item_material->name }}</td>
+                            <td>{{ $summary->material }}</td>
                             <td>{{ (int) $summary->total_quantity }}</td>
-                            <td>{{ $summary->bomItem->item_material->unit_of_measurement }}</td>
+                            <td>{{ $summary->unit }}</td>
                         </tr>
                     @empty
                         <tr>
@@ -103,4 +104,5 @@
 </div>
 
 @include('requisitions.requisition_modal')
+@include('requisitions.adhoc_modal')
 @endsection

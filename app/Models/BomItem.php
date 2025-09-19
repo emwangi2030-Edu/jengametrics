@@ -13,7 +13,7 @@ class BomItem extends Model
 
     public function bom()
     {
-        return $this->belongsTo(BOM::class);
+        return $this->belongsTo(Bom::class);
     }
 
     public function item_material()
@@ -25,4 +25,10 @@ class BomItem extends Model
     {
         return $this->hasMany(Requisition::class, 'bom_item_id');
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
+

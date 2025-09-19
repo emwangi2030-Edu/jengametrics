@@ -2,6 +2,15 @@
 
 @section('content')
 <div class="container py-5">
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="row mb-5 text-center">
         <div class="col-12">
             <h2 class="display-6 fw-bold" style="color:#027333;">Record New Material Purchase</h2>
@@ -18,26 +27,42 @@
 
                         {{-- Material Dropdown --}}
                         <div class="mb-4">
-                            <label class="form-label">Materials</label>
+                            <label class="form-label">Materials (from Approved Requisitions)</label>
                             <div class="input-group">
-                                <select class="form-select" id="product_id" name="product_id" required>
-                                    <option value="" disabled selected>Select Material</option>
+                                <select class="form-select" id="material_key" name="material_key" required {{ $requisitions->isEmpty() ? 'disabled' : '' }}>
+                                    <option value="" disabled {{ old('material_key') ? '' : 'selected' }}>Select Material</option>
                                     @foreach($requisitions as $req)
                                         <option
-                                            value="{{ $req->product_id }}"
-                                            data-quantity="{{ (int) $req->remaining_quantity }}"
-                                            data-unit="{{ $req->material->unit_of_measurement }}"
+                                            value="{{ $req->key }}"
+                                            data-type="{{ $req->type }}"
+                                            data-product="{{ $req->product_id }}"
+                                            data-name="{{ $req->name }}"
+                                            data-unit="{{ $req->unit }}"
+                                            data-quantity="{{ (float) $req->remaining_quantity }}"
+                                            data-requested="{{ (float) $req->requested_quantity }}"
+                                            {{ old('material_key') === $req->key ? 'selected' : '' }}
                                         >
-                                            {{ $req->material->name }} (Max Qty: {{ (int) $req->remaining_quantity }} {{ $req->material->unit_of_measurement }})
+                                            {{ $req->name }} (Remaining: {{ (float) $req->remaining_quantity }} {{ $req->unit }})
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
 
+                        <input type="hidden" id="material_type" name="material_type" value="{{ old('material_type') }}">
+                        <input type="hidden" id="product_id" name="product_id" value="{{ old('product_id') }}">
+                        <input type="hidden" id="adhoc_name" name="adhoc_name" value="{{ old('adhoc_name') }}">
+                        <input type="hidden" id="adhoc_unit" name="adhoc_unit" value="{{ old('adhoc_unit') }}">
+                        <input type="hidden" id="requisitioned_quantity" name="requisitioned_quantity" value="{{ old('requisitioned_quantity') }}">
+                        <input type="hidden" id="expected_quantity" name="expected_quantity" value="{{ old('expected_quantity') }}">
+
+                        @if($requisitions->isEmpty())
+                            <p class="text-muted small">No approved requisitions available to receive.</p>
+                        @endif
+
                         {{-- Unit Price --}}
                         <div class="form-floating mb-4">
-                            <input type="text" class="form-control" id="unit_price" name="unit_price" value="{{ old('unit_price', $material->unit_price ?? '') }}" placeholder="Enter price" required>
+                            <input type="text" class="form-control" id="unit_price" name="unit_price" value="{{ old('unit_price') }}" placeholder="Enter price" required>
                             <label for="unit_price" id="unit_price_label">Price per Unit</label>
                         </div>
 
@@ -45,18 +70,18 @@
                         <div class="form-floating mb-4">
                             <input type="number" step="0.01" class="form-control text-muted" 
                                 id="quantity_in_stock" name="quantity_in_stock"
-                                value="{{ old('quantity_in_stock', $material->quantity_in_stock ?? '') }}"
+                                value="{{ old('quantity_in_stock') }}"
                                 placeholder="Enter quantity" required>
                             <label for="quantity_in_stock" id="quantity_label">Quantity</label>
                         </div>
 
                         {{-- Variance --}}
                         <div class="form-floating mb-4">
-                            <input type="text" class="form-control" id="variance" name="variance" placeholder="Variance" readonly>
-                            <label for="variance">Variance</label>
+                            <input type="text" class="form-control" id="variance_display" placeholder="Variance" value="{{ old('variance') }}" readonly>
+                            <label for="variance_display">Variance</label>
                         </div>
 
-                        <input type="text" class="form-control" id="requisitioned_quantity" name="requisitioned_quantity" hidden>
+                        <input type="hidden" id="variance" name="variance" value="{{ old('variance') }}">
 
                         {{-- Supplier Dropdown + Add Button --}}
                         <div class="mb-4">
@@ -65,7 +90,7 @@
                                 <select class="form-select" id="supplier_id" name="supplier_id" required>
                                     <option value="" disabled selected>Select Supplier</option>
                                     @foreach($suppliers as $supplier)
-                                        <option value="{{ $supplier->id }}" data-contact="{{ $supplier->contact_info }}">{{ $supplier->name }}</option>
+                                        <option value="{{ $supplier->id }}" data-contact="{{ $supplier->contact_info }}" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>{{ $supplier->name }}</option>
                                     @endforeach
                                 </select>
                                 <br>
@@ -75,7 +100,7 @@
 
                         {{-- Supplier Contact --}}
                         <div class="form-floating mb-4">
-                            <input type="text" class="form-control" id="supplier_contact" name="supplier_contact" placeholder="Supplier contact" readonly>
+                            <input type="text" class="form-control" id="supplier_contact" name="supplier_contact" placeholder="Supplier contact" value="{{ old('supplier_contact') }}" readonly>
                             <label for="supplier_contact">Supplier Contact</label>
                         </div>
 
@@ -134,16 +159,28 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        // Update supplier contact
+        const $materialSelect = $('#material_key');
+        const $materialType = $('#material_type');
+        const $productIdInput = $('#product_id');
+        const $adhocNameInput = $('#adhoc_name');
+        const $adhocUnitInput = $('#adhoc_unit');
+        const $quantityInput = $('#quantity_in_stock');
+        const $unitPriceLabel = $('#unit_price_label');
+        const $varianceDisplay = $('#variance_display');
+        const $varianceInput = $('#variance');
+        const $requisitionedQuantity = $('#requisitioned_quantity');
+        const $expectedQuantity = $('#expected_quantity');
+        const initialQuantity = $quantityInput.val();
+        const hasInitialQuantity = initialQuantity !== '';
+
         $('#supplier_id').on('change', function () {
-            var contact = $(this).find('option:selected').data('contact');
+            const contact = $(this).find('option:selected').data('contact');
             $('#supplier_contact').val(contact);
         });
 
-        // Save new supplier via AJAX
         $('#saveNewSupplier').on('click', function () {
-            var name = $('#new_supplier_name').val();
-            var contact = $('#new_supplier_contact').val();
+            const name = $('#new_supplier_name').val();
+            const contact = $('#new_supplier_contact').val();
 
             if (name && contact) {
                 $.ajax({
@@ -155,20 +192,20 @@
                         contact_info: contact
                     },
                     success: function (response) {
-                        if (response.id && response.name) {
-                            let newOption = $('<option>', {
-                                value: response.id,
-                                text: response.name,
-                                'data-contact': response.contact_info
-                            });
-                            $('#supplier_id').append(newOption);
-                            newOption.prop('selected', true);
-                            $('#supplier_contact').val(response.contact_info);
-                            $('#addSupplierModal').modal('hide');
-                            $('#new_supplier_name, #new_supplier_contact').val('');
-                        } else {
-                            alert('Failed to add supplier.');
-                        }
+                         if (response.id && response.name) {
+                             const newOption = $('<option>', {
+                                 value: response.id,
+                                 text: response.name,
+                                 'data-contact': response.contact_info
+                             });
+                             $('#supplier_id').append(newOption);
+                             newOption.prop('selected', true);
+                             $('#supplier_contact').val(response.contact_info);
+                             $('#addSupplierModal').modal('hide');
+                             $('#new_supplier_name, #new_supplier_contact').val('');
+                         } else {
+                             alert('Failed to add supplier.');
+                         }
                     },
                     error: function (xhr) {
                         alert('Error: ' + xhr.responseText);
@@ -179,44 +216,101 @@
             }
         });
 
-        $('#product_id').on('change', function () {
+        $materialSelect.on('change', function () {
             const selectedOption = $(this).find('option:selected');
-            const maxQty = parseFloat(selectedOption.data('quantity')) || 0;
-            const unit = selectedOption.data('unit');
+            const type = selectedOption.data('type') || '';
+            const rawMax = selectedOption.data('quantity');
+            const maxQty = parseFloat(rawMax);
+            const hasMaxQty = !Number.isNaN(maxQty);
+            const unit = selectedOption.data('unit') || '';
+            const productId = selectedOption.data('product') || '';
+            const name = selectedOption.data('name') || '';
+            const requestedRaw = selectedOption.data('requested');
+            const requested = requestedRaw !== undefined ? parseFloat(requestedRaw) : NaN;
+            const hasRequested = !Number.isNaN(requested);
 
-            $('#unit_price_label').text('Price per ' + unit);
-            $('#quantity_in_stock')
-                .val('')
-                .attr('placeholder', `Max approved quantity: ${maxQty} ${unit}`)
-                .data('max', maxQty)
+            $materialType.val(type);
+
+            if (type === 'bom') {
+                $productIdInput.val(productId);
+                $adhocNameInput.val('');
+                $adhocUnitInput.val('');
+            } else if (type === 'adhoc') {
+                $productIdInput.val('');
+                $adhocNameInput.val(name);
+                $adhocUnitInput.val(unit);
+            } else {
+                $productIdInput.val('');
+                $adhocNameInput.val('');
+                $adhocUnitInput.val('');
+            }
+
+            $unitPriceLabel.text(unit ? 'Price per ' + unit : 'Price per Unit');
+            $quantityInput
+                .attr('placeholder', hasMaxQty ? ('Approved quantity: ' + maxQty + ' ' + unit + ' (can record more)') : 'Enter quantity')
+                .data('max', hasMaxQty ? maxQty : null)
                 .data('unit', unit);
 
-            $('#requisitioned_quantity').val(maxQty);
+            if (!hasInitialQuantity) {
+                $quantityInput.val('');
+            }
 
-            $('#variance').val('');
+            if (hasMaxQty) {
+                $requisitionedQuantity.val(maxQty);
+            } else if (hasRequested) {
+                $requisitionedQuantity.val(requested);
+            } else {
+                $requisitionedQuantity.val('');
+            }
+
+            if (hasMaxQty) {
+                $expectedQuantity.val(maxQty);
+            } else if (hasRequested) {
+                $expectedQuantity.val(requested);
+            } else {
+                $expectedQuantity.val('');
+            }
+
+            $varianceDisplay.val('');
+            $varianceInput.val('');
         });
 
-
-        $('#quantity_in_stock').on('input', function () {
-            const max = parseFloat($(this).data('max'));
-            const unit = $(this).data('unit');
+        $quantityInput.on('input', function () {
+            const maxRaw = $(this).data('max');
+            const max = typeof maxRaw === 'number' ? maxRaw : parseFloat(maxRaw);
+            const unit = $(this).data('unit') || '';
             const entered = parseFloat($(this).val());
 
-            if (!max || isNaN(entered)) {
-                $('#variance').val('');
+            if (Number.isNaN(entered) || Number.isNaN(max)) {
+                $varianceDisplay.val('');
+                $varianceInput.val('');
                 return;
             }
 
-            let difference = entered - max;
+            let difference = Number((entered - max).toFixed(2));
+            if (Math.abs(difference) < 0.005) {
+                difference = 0;
+            }
+            let varianceText = '0';
 
             if (difference > 0) {
-                $('#variance').val(`excess: ${difference} ${unit}`);
+                varianceText = 'excess: ' + difference + ' ' + unit;
             } else if (difference < 0) {
-                $('#variance').val(`remaining balance: ${Math.abs(difference)} ${unit}`);
-            } else {
-                $('#variance').val(0);
+                varianceText = 'remaining balance: ' + Math.abs(difference) + ' ' + unit;
             }
+
+            $varianceDisplay.val(varianceText);
+            $varianceInput.val(difference);
         });
+
+        if ($materialSelect.val()) {
+            $materialSelect.trigger('change');
+            if (hasInitialQuantity) {
+                $quantityInput.val(initialQuantity);
+                $quantityInput.trigger('input');
+            }
+        }
     });
 </script>
 @endpush
+

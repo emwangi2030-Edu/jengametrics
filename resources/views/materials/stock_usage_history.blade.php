@@ -47,7 +47,7 @@
                     <tbody>
                         @forelse($stockUsages as $usage)
                             <tr>
-                                <td><div class="px-2">{{ $usage->created_at->format('Y-m-d') }}</div></td>
+                                    <td><div class="px-2">{{ $usage->created_at->format('d-m-Y') }}</div></td>
                                 <td>{{ $usage->material->name ?? 'N/A' }}</td>
                                 <td>{{ $usage->section->name ?? 'N/A' }}</td>
                                 <td>{{ $usage->quantity_used }}</td>
@@ -64,4 +64,3 @@
     </div>
 </div>
 @endsection
-

@@ -33,7 +33,7 @@
                                         <a href="{{ route('bq_documents.show', $document) }}" class="text-primary font-weight-bold">
                                             {{ $document->title }}
                                         </a>
-                                        <span class="badge badge-primary badge-pill">{{ $document->created_at->format('Y-m-d') }}</span>
+                                        <span class="badge badge-primary badge-pill">{{ $document->created_at->format('d-m-Y') }}</span>
                                     </li>
                                 @endforeach
                             </ul>

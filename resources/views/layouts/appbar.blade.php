@@ -122,30 +122,38 @@ use Illuminate\Support\Facades\Auth;
                                 /* Dropdown menu */
                                 .nav-item-wrapper .dropdown-menu {
                                     position: static !important;
-                                    display: none;
+                                    display: block;
                                     margin: 0;
                                     padding: 0 0 0 1.5rem;
                                     background: transparent;
                                     border: none;
                                     box-shadow: none;
                                     list-style: none;
+                                    max-height: 0;
+                                    overflow: hidden;
+                                    opacity: 0;
+                                    pointer-events: none;
+                                    transition: max-height 0.3s ease, opacity 0.3s ease;
                                 }
 
-                                /* Show submenu on hover */
+                                /* Smoothly expand submenu when open */
                                 .nav-item-wrapper.open > .dropdown-menu {
-                                    display: block;
+                                    max-height: 600px;
+                                    opacity: 1;
+                                    pointer-events: auto;
                                 }
 
                                 /* Submenu items */
                                 .nav-item-wrapper .dropdown-menu .dropdown-item {
                                     display: flex;
                                     align-items: center;
-                                    padding: 0.65rem 1rem 0.65rem 2.5rem;
-                                    color: #333;
+                                    padding: 0.75rem 1rem 0.75rem 2.5rem;
+                                    color: #027333;
                                     text-decoration: none;
-                                    font-size: 0.9rem;
-                                    border-radius: 0.5rem;
-                                    transition: background 0.2s, color 0.2s;
+                                    font-size: 0.95rem;
+                                    border-radius: 0.375rem;
+                                    transition: background-color 0.3s ease, color 0.3s ease;
+                                    background-color: transparent;
                                     position: relative;
                                 }
 
@@ -175,6 +183,16 @@ use Illuminate\Support\Facades\Auth;
                                 .nav-item-wrapper .dropdown-menu .dropdown-item:hover {
                                     background-color: #e0f2f1;
                                     color: #014d22;
+                                }
+
+                                .nav-item-wrapper .dropdown-menu .dropdown-item::before {
+                                    content: '';
+                                    position: absolute;
+                                    top: 50%;
+                                    left: 1.1rem;
+                                    transform: translateY(-50%);
+                                    width: 24px;
+                                    height: 24px;
                                 }
 
                                 .nav-item-wrapper .dropdown-menu .dropdown-item.active {
@@ -219,6 +237,12 @@ use Illuminate\Support\Facades\Auth;
                                     font-weight: 500;
                                     margin-left: 0.5rem;
                                     color: #027333;
+                                }
+
+                                .nav-item-wrapper .dropdown-menu .dropdown-item .nav-link-text {
+                                    margin-left: 0;
+                                    color: inherit;
+                                    font-size: 15px;
                                 }
 
                             </style>
@@ -282,23 +306,39 @@ use Illuminate\Support\Facades\Auth;
                                     <!-- Dropdown Menu -->
                                     <ul class="dropdown-menu" style="margin-right: 17px; padding-top: 1px;">
                                         <li>
-                                            <a class="dropdown-item" href="{{ route('requisitions.index') }}">
-                                                Requisitions
+                                            <a class="dropdown-item nav-link label-1" href="{{ route('requisitions.index') }}">
+                                                <div class="d-flex align-items-center" style="margin-left: 10px;">
+                                                    <span class="nav-link-text-wrapper">
+                                                        <span class="nav-link-text">Requisitions</span>
+                                                    </span>
+                                                </div>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" href="{{ route('materials.delivered') }}">
-                                                Materials Delivered
+                                            <a class="dropdown-item nav-link label-1" href="{{ route('materials.delivered') }}">
+                                                <div class="d-flex align-items-center" style="margin-left: 10px;">
+                                                    <span class="nav-link-text-wrapper">
+                                                        <span class="nav-link-text">Materials Delivered</span>
+                                                    </span>
+                                                </div>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" href="{{ route('materials.inventory') }}">
-                                                Inventory Management
+                                            <a class="dropdown-item nav-link label-1" href="{{ route('materials.inventory') }}">
+                                                <div class="d-flex align-items-center" style="margin-left: 10px;">
+                                                    <span class="nav-link-text-wrapper">
+                                                        <span class="nav-link-text">Inventory Management</span>
+                                                    </span>
+                                                </div>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" href="{{ route('materials.usage') }}">
-                                                Stock Usage
+                                            <a class="dropdown-item nav-link label-1" href="{{ route('materials.usage') }}">
+                                                <div class="d-flex align-items-center" style="margin-left: 10px;">
+                                                    <span class="nav-link-text-wrapper">
+                                                        <span class="nav-link-text">Stock Usage</span>
+                                                    </span>
+                                                </div>
                                             </a>
                                         </li>
                                     </ul>
@@ -886,6 +926,11 @@ use Illuminate\Support\Facades\Auth;
     <script>
     function toggleDropdown(element) {
         const parent = element.closest('.nav-item-wrapper');
+
+        if (!parent) {
+            return;
+        }
+
         parent.classList.toggle('open');
     }
     </script>
