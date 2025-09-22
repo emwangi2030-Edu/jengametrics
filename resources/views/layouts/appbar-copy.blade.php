@@ -43,7 +43,7 @@ License: For each use you must have a valid license purchased only from above li
     <!--end::Global Stylesheets Bundle-->
 
     <!--begin::Google tag-->
-    <script async="" src="../gtag/js?id=UA-37564768-1"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-37564768-1"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
@@ -59,12 +59,86 @@ License: For each use you must have a valid license purchased only from above li
     </script>
 
     <!-- Include jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+
     <!-- Include jQuery UI -->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        (function () {
+            if (!Element.prototype.matches) {
+                Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+            }
+
+            if (!Element.prototype.closest) {
+                Element.prototype.closest = function (selector) {
+                    var element = this;
+                    while (element) {
+                        if (element.matches(selector)) {
+                            return element;
+                        }
+                        element = element.parentElement;
+                    }
+                    return null;
+                };
+            }
+
+            if (!NodeList.prototype.forEach) {
+                NodeList.prototype.forEach = function (callback, thisArg) {
+                    thisArg = thisArg || window;
+                    for (var i = 0; i < this.length; i++) {
+                        callback.call(thisArg, this[i], i, this);
+                    }
+                };
+            }
+
+            if (!window.fetch) {
+                window.fetch = function (url, options) {
+                    options = options || {};
+                    return new Promise(function (resolve, reject) {
+                        var request = new XMLHttpRequest();
+                        request.open(options.method || 'GET', url, true);
+
+                        if (options.headers) {
+                            Object.keys(options.headers).forEach(function (header) {
+                                request.setRequestHeader(header, options.headers[header]);
+                            });
+                        }
+
+                        request.onload = function () {
+                            var status = request.status;
+                            var ok = status >= 200 && status < 300;
+                            var response = {
+                                ok: ok,
+                                status: status,
+                                statusText: request.statusText,
+                                text: function () {
+                                    return Promise.resolve(request.responseText);
+                                },
+                                json: function () {
+                                    return new Promise(function (resolve, reject) {
+                                        try {
+                                            resolve(JSON.parse(request.responseText || 'null'));
+                                        } catch (error) {
+                                            reject(error);
+                                        }
+                                    });
+                                }
+                            };
+                            resolve(response);
+                        };
+
+                        request.onerror = function () {
+                            reject(new TypeError('Network request failed'));
+                        };
+
+                        request.send(options.body || null);
+                    });
+                };
+            }
+        })();
+    </script>
 </head>
 <!--end::Head-->
 

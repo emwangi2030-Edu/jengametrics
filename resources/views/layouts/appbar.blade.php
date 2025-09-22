@@ -49,19 +49,100 @@ use Illuminate\Support\Facades\Auth;
     <!--    Additional Scripts and Styles-->
     <!-- ===============================================-->
     <script>
-        var phoenixIsRTL = window.config.config.phoenixIsRTL;
-        if (phoenixIsRTL) {
-            var linkDefault = document.getElementById('style-default');
-            var userLinkDefault = document.getElementById('user-style-default');
-            linkDefault.setAttribute('disabled', true);
-            userLinkDefault.setAttribute('disabled', true);
-            document.querySelector('html').setAttribute('dir', 'rtl');
-        } else {
-            var linkRTL = document.getElementById('style-rtl');
-            var userLinkRTL = document.getElementById('user-style-rtl');
-            linkRTL.setAttribute('disabled', true);
-            userLinkRTL.setAttribute('disabled', true);
-        }
+        (function () {
+            if (!Element.prototype.matches) {
+                Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+            }
+
+            if (!Element.prototype.closest) {
+                Element.prototype.closest = function (selector) {
+                    let element = this;
+                    while (element) {
+                        if (element.matches(selector)) {
+                            return element;
+                        }
+                        element = element.parentElement;
+                    }
+                    return null;
+                };
+            }
+
+            if (!NodeList.prototype.forEach) {
+                NodeList.prototype.forEach = function (callback, thisArg) {
+                    thisArg = thisArg || window;
+                    for (let i = 0; i < this.length; i++) {
+                        callback.call(thisArg, this[i], i, this);
+                    }
+                };
+            }
+
+            if (!window.fetch) {
+                window.fetch = function (url, options) {
+                    options = options || {};
+                    return new Promise(function (resolve, reject) {
+                        const request = new XMLHttpRequest();
+                        request.open(options.method || 'GET', url, true);
+
+                        if (options.headers) {
+                            Object.keys(options.headers).forEach(function (header) {
+                                request.setRequestHeader(header, options.headers[header]);
+                            });
+                        }
+
+                        request.onload = function () {
+                            const status = request.status;
+                            const ok = status >= 200 && status < 300;
+                            const response = {
+                                ok: ok,
+                                status: status,
+                                statusText: request.statusText,
+                                text: function () {
+                                    return Promise.resolve(request.responseText);
+                                },
+                                json: function () {
+                                    return new Promise(function (resolve, reject) {
+                                        try {
+                                            resolve(JSON.parse(request.responseText || 'null'));
+                                        } catch (error) {
+                                            reject(error);
+                                        }
+                                    });
+                                }
+                            };
+                            resolve(response);
+                        };
+
+                        request.onerror = function () {
+                            reject(new TypeError('Network request failed'));
+                        };
+
+                        request.send(options.body || null);
+                    });
+                };
+            }
+
+            var phoenixIsRTL = window.config && window.config.config ? window.config.config.phoenixIsRTL : false;
+            if (phoenixIsRTL) {
+                var linkDefault = document.getElementById('style-default');
+                var userLinkDefault = document.getElementById('user-style-default');
+                if (linkDefault) {
+                    linkDefault.setAttribute('disabled', true);
+                }
+                if (userLinkDefault) {
+                    userLinkDefault.setAttribute('disabled', true);
+                }
+                document.documentElement.setAttribute('dir', 'rtl');
+            } else {
+                var linkRTL = document.getElementById('style-rtl');
+                var userLinkRTL = document.getElementById('user-style-rtl');
+                if (linkRTL) {
+                    linkRTL.setAttribute('disabled', true);
+                }
+                if (userLinkRTL) {
+                    userLinkRTL.setAttribute('disabled', true);
+                }
+            }
+        })();
     </script>
     <link href="{{ asset('assets/metrics/vendors/leaflet/leaflet.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/metrics/vendors/leaflet.markercluster/MarkerCluster.css') }}" rel="stylesheet">
@@ -887,26 +968,23 @@ use Illuminate\Support\Facades\Auth;
 
 
     </main>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
-            integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/5hb5g6Q2bj0Ib6W9crrxJKKo4qklqUhcHZCl1r"
-            crossorigin="anonymous">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('assets/metrics/vendors/popper/popper.min.js') }}"></script>
-    <script src="{{ asset('assets/metrics/vendors/anchorjs/anchor.min.js') }}"></script>
-    <script src="{{ asset('assets/metrics/vendors/is/is.min.js') }}"></script>
-    <script src="{{ asset('assets/metrics/vendors/fontawesome/all.min.js') }}"></script>
-    <script src="{{ asset('assets/metrics/vendors/lodash/lodash.min.js') }}"></script>
-    <script src="{{ asset('assets/metrics/vendors/list.js/list.min.js') }}"></script>
-    <script src="{{ asset('assets/metrics/vendors/feather-icons/feather.min.js') }}"></script>
-    <script src="{{ asset('assets/metrics/vendors/dayjs/dayjs.min.js') }}"></script>
-    <script src="{{ asset('assets/metrics/vendors/leaflet/leaflet.js') }}"></script>
-    <script src="{{ asset('assets/metrics/vendors/leaflet.markercluster/leaflet.markercluster.js') }}"></script>
-    <script src="{{ asset('assets/metrics/vendors/leaflet.tilelayer.colorfilter/leaflet-tilelayer-colorfilter.min.js') }}"></script>
-    <script src="{{ asset('assets/metrics/assets/js/phoenix.js') }}"></script>
-    <script src="{{ asset('assets/metrics/vendors/echarts/echarts.min.js') }}"></script>
-    <script src="{{ asset('assets/metrics/assets/js/ecommerce-dashboard.js') }}"></script>
-    <script src="{{ asset('assets/metrics/vendors/prism/prism.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/popper/popper.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/anchorjs/anchor.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/is/is.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/fontawesome/all.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/lodash/lodash.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/list.js/list.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/feather-icons/feather.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/dayjs/dayjs.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/leaflet/leaflet.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/leaflet.markercluster/leaflet.markercluster.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/leaflet.tilelayer.colorfilter/leaflet-tilelayer-colorfilter.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/assets/js/phoenix.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/echarts/echarts.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/assets/js/ecommerce-dashboard.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/prism/prism.js') }}" defer></script>
 
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -918,8 +996,15 @@ use Illuminate\Support\Facades\Auth;
 
     <!-- Custom Theme Script -->
     <script>
-        $(document).on('click', '.ghuranti', function () {
-            $('.themeqx-demo-chooser-wrap').toggleClass('open');
+        document.addEventListener('click', function (event) {
+            const trigger = event.target.closest('.ghuranti');
+            if (!trigger) {
+                return;
+            }
+
+            document.querySelectorAll('.themeqx-demo-chooser-wrap').forEach(function (wrap) {
+                wrap.classList.toggle('open');
+            });
         });
     </script>
 
