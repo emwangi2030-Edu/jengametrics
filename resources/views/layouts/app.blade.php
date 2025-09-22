@@ -1,36 +1,1028 @@
+<?php
+use Illuminate\Support\Facades\Auth;
+?>
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <!-- ===============================================-->
+    <!--    Document Title-->
+    <!-- ===============================================-->
+    <title>@section('title') Jengametrics @show</title>
+    <meta name="description" content="@section('description') Jengametrics @show">
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+    <!-- ===============================================-->
+    <!--    Favicons-->
+    <!-- ===============================================-->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ favicon_url() }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ favicon_url() }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ favicon_url() }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ favicon_url() }}">
+    <link rel="manifest" href="{{ favicon_url() }}">
+    <meta name="msapplication-TileImage" content="{{ favicon_url() }}">
+    <meta name="theme-color" content="#ffffff">
+    <script src="{{ asset('assets/metrics/vendors/simplebar/simplebar.min.js') }}"></script>
+    <script src="{{ asset('assets/metrics/assets/js/config.js') }}"></script>
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
+    <!-- ===============================================-->
+    <!--    Stylesheets-->
+    <!-- ===============================================-->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&amp;display=swap"
+    rel="stylesheet">
+    <link href="{{ asset('assets/metrics/vendors/simplebar/simplebar.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/metrics/assets/css/line.css') }}">
+    <link href="{{ asset('assets/metrics/assets/css/theme-rtl.min.css') }}" type="text/css" rel="stylesheet" id="style-rtl">
+    <link href="{{ asset('assets/metrics/assets/css/theme.min.css') }}" type="text/css" rel="stylesheet" id="style-default">
+    <link href="{{ asset('assets/metrics/assets/css/user-rtl.min.css') }}" type="text/css" rel="stylesheet"
+    id="user-style-rtl">
+    <link href="{{ asset('assets/metrics/assets/css/user.min.css') }}" type="text/css" rel="stylesheet"
+    id="user-style-default">
+    <link href="{{ asset('assets/metrics/vendors/prism/prism-okaidia.css') }}" rel="stylesheet">
+
+    <!-- ===============================================-->
+    <!--    Additional Scripts and Styles-->
+    <!-- ===============================================-->
+    <script>
+        (function () {
+            if (!Element.prototype.matches) {
+                Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+            }
+
+            if (!Element.prototype.closest) {
+                Element.prototype.closest = function (selector) {
+                    let element = this;
+                    while (element) {
+                        if (element.matches(selector)) {
+                            return element;
+                        }
+                        element = element.parentElement;
+                    }
+                    return null;
+                };
+            }
+
+            if (!NodeList.prototype.forEach) {
+                NodeList.prototype.forEach = function (callback, thisArg) {
+                    thisArg = thisArg || window;
+                    for (let i = 0; i < this.length; i++) {
+                        callback.call(thisArg, this[i], i, this);
+                    }
+                };
+            }
+
+            if (!window.fetch) {
+                window.fetch = function (url, options) {
+                    options = options || {};
+                    return new Promise(function (resolve, reject) {
+                        const request = new XMLHttpRequest();
+                        request.open(options.method || 'GET', url, true);
+
+                        if (options.headers) {
+                            Object.keys(options.headers).forEach(function (header) {
+                                request.setRequestHeader(header, options.headers[header]);
+                            });
+                        }
+
+                        request.onload = function () {
+                            const status = request.status;
+                            const ok = status >= 200 && status < 300;
+                            const response = {
+                                ok: ok,
+                                status: status,
+                                statusText: request.statusText,
+                                text: function () {
+                                    return Promise.resolve(request.responseText);
+                                },
+                                json: function () {
+                                    return new Promise(function (resolve, reject) {
+                                        try {
+                                            resolve(JSON.parse(request.responseText || 'null'));
+                                        } catch (error) {
+                                            reject(error);
+                                        }
+                                    });
+                                }
+                            };
+                            resolve(response);
+                        };
+
+                        request.onerror = function () {
+                            reject(new TypeError('Network request failed'));
+                        };
+
+                        request.send(options.body || null);
+                    });
+                };
+            }
+
+            var phoenixIsRTL = window.config && window.config.config ? window.config.config.phoenixIsRTL : false;
+            if (phoenixIsRTL) {
+                var linkDefault = document.getElementById('style-default');
+                var userLinkDefault = document.getElementById('user-style-default');
+                if (linkDefault) {
+                    linkDefault.setAttribute('disabled', true);
+                }
+                if (userLinkDefault) {
+                    userLinkDefault.setAttribute('disabled', true);
+                }
+                document.documentElement.setAttribute('dir', 'rtl');
+            } else {
+                var linkRTL = document.getElementById('style-rtl');
+                var userLinkRTL = document.getElementById('user-style-rtl');
+                if (linkRTL) {
+                    linkRTL.setAttribute('disabled', true);
+                }
+                if (userLinkRTL) {
+                    userLinkRTL.setAttribute('disabled', true);
+                }
+            }
+        })();
+    </script>
+    <link href="{{ asset('assets/metrics/vendors/leaflet/leaflet.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/metrics/vendors/leaflet.markercluster/MarkerCluster.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/metrics/vendors/leaflet.markercluster/MarkerCluster.Default.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+
+    @yield('page-css')
+
+    <style>
+        .modal {
+            z-index: 1050 !important;
+            /* Ensure the modal is above other elements */
+        }
+
+        .modal-backdrop {
+            z-index: 1040 !important;
+            /* Ensure the backdrop is below the modal */
+        }
+
+        a.btn:hover {
+            transform: scale(1.1);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .green_text {
+            color: #027333;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===============================================-->
+    <!--    Main Content-->
+    <!-- ===============================================-->
+    <main class="main" id="top">
+        <nav class="navbar navbar-vertical navbar-expand-lg" style="display:none;">
+            <div class="collapse navbar-collapse" id="navbarVerticalCollapse">
+                <!-- scrollbar removed-->
+                <div class="navbar-vertical-content">
+                    <ul class="navbar-nav flex-column" id="navbarVerticalNav">
+                        <div class="nav-item">
+                            <!-- label-->
+                            <p class="navbar-vertical-label">Apps</p>
+                            <hr class="navbar-vertical-line" /><!-- parent pages-->
+
+                            <style>
+                                /* Navigation Item Styles */
+                                .nav-item-wrapper {
+                                    margin-bottom: 0.5rem;
+                                    position: relative;
+                                }
+
+                                /* Dropdown menu */
+                                .nav-item-wrapper .dropdown-menu {
+                                    position: static !important;
+                                    display: block;
+                                    margin: 0;
+                                    padding: 0 0 0 1.5rem;
+                                    background: transparent;
+                                    border: none;
+                                    box-shadow: none;
+                                    list-style: none;
+                                    max-height: 0;
+                                    overflow: hidden;
+                                    opacity: 0;
+                                    pointer-events: none;
+                                    transition: max-height 0.3s ease, opacity 0.3s ease;
+                                }
+
+                                /* Smoothly expand submenu when open */
+                                .nav-item-wrapper.open > .dropdown-menu {
+                                    max-height: 600px;
+                                    opacity: 1;
+                                    pointer-events: auto;
+                                }
+
+                                /* Submenu items */
+                                .nav-item-wrapper .dropdown-menu .dropdown-item {
+                                    display: flex;
+                                    align-items: center;
+                                    padding: 0.75rem 1rem 0.75rem 2.5rem;
+                                    color: #027333;
+                                    text-decoration: none;
+                                    font-size: 0.95rem;
+                                    border-radius: 0.375rem;
+                                    transition: background-color 0.3s ease, color 0.3s ease;
+                                    background-color: transparent;
+                                    position: relative;
+                                }
+
+                                /* Parent nav links that have a submenu */
+                                .nav-item-wrapper.has-submenu > .nav-link {
+                                    position: relative;
+                                    padding-right: 2rem;
+                                }
+
+                                /* Chevron arrow for parent links */
+                                .nav-item-wrapper.has-submenu > .nav-link::after {
+                                    content: "▾";
+                                    position: absolute;
+                                    right: 1rem;
+                                    font-size: 14px;
+                                    color: #027333;
+                                    transition: transform 0.3s ease, color 0.3s ease;
+                                }
+
+                                /* Rotate chevron when submenu is expanded */
+                                .nav-item-wrapper.has-submenu.open > .nav-link::after {
+                                    transform: rotate(180deg);
+                                    color: #014d22;
+                                }
+
+                                /* Hover state for submenu items */
+                                .nav-item-wrapper .dropdown-menu .dropdown-item:hover {
+                                    background-color: #e0f2f1;
+                                    color: #014d22;
+                                }
+
+                                .nav-item-wrapper .dropdown-menu .dropdown-item::before {
+                                    content: '';
+                                    position: absolute;
+                                    top: 50%;
+                                    left: 1.1rem;
+                                    transform: translateY(-50%);
+                                    width: 24px;
+                                    height: 24px;
+                                }
+
+                                .nav-item-wrapper .dropdown-menu .dropdown-item.active {
+                                    background-color: #e9ecef;
+                                    font-weight: 500;
+                                }
+
+                                /* Main nav link */
+                                .nav-link {
+                                    display: flex;
+                                    align-items: center;
+                                    padding: 0.75rem 1rem;
+                                    border-radius: 0.375rem;
+                                    transition: background-color 0.3s ease, color 0.3s ease;
+                                    color: #027333;
+                                    text-decoration: none;
+                                }
+
+                                /* Hover state */
+                                .nav-link:hover {
+                                    background-color: #e0f2f1;
+                                    color: #014d22;
+                                }
+
+                                /* Subtle scaling only on text/icon */
+                                .nav-link:hover .nav-link-text,
+                                .nav-link:hover .nav-link-icon {
+                                    transform: scale(1.05);
+                                    transition: transform 0.2s ease-in-out;
+                                }
+
+                                /* Icon styling */
+                                .nav-link-icon i {
+                                    font-size: 20px;
+                                    color: #027333;
+                                    margin-right: 0.5rem;
+                                }
+
+                                /* Text styling */
+                                .nav-link-text {
+                                    font-size: 16px;
+                                    font-weight: 500;
+                                    margin-left: 0.5rem;
+                                    color: #027333;
+                                }
+
+                                .nav-item-wrapper .dropdown-menu .dropdown-item .nav-link-text {
+                                    margin-left: 0;
+                                    color: inherit;
+                                    font-size: 15px;
+                                }
+
+                            </style>
+
+                            <!-- Dashboard Item -->
+                            <div class="nav-item-wrapper">
+                                <a class="nav-link label-1" href="{{ route('dashboard') }}" role="button" aria-expanded="false">
+                                    <div class="d-flex align-items-center">
+                                        <span class="nav-link-icon"><span data-feather="home"></span></span>
+                                        <span class="nav-link-text-wrapper">
+                                            <span class="nav-link-text">Dashboard</span>
+                                        </span>
+                                    </div>
+                                </a>
+                            </div>
+
+                            @if(Auth::user()->is_client())
+                                <!-- Bills of Quantities (BQ) -->
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link label-1" href="{{ route('boq') }}" role="button" aria-expanded="false">
+                                        <div class="d-flex align-items-center">
+                                            <span class="nav-link-icon">
+                                                <span data-feather="file-text"></span>
+                                            </span>
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Bills of Quantities</span>
+                                            </span>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Bills of Materials (BOM) -->
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link label-1" href="{{ route('boms.index') }}" role="button" aria-expanded="false">
+                                        <div class="d-flex align-items-center">
+                                            <span class="nav-link-icon">
+                                                <span data-feather="file-text"></span>
+                                            </span>
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Bills of Materials</span>
+                                            </span>
+                                        </div>
+                                    </a>
+                                </div>
+
+                              <!-- Material Management (Dropdown Parent) -->
+                                <div class="nav-item-wrapper has-submenu">
+                                    <a class="nav-link label-1" 
+                                    href="javascript:void(0)" 
+                                    onclick="toggleDropdown(this)">
+                                        <div class="d-flex align-items-center">
+                                            <span class="nav-link-icon">
+                                                <span data-feather="box"></span>
+                                            </span>
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Manage Material</span>
+                                            </span>
+                                        </div>
+                                    </a>
+
+                                    <!-- Dropdown Menu -->
+                                    <ul class="dropdown-menu" style="margin-right: 17px; padding-top: 1px;">
+                                        <li>
+                                            <a class="dropdown-item nav-link label-1" href="{{ route('requisitions.index') }}">
+                                                <div class="d-flex align-items-center" style="margin-left: 10px;">
+                                                    <span class="nav-link-text-wrapper">
+                                                        <span class="nav-link-text">Requisitions</span>
+                                                    </span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item nav-link label-1" href="{{ route('materials.delivered') }}">
+                                                <div class="d-flex align-items-center" style="margin-left: 10px;">
+                                                    <span class="nav-link-text-wrapper">
+                                                        <span class="nav-link-text">Materials Delivered</span>
+                                                    </span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item nav-link label-1" href="{{ route('materials.inventory') }}">
+                                                <div class="d-flex align-items-center" style="margin-left: 10px;">
+                                                    <span class="nav-link-text-wrapper">
+                                                        <span class="nav-link-text">Inventory Management</span>
+                                                    </span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item nav-link label-1" href="{{ route('materials.usage') }}">
+                                                <div class="d-flex align-items-center" style="margin-left: 10px;">
+                                                    <span class="nav-link-text-wrapper">
+                                                        <span class="nav-link-text">Stock Usage</span>
+                                                    </span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Labour -->
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link label-1" title="Manage your labour" href="{{ route('workers.index') }}" role="button" aria-expanded="false">
+                                        <div class="d-flex align-items-center">
+                                            <span class="nav-link-icon">
+                                                <span data-feather="users"></span>
+                                            </span>
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Labour</span>
+                                            </span>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- Cost Tracking -->
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link label-1" title="track your costs" href="{{ route('cost-tracking.index') }}" role="button" aria-expanded="false">
+                                        <div class="d-flex align-items-center">
+                                            <span class="nav-link-icon">
+                                                <span data-feather="trending-up"></span>
+                                            </span>
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Cost Tracking</span>
+                                            </span>
+                                        </div>
+                                    </a>        
+                                </div>
+
+                                <!-- Reporting -->
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link label-1" title="Daily logs/reports" href="{{ route('reports') }}" role="button" aria-expanded="false">
+                                        <div class="d-flex align-items-center">
+                                            <span class="nav-link-icon">
+                                                <span data-feather="file"></span>
+                                            </span> 
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Reporting</span>
+                                            </span>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endif             
+
+                            @if(Auth::user()->is_admin())
+                                <!-- Sales & Payment Section -->
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link dropdown-indicator label-1" href="#sidebarSalesPayment" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="sidebarSalesPayment">
+                                        <div class="d-flex align-items-center">
+                                            <div class="dropdown-indicator-icon-wrapper">
+                                                <span class="fas fa-caret-right dropdown-indicator-icon"></span>
+                                            </div>
+                                            <span class="nav-link-icon"><span data-feather="credit-card"></span></span>
+                                            <span class="nav-link-text">Clients</span>
+                                        </div>
+                                    </a>
+                                    <div class="parent-wrapper label-1 ">
+                                        <ul class="nav collapse parent {{ request()->is('transactions') || request()->is('billings') || request()->is('recurring-invoices') || request()->is('admin/listofusers') || request()->is('products') ? 'show' : '' }}"
+                                            data-bs-parent="#navbarVerticalCollapse" id="sidebarSalesPayment">
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->is('admin/listofusers') ? 'active' : '' }}" href="{{ url('listofadmins') }}">
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="nav-link-text">Merchants</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->is('transactions') ? 'active' : '' }}" href="/transactions">
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="nav-link-text">Payments</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item"><a
+                                                class="nav-link {{ request()->is('billings') ? 'active' : '' }}"
+                                                href="/billings">
+                                                <div class="d-flex align-items-center"><span
+                                                    class="nav-link-text">Invoices</span></div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link dropdown-indicator label-1" href="#settings" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="settings">
+                                        <div class="d-flex align-items-center">
+                                            <div class="dropdown-indicator-icon-wrapper">
+                                                <span class="fas fa-caret-right dropdown-indicator-icon"></span>
+                                            </div>
+                                            <span class="nav-link-icon"><span data-feather="settings"></span></span>
+                                            <span class="nav-link-text">Settings</span>
+                                        </div>
+                                    </a>
+
+                                    <div class="parent-wrapper label-1">
+                                        <ul class="nav collapse parent {{ request()->is('transactions') || request()->is('reconciliation') || request()->is('chart-of-accounts') ? 'show' : '' }}"
+                                            data-bs-parent="#navbarVerticalCollapse" id="settings">
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ url('website_info')}}">
+                                                    <div class="d-flex align-items-center"><span
+                                                        class="nav-link-text">Website setting</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->is('sections') ? 'active' : '' }}" href="{{ route('sections.index') }}">
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="nav-link-text">Sections</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a class="nav-link" href="{{ route('products.index') }}">
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="nav-link-text">Materials Library</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </ul>
+                </div>
+            </div>
+            <div class="navbar-vertical-footer">
+                <button class="btn navbar-vertical-toggle border-0 fw-semibold w-100 white-space-nowrap d-flex align-items-center">
+                    <span class="uil uil-left-arrow-to-left fs-8"></span>
+                    <span class="uil uil-arrow-from-right fs-8"></span>
+                    <span class="navbar-vertical-footer-text ms-2">Collapsed View</span>
+                </button>
+            </div>
+        </nav>
+        <nav class="navbar navbar-top fixed-top navbar-expand" id="navbarDefault" style="display:none;">
+            <div class="collapse navbar-collapse justify-content-between">
+                <div class="navbar-logo">
+                    <button class="btn navbar-toggler navbar-toggler-humburger-icon hover-bg-transparent" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse"
+                    aria-controls="navbarVerticalCollapse" aria-expanded="false"
+                    aria-label="Toggle Navigation">
+                        <span class="navbar-toggle-icon">
+                            <span class="toggle-line"></span>
+                        </span>
+                    </button>
+                    <a class="navbar-brand me-1 me-sm-3" href="{{ url('/') }}">
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center"><img src="{{ favicon_url() }}" alt="b2b"
+                                width="27" />
+                                <h5 class="logo-text ms-2 d-none d-sm-block" style="color: #027333;">JengaMetrics</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <ul class="navbar-nav navbar-nav-icons flex-row">
+                    <li class="nav-item">
+                        <div class="theme-control-toggle fa-icon-wait px-2">
+                            <input class="form-check-input ms-0 theme-control-toggle-input" type="checkbox" data-theme-control="phoenixTheme" value="dark" id="themeControlToggle" />
+                            <label class="mb-0 theme-control-toggle-label theme-control-toggle-light" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
+                                data-bs-title="Switch theme" style="height:32px;width:32px;">
+                                <span class="icon" data-feather="moon"></span>
+                            </label>
+                            <label class="mb-0 theme-control-toggle-label theme-control-toggle-dark" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
+                                data-bs-title="Switch theme" style="height:32px;width:32px;">
+                                <span class="icon" data-feather="sun"></span>
+                            </label>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link lh-1 pe-0" id="navbarDropdownUser" href="#!" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true"
+                            aria-expanded="false">
+                            <span class="fs-8">{{ project() }}</span>
+                            <i class="fas fa-angle-down"></i>
+                        </a>
+
+
+                        <div class="dropdown-menu dropdown-menu-end navbar-dropdown-caret py-0 dropdown-profile shadow border" aria-labelledby="navbarDropdownUser">
+                        <div class="card position-relative border-0">
+                            <div class="card-body p-0">
+                                <div class="text-center pt-4 pb-3">
+                                    <div class="avatar avatar-xl ">
+                                        <img class="rounded-circle " src="{{ Auth::user()->get_gravatar(150) }}"
+                                        alt="" />
+                                    </div>
+                                    <h6 class="mt-2 text-body-emphasis">{{ project() }}</h6>
+                                </div>
+                            </div>
+                            <div>
+                                @if(Auth::user()->is_client())
+                                    @if(Auth::user()->package)
+                                        @if(package(Auth::user()->package)->name == "Basic")
+                                            <div class="help-box text-center">
+                                                <p class="mb-3 mt-2 text-muted">
+                                                    <strong>{{ package(Auth::user()->package)->name }}</strong><br>
+                                                    Upgrade your plan and get the most out of JengaMetrics
+                                                </p>
+                                                <div class="mt-3">
+                                                    <a href="{{ route('subscribe') }}" class="btn btn-success"> Upgrade now</a>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @endif
+                                @endif
+
+
+
+                                <ul class="nav d-flex flex-column mb-2 pb-1">
+                                    @if(Auth::user()->is_client())
+                                    @if(Auth::user()->project_id)
+                                    <li class="nav-item"><a class="nav-link px-3 d-block"
+                                        href="/admin/settings"><span class="me-2 text-body align-bottom"
+                                        data-feather="pie-chart"></span>Project settings</a></li>
+                                        <li class="nav-item">
+
+
+                                            <a class="nav-link px-3 d-block" href="#" data-bs-toggle="modal"
+                                            data-bs-target="#switchbusinesses">
+                                            <span class="me-2 text-body align-bottom" data-feather="pie-chart">
+
+                                            </span>Switch Projects
+                                        </a>
+
+
+
+
+
+
+
+                                    </li>
+                                    @endif 
+
+                                    @endif
+                                </ul>
+                            </div>
+                            <div class="card-footer p-0 border-top border-translucent">
+                                <ul class="nav d-flex flex-column my-3">
+                                    @if(Auth::user()->is_client())
+                                        <a class="dropdown-item" href="{{ url('account') }}">
+                                            <i class="fa fa-user"></i> 
+                                            <span key="t-profile">Profile</span>
+                                        </a>
+                                        <a class="dropdown-item" href="{{ url('businesses') }}">
+                                            <i class="fa fa-users"></i> 
+                                            <span key="t-profile">Manage your projects</span>
+                                        </a>
+                                        <a class="dropdown-item" href="{{ url('billings') }}">
+                                            <i class="fa fa-users"></i>
+                                            <span key="t-profile">Manage your billings</span>
+                                        </a>
+                                        <a class="dropdown-item" href="{{ url('subscribe') }}">
+                                            <i class="fa fa-users"></i>
+                                            <span key="t-profile">Manage your subscriptions</span>
+                                        </a>
+                                    @endif
+
+
+                                                </ul>
+                                                <hr />
+                                                <div class="px-3"> 
+
+
+                                                <form method="POST" action="{{ route('logout') }}">
+                                                    @csrf
+
+                                                    <x-responsive-nav-link :href="route('logout')" class="btn btn-phoenix-secondary d-flex flex-center w-100"
+                                                    onclick="event.preventDefault();
+                                                    this.closest('form').submit();">
+                                                    <span class="me-2" data-feather="log-out">
+                                                    </span>Sign out</a>
+                                                </x-responsive-nav-link>
+                                            </form>
+                                        </div>
+                                        <div class="my-2 text-center fw-bold fs-10 text-body-quaternary"><a
+                                            class="text-body-quaternary me-1" href="#!">Privacy policy</a>&bull;<a
+                                            class="text-body-quaternary mx-1" href="#!">Terms</a>&bull;<a
+                                            class="text-body-quaternary ms-1" href="#!">Cookies</a></div>
+                                        </div>
+                        </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+
+
+
+
+
+            <script>
+                var navbarTopShape = window.config.config.phoenixNavbarTopShape;
+                var navbarPosition = window.config.config.phoenixNavbarPosition;
+                var body = document.querySelector('body');
+                var navbarDefault = document.querySelector('#navbarDefault');
+                var navbarTop = document.querySelector('#navbarTop');
+                var topNavSlim = document.querySelector('#topNavSlim');
+                var navbarTopSlim = document.querySelector('#navbarTopSlim');
+                var navbarCombo = document.querySelector('#navbarCombo');
+                var navbarComboSlim = document.querySelector('#navbarComboSlim');
+                var dualNav = document.querySelector('#dualNav');
+
+                var documentElement = document.documentElement;
+                var navbarVertical = document.querySelector('.navbar-vertical');
+
+                if (navbarPosition === 'dual-nav') {
+                    topNavSlim?.remove();
+                    navbarTop?.remove();
+                    navbarTopSlim?.remove();
+                    navbarCombo?.remove();
+                    navbarComboSlim?.remove();
+                    navbarDefault?.remove();
+                    navbarVertical?.remove();
+                    dualNav.removeAttribute('style');
+                    document.documentElement.setAttribute('data-navigation-type', 'dual');
+
+                } else if (navbarTopShape === 'slim' && navbarPosition === 'vertical') {
+                    navbarDefault?.remove();
+                    navbarTop?.remove();
+                    navbarTopSlim?.remove();
+                    navbarCombo?.remove();
+                    navbarComboSlim?.remove();
+                    topNavSlim.style.display = 'block';
+                    navbarVertical.style.display = 'inline-block';
+                    document.documentElement.setAttribute('data-navbar-horizontal-shape', 'slim');
+
+                } else if (navbarTopShape === 'slim' && navbarPosition === 'horizontal') {
+                    navbarDefault?.remove();
+                    navbarVertical?.remove();
+                    navbarTop?.remove();
+                    topNavSlim?.remove();
+                    navbarCombo?.remove();
+                    navbarComboSlim?.remove();
+                    dualNav?.remove();
+                    navbarTopSlim.removeAttribute('style');
+                    document.documentElement.setAttribute('data-navbar-horizontal-shape', 'slim');
+                } else if (navbarTopShape === 'slim' && navbarPosition === 'combo') {
+                    navbarDefault?.remove();
+                    navbarTop?.remove();
+                    topNavSlim?.remove();
+                    navbarCombo?.remove();
+                    navbarTopSlim?.remove();
+                    dualNav?.remove();
+                    navbarComboSlim.removeAttribute('style');
+                    navbarVertical.removeAttribute('style');
+                    document.documentElement.setAttribute('data-navbar-horizontal-shape', 'slim');
+                } else if (navbarTopShape === 'default' && navbarPosition === 'horizontal') {
+                    navbarDefault?.remove();
+                    topNavSlim?.remove();
+                    navbarVertical?.remove();
+                    navbarTopSlim?.remove();
+                    navbarCombo?.remove();
+                    navbarComboSlim?.remove();
+                    dualNav?.remove();
+                    navbarTop.removeAttribute('style');
+                    document.documentElement.setAttribute('data-navigation-type', 'horizontal');
+                } else if (navbarTopShape === 'default' && navbarPosition === 'combo') {
+                    topNavSlim?.remove();
+                    navbarTop?.remove();
+                    navbarTopSlim?.remove();
+                    navbarDefault?.remove();
+                    navbarComboSlim?.remove();
+                    dualNav?.remove();
+                    navbarCombo.removeAttribute('style');
+                    navbarVertical.removeAttribute('style');
+                    document.documentElement.setAttribute('data-navigation-type', 'combo');
+                } else {
+                    topNavSlim?.remove();
+                    navbarTop?.remove();
+                    navbarTopSlim?.remove();
+                    navbarCombo?.remove();
+                    navbarComboSlim?.remove();
+                    dualNav?.remove();
+                    navbarDefault.removeAttribute('style');
+                    navbarVertical.removeAttribute('style');
+                }
+
+                var navbarTopStyle = window.config.config.phoenixNavbarTopStyle;
+                var navbarTop = document.querySelector('.navbar-top');
+                if (navbarTopStyle === 'darker') {
+                    navbarTop.setAttribute('data-navbar-appearance', 'darker');
+                }
+
+                var navbarVerticalStyle = window.config.config.phoenixNavbarVerticalStyle;
+                var navbarVertical = document.querySelector('.navbar-vertical');
+                if (navbarVerticalStyle === 'darker') {
+                    navbarVertical.setAttribute('data-navbar-appearance', 'darker');
+                }
+            </script>
+
+            <div class="modal modal-blur fade" id="switchbusinesses" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Select project</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <?php
+                        $projects = \App\Models\Project::whereUserId(Auth::user()->id)->get();
+                        ?>
+                        <div class="modal-body">
+                            <table class="table">
+                                <tbody>
+                                    @foreach ($projects as $project)
+                                        <tr>
+                                            <td><b>{{ $loop->iteration }}. {{ $project->name }}</b></td>
+                                            <td>
+                                                <form action="{{ route('select_project') }}" method="POST"
+                                                    style="display:inline;">
+                                                    @csrf
+                                                    <input type="hidden" name="id" value="{{ $project->id }}">
+                                                    <button type="submit" class="btn btn-success btn-sm">Select</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    <tr>
+                                        <td>
+                                            <!-- <a class="dropdown-item" href="{{ url('businesses') }}">
+                                                <i class="fa fa-users"></i> 
+                                                <span key="t-profile">Manage your projects</span>
+                                            </a>
+                                            <br> -->
+                                            <a class="btn btn-success btn-small" href="{{ route('wizard.step1') }}">
+                                                <i class="fa fa-users"></i>
+                                                <span key="t-profile">Create new project</span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                                <!-- Pagination Links -->
+                            </div>
+
+                        </div>
                     </div>
-                </header>
-            @endisset
+                </div>
+                <div class="content">
+                    @yield('content')
+                </div>
+                <style>
+                    #toast-container {
+                        position: fixed;
+                        top: 1rem;
+                        right: 1rem;
+                        z-index: 1050;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1rem;
+                    }
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
-    </body>
+                    .toast {
+                        border-radius: 8px;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        overflow: hidden;
+                        animation: fadeInUp 0.5s ease-out;
+                    }
+
+                    .toast-header {
+                        background-color: #f8f9fa;
+                        border-bottom: 1px solid #e9ecef;
+                    }
+
+                    .toast-body {
+                        font-size: 0.9rem;
+                    }
+
+                    .toast .badge {
+                        margin-right: 0.5rem;
+                        font-size: 0.75rem;
+                    }
+
+                    @keyframes fadeInUp {
+                        from {
+                            transform: translateY(20px);
+                            opacity: 0;
+                        }
+                        to {
+                            transform: translateY(0);
+                            opacity: 1;
+                        }
+                    }
+                </style>
+                <div id="toast-container">
+                    @if (\Session::has('success'))
+                        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                            <div class="toast-header">
+                                <span class="avatar avatar-xs me-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-success" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /><path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727" /><path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" /></svg>
+                                </span>
+                                <strong class="me-auto">System</strong>
+                                <small>Just now</small>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                <span class="badge bg-success">Success</span>
+                                {!! \Session::get('success') !!}
+                            </div>
+                        </div>
+                    @endif 
+
+                    @if (\Session::has('warning'))
+                        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                            <div class="toast-header">
+                                <span class="avatar avatar-xs me-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-warning" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /><path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727" /><path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" /></svg>
+                                </span>
+                                <strong class="me-auto">System</strong>
+                                <small>Just now</small>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                <span class="badge bg-warning">Warning</span>
+                                {!! \Session::get('warning') !!}
+                            </div>
+                        </div>
+                    @endif 
+
+                    @if (\Session::has('danger'))
+                        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+                            <div class="toast-header">
+                                <span class="avatar avatar-xs me-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-danger" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /><path d="M21 6.727a11.05 11.05 0 0 0 -2.794 -3.727" /><path d="M3 6.727a11.05 11.05 0 0 1 2.792 -3.727" /></svg>
+                                </span>
+                                <strong class="me-auto">System</strong>
+                                <small>Just now</small>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                <span class="badge bg-danger">Error</span>
+                                {!! \Session::get('danger') !!}
+                            </div>
+                        </div>
+                    @endif 
+                </div>
+
+
+
+    </main>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/popper/popper.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/anchorjs/anchor.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/is/is.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/fontawesome/all.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/lodash/lodash.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/list.js/list.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/feather-icons/feather.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/dayjs/dayjs.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/leaflet/leaflet.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/leaflet.markercluster/leaflet.markercluster.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/leaflet.tilelayer.colorfilter/leaflet-tilelayer-colorfilter.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/assets/js/phoenix.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/echarts/echarts.min.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/assets/js/ecommerce-dashboard.js') }}" defer></script>
+    <script src="{{ asset('assets/metrics/vendors/prism/prism.js') }}" defer></script>
+
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Toast Options (if using toastr.js) -->
+    <script>
+        var toastr_options = { closeButton: true };
+    </script>
+
+    <!-- Custom Theme Script -->
+    <script>
+        document.addEventListener('click', function (event) {
+            const trigger = event.target.closest('.ghuranti');
+            if (!trigger) {
+                return;
+            }
+
+            document.querySelectorAll('.themeqx-demo-chooser-wrap').forEach(function (wrap) {
+                wrap.classList.toggle('open');
+            });
+        });
+    </script>
+
+    <script>
+    function toggleDropdown(element) {
+        const parent = element.closest('.nav-item-wrapper');
+
+        if (!parent) {
+            return;
+        }
+
+        parent.classList.toggle('open');
+    }
+    </script>
+
+    <!-- Blade Yield Stacks -->
+    @yield('page-js')
+    @yield('scripts')
+    @stack('scripts')
+</body>
 </html>

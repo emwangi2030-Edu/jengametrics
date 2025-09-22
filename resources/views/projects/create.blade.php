@@ -1,4 +1,4 @@
-@extends('layouts.appbar')
+@extends('layouts.app')
 
 @section('content')
     <h1>Create Class</h1>

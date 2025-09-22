@@ -1,4 +1,4 @@
-@extends('layouts.appbar')
+@extends('layouts.app')
 @section('content')    
 
 <x-app-layout>
@@ -32,4 +32,3 @@
 </x-app-layout>
 
 @endsection
-

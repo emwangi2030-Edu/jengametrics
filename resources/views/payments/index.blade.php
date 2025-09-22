@@ -1,4 +1,4 @@
-@extends('layouts.appbar')
+@extends('layouts.app')
 
 @section('content')
     <div class="card shadow-sm mt-4 p-4">
@@ -36,4 +36,3 @@
         </div>
     </div>
 @endsection
-
