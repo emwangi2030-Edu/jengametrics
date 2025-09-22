@@ -15,6 +15,7 @@ class Payment extends Model
         'payment_date',
         'period_start',
         'period_end',
+        'project_id',
     ];
 
     public function worker()

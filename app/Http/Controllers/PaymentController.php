@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Worker;
+use Illuminate\Support\Facades\Auth;
 
 class PaymentController extends Controller
 {
@@ -21,6 +22,7 @@ class PaymentController extends Controller
 
     public function store(Request $request, Worker $worker)
     {
+        $projectId = Auth::user()->project_id;
         $amount = $request->input('amount');
 
         if ($amount > 0) {
@@ -29,7 +31,7 @@ class PaymentController extends Controller
                 'payment_date' => now(),
                 'period_start' => now()->startOfMonth()->toDateString(),
                 'period_end' => now()->endOfMonth()->toDateString(),
-                'project_id' => $worker->project_id,
+                'project_id' => $projectId,
             ]);
         }
 

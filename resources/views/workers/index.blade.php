@@ -49,7 +49,7 @@
                                         <td>{{ $worker->job_category }}</td>
                                         <td>{{ $worker->work_type }}</td>
                                         <td>{{ $worker->phone }}</td>
-                                        <td>{{ $worker->email ?? 'null' }}</td>
+                                        <td>{{ $worker->email ?? 'N/A' }}</td>
                                         <td>{{ $worker->payment_amount }}</td>
                                         <td>{{ $worker->payment_frequency }}</td>
                                         <td>{{ $worker->mode_of_payment }}</td>

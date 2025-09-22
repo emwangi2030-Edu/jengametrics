@@ -25,6 +25,16 @@
                 </div>
             </div>
         </div>
+
+        <!-- Total Labour Expenses Card -->
+        <div class="col-md-4">
+            <div class="card shadow border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title" style="color:#027333">Total Labour Expenses</h5>
+                    <h3 class="text-dark">KES {{ number_format($totalPayments, 2) }}</h3>
+                </div>
+            </div>
+        </div>
     </div>
 
     <br>
@@ -42,7 +52,7 @@
 
     <div class="row mt-4">
         <div class="col-md-12">
-            <h3 style="color:#027333">Material Expense Trends</h3>
+            <h3 style="color:#027333">Material & Labour Expense Trends</h3>
             <canvas id="expenseChart"></canvas>
         </div>
     </div>
@@ -57,15 +67,26 @@
         type: 'line',
         data: {
             labels: @json($labels),
-            datasets: [{
-                label: 'Material Expenses',
-                data: @json($data),
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.3
-            }]
+            datasets: [
+                {
+                    label: 'Material Expenses',
+                    data: @json($data),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: 'Labour Expenses',
+                    data: @json($labourData),
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }
+            ]
         },
         options: {
         responsive: true,

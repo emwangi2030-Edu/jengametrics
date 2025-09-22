@@ -555,11 +555,12 @@ use Illuminate\Support\Facades\Auth;
                     </ul>
                 </div>
             </div>
-            <div class="navbar-vertical-footer">
-                <button class="btn navbar-vertical-toggle border-0 fw-semibold w-100 white-space-nowrap d-flex align-items-center">
-                    <span class="uil uil-left-arrow-to-left fs-8"></span>
-                    <span class="uil uil-arrow-from-right fs-8"></span>
-                    <span class="navbar-vertical-footer-text ms-2">Collapsed View</span>
+            <div class="navbar-vertical-footer px-3 py-2">
+                <button class="navbar-vertical-toggle nav-link w-100 d-flex align-items-center px-3 py-2 text-start border-0 bg-transparent" type="button" role="button">
+                    <span class="navbar-vertical-toggle-icon navbar-vertical-toggle-icon--expanded uil uil-left-arrow-to-left me-2 fs-6" aria-hidden="true"></span>
+                    <span class="navbar-vertical-toggle-icon navbar-vertical-toggle-icon--collapsed fs-4 me-2 d-none" aria-hidden="true">&rsaquo;</span>
+                    <span class="navbar-vertical-toggle-chevron me-2" aria-hidden="true">&lsaquo;</span>
+                    <span class="navbar-vertical-footer-text flex-grow-1" data-expanded-text="Collapse Menu" data-collapsed-text="Expand Menu">Collapse Menu</span>
                 </button>
             </div>
         </nav>
@@ -992,6 +993,57 @@ use Illuminate\Support\Facades\Auth;
     <!-- Toast Options (if using toastr.js) -->
     <script>
         var toastr_options = { closeButton: true };
+    </script>
+
+    <script>
+        (function () {
+            const htmlEl = document.documentElement;
+            const toggleBtn = document.querySelector('.navbar-vertical-toggle');
+
+            if (!htmlEl || !toggleBtn) {
+                return;
+            }
+
+            const expandedIcon = toggleBtn.querySelector('.navbar-vertical-toggle-icon--expanded');
+            const collapsedIcon = toggleBtn.querySelector('.navbar-vertical-toggle-icon--collapsed');
+            const text = toggleBtn.querySelector('.navbar-vertical-footer-text');
+            const chevron = toggleBtn.querySelector('.navbar-vertical-toggle-chevron');
+
+            function syncToggleButton() {
+                const isCollapsed = htmlEl.classList.contains('navbar-vertical-collapsed');
+
+                if (expandedIcon) {
+                    expandedIcon.classList.toggle('d-none', isCollapsed);
+                }
+
+                if (collapsedIcon) {
+                    collapsedIcon.classList.toggle('d-none', !isCollapsed);
+                }
+
+                if (text) {
+                    const expandedText = text.getAttribute('data-expanded-text') || text.textContent || 'Collapse Menu';
+                    const collapsedText = text.getAttribute('data-collapsed-text') || 'Expand Menu';
+                    text.textContent = isCollapsed ? collapsedText : expandedText;
+                    text.classList.toggle('d-none', isCollapsed);
+                }
+
+                if (chevron) {
+                    chevron.classList.toggle('d-none', isCollapsed);
+                }
+
+                toggleBtn.setAttribute('aria-label', isCollapsed ? 'Expand navigation menu' : 'Collapse navigation menu');
+                toggleBtn.setAttribute('aria-expanded', (!isCollapsed).toString());
+            }
+
+            syncToggleButton();
+
+            const observer = new MutationObserver(syncToggleButton);
+            observer.observe(htmlEl, { attributes: true, attributeFilter: ['class'] });
+
+            toggleBtn.addEventListener('click', function () {
+                requestAnimationFrame(syncToggleButton);
+            });
+        })();
     </script>
 
     <!-- Custom Theme Script -->
