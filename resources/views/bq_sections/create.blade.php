@@ -74,7 +74,7 @@
         </div>
     </div>
 </div>
-
+@push('scripts')
 <script>
     $(document).ready(function () {
         console.log('Page loaded, jQuery is ready');
@@ -156,4 +156,5 @@
         });
     });
 </script>
+@endpush
 @endsection
