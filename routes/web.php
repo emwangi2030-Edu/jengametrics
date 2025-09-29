@@ -93,8 +93,9 @@ Route::put('bq_documents/{bqDocument}/sections/{bqSection}', [BqSectionControlle
 Route::put('sections/bqitems/{id}', [BqSectionController::class, 'updateItem'])->name('bq_items.update');
 Route::delete('/bq_sections/item/{id}', [BqSectionController::class, 'destroyItem'])->name('bq_sections.item.destroy');
 
-Route::get('/get/elements', [BqDocumentController::class, 'getElements'])->name('get.elements');
-Route::get('/get/items', [BqDocumentController::class, 'getItems'])->name('get.items');
+// Consolidated AJAX endpoints (canonical controllers)
+Route::get('/get/elements', [ElementController::class, 'getElementsBySection'])->name('get.elements');
+Route::get('/get/items', [ItemsController::class, 'getItemsByElement'])->name('get.items');
 
 // Items Routes
 Route::get('bq_documents/{bqDocument}/items/create', [BqItemController::class, 'create'])->name('bq_documents.items.create');
@@ -112,6 +113,9 @@ Route::get('create-bq-item', ['as'=>'create_bq_item', 'uses' => '\App\Http\Contr
 
 
 Route::resource('boms', BOMController::class);
+
+// Rebuild BoM for a section from its BoQ items
+Route::post('boms/sections/{section}/rebuild', [BOMController::class, 'rebuildSection'])->name('boms.sections.rebuild');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/requisitions', [RequisitionController::class, 'index'])->name('requisitions.index');
