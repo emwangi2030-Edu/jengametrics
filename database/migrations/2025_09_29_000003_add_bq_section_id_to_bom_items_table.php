@@ -12,8 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bom_items', function (Blueprint $table) {
-            if (!Schema::hasColumn('bom_items', 'item_material_id')) {
-                $table->unsignedBigInteger('item_material_id')->after('item_id');
+            if (!Schema::hasColumn('bom_items', 'bq_section_id')) {
+                $table->unsignedBigInteger('bq_section_id')->nullable()->after('project_id');
+                // Optional FK for referential integrity:
+                // $table->foreign('bq_section_id')->references('id')->on('bq_sections')->onDelete('cascade');
             }
         });
     }
@@ -24,9 +26,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('bom_items', function (Blueprint $table) {
-            if (Schema::hasColumn('bom_items', 'item_material_id')) {
-                $table->dropColumn('item_material_id');
+            if (Schema::hasColumn('bom_items', 'bq_section_id')) {
+                // $table->dropForeign(['bq_section_id']); // if FK was added
+                $table->dropColumn('bq_section_id');
             }
         });
     }
 };
+

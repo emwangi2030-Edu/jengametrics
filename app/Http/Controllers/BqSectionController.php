@@ -24,16 +24,26 @@ class BqSectionController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'section_id' => 'required|exists:sections,id',
+            'element_id' => 'required|exists:elements,id',
+            'item_id'    => 'required|exists:items,id',
+            'rate'       => 'required|numeric|min:0',
+            'quantity'   => 'required|numeric|min:0',
+            'amount'     => 'nullable|numeric|min:0',
+        ]);
         // Retrieve the selected item
         $selectedItem = Item::find($request->item_id);
        
+        $calculatedAmount = ($request->rate ?? 0) * ($request->quantity ?? 0);
+
         $data = [
             'section_id' => $request->section_id,
             'element_id' => $request->element_id,
             'item_id' => $request->item_id,
             'rate' => $request->rate,
             'quantity' => $request->quantity,
-            'amount' => $request->amount,
+            'amount' => $calculatedAmount,
             'project_id' => project_id(),
             'item_name' => $selectedItem?->name,
             'units' => $selectedItem?->unit_of_measurement
