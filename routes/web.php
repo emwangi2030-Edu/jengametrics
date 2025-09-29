@@ -85,7 +85,11 @@ Route::resource('bq_documents', BqDocumentController::class);
 Route::get('boq', [BqDocumentController::class, 'index'])->name('boq');
 // Sections Routes
 Route::get('bq_documents/sections/create', [BqSectionController::class, 'create'])->name('bq_sections.create');
+Route::get('bq_documents/sections/bulk', [BqSectionController::class, 'bulkCreate'])->name('bq_sections.bulk_create');
 Route::post('bq_documents/sections', [BqSectionController::class, 'store'])->name('bq_sections.store');
+// Bulk add BoQ items into a section
+Route::post('bq_documents/sections/bulk', [BqSectionController::class, 'storeBulk'])->name('bq_sections.store_bulk');
+Route::post('bq_documents/sections/bulk/import', [BqSectionController::class, 'importCsv'])->name('bq_sections.import_csv');
 Route::get('section/{id}', [BqSectionController::class, 'show'])->name('section.show');
 
 Route::get('sections/{bqSection}/edit', [BqSectionController::class, 'edit'])->name('bq_sections.edit');

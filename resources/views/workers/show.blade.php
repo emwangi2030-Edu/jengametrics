@@ -115,6 +115,17 @@
     }
     
     });
+    // Override tooltip labels to avoid encoding glitches
+    if (attendanceChart && attendanceChart.options && attendanceChart.options.plugins && attendanceChart.options.plugins.tooltip) {
+        attendanceChart.options.plugins.tooltip.callbacks = {
+            label: function(context) {
+                if (context.dataset.label === 'Present') return 'Present';
+                if (context.dataset.label === 'Absent') return 'Absent';
+                if (context.dataset.label === 'Inactive') return 'Inactive';
+                return '';
+            }
+        };
+    }
 
     function loadAttendanceData() {
         const month = document.getElementById('month').value;

@@ -13,6 +13,7 @@ use App\Models\Product;
 use App\Models\Element;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class BqSectionController extends Controller
 {
@@ -20,6 +21,15 @@ class BqSectionController extends Controller
     {
         $sections = Section::all();
         return view('bq_sections.create', compact('sections'));
+    }
+
+    public function bulkCreate(Request $request)
+    {
+        $sections = Section::all();
+        return view('bq_sections.bulk', [
+            'sections' => $sections,
+            'prefillSection' => $request->get('section_id'),
+        ]);
     }
 
     public function store(Request $request)
@@ -85,6 +95,205 @@ class BqSectionController extends Controller
             }
         }
         return redirect()->route('bq_documents.index')->with('success', trans('Section added successfully.'));
+    }
+
+    public function storeBulk(Request $request)
+    {
+        $request->validate([
+            'section_id' => 'required|exists:sections,id',
+            'items' => 'required|array|min:1',
+            'items.*.element_id' => 'required|exists:elements,id',
+            'items.*.item_id' => 'required|exists:items,id',
+            'items.*.rate' => 'required|numeric|min:0',
+            'items.*.quantity' => 'required|numeric|min:0',
+        ]);
+
+        $sectionId = (int) $request->section_id;
+        $count = 0;
+
+        foreach ($request->items as $row) {
+            $selectedItem = Item::find($row['item_id']);
+            $rate = (float) ($row['rate'] ?? 0);
+            $qty = (float) ($row['quantity'] ?? 0);
+            $amount = $rate * $qty;
+
+            $sectionCreated = BqSection::create([
+                'section_id' => $sectionId,
+                'element_id' => $row['element_id'],
+                'item_id'    => $row['item_id'],
+                'rate'       => $rate,
+                'quantity'   => $qty,
+                'amount'     => $amount,
+                'project_id' => project_id(),
+                'item_name'  => $selectedItem?->name,
+                'units'      => $selectedItem?->unit_of_measurement,
+            ]);
+
+            if ($sectionCreated) {
+                // Labour
+                $unit = Item::find($row['item_id']);
+                BomLabour::create([
+                    'section_id'    => $sectionCreated->section_id,
+                    'item_id'       => $sectionCreated->item_id,
+                    'quantity'      => $qty,
+                    'rate'          => $unit->labour ?? 0,
+                    'amount'        => $qty * ($unit->labour ?? 0),
+                    'project_id'    => project_id(),
+                    'bq_section_id' => $sectionCreated->id,
+                ]);
+
+                // Materials
+                $materials = ItemMaterial::where('item_id', $row['item_id'])->get();
+                foreach ($materials as $material) {
+                    $product = Product::find($material->product_id);
+                    $quantity = $qty * ($material->conversion_factor ?? 0);
+                    $matRate = $product?->rate ?? 0;
+                    $matAmt = $quantity * $matRate;
+
+                    BomItem::create([
+                        'section_id'       => $sectionCreated->section_id,
+                        'item_id'          => $sectionCreated->item_id,
+                        'item_material_id' => $material->id,
+                        'product_id'       => $material->product_id,
+                        'quantity'         => $quantity,
+                        'rate'             => $matRate,
+                        'amount'           => $matAmt,
+                        'project_id'       => project_id(),
+                        'bq_section_id'    => $sectionCreated->id,
+                    ]);
+                }
+                $count++;
+            }
+        }
+
+        return redirect()->route('section.show', $sectionId)->with('success', "$count items added to BoQ and BoM.");
+    }
+
+    public function importCsv(Request $request)
+    {
+        $request->validate([
+            'section_id' => 'required|exists:sections,id',
+            'csv' => 'required|file|mimes:csv,txt',
+        ]);
+
+        $sectionId = (int) $request->section_id;
+        $path = $request->file('csv')->getRealPath();
+
+        $handle = fopen($path, 'r');
+        if ($handle === false) {
+            return back()->withErrors(['csv' => 'Unable to read uploaded file.']);
+        }
+
+        $rows = [];
+        $header = null;
+        while (($data = fgetcsv($handle)) !== false) {
+            if ($header === null) {
+                // Detect header by checking if it contains expected column names
+                $lower = array_map(fn($v) => strtolower(trim($v)), $data);
+                if (in_array('element_id', $lower) && in_array('item_id', $lower) && in_array('rate', $lower) && in_array('quantity', $lower)) {
+                    $header = $lower;
+                    continue;
+                }
+            }
+
+            if ($header) {
+                $row = array_combine($header, $data);
+                $rows[] = [
+                    'element_id' => trim($row['element_id'] ?? ''),
+                    'item_id'    => trim($row['item_id'] ?? ''),
+                    'rate'       => trim($row['rate'] ?? ''),
+                    'quantity'   => trim($row['quantity'] ?? ''),
+                ];
+            } else {
+                if (count($data) < 4) { continue; }
+                $rows[] = [
+                    'element_id' => trim($data[0] ?? ''),
+                    'item_id'    => trim($data[1] ?? ''),
+                    'rate'       => trim($data[2] ?? ''),
+                    'quantity'   => trim($data[3] ?? ''),
+                ];
+            }
+        }
+        fclose($handle);
+
+        if (empty($rows)) {
+            return back()->withErrors(['csv' => 'No valid rows found in CSV.']);
+        }
+
+        // Validate each row
+        $errors = [];
+        foreach ($rows as $i => $row) {
+            $v = Validator::make($row, [
+                'element_id' => 'required|exists:elements,id',
+                'item_id'    => 'required|exists:items,id',
+                'rate'       => 'required|numeric|min:0',
+                'quantity'   => 'required|numeric|min:0',
+            ]);
+            if ($v->fails()) {
+                $errors["row_".($i+1)] = $v->errors()->all();
+            }
+        }
+
+        if (!empty($errors)) {
+            return back()->withErrors($errors)->withInput();
+        }
+
+        // Reuse creation logic from storeBulk
+        $count = 0;
+        foreach ($rows as $row) {
+            $selectedItem = Item::find($row['item_id']);
+            $rate = (float) ($row['rate'] ?? 0);
+            $qty = (float) ($row['quantity'] ?? 0);
+            $amount = $rate * $qty;
+
+            $sectionCreated = BqSection::create([
+                'section_id' => $sectionId,
+                'element_id' => $row['element_id'],
+                'item_id'    => $row['item_id'],
+                'rate'       => $rate,
+                'quantity'   => $qty,
+                'amount'     => $amount,
+                'project_id' => project_id(),
+                'item_name'  => $selectedItem?->name,
+                'units'      => $selectedItem?->unit_of_measurement,
+            ]);
+
+            if ($sectionCreated) {
+                $unit = Item::find($row['item_id']);
+                BomLabour::create([
+                    'section_id'    => $sectionCreated->section_id,
+                    'item_id'       => $sectionCreated->item_id,
+                    'quantity'      => $qty,
+                    'rate'          => $unit->labour ?? 0,
+                    'amount'        => $qty * ($unit->labour ?? 0),
+                    'project_id'    => project_id(),
+                    'bq_section_id' => $sectionCreated->id,
+                ]);
+
+                $materials = ItemMaterial::where('item_id', $row['item_id'])->get();
+                foreach ($materials as $material) {
+                    $product = Product::find($material->product_id);
+                    $quantity = $qty * ($material->conversion_factor ?? 0);
+                    $matRate = $product?->rate ?? 0;
+                    $matAmt = $quantity * $matRate;
+
+                    BomItem::create([
+                        'section_id'       => $sectionCreated->section_id,
+                        'item_id'          => $sectionCreated->item_id,
+                        'item_material_id' => $material->id,
+                        'product_id'       => $material->product_id,
+                        'quantity'         => $quantity,
+                        'rate'             => $matRate,
+                        'amount'           => $matAmt,
+                        'project_id'       => project_id(),
+                        'bq_section_id'    => $sectionCreated->id,
+                    ]);
+                }
+                $count++;
+            }
+        }
+
+        return redirect()->route('section.show', $sectionId)->with('success', "$count items imported into BoQ and BoM.");
     }
 
     // Update the specified item in storage

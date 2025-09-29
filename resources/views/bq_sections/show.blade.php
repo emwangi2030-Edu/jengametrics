@@ -16,12 +16,67 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <div class="d-flex gap-2 mb-3">
-                            <a href="{{ route('bq_sections.create') }}" class="btn btn-success btn-sm">
+                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addItemModal">
                                 {{ __('Add New Item') }}
+                            </button>
+                            <a href="{{ route('bq_sections.bulk_create', ['section_id' => $bqSection->id]) }}" class="btn btn-outline-success btn-sm">
+                                {{ __('Bulk Add (Full Page)') }}
                             </a>
                             <a href="{{ route('boms.show', $bqSection->id) }}" class="btn btn-outline-primary btn-sm">
                                 {{ __('View BoM for this Section') }}
                             </a>
+                            <form action="{{ route('boms.sections.rebuild', $bqSection->id) }}" method="POST" onsubmit="return confirm('Rebuild BoM from BoQ for this section? This will overwrite existing BoM entries.');">
+                                @csrf
+                                <button type="submit" class="btn btn-warning btn-sm">{{ __('Rebuild BoM') }}</button>
+                            </form>
+                        </div>
+
+                        <!-- Add Item Modal -->
+                        <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="addItemModalLabel">{{ __('Add New BoQ Item') }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form method="POST" action="{{ route('bq_sections.store') }}">
+                                        @csrf
+                                        <input type="hidden" name="section_id" value="{{ $bqSection->id }}">
+                                        <div class="modal-body">
+                                            <div class="row g-3">
+                                                <div class="col-12">
+                                                    <label for="modal_element" class="form-label">{{ __('Element') }}</label>
+                                                    <select name="element_id" id="modal_element" class="form-select" required>
+                                                        <option value="">{{ __('Choose Element') }}</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label for="modal_item_id" class="form-label">{{ __('Item') }}</label>
+                                                    <select name="item_id" id="modal_item_id" class="form-select" required>
+                                                        <option value="">{{ __('Choose Item') }}</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="modal_rate" class="form-label">{{ __('Rate') }}</label>
+                                                    <input type="number" step="0.01" name="rate" id="modal_rate" class="form-control" placeholder="0.00" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="modal_quantity" class="form-label">{{ __('Quantity') }}</label>
+                                                    <input type="number" step="0.01" name="quantity" id="modal_quantity" class="form-control" placeholder="0" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="modal_amount" class="form-label">{{ __('Amount') }}</label>
+                                                    <input type="number" step="0.01" name="amount" id="modal_amount" class="form-control" placeholder="0.00" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                                            <button type="submit" class="btn btn-success">{{ __('Save to BoQ') }}</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="table-responsive">
@@ -89,3 +144,66 @@
         </div>
     </div>
 @endsection
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var addItemModal = document.getElementById('addItemModal');
+        if (!addItemModal) return;
+
+        var elementSelect = document.getElementById('modal_element');
+        var itemSelect = document.getElementById('modal_item_id');
+        var rateInput = document.getElementById('modal_rate');
+        var qtyInput = document.getElementById('modal_quantity');
+        var amountInput = document.getElementById('modal_amount');
+        var sectionId = {{ $bqSection->id }};
+
+        function computeAmount() {
+            var r = parseFloat(rateInput.value) || 0;
+            var q = parseFloat(qtyInput.value) || 0;
+            amountInput.value = (r * q).toFixed(2);
+        }
+
+        rateInput && rateInput.addEventListener('input', computeAmount);
+        qtyInput && qtyInput.addEventListener('input', computeAmount);
+
+        addItemModal.addEventListener('shown.bs.modal', function () {
+            // Load elements for this section
+            fetch(`{{ route('get.elements') }}?section_id=${sectionId}`)
+                .then(r => r.json())
+                .then(data => {
+                    elementSelect.innerHTML = '<option value="">{{ __('Choose Element') }}</option>';
+                    Object.keys(data).forEach(function (id) {
+                        var opt = document.createElement('option');
+                        opt.value = id;
+                        opt.textContent = data[id];
+                        elementSelect.appendChild(opt);
+                    });
+                    itemSelect.innerHTML = '<option value="">{{ __('Choose Item') }}</option>';
+                })
+                .catch(() => {
+                    elementSelect.innerHTML = '<option value="">{{ __('Failed to load elements') }}</option>';
+                });
+        });
+
+        elementSelect && elementSelect.addEventListener('change', function () {
+            var elementId = this.value;
+            itemSelect.innerHTML = '<option value="">{{ __('Choose Item') }}</option>';
+            if (!elementId) return;
+            fetch(`{{ route('get.items') }}?element_id=${elementId}`)
+                .then(r => r.json())
+                .then(data => {
+                    itemSelect.innerHTML = '<option value="">{{ __('Choose Item') }}</option>';
+                    Object.keys(data).forEach(function (id) {
+                        var opt = document.createElement('option');
+                        opt.value = id;
+                        opt.textContent = data[id];
+                        itemSelect.appendChild(opt);
+                    });
+                })
+                .catch(() => {
+                    itemSelect.innerHTML = '<option value="">{{ __('Failed to load items') }}</option>';
+                });
+        });
+    });
+</script>
+@endpush
