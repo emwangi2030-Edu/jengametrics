@@ -108,6 +108,36 @@ class WorkerController extends Controller
         $amountOwed = max($totalOwed - $alreadyPaid, 0);
 
 
+        // Recompute amount owed scoped to selected month/year
+        try {
+            $periodStart = Carbon::createFromDate($year, $month, 1)->startOfDay();
+            $periodEnd = (clone $periodStart)->endOfMonth();
+            $attendanceCount = $attendances->where('present', true)->count();
+            $totalOwedPeriod = 0.0;
+            if ($worker->payment_frequency === 'per day') {
+                $totalOwedPeriod = $attendanceCount * (float) $worker->payment_amount;
+            } elseif ($worker->payment_frequency === 'per month') {
+                $activeStart = $worker->created_at->gt($periodStart) ? $worker->created_at->copy()->startOfDay() : $periodStart;
+                $activeDays = max(0, $activeStart->diffInDays($periodEnd->copy()->addDay()));
+                $daysInMonth = $periodStart->daysInMonth;
+                $prorataFactor = $daysInMonth > 0 ? ($activeDays / $daysInMonth) : 0;
+                $totalOwedPeriod = (float) $worker->payment_amount * $prorataFactor;
+            } elseif ($worker->payment_frequency === 'one-time payment') {
+                $hasAnyPayment = $worker->payments()->exists();
+                $totalOwedPeriod = $hasAnyPayment ? 0.0 : (float) $worker->payment_amount;
+            }
+            if ($worker->payment_frequency === 'one-time payment') {
+                $alreadyPaidPeriod = (float) $worker->payments()->sum('amount');
+            } else {
+                $alreadyPaidPeriod = (float) $worker->payments()
+                    ->whereBetween('payment_date', [$periodStart, $periodEnd])
+                    ->sum('amount');
+            }
+            $amountOwed = max($totalOwedPeriod - $alreadyPaidPeriod, 0.0);
+        } catch (\Throwable $e) {
+            // fallback to previous amountOwed if anything goes wrong
+        }
+
         return view('workers.show', compact(
             'worker',
             'labels',

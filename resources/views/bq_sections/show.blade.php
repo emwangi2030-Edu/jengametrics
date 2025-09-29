@@ -19,6 +19,9 @@
                             <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addItemModal">
                                 {{ __('Add New Item') }}
                             </button>
+                            <a href="{{ route('bq_sections.bulk_create', ['section_id' => $bqSection->id]) }}" class="btn btn-outline-success btn-sm">
+                                {{ __('Bulk Add (Full Page)') }}
+                            </a>
                             <a href="{{ route('boms.show', $bqSection->id) }}" class="btn btn-outline-primary btn-sm">
                                 {{ __('View BoM for this Section') }}
                             </a>

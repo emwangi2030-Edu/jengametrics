@@ -27,7 +27,7 @@ class MaterialController extends Controller
         $year = $request->input('year', now()->year);
 
         // Build materials query
-        $materialsQuery = Material::with('supplier', 'requisition')
+        $materialsQuery = Material::with('supplier')
             ->where('project_id', $projectId);
 
         // Apply time filters
@@ -119,7 +119,7 @@ class MaterialController extends Controller
         $projectId = Auth::user()->project_id;
         $year = $request->input('year', now()->year);
 
-        $materialsQuery = Material::with('supplier', 'requisition')
+        $materialsQuery = Material::with('supplier')
             ->where('project_id', $projectId);
 
         if ($request->filter === 'week') {
@@ -570,24 +570,40 @@ class MaterialController extends Controller
             $materialQuery->where('product_id', $key);
         }
 
-        $material = $materialQuery->oldest()->first();
-
-        if (!$material) {
+        // Consume stock FIFO across multiple batches if necessary
+        $batches = $materialQuery->orderBy('created_at', 'asc')->get();
+        if ($batches->isEmpty()) {
             return response()->json(['error' => 'No material found in stock.'], 400);
         }
 
-        if ($validated['quantity_used'] > $material->quantity_in_stock) {
-            return response()->json(['error' => 'Not enough stock available.'], 400);
+        $required = (float) $validated['quantity_used'];
+        $remainingToConsume = $required;
+
+        foreach ($batches as $batch) {
+            if ($remainingToConsume <= 0) break;
+            $available = (float) $batch->quantity_in_stock;
+            if ($available <= 0) continue;
+
+            $take = min($available, $remainingToConsume);
+            // Update batch stock
+            $batch->quantity_in_stock = $available - $take;
+            $batch->save();
+
+            // Record usage for this batch
+            StockUsage::create([
+                'material_id' => $batch->id,
+                'quantity_used' => $take,
+                'section_id' => $validated['section_id'],
+            ]);
+
+            $remainingToConsume -= $take;
         }
 
-        $material->quantity_in_stock -= $validated['quantity_used'];
-        $material->save();
-
-        StockUsage::create([
-            'material_id' => $material->id,
-            'quantity_used' => $validated['quantity_used'],
-            'section_id' => $validated['section_id'],
-        ]);
+        if ($remainingToConsume > 0) {
+            // Rollback-like notice would be more complex; inform client of partial availability
+            $availableTotal = $required - $remainingToConsume;
+            return response()->json(['error' => "Only $availableTotal available in stock."], 400);
+        }
 
         $remainingStock = Material::where('project_id', $projectId)
             ->when($isAdhoc, function ($query) use ($validated) {
