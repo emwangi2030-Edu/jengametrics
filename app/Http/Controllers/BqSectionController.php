@@ -16,12 +16,10 @@ use Illuminate\Http\Request;
 
 class BqSectionController extends Controller
 {
-    public function create(BqDocument $bqDocument)
+    public function create()
     {
-       
         $sections = Section::all();
-
-        return view('bq_sections.create', compact('bqDocument', 'sections'));
+        return view('bq_sections.create', compact('sections'));
     }
 
     public function store(Request $request)
@@ -42,36 +40,34 @@ class BqSectionController extends Controller
         ];
 
         $section_created = BqSection::create($data);
-        if($section_created){
-
+        if ($section_created) {
             $materials = ItemMaterial::where('item_id', $request->item_id)->get();
 
             $unit = Item::find($request->item_id);
-            $labour = $unit->labour;
-            $labour = $labour*$request->quantity;
 
-                BomLabour::create([
-                    'section_id'       => $section_created->section_id,
-                    'item_id'          => $section_created->item_id,
-                    'quantity'         => $request->quantity,
-                    'rate'             => $unit->labour,
-                    'amount'           => $request->quantity*$unit->labour,
-                    'project_id'       => project_id(),
-                    'bq_section_id'    => $section_created->id,
-                ]);
+            BomLabour::create([
+                'section_id'    => $section_created->section_id,
+                'item_id'       => $section_created->item_id,
+                'quantity'      => $request->quantity,
+                'rate'          => $unit->labour,
+                'amount'        => $request->quantity * $unit->labour,
+                'project_id'    => project_id(),
+                'bq_section_id' => $section_created->id,
+            ]);
 
-
-            foreach($materials as $material) {
+            foreach ($materials as $material) {
                 $product = Product::find($material->product_id);
-                $quantity = $request->quantity * $material->conversion_factor;
-                $amount = $material->amount*$material->rate; 
+                $quantity = $request->quantity * ($material->conversion_factor ?? 0);
+                $rate = $product?->rate ?? 0;
+                $amount = $quantity * $rate;
+
                 BomItem::create([
                     'section_id'       => $section_created->section_id,
                     'item_id'          => $section_created->item_id,
                     'item_material_id' => $material->id,
                     'product_id'       => $material->product_id,
-                    'quantity'         => $request->quantity,
-                    'rate'             => $product->rate,
+                    'quantity'         => $quantity,
+                    'rate'             => $rate,
                     'amount'           => $amount,
                     'project_id'       => project_id(),
                     'bq_section_id'    => $section_created->id,
