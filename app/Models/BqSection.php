@@ -29,6 +29,14 @@ class BqSection extends Model
     {
         return $this->belongsTo(Item::class);
     }
+
+    public function bomItems()
+    {
+        return $this->hasMany(BomItem::class, 'bq_section_id');
+    }
+
+    public function bomLabours()
+    {
+        return $this->hasMany(BomLabour::class, 'bq_section_id');
+    }
 }
-
-

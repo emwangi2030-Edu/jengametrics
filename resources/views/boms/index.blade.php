@@ -5,13 +5,51 @@
     <div class="row mb-4">
         <div class="col-12">
             <h2 class="font-weight-bold" style="color:#027333">
-                Bill of Materials: <span class="text-black">{{ get_project()->name }}</span>
+                Bill of Materials: <span class="text-black">{{ $project->name }}</span>
             </h2>
         </div>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-md-10">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">{{ __('Sub BoQ Contribution') }}</h5>
+                    @if($subDocuments->isEmpty())
+                        <p class="text-muted mb-0">{{ __('No sub BoQs available yet.') }}</p>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>{{ __('Sub BoQ') }}</th>
+                                        <th class="text-end">{{ __('Material Cost (KES)') }}</th>
+                                        <th class="text-end">{{ __('Labour Cost (KES)') }}</th>
+                                        <th class="text-end">{{ __('Total (KES)') }}</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($subDocuments as $document)
+                                        <tr>
+                                            <td class="fw-semibold">{{ $document->title }}</td>
+                                           <td class="text-end">{{ number_format($document->materials_total, 2) }}</td>
+                                           <td class="text-end">{{ number_format($document->labour_total, 2) }}</td>
+                                           <td class="text-end">{{ number_format($document->combined_total, 2) }}</td>
+                                           <td class="text-end">
+                                                <a href="{{ route('boms.documents.show', $document) }}" class="btn btn-outline-primary btn-sm">
+                                                    {{ __('Open BoM') }}
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <!-- Document Details -->
@@ -88,5 +126,3 @@
     </div>
 </div>
 @endsection
-
-

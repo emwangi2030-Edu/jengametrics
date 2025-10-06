@@ -22,6 +22,7 @@
                     <tr>
                         <th>Requisition No.</th>
                         <th>Material</th>
+                        <th>BoQ</th>
                         <th>Quantity Requested</th>
                         <th>Status</th>
                         <th>Section</th>
@@ -37,6 +38,7 @@
                         <tr>
                             <td>{{ $req->requisition_no }}</td>
                             <td>{{ $req->bomItem->item_material->name ?? $req->extra_material_name }}</td>
+                            <td>{{ $req->bomItem->bqDocument->title ?? ($req->extra_material_name ? __('Ad-hoc Request') : __('Unknown')) }}</td>
                             <td>
                                 {{ (int) $req->quantity_requested }} {{ $req->bomItem->item_material->unit_of_measurement ?? $req->extra_unit }}
                             </td>
@@ -67,7 +69,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center">No requisitions found.</td>
+                            <td colspan="10" class="text-center">No requisitions found.</td>
                         </tr>
                     @endforelse
                 </tbody>

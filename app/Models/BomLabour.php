@@ -9,8 +9,18 @@ class BomLabour extends Model
 {
     protected $guarded = [];
 
-     public function item()
+    public function item()
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function bqDocument()
+    {
+        return $this->belongsTo(BqDocument::class);
+    }
+
+    public function bqSection()
+    {
+        return $this->belongsTo(BqSection::class);
     }
 }

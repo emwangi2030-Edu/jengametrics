@@ -4,8 +4,8 @@
 <div class="container py-5">
     <div class="row mb-5 text-center">
         <div class="col-12">
-            <h2 class="display-6 fw-bold" style="color:#027333;">{{ __('Create New BQ Document') }}</h2>
-            <p class="text-muted">Fill in the details to create a comprehensive Bill of Quantities document.</p>
+            <h2 class="display-6 fw-bold" style="color:#027333;">{{ __('Add Item to :document', ['document' => $bqDocument->title]) }}</h2>
+            <p class="text-muted">{{ __('Select a section, element, and item to include in this sub BoQ.') }}</p>
         </div>
     </div>
 
@@ -67,7 +67,7 @@
                     </form>
                     <br>
                     <div class="d-flex justify-content-center">
-                        <a href="{{ route('boq') }}" class="btn btn-dark">Back</a>
+                        <a href="{{ route('bq_documents.show', $bqDocument) }}" class="btn btn-dark">{{ __('Back') }}</a>
                     </div>
                 </div>
             </div>

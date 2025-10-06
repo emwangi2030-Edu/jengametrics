@@ -6,8 +6,9 @@
         <div class="row mb-4">
             <div class="col-12">
                 <h2 class="font-weight-bold text-dark">
-                    {{ __('Create New Bill of Quantities') }}
+                    {{ __('Create Sub Bill of Quantities') }}
                 </h2>
+                <p class="text-muted mb-0">{{ __('Sub BoQs roll up into the master BoQ for project-wide totals.') }}</p>
             </div>
         </div>
 
@@ -38,7 +39,7 @@
 
                             <!-- Submit Button -->
                             <button type="submit" class="btn btn-primary">
-                                {{ __('Create') }}
+                                {{ __('Create Sub BoQ') }}
                             </button>
                         </form>
                     </div>

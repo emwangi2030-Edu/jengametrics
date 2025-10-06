@@ -20,20 +20,48 @@ class BOMController extends Controller
 {
     public function index()
     {
-        $bqDocument = get_project()->id;
+        $project = get_project();
+
         $sections = Section::orderBy('id', 'asc')->get();
-        // $total_section_material_costs = BomItem::whereProjectId(project_id())
-        //                                     ->where('section_id', $sections->id)
-        //                                     ->selectRaw('SUM(quantity * rate) as total')
-        //                                     ->value('total');
-        $totalAmount = BomItem::where('project_id', project_id())
-                                ->selectRaw('SUM(quantity * rate) as total')
-                                ->value('total');
-        $totalLabour = BomLabour::where('project_id', project_id())
-                                ->sum('amount');
 
+        $projectId = project_id();
 
-        return view('boms.index', compact('bqDocument', 'sections', 'totalAmount', 'totalLabour'));
+        $labourTotalsByDocument = BomLabour::where('project_id', $projectId)
+            ->with('bqSection')
+            ->get()
+            ->groupBy(function (BomLabour $labour) {
+                return $labour->bq_document_id
+                    ?: optional($labour->bqSection)->bq_document_id
+                    ?: 'unassigned';
+            })
+            ->map(function ($items) {
+                return (float) $items->sum('amount');
+            });
+
+        $subDocuments = BqDocument::where('project_id', $project->id)
+            ->whereNotNull('parent_id')
+            ->orderBy('created_at')
+            ->get()
+            ->load(['sections' => function ($query) {
+                $query->orderBy('section_id')
+                    ->with([
+                        'section',
+                        'bomItems.item_material',
+                        'bomItems.product',
+                    ]);
+            }])
+            ->map(fn (BqDocument $document) => $this->transformDocumentForBom($document, $labourTotalsByDocument));
+
+        $totalAmount = $subDocuments->sum('materials_total');
+        $totalLabour = $subDocuments->sum('labour_total');
+
+        return view('boms.index', [
+            'project' => $project,
+            'sections' => $sections,
+            'totalAmount' => $totalAmount,
+            'totalLabour' => $totalLabour,
+            'subDocuments' => $subDocuments,
+        ]);
     }
 
     public function create()
@@ -119,6 +147,35 @@ class BOMController extends Controller
         return redirect()->route('boms.index')->with('success', 'BOM deleted successfully.');
     }
 
+    public function showDocument(BqDocument $bqDocument)
+    {
+        $project = get_project();
+
+        if ($bqDocument->project_id !== $project->id || is_null($bqDocument->parent_id)) {
+            abort(404);
+        }
+
+        $bqDocument->load(['sections' => function ($query) {
+            $query->orderBy('section_id')
+                ->with([
+                    'section',
+                    'bomItems.item_material',
+                    'bomItems.product',
+                ]);
+        }]);
+
+        $labourTotal = BomLabour::where('project_id', project_id())
+            ->where('bq_document_id', $bqDocument->id)
+            ->sum('amount');
+
+        $document = $this->transformDocumentForBom($bqDocument, collect([$bqDocument->id => $labourTotal]));
+
+        return view('boms.document', [
+            'project' => $project,
+            'document' => $document,
+        ]);
+    }
+
     public function report()
     {
 
@@ -146,6 +203,142 @@ class BOMController extends Controller
         $project = Project::find($projectId);
 
         return view('report.report', compact('totalEstimatedCost', 'totalEstimatedCost_labour', 'total_actual_cost', 'total_actual_payments','project'));
+    }
+
+    protected function transformDocumentForBom(BqDocument $document, $labourTotalsByDocument)
+    {
+        $processedSections = $document->sections->map(function (BqSection $section) {
+            $materials = $section->bomItems->map(function (BomItem $item) {
+                $product = optional($item->product);
+                $itemMaterial = optional($item->item_material);
+
+                $name = $itemMaterial->name
+                    ?? $product->name
+                    ?? $item->item_description
+                    ?? __('Unknown Material');
+
+                $unit = $itemMaterial->unit_of_measurement
+                    ?? $product->unit
+                    ?? $item->unit
+                    ?? 'N/A';
+
+                $quantity = (float) ($item->quantity ?? 0);
+                $rate = (float) ($item->rate ?? $product->rate ?? 0);
+                $amount = (float) ($item->amount ?? ($quantity * $rate));
+
+                return (object) [
+                    'product_id' => $item->product_id,
+                    'name' => $name,
+                    'unit' => $unit,
+                    'quantity' => $this->normalizeNumeric($quantity),
+                    'rate' => $rate,
+                    'amount' => $amount,
+                ];
+            });
+
+            $sectionModel = optional($section->section);
+            $key = $sectionModel?->id;
+
+            if (is_null($key)) {
+                $key = 'bq:' . $section->id;
+            }
+
+            return collect([
+                'group_key' => $key,
+                'section_id' => $sectionModel?->id,
+                'section_name' => $sectionModel?->name ?? ($section->item_name ?: __('Unassigned Section')),
+                'units' => $section->units,
+                'quantity' => (float) ($section->quantity ?? 0),
+                'amount' => (float) ($section->amount ?? 0),
+                'materials' => $materials,
+            ]);
+        });
+
+        $aggregatedSections = $processedSections
+            ->groupBy('group_key')
+            ->map(function ($group) {
+                $first = $group->first();
+
+                $materialsCollection = $group
+                    ->pluck('materials')
+                    ->flatten(1);
+
+                $withProduct = $materialsCollection
+                    ->filter(fn ($material) => ! is_null($material->product_id))
+                    ->groupBy('product_id')
+                    ->map(function ($materials) {
+                        $sample = $materials->first();
+                        $totalQuantity = $materials->sum(fn ($material) => (float) ($material->quantity ?? 0));
+                        $totalAmount = $materials->sum(fn ($material) => (float) ($material->amount ?? 0));
+
+                        $rate = $totalQuantity > 0
+                            ? $totalAmount / $totalQuantity
+                            : (float) ($sample->rate ?? 0);
+
+                        return (object) [
+                            'product_id' => $sample->product_id,
+                            'name' => $sample->name ?? __('Unknown Material'),
+                            'unit' => $sample->unit ?? 'N/A',
+                            'quantity' => $this->normalizeNumeric($totalQuantity),
+                            'rate' => $rate,
+                            'amount' => $totalAmount,
+                        ];
+                    })
+                    ->values();
+
+                $withoutProduct = $materialsCollection
+                    ->filter(fn ($material) => is_null($material->product_id));
+
+                if ($withoutProduct->isNotEmpty()) {
+                    $totalQuantity = $withoutProduct->sum(fn ($material) => (float) ($material->quantity ?? 0));
+                    $totalAmount = $withoutProduct->sum(fn ($material) => (float) ($material->amount ?? 0));
+                    $rate = $totalQuantity > 0 ? $totalAmount / $totalQuantity : 0;
+
+                    $withProduct->push((object) [
+                        'product_id' => null,
+                        'name' => __('Unassigned Materials'),
+                        'unit' => 'N/A',
+                        'quantity' => $this->normalizeNumeric($totalQuantity),
+                        'rate' => $rate,
+                        'amount' => $totalAmount,
+                    ]);
+                }
+
+                $materials = $withProduct;
+
+                return (object) [
+                    'section_id' => $first->get('section_id'),
+                    'section_name' => $first->get('section_name'),
+                    'units' => $first->get('units') ?? 'N/A',
+                    'quantity' => $this->normalizeNumeric($group->sum(fn ($section) => (float) ($section->get('quantity') ?? 0))),
+                    'amount' => $group->sum(fn ($section) => (float) ($section->get('amount') ?? 0)),
+                    'materials' => $materials,
+                    'material_total' => $materials->sum('amount'),
+                    'item_count' => $group->count(),
+                ];
+            })
+            ->values();
+
+        $document->sections = $aggregatedSections;
+
+        $labourTotal = $labourTotalsByDocument[$document->id] ?? 0;
+
+        $document->materials_total = (float) $document->sections->sum('material_total');
+        $document->labour_total = (float) $labourTotal;
+        $document->combined_total = $document->materials_total + $document->labour_total;
+
+        return $document;
+    }
+
+    protected function normalizeNumeric(float $value)
+    {
+        $rounded = round($value, 4);
+
+        if (abs($rounded - round($rounded)) < 0.0001) {
+            return (int) round($rounded);
+        }
+
+        return (float) $rounded;
     }
 }
 
