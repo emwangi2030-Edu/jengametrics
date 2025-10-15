@@ -10,7 +10,7 @@
         } elseif (\Illuminate\Support\Str::startsWith($picturePath, ['storage/', '/storage/'])) {
             $photoUrl = asset($picturePath);
         } else {
-            $photoUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($picturePath);
+            $photoUrl = \Illuminate\Support\Facades\Storage::url($picturePath);
         }
     }
 @endphp
