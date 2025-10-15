@@ -11,13 +11,24 @@ use Illuminate\Support\Facades\Auth;
 
 class WorkerController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index()
     {
-        // Get the project ID from the authenticated user
-        $projectId = Auth::user()->project_id;
+        $user = Auth::user();
+        $projectId = $user?->project_id;
+
+        if (!$projectId) {
+            return redirect()
+                ->route('wizard.step1')
+                ->with('warning', 'Select or create a project before managing workers.');
+        }
 
         // Retrieve workers only for the user's current project
-         $workers = Worker::withCount('attendances')
+        $workers = Worker::withCount('attendances')
             ->where('project_id', $projectId)
             ->get();
 
@@ -42,34 +53,6 @@ class WorkerController extends Controller
             ->orderBy('date')
             ->get()
             ->keyBy(fn($att) => Carbon::parse($att->date)->format('d-m-Y'));
-
-        $labels = [];
-        $presentData = [];
-        $absentData = [];
-        $inactiveData = [];
-
-        $daysInMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
-        $today = Carbon::today();
-        $workerCreatedAt = $worker->created_at->startOfDay();
-
-        for ($day = 1; $day <= $daysInMonth; $day++) {
-            $date = Carbon::createFromDate($year, $month, $day);
-            $formattedDate = $date->format('d-m-Y');
-            $labels[] = $date->format('M d');
-
-            // If before worker joined or after today, leave as inactive
-            if ($date->lt($workerCreatedAt) || $date->gt($today)) {
-                $presentData[] = 0;
-                $absentData[] = 0;
-                $inactiveData[] = 1;
-                continue;
-            }
-
-            $isPresent = $attendances->has($formattedDate) && (bool) $attendances[$formattedDate]->present;
-            $presentData[] = $isPresent ? 1 : 0;
-            $absentData[] = $isPresent ? 0 : 1;
-            $inactiveData[] = 0;
-        }
 
         // Dropdown data
         $availableYears = Attendance::where('worker_id', $worker->id)
@@ -110,10 +93,6 @@ class WorkerController extends Controller
 
         return view('workers.show', compact(
             'worker',
-            'labels',
-            'presentData',
-            'absentData',
-            'inactiveData',
             'month',
             'year',
             'availableMonths',
@@ -124,8 +103,14 @@ class WorkerController extends Controller
 
     public function create()
     {
-        // Get the project ID from the authenticated user
-        $projectId = Auth::user()->project_id;
+        $user = Auth::user();
+        $projectId = $user?->project_id;
+
+        if (!$projectId) {
+            return redirect()
+                ->route('wizard.step1')
+                ->with('warning', 'Select or create a project before adding workers.');
+        }
 
         return view('workers.create', compact('projectId'));
     }
@@ -133,7 +118,16 @@ class WorkerController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $user = Auth::user();
+        $projectId = $user?->project_id;
+
+        if (!$projectId) {
+            return redirect()
+                ->route('wizard.step1')
+                ->with('warning', 'Select or create a project before adding workers.');
+        }
+
+        $validated = $request->validate([
             'full_name'         => 'required|string|max:255',
             'id_number'         => 'required|integer',
             'job_category'      => 'required|string',
@@ -143,24 +137,18 @@ class WorkerController extends Controller
             'payment_amount'    => 'nullable|numeric|min:0',
             'payment_frequency' => 'nullable|string|in:per day,per month,one-time payment',
             'mode_of_payment'   => 'required|string',
-            'bank_name'         => 'required_if:mode_of_payment,Bank|string|max:255',
-            'bank_account'      => 'required_if:mode_of_payment,Bank|string|max:255',
+            'bank_name'         => ['required_if:mode_of_payment,Bank', 'nullable', 'string', 'max:255'],
+            'bank_account'      => ['required_if:mode_of_payment,Bank', 'nullable', 'string', 'max:255'],
         ]);
 
-        Worker::create([
-            'full_name'         => $request->input('full_name'),
-            'id_number'         => $request->input('id_number'),
-            'job_category'      => $request->input('job_category'),
-            'work_type'         => $request->input('work_type'),
-            'phone'             => $request->input('phone'),
-            'email'             => $request->input('email'),
-            'payment_amount'    => $request->input('payment_amount'),
-            'payment_frequency' => $request->input('payment_frequency'),
-            'mode_of_payment'   => $request->input('mode_of_payment'),
-            'bank_name'         => $request->input('bank_name'),
-            'bank_account'      => $request->input('bank_account'),
-            'project_id'        => Auth::user()->project_id,
-        ]);
+        if (($validated['mode_of_payment'] ?? '') !== 'Bank') {
+            $validated['bank_name'] = null;
+            $validated['bank_account'] = null;
+        }
+
+        $validated['project_id'] = $projectId;
+
+        Worker::create($validated);
 
         return redirect()
             ->route('workers.index')
@@ -178,7 +166,7 @@ class WorkerController extends Controller
     {
         $worker = Worker::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'full_name'         => 'required|string|max:255',
             'id_number'         => 'required|integer',
             'job_category'      => 'required|string',
@@ -188,23 +176,16 @@ class WorkerController extends Controller
             'payment_amount'    => 'nullable|numeric|min:0',
             'payment_frequency' => 'nullable|string|in:per day,per month,one-time payment',
             'mode_of_payment'   => 'required|string',
-            'bank_name'         => 'required_if:mode_of_payment,Bank|string|max:255',
-            'bank_account'      => 'required_if:mode_of_payment,Bank|string|max:255',
+            'bank_name'         => ['required_if:mode_of_payment,Bank', 'nullable', 'string', 'max:255'],
+            'bank_account'      => ['required_if:mode_of_payment,Bank', 'nullable', 'string', 'max:255'],
         ]);
 
-        $worker->update([
-            'full_name'         => $request->input('full_name'),
-            'id_number'         => $request->input('id_number'),
-            'job_category'      => $request->input('job_category'),
-            'work_type'         => $request->input('work_type'),
-            'phone'             => $request->input('phone'),
-            'email'             => $request->input('email'),
-            'payment_amount'    => $request->input('payment_amount'),
-            'payment_frequency' => $request->input('payment_frequency'),
-            'mode_of_payment'   => $request->input('mode_of_payment'),
-            'bank_name'         => $request->input('bank_name'),
-            'bank_account'      => $request->input('bank_account'),
-        ]);
+        if (($validated['mode_of_payment'] ?? '') !== 'Bank') {
+            $validated['bank_name'] = null;
+            $validated['bank_account'] = null;
+        }
+
+        $worker->update($validated);
 
         return redirect()
             ->route('workers.index')
@@ -226,38 +207,63 @@ class WorkerController extends Controller
             ->keyBy(fn($att) => Carbon::parse($att->date)->format('d-m-Y'));
 
         $labels = [];
-        $presentData = [];
-        $absentData = [];
-        $inactiveData = [];
-        $weekendIndexes = [];
+        $values = [];
+        $backgroundColors = [];
+        $borderColors = [];
+        $statuses = [];
 
         $daysInMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
         $today = Carbon::today();
         $workerCreatedAt = $worker->created_at->startOfDay();
 
+        $colors = [
+            'present' => ['bg' => 'rgba(40, 167, 69, 0.6)', 'border' => 'rgba(40, 167, 69, 1)'],
+            'absent' => ['bg' => 'rgba(220, 53, 69, 0.6)', 'border' => 'rgba(220, 53, 69, 1)'],
+            'weekend' => ['bg' => 'rgba(173, 216, 230, 0.8)', 'border' => 'rgba(100, 149, 237, 0.9)'],
+            'inactive' => ['bg' => 'rgba(200, 200, 200, 0.5)', 'border' => 'rgba(200, 200, 200, 0.8)'],
+        ];
+
         for ($day = 1; $day <= $daysInMonth; $day++) {
             $date = Carbon::createFromDate($year, $month, $day);
             $formattedDate = $date->format('d-m-Y');
             $labels[] = $date->format('M d');
+            $values[] = 1;
 
             if ($date->lt($workerCreatedAt) || $date->gt($today)) {
-                $presentData[] = 0;
-                $absentData[] = 0;
-                $inactiveData[] = 1;
+                $backgroundColors[] = $colors['inactive']['bg'];
+                $borderColors[] = $colors['inactive']['border'];
+                $statuses[] = 'Inactive';
                 continue;
             }
 
             $isPresent = $attendances->has($formattedDate) && (bool) $attendances[$formattedDate]->present;
-            $presentData[] = $isPresent ? 1 : 0;
-            $absentData[] = $isPresent ? 0 : 1;
-            $inactiveData[] = 0;
+            $isWeekend = $date->isWeekend();
+
+            if ($isPresent) {
+                $backgroundColors[] = $colors['present']['bg'];
+                $borderColors[] = $colors['present']['border'];
+                $statuses[] = 'Present';
+                continue;
+            }
+
+            if ($isWeekend) {
+                $backgroundColors[] = $colors['weekend']['bg'];
+                $borderColors[] = $colors['weekend']['border'];
+                $statuses[] = 'Weekend';
+                continue;
+            }
+
+            $backgroundColors[] = $colors['absent']['bg'];
+            $borderColors[] = $colors['absent']['border'];
+            $statuses[] = 'Absent';
         }
 
         return response()->json([
             'labels' => $labels,
-            'presentData' => $presentData,
-            'absentData' => $absentData,
-            'inactiveData' => $inactiveData,
+            'values' => $values,
+            'backgroundColors' => $backgroundColors,
+            'borderColors' => $borderColors,
+            'statuses' => $statuses,
             'title' => "Attendance for " . Carbon::create()->month((int) $month)->format('F') . " $year"
         ]);
     }

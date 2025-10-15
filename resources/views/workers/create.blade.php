@@ -6,6 +6,16 @@
 
         <div class="card shadow-sm w-75 m-auto">
             <div class="card-body">
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <form method="POST" action="{{ route('workers.store') }}">
                     @csrf
                     <input type="hidden" name="project_id" value="{{ $projectId }}">
@@ -61,17 +71,17 @@
                     <div class="mb-3">
                         <label for="payment_frequency" class="form-label">Payment Frequency</label>
                         <select name="payment_frequency" id="payment_frequency" class="form-select" required>
-                            <option value="" selected>Select Frequency</option>
-                            <option value="per day">Per Day</option>
-                            <option value="per month">Per Month</option>
-                            <option value="one-time payment">One-time Payment</option>
+                            <option value="" {{ old('payment_frequency') ? '' : 'selected' }}>Select Frequency</option>
+                            <option value="per day" {{ old('payment_frequency') == 'per day' ? 'selected' : '' }}>Per Day</option>
+                            <option value="per month" {{ old('payment_frequency') == 'per month' ? 'selected' : '' }}>Per Month</option>
+                            <option value="one-time payment" {{ old('payment_frequency') == 'one-time payment' ? 'selected' : '' }}>One-time Payment</option>
                         </select>
                     </div>
 
                     <div class="mb-3">
                         <label for="mode_of_payment" class="form-label">Mode of Payment</label>
                         <select name="mode_of_payment" id="mode_of_payment" class="form-select" required>
-                            <option value="">Select Mode</option>
+                            <option value="" {{ old('mode_of_payment') ? '' : 'selected' }}>Select Mode</option>
                             <option value="MPESA" {{ old('mode_of_payment') == 'MPESA' ? 'selected' : '' }}>MPESA</option>
                             <option value="Airtel Money" {{ old('mode_of_payment') == 'Airtel Money' ? 'selected' : '' }}>Airtel Money</option>
                             <option value="Bank" {{ old('mode_of_payment') == 'Bank' ? 'selected' : '' }}>Bank</option>
@@ -82,11 +92,11 @@
                     <div id="bankFields" style="display: none;">
                         <div class="mb-3">
                             <label for="bank_name" class="form-label">Bank Name</label>
-                            <input type="text" name="bank_name" id="bank_name" value="{{ old('bank_name') }}" class="form-control" required>
+                            <input type="text" name="bank_name" id="bank_name" value="{{ old('bank_name') }}" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="bank_account" class="form-label">Bank Account</label>
-                            <input type="text" name="bank_account" id="bank_account" value="{{ old('bank_account') }}" class="form-control" required>
+                            <input type="text" name="bank_account" id="bank_account" value="{{ old('bank_account') }}" class="form-control">
                         </div>
                     </div>
 
@@ -112,10 +122,16 @@
                     bankFields.style.display = 'block';
                     bankName.required = true;
                     bankAccount.required = true;
+                    bankName.disabled = false;
+                    bankAccount.disabled = false;
                 } else {
                     bankFields.style.display = 'none';
                     bankName.required = false;
                     bankAccount.required = false;
+                    bankName.disabled = true;
+                    bankAccount.disabled = true;
+                    bankName.value = '';
+                    bankAccount.value = '';
                 }
             }
 

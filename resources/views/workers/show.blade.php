@@ -68,6 +68,24 @@
 
                     <!-- Chart Canvas -->
                     <canvas id="attendanceChart" height="300"></canvas>
+                    <div class="d-flex flex-wrap align-items-center mt-2" style="gap: 12px;">
+                        <span class="d-flex align-items-center">
+                            <span style="width:12px;height:12px;background-color:#28a745;border-radius:2px;display:inline-block;margin-right:6px;"></span>
+                            <small class="text-muted">Present</small>
+                        </span>
+                        <span class="d-flex align-items-center">
+                            <span style="width:12px;height:12px;background-color:#dc3545;border-radius:2px;display:inline-block;margin-right:6px;"></span>
+                            <small class="text-muted">Absent</small>
+                        </span>
+                        <span class="d-flex align-items-center">
+                            <span style="width:12px;height:12px;background-color:#add8e6;border-radius:2px;display:inline-block;margin-right:6px;"></span>
+                            <small class="text-muted">Weekend</small>
+                        </span>
+                        <span class="d-flex align-items-center">
+                            <span style="width:12px;height:12px;background-color:#c8c8c8;border-radius:2px;display:inline-block;margin-right:6px;"></span>
+                            <small class="text-muted">Inactive</small>
+                        </span>
+                    </div>
                     <!-- Download Button -->
                     <div class="mt-3 text-end">
                         <button class="btn btn-outline-primary btn-sm" onclick="downloadChart()">Download Chart</button>
@@ -82,80 +100,109 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('attendanceChart').getContext('2d');
+    const attendanceDataUrl = `/workers/{{ $worker->id }}/attendance-data`;
     let attendanceChart = new Chart(ctx, {
         type: 'bar',
-        data: { labels: [], datasets: [] },
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Attendance',
+                    data: [],
+                    backgroundColor: [],
+                    borderColor: [],
+                    borderWidth: 1,
+                    customStatuses: []
+                }
+            ]
+        },
         options: {
-        responsive: true,
-        plugins: {
-            title: {
-                display: true,
-                text: 'Attendance for ...'
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Attendance for ...'
+                },
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const statuses = context.dataset.customStatuses || [];
+                            return statuses[context.dataIndex] || '';
+                        }
+                    }
+                }
             },
-            legend: {
-                display: true,
-                position: 'top'
-            },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        if (context.dataset.label === "Present") return "Present ✓";
-                        if (context.dataset.label === "Absent") return "Absent ✗";
-                        if (context.dataset.label === "Inactive") return "Inactive";
-                        return "";
+            scales: {
+                y: {
+                    display: false,
+                    beginAtZero: true,
+                    suggestedMax: 1
+                },
+                x: {
+                    grid: {
+                        display: false
                     }
                 }
             }
-        },
-        scales: {
-            y: {
-                display: false
-            }
         }
-    }
-    
     });
 
     function loadAttendanceData() {
-        const month = document.getElementById('month').value;
-        const year = document.getElementById('year').value;
+        const monthSelect = document.getElementById('month');
+        const yearSelect = document.getElementById('year');
 
-        fetch(`/workers/{{ $worker->id }}/attendance-data?month=${month}&year=${year}`)
+        if (!monthSelect || !yearSelect) {
+            return;
+        }
+
+        const month = monthSelect.value;
+        const year = yearSelect.value;
+        const url = `${attendanceDataUrl}?month=${month}&year=${year}&_=${Date.now()}`;
+
+        fetch(url, { cache: 'no-store' })
             .then(res => res.json())
             .then(data => {
+                const dataset = attendanceChart.data.datasets[0];
+
                 attendanceChart.data.labels = data.labels;
-                attendanceChart.data.datasets = [
-                    {
-                        label: 'Present',
-                        data: data.presentData,
-                        backgroundColor: 'rgba(40, 167, 69, 0.6)',
-                        borderColor: 'rgba(40, 167, 69, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Absent',
-                        data: data.absentData,
-                        backgroundColor: 'rgba(220, 53, 69, 0.6)',
-                        borderColor: 'rgba(220, 53, 69, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Inactive',
-                        data: data.inactiveData,
-                        backgroundColor: 'rgba(200,200,200,0.5)',
-                        borderColor: 'rgba(200,200,200,0.8)',
-                        borderWidth: 1
-                    }
-                ];
-                attendanceChart.options.plugins.title = { display: true, text: data.title };
+                dataset.data = data.values || [];
+                dataset.backgroundColor = data.backgroundColors || [];
+                dataset.borderColor = data.borderColors || [];
+                dataset.customStatuses = data.statuses || [];
+
+                attendanceChart.options.plugins.title.text = data.title;
                 attendanceChart.update();
-            });
+            })
+            .catch(error => console.error('Unable to load attendance data', error));
     }
 
-    // trigger on page load & dropdown changes
-    document.getElementById('month').addEventListener('change', loadAttendanceData);
-    document.getElementById('year').addEventListener('change', loadAttendanceData);
+    const monthFilter = document.getElementById('month');
+    const yearFilter = document.getElementById('year');
+
+    if (monthFilter) {
+        monthFilter.addEventListener('change', loadAttendanceData);
+    }
+
+    if (yearFilter) {
+        yearFilter.addEventListener('change', loadAttendanceData);
+    }
+
     window.addEventListener('load', loadAttendanceData);
+
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'attendance:lastSaved') {
+            loadAttendanceData();
+        }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            loadAttendanceData();
+        }
+    });
 </script>
 <script>
     function downloadChart() {

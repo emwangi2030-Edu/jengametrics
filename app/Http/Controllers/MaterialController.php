@@ -148,11 +148,10 @@ class MaterialController extends Controller
                 'product_id',
                 DB::raw('SUM(quantity) as total_quantity')
             )
-            ->whereHas('bom', function ($q) use ($projectId) {
-                $q->where('project_id', $projectId);
-            })
+            ->where('project_id', $projectId)
+            ->whereNotNull('product_id')
             ->groupBy('product_id')
-            ->with('product:id,name,unit_of_measure')
+            ->with('product:id,name,unit')
             ->get();
 
 
@@ -332,7 +331,17 @@ class MaterialController extends Controller
 
                 return 'adhoc_' . Str::slug($material->name . '_' . $material->unit_of_measure);
             })
-            ->map(fn($group) => $group->sum('quantity_purchased'));
+            ->map(function ($group) {
+                return $group->sum(function ($material) {
+                    $reference = $material->requisitioned_quantity;
+
+                    if (is_null($reference) || $reference <= 0) {
+                        return (float) $material->quantity_purchased;
+                    }
+
+                    return min((float) $material->quantity_purchased, (float) $reference);
+                });
+            });
 
         $requisitions = $approvedRequisitions
             ->map(function ($item) use ($purchases) {
