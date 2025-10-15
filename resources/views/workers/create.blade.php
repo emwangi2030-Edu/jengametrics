@@ -16,7 +16,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('workers.store') }}">
+                <form method="POST" action="{{ route('workers.store') }}" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="project_id" value="{{ $projectId }}">
 
@@ -61,6 +61,11 @@
                     <div class="mb-4">
                         <label for="email" class="form-label">Email <span class="text-muted">(optional)</span></label>
                         <input type="email" name="email" class="form-control" value="{{ old('email') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="picture" class="form-label">Profile Photo <span class="text-muted">(optional)</span></label>
+                        <input type="file" name="picture" id="picture" class="form-control" accept="image/*">
                     </div>
 
                     <div class="mb-3">

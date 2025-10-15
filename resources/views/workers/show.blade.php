@@ -1,5 +1,20 @@
 @extends('layouts.app')
 
+@php
+    $photoUrl = null;
+    $picturePath = $worker->picture;
+
+    if (!empty($picturePath)) {
+        if (preg_match('/^https?:\/\//i', $picturePath)) {
+            $photoUrl = $picturePath;
+        } elseif (\Illuminate\Support\Str::startsWith($picturePath, ['storage/', '/storage/'])) {
+            $photoUrl = asset($picturePath);
+        } else {
+            $photoUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($picturePath);
+        }
+    }
+@endphp
+
 @section('content')
 <div class="container py-4">
     <h2 class="mb-4" style="color:#027333;">Worker Profile</h2>
@@ -7,34 +22,43 @@
     <div class="row">
         <div class="col-md-6">
             <div class="card shadow-sm mb-3">
-                <div class="card-body">
-                    <h4 class="text-dark">{{ $worker->full_name }}</h4>
-                    <p><strong>ID Number:</strong> {{ $worker->id_number }}</p>
-                    <p><strong>Job Category:</strong> {{ $worker->job_category }}</p>
-                    <p><strong>Work Type:</strong> {{ $worker->work_type }}</p>
-                    <p><strong>Phone:</strong> {{ $worker->phone }}</p>
-                    <p><strong>Email:</strong> {{ $worker->email ?? 'N/A' }}</p>
-                    <p><strong>Start Date:</strong> {{ $worker->created_at->format('d F, Y') }}</p>
-                    <p><strong>Payment Rate:</strong> {{ $worker->payment_amount }}</p>
-                    <p><strong>Payment Frequency:</strong> {{ $worker->payment_frequency }}</p>
-                    <p><strong>Mode of Payment:</strong> {{ $worker->mode_of_payment }}</p>
-                    @if ($worker->mode_of_payment == 'Bank')
-                        <p><strong>Bank Name:</strong> {{ $worker->bank_name }}</p>
-                        <p><strong>Bank Account:</strong> {{ $worker->bank_account }}</p>
-                    @endif
-                    <p><strong>Amount Owed:</strong> {{ number_format($amountOwed, 2) }}</p>
-                    <a href="{{ route('payments.index', $worker->id) }}" class="btn btn-primary mb-3">
-                        View Payment History
-                    </a>
-                    <form action="{{ route('payments.store', $worker->id) }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="amount" value="{{ $amountOwed }}">
-                        <button type="submit" class="btn btn-success"
-                            @if($amountOwed <= 0) disabled @endif>
-                            Record Payment
-                        </button>
-                    </form>
-                    <a href="{{ route('workers.index') }}" class="btn btn-secondary mt-3">Back</a>
+                <div class="d-flex flex-column flex-md-row align-items-stretch">
+                    <div class="card-body flex-grow-1">
+                        <h4 class="text-dark">{{ $worker->full_name }}</h4>
+                        <p><strong>ID Number:</strong> {{ $worker->id_number }}</p>
+                        <p><strong>Job Category:</strong> {{ $worker->job_category }}</p>
+                        <p><strong>Work Type:</strong> {{ $worker->work_type }}</p>
+                        <p><strong>Phone:</strong> {{ $worker->phone }}</p>
+                        <p><strong>Email:</strong> {{ $worker->email ?? 'N/A' }}</p>
+                        <p><strong>Start Date:</strong> {{ $worker->created_at->format('d F, Y') }}</p>
+                        <p><strong>Payment Rate:</strong> {{ $worker->payment_amount }}</p>
+                        <p><strong>Payment Frequency:</strong> {{ $worker->payment_frequency }}</p>
+                        <p><strong>Mode of Payment:</strong> {{ $worker->mode_of_payment }}</p>
+                        @if ($worker->mode_of_payment == 'Bank')
+                            <p><strong>Bank Name:</strong> {{ $worker->bank_name }}</p>
+                            <p><strong>Bank Account:</strong> {{ $worker->bank_account }}</p>
+                        @endif
+                        <p><strong>Amount Owed:</strong> {{ number_format($amountOwed, 2) }}</p>
+                        <a href="{{ route('payments.index', $worker->id) }}" class="btn btn-primary mb-3">
+                            View Payment History
+                        </a>
+                        <form action="{{ route('payments.store', $worker->id) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="amount" value="{{ $amountOwed }}">
+                            <button type="submit" class="btn btn-success"
+                                @if($amountOwed <= 0) disabled @endif>
+                                Record Payment
+                            </button>
+                        </form>
+                        <a href="{{ route('workers.index') }}" class="btn btn-secondary mt-3">Back</a>
+                    </div>
+                    <div class="p-3 border-top border-md-top-0 border-md-start d-flex align-items-start justify-content-center" style="min-width:220px; flex:0 0 240px;">
+                        <img
+                            src="{{ $photoUrl ?? asset('assets/media/svg/avatars/blank.svg') }}"
+                            alt="{{ $worker->full_name }} photo"
+                            class="img-fluid rounded shadow-sm"
+                            style="width: 100%; height: auto; object-fit: contain;">
+                    </div>
                 </div>
             </div>
         </div>

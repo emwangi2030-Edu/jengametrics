@@ -8,6 +8,8 @@ use App\Models\Project;
 use App\Models\Attendance;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class WorkerController extends Controller
 {
@@ -134,6 +136,7 @@ class WorkerController extends Controller
             'work_type'         => 'required|string',
             'phone'             => 'required|string|max:15',
             'email'             => 'nullable|email|max:255',
+            'picture'           => 'nullable|image|max:4096',
             'payment_amount'    => 'nullable|numeric|min:0',
             'payment_frequency' => 'nullable|string|in:per day,per month,one-time payment',
             'mode_of_payment'   => 'required|string',
@@ -144,6 +147,10 @@ class WorkerController extends Controller
         if (($validated['mode_of_payment'] ?? '') !== 'Bank') {
             $validated['bank_name'] = null;
             $validated['bank_account'] = null;
+        }
+        if ($request->hasFile('picture')) {
+            $path = $request->file('picture')->store('workers', 'public');
+            $validated['picture'] = $path;
         }
 
         $validated['project_id'] = $projectId;
@@ -173,6 +180,7 @@ class WorkerController extends Controller
             'work_type'         => 'required|string',
             'phone'             => 'required|string|max:15',
             'email'             => 'nullable|email|max:255',
+            'picture'           => 'nullable|image|max:4096',
             'payment_amount'    => 'nullable|numeric|min:0',
             'payment_frequency' => 'nullable|string|in:per day,per month,one-time payment',
             'mode_of_payment'   => 'required|string',
@@ -183,6 +191,25 @@ class WorkerController extends Controller
         if (($validated['mode_of_payment'] ?? '') !== 'Bank') {
             $validated['bank_name'] = null;
             $validated['bank_account'] = null;
+        }
+
+        if ($request->hasFile('picture')) {
+            $existingPicture = $worker->picture;
+
+            if ($existingPicture && !Str::startsWith($existingPicture, ['http://', 'https://'])) {
+                if (Str::startsWith($existingPicture, ['storage/', '/storage/'])) {
+                    $previousPath = Str::after($existingPicture, 'storage/');
+                } else {
+                    $previousPath = ltrim($existingPicture, '/');
+                }
+
+                if (!empty($previousPath)) {
+                    Storage::disk('public')->delete($previousPath);
+                }
+            }
+
+            $path = $request->file('picture')->store('workers', 'public');
+            $validated['picture'] = $path;
         }
 
         $worker->update($validated);

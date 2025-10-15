@@ -13,14 +13,22 @@ class AttendanceController extends Controller
     public function create(Request $request)
     {
         $projectId = Auth::user()->project_id;
-        $date = $request->input('date') ?? $request->input('selected_date') ?? now()->toDateString();
+        $dateInput = $request->input('date') ?? $request->input('selected_date') ?? now()->toDateString();
+        $selectedDate = Carbon::parse($dateInput)->endOfDay();
 
-        $workers = Worker::where('project_id', $projectId)->get();
+        $workers = Worker::where('project_id', $projectId)
+            ->where('created_at', '<=', $selectedDate)
+            ->orderBy('full_name')
+            ->get();
 
-        $existingAttendances = Attendance::whereDate('date', $date)->get()
+        $existingAttendances = Attendance::whereDate('date', $dateInput)->get()
             ->keyBy('worker_id');
 
-        return view('attendance.create', compact('workers', 'date', 'existingAttendances'));
+        return view('attendance.create', [
+            'workers' => $workers,
+            'date' => Carbon::parse($dateInput)->toDateString(),
+            'existingAttendances' => $existingAttendances,
+        ]);
     }
 
 
@@ -34,7 +42,7 @@ class AttendanceController extends Controller
         $date = $request->input('date');
         $presentIds = $request->input('present', []);
 
-        foreach ($request->input('worker_ids') as $workerId) {
+        foreach ($request->input('worker_ids', []) as $workerId) {
             if (in_array($workerId, $presentIds)) {
                 // Mark as present (update or create)
                 Attendance::updateOrCreate(
@@ -55,14 +63,22 @@ class AttendanceController extends Controller
     public function fetchAttendance(Request $request)
     {
         $projectId = Auth::user()->project_id;
-        $date = $request->input('date') ?? now()->toDateString();
+        $dateInput = $request->input('date') ?? now()->toDateString();
+        $selectedDate = Carbon::parse($dateInput)->endOfDay();
 
-        $workers = Worker::where('project_id', $projectId)->get();
-        $existingAttendances = Attendance::whereDate('date', $date)->get()
+        $workers = Worker::where('project_id', $projectId)
+            ->where('created_at', '<=', $selectedDate)
+            ->orderBy('full_name')
+            ->get();
+        $existingAttendances = Attendance::whereDate('date', $dateInput)->get()
             ->keyBy('worker_id');
 
         // return only the table HTML
-        return view('attendance.partials.table', compact('workers', 'date', 'existingAttendances'));
+        return view('attendance.partials.table', [
+            'workers' => $workers,
+            'date' => Carbon::parse($dateInput)->toDateString(),
+            'existingAttendances' => $existingAttendances,
+        ]);
     }
 
 }

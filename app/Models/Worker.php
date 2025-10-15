@@ -16,6 +16,7 @@ class Worker extends Model
         'work_type', 
         'phone', 
         'email',
+        'picture',
         'payment_amount', 
         'payment_frequency',
         'mode_of_payment',
@@ -41,4 +42,3 @@ class Worker extends Model
         return $this->hasMany(Payment::class);
     }
 }
-
