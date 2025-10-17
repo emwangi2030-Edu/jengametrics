@@ -83,6 +83,10 @@ Route::post('select-project', [ProjectController::class, 'selectProject'])->name
 // BoQ Documents Routes
 Route::get('boq', [BqDocumentController::class, 'index'])->name('boq');
 Route::resource('bq_documents', BqDocumentController::class);
+Route::get('bq_documents/{bqDocument}/copy', [BqDocumentController::class, 'copyForm'])
+    ->name('bq_documents.copy');
+Route::post('bq_documents/{bqDocument}/copy', [BqDocumentController::class, 'copyStore'])
+    ->name('bq_documents.copy.store');
 
 // BoQ Sections Routes (scoped to BoQ documents)
 Route::get('bq_documents/{bqDocument}/sections/create', [BqSectionController::class, 'create'])->name('bq_sections.create');

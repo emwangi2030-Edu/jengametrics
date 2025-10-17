@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\BqDocument;
 use App\Models\BqSection;
+use App\Models\BomItem;
+use App\Models\BomLabour;
 use App\Models\Element;
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class BqDocumentController extends Controller
 {
@@ -105,6 +109,92 @@ class BqDocumentController extends Controller
     {
         $items = Item::where('element_id', $request->element_id)->pluck('name', 'id');
         return response()->json($items);
+    }
+
+    public function copyForm(BqDocument $bqDocument)
+    {
+        $project = get_project();
+
+        $this->assertSubDocumentAccess($bqDocument, $project->id);
+
+        $sections = $bqDocument->sections()
+            ->with(['section', 'item'])
+            ->orderBy('section_id')
+            ->orderBy('id')
+            ->get();
+
+        $groupedSections = $sections->groupBy('section_id')->map(function ($items) {
+            return [
+                'section' => $items->first()->section,
+                'items' => $items,
+            ];
+        });
+
+        return view('bq_documents.copy', [
+            'project' => $project,
+            'sourceDocument' => $bqDocument,
+            'groupedSections' => $groupedSections,
+            'suggestedTitle' => trim($bqDocument->title . ' Copy'),
+        ]);
+    }
+
+    public function copyStore(Request $request, BqDocument $bqDocument)
+    {
+        $project = get_project();
+
+        $this->assertSubDocumentAccess($bqDocument, $project->id);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'items' => 'required|array|min:1',
+            'items.*' => [
+                'integer',
+                Rule::exists('bq_sections', 'id')->where('bq_document_id', $bqDocument->id),
+            ],
+        ]);
+
+        $selectedItemIds = collect($validated['items'])->map(fn ($id) => (int) $id)->unique()->values();
+
+        $sections = BqSection::query()
+            ->where('bq_document_id', $bqDocument->id)
+            ->whereIn('id', $selectedItemIds)
+            ->get();
+
+        if ($sections->count() !== $selectedItemIds->count()) {
+            return back()
+                ->withInput()
+                ->withErrors(['items' => __('One or more selected items could not be found.')]);
+        }
+
+        $masterDocument = $this->ensureMasterDocument($project->id, $project->name);
+
+        $newDocument = null;
+
+        DB::transaction(function () use (
+            &$newDocument,
+            $bqDocument,
+            $sections,
+            $project,
+            $validated,
+            $masterDocument
+        ) {
+            $newDocument = BqDocument::create([
+                'title' => $validated['title'],
+                'description' => $validated['description'] ?? null,
+                'user_id' => auth()->id() ?: $bqDocument->user_id,
+                'project_id' => $project->id,
+                'parent_id' => $masterDocument->id,
+            ]);
+
+            foreach ($sections as $section) {
+                $this->duplicateSectionWithBom($section, $newDocument);
+            }
+        });
+
+        return redirect()
+            ->route('bq_documents.show', $newDocument)
+            ->with('success', __('BoQ copied successfully.'));
     }
     
     /**
@@ -261,5 +351,48 @@ class BqDocumentController extends Controller
             'project_id' => $projectId,
             'parent_id' => null,
         ]);
+    }
+
+    protected function assertSubDocumentAccess(BqDocument $bqDocument, int $projectId): void
+    {
+        if (is_null($bqDocument->project_id)) {
+            $bqDocument->update(['project_id' => $projectId]);
+        }
+
+        if ((int) $bqDocument->project_id !== (int) $projectId || is_null($bqDocument->parent_id)) {
+            abort(404);
+        }
+    }
+
+    protected function duplicateSectionWithBom(BqSection $section, BqDocument $targetDocument): void
+    {
+        $newSection = $section->replicate();
+        $newSection->bq_document_id = $targetDocument->id;
+        $newSection->project_id = $targetDocument->project_id;
+        $newSection->save();
+
+        $bomItems = BomItem::query()
+            ->where('bq_section_id', $section->id)
+            ->get();
+
+        foreach ($bomItems as $bomItem) {
+            $newBomItem = $bomItem->replicate();
+            $newBomItem->bq_section_id = $newSection->id;
+            $newBomItem->bq_document_id = $targetDocument->id;
+            $newBomItem->project_id = $targetDocument->project_id;
+            $newBomItem->save();
+        }
+
+        $bomLabours = BomLabour::query()
+            ->where('bq_section_id', $section->id)
+            ->get();
+
+        foreach ($bomLabours as $bomLabour) {
+            $newBomLabour = $bomLabour->replicate();
+            $newBomLabour->bq_section_id = $newSection->id;
+            $newBomLabour->bq_document_id = $targetDocument->id;
+            $newBomLabour->project_id = $targetDocument->project_id;
+            $newBomLabour->save();
+        }
     }
 }

@@ -57,6 +57,9 @@
                                             <td class="text-end">{{ number_format($document->aggregated_amount ?? 0, 2) }}</td>
                                             <td class="text-end">{{ $document->created_at->format('d M Y') }}</td>
                                             <td class="text-end">
+                                                <a href="{{ route('bq_documents.copy', $document) }}" class="btn btn-success btn-sm me-2" title="{{ __('Copy BoQ') }}">
+                                                    +
+                                                </a>
                                                 <a href="{{ route('bq_documents.show', $document) }}" class="btn btn-primary btn-sm me-2">
                                                     {{ __('View') }}
                                                 </a>
