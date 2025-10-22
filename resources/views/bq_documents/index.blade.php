@@ -195,10 +195,10 @@
                                                                                                                                                     
                     <div class="mt-3">                                                                                                            
                         <label class="form-label">{{ __('Selected Items') }}</label>                                                              
-                        <div id="edit-library-selected-items" class="border rounded p-3 bg-light" style="max-height: 200px; overflow-y: auto;">   
+                        <div id="edit-library-selected-items" class="selected-items border rounded p-3 bg-light" style="max-height: 200px; overflow-y: auto;">   
                             <p class="text-muted mb-0">{{ __('No items selected yet.') }}</p>                                                     
                         </div>                                                                                                                    
-                        <div id="edit-library-selected-inputs" class="d-none"></div>                                                              
+                        <div id="edit-library-selected-inputs" class="hidden-selected-inputs d-none"></div>                                                              
                     </div>                                                                                                                        
                 </div>                                                                                                                            
                                                                                                                                                     
@@ -253,12 +253,20 @@
                         <div id="library-items-container" class="border rounded p-3" style="max-height: 250px; overflow-y: auto;">
                             <p class="text-muted mb-0">{{ __('Select a section and element to load items.') }}</p>
                         </div>
-                        <p class="small text-muted mt-2 mb-0">{{ __('Tick one or more items to include them in this library.') }}</p>
+                        <p class="small text-muted mt-2 mb-0">{{ __('Tick items to include them in this library. You can switch sections and elements to keep adding more; selections appear below.') }}</p>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label">{{ __('Selected Items') }}</label>
+                        <div id="library-selected-items" class="selected-items border rounded p-3 bg-light" style="max-height: 200px; overflow-y: auto;">
+                            <p class="text-muted mb-0">{{ __('No items selected yet.') }}</p>
+                        </div>
+                        <div id="library-selected-inputs" class="hidden-selected-inputs d-none"></div>
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>                   
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
                     <button type="submit" class="btn btn-primary">{{ __('Create') }}</button>                                                     
                 </div>                                                                                                                            
             </form>                                                                                                                               
@@ -316,15 +324,45 @@
             </div>                                                                                                                                
         `;                                                                                                                                        
 
-        function renderAvailableItems(container, items) {                                                                                         
-            container.empty();                                                                                                                    
-                                                                                                                                                
-            if (!items || !items.length) {                                                                                                        
-                container.append('<p class="text-muted mb-0">{{ __('No items found for the current selection.') }}</p>');                         
-                return;                                                                                                                           
-            }                                                                                                                                     
-                                                                                                                                                
-            items.forEach(item => container.append(CHECKBOX_TEMPLATE(item)));                                                                     
+        function renderAvailableItems(container, items, selectedMap = new Map()) {
+            container.empty();
+
+            if (!items || !items.length) {
+                container.append('<p class="text-muted mb-0">{{ __('No items found for the current selection.') }}</p>');
+                return;
+            }
+
+            items.forEach((item) => {
+                const payload = {
+                    id: parseInt(item.id ?? item.item_id, 10),
+                    name: item.name ?? item.item ?? '-',
+                    section_id: item.section_id ?? null,
+                    section_name: item.section_name ?? item.section ?? '-',
+                    element_id: item.element_id ?? null,
+                    element_name: item.element_name ?? item.element ?? '-',
+                };
+
+                const existing = selectedMap.get(payload.id);
+                if (existing) {
+                    existing.section_id = payload.section_id;
+                    existing.section_name = payload.section_name;
+                    existing.element_id = payload.element_id;
+                    existing.element_name = payload.element_name;
+                }
+
+                const templateData = {
+                    id: payload.id,
+                    name: payload.name,
+                    section_name: (existing ?? payload).section_name,
+                    element_name: (existing ?? payload).element_name,
+                };
+
+                const node = $(CHECKBOX_TEMPLATE(templateData));
+                const checkbox = node.find('.library-item-checkbox');
+                checkbox.data('payload', existing ?? payload);
+                checkbox.prop('checked', Boolean(existing));
+                container.append(node);
+            });
         }
                                                                                                                                                 
         function renderSelectedItems(wrapper, list) {                                                                                             
@@ -345,7 +383,7 @@
             });                                                                                                                                   
         }                                                                                                                                         
 
-        async function loadItemsForCreate(elementSelect, itemsContainer) {
+        async function loadItemsForCreate(elementSelect, itemsContainer, selectedMap, selectedList) {
             const elementId = elementSelect.val();
 
             if (!elementId) {
@@ -366,20 +404,39 @@
                 itemsContainer.empty();
 
                 items.forEach((item) => {
+                    const existing = selectedMap.get(item.id);
+                    const payload = existing ?? {
+                        id: item.id,
+                        name: item.name,
+                        section_id: item.section_id,
+                        section_name: item.section_name,
+                        element_id: item.element_id,
+                        element_name: item.element_name,
+                    };
+
+                    if (existing) {
+                        existing.section_id = item.section_id;
+                        existing.section_name = item.section_name;
+                        existing.element_id = item.element_id;
+                        existing.element_name = item.element_name;
+                    }
+
                     const checkboxId = `create-library-item-${item.id}`;
                     const wrapper = $('<div>', { class: 'form-check mb-2' });
                     const input = $('<input>', {
                         class: 'form-check-input library-item-checkbox',
                         type: 'checkbox',
-                        name: 'items[]',
                         value: item.id,
-                        id: checkboxId
+                        id: checkboxId,
+                        checked: Boolean(existing),
                     });
+                    input.data('payload', payload);
+
                     const label = $('<label>', { class: 'form-check-label', for: checkboxId });
                     label.append($('<div>', { class: 'fw-semibold' }).text(item.name || '-'));
 
-                    const sectionName = item.section_name || '-';
-                    const elementName = item.element_name || '-';
+                    const sectionName = payload.section_name || '-';
+                    const elementName = payload.element_name || '-';
                     label.append($('<div>', { class: 'small text-muted' }).text(`${sectionName} / ${elementName}`));
 
                     wrapper.append(input);
@@ -411,58 +468,22 @@
             }                                                                                                                                     
         }                                                                                                                                         
                                                                                                                                                 
-        async function loadItems(elementSelect, itemsContainer, selected, selectedMap) {                                                          
-            const elementId = elementSelect.val();                                                                                                
-            renderAvailableItems(itemsContainer, null);                                                                                           
-                                                                                                                                                
-            if (!elementId) return;                                                                                                               
-                                                                                                                                                
-            try {                                                                                                                                 
-                const items = await $.get('{{ route('items.details') }}', { element_id: elementId });                                             
-                                                                                                                                                
-                const filtered = items.filter(item => !selectedMap.has(item.id));                                                                 
-                renderAvailableItems(itemsContainer, filtered);                                                                                   
-            } catch (_) {                                                                                                                         
+        async function loadItems(elementSelect, itemsContainer, selectedMap) {
+            const elementId = elementSelect.val();
+            renderAvailableItems(itemsContainer, null);
+
+            if (!elementId) return;
+
+            try {
+                const items = await $.get('{{ route('items.details') }}', { element_id: elementId });
+                renderAvailableItems(itemsContainer, items, selectedMap);
+            } catch (_) {
                 itemsContainer.empty().append(
-                    '<p class="text-muted mb-0">{{ __('Unable to load items. Please try again.') }}</p>'                                          
-                );                                                                                                                                
-            }                                                                                                                                     
-        }                                                                                                                                         
-                                                                                                                                                
-        function attachAvailableHandlers(modal, availableContainer, selectedList, selectedMap) {                                                  
-            availableContainer.on('change', '.library-item-checkbox', function () {                                                               
-                const id = parseInt(this.value, 10);                                                                                              
-                if (this.checked) {                                                                                                               
-                    const data = $(this).data('payload');                                                                                         
-                    selectedMap.set(id, data);                                                                                                    
-                } else {                                                                                                                          
-                    selectedMap.delete(id);                                                                                                       
-                }                                                                                                                                 
-                                                                                                                                                
-                selectedList.splice(0, selectedList.length, ...selectedMap.values());                                                             
-                renderSelectedItems(modal.find('.selected-items'), selectedList);                                                                 
-                syncHiddenInputs(modal.find('.hidden-selected-inputs'), selectedList);
-                $(this).closest('.form-check').remove();                                                                                          
-            });                                                                                                                                   
-        }                                                                                                                                         
-                                                                                                                                                
-        function attachSelectedHandlers(modal, selectedList, selectedMap, availableContainer) {                                                   
-            modal.on('click', '.remove-selected-item', function () {                                                                              
-                const id = parseInt($(this).data('item-id'), 10);                                                                                 
-                const removed = selectedMap.get(id);                                                                                              
-                selectedMap.delete(id);                                                                                                           
-                                                                                                                                                
-                selectedList.splice(0, selectedList.length, ...selectedMap.values());                                                             
-                renderSelectedItems(modal.find('.selected-items'), selectedList);                                                                 
-                syncHiddenInputs(modal.find('.hidden-selected-inputs'), selectedList);                                                            
-                                                                                                                                                
-                if (removed) {                                                                                                                    
-                    availableContainer.prepend(CHECKBOX_TEMPLATE(removed));                                                                       
-                    availableContainer.find(`#item-${removed.id}`).data('payload', removed);                                                      
-                }                                                                                                                                 
-            });                                                                                                                                   
-        }                                                                                                                                         
-                                                                                                                                                
+                    '<p class="text-muted mb-0">{{ __('Unable to load items. Please try again.') }}</p>'
+                );
+            }
+        }
+
         /**                                                                                                                                       
          * Create flow                                                                                                                            
          */                                                                                                                                       
@@ -473,15 +494,24 @@
             const sectionSelect = $('#library-section');
             const elementSelect = $('#library-element');
             const available = $('#library-items-container');
+            const selectedWrapper = $('#library-selected-items');
+            const hiddenInputs = $('#library-selected-inputs');
+
+            const selectedMap = new Map();
+            const selectedList = [];
+
+            function renderSelected() {
+                renderSelectedItems(selectedWrapper, selectedList);
+                syncHiddenInputs(hiddenInputs, selectedList);
+            }
 
             function reset() {
                 sectionSelect.val('');
                 elementSelect.prop('disabled', true).val('');
                 available.html('<p class="text-muted mb-0">{{ __('Select a section and element to load items.') }}</p>');
-            }
-
-            async function handleElementChange() {
-                await loadItemsForCreate(elementSelect, available);
+                selectedMap.clear();
+                selectedList.splice(0);
+                renderSelected();
             }
 
             modal.on('show.bs.modal', reset);
@@ -493,7 +523,42 @@
                 await loadElements(sectionSelect, elementSelect);
             });
 
-            elementSelect.on('change', handleElementChange);
+            elementSelect.on('change', async function () {
+                await loadItemsForCreate(elementSelect, available, selectedMap, selectedList);
+            });
+
+            available.on('change', '.library-item-checkbox', function () {
+                const id = parseInt(this.value, 10);
+                const payload = $(this).data('payload');
+
+                if (this.checked) {
+                    if (payload && !selectedMap.has(id)) {
+                        selectedMap.set(id, payload);
+                        selectedList.push(payload);
+                    }
+                } else {
+                    selectedMap.delete(id);
+                    const index = selectedList.findIndex(item => item.id === id);
+                    if (index !== -1) {
+                        selectedList.splice(index, 1);
+                    }
+                }
+
+                renderSelected();
+            });
+
+            modal.on('click', '.remove-selected-item', function () {
+                const id = parseInt($(this).data('item-id'), 10);
+
+                selectedMap.delete(id);
+                const index = selectedList.findIndex(item => item.id === id);
+                if (index !== -1) {
+                    selectedList.splice(index, 1);
+                }
+
+                renderSelected();
+                available.find(`#create-library-item-${id}`).prop('checked', false);
+            });
         })();
                                                                                                                                                 
         /**                                                                                                                                       
@@ -543,13 +608,19 @@
                     $('#edit-library-name').val(library.name || '');                                                                              
                     $('#edit-library-description').val(library.description || '');                                                                
                                                                                                                                                 
-                    selectedMap.clear();                                                                                                          
-                    items.forEach(item => selectedMap.set(parseInt(item.item_id, 10), {                                                           
-                        id: parseInt(item.item_id, 10),                                                                                           
-                        name: item.item,                                                                                                          
-                        section_name: item.section,                                                                                               
-                        element_name: item.element,                                                                                               
-                    }));                                                                                                                          
+                    selectedMap.clear();
+                    items.forEach(item => {
+                        const payload = {
+                            id: parseInt(item.item_id, 10),
+                            name: item.item,
+                            section_id: item.section_id ?? null,
+                            section_name: item.section,
+                            element_id: item.element_id ?? null,
+                            element_name: item.element,
+                        };
+
+                        selectedMap.set(payload.id, payload);
+                    });
                     selectedList.splice(0, selectedList.length, ...selectedMap.values());
                     renderSelectedItems(selectedWrapper, selectedList);                                                                           
                     syncHiddenInputs(hiddenInputs, selectedList);                                                                                 
@@ -557,19 +628,12 @@
                     sectionSelect.val(library.section_id || '');                                                                                  
                     await loadElements(sectionSelect, elementSelect);                                                                             
                                                                                                                                                 
-                    if (library.element_id) {                                                                                                     
-                        elementSelect.val(library.element_id);                                                                                    
-                        await loadItems(elementSelect, available, selectedList, selectedMap);                                                     
-                    } else {                                                                                                                      
-                        available.html('<p class="text-muted mb-0">{{ __('Select a section to load items.') }}</p>');                             
-                    }                                                                                                                             
-                                                                                                                                                
-                    // flag each checkbox with payload                                                                                            
-                    available.find('.library-item-checkbox').each(function () {                                                                   
-                        const id = parseInt(this.value, 10);                                                                                      
-                        const payload = selectedMap.get(id);                                                                                      
-                        if (payload) $(this).closest('.form-check').remove();                                                                     
-                    });                                                                                                                           
+                    if (library.element_id) {
+                        elementSelect.val(library.element_id);
+                        await loadItems(elementSelect, available, selectedMap);
+                    } else {
+                        available.html('<p class="text-muted mb-0">{{ __('Select a section to load items.') }}</p>');
+                    }
                                                                                                                                                 
                     modal.modal('show');                                                                                                          
                 } catch (_) {                                                                                                                     
@@ -584,26 +648,43 @@
             });                                                                                                                                   
                                                                                                                                                 
             elementSelect.on('change', async function () {                                                                                        
-                await loadItems(elementSelect, available, selectedList, selectedMap);                                                             
+                await loadItems(elementSelect, available, selectedMap);                                                             
             });                                                                                                                                   
                                                                                                                                                 
-            available.on('change', '.library-item-checkbox', function () {                                                                        
-                const id = parseInt(this.value, 10);                                                                                              
-                const payload = $(this).data('payload');                                                                                          
-                                                                                                                                                
-                if (this.checked && payload) {                                                                                                    
-                    selectedMap.set(id, payload);                                                                                                 
-                } else {                                                                                                                          
-                    selectedMap.delete(id);                                                                                                       
-                }                                                                                                                                 
-                                                                                                                                                
-                selectedList.splice(0, selectedList.length, ...selectedMap.values());                                                             
-                renderSelectedItems(selectedWrapper, selectedList);                                                                               
-                syncHiddenInputs(hiddenInputs, selectedList);                                                                                     
-                $(this).closest('.form-check').remove();                                                                                          
+            available.on('change', '.library-item-checkbox', function () {
+                const id = parseInt(this.value, 10);
+                const payload = $(this).data('payload');
+
+                if (this.checked) {
+                    if (payload && !selectedMap.has(id)) {
+                        selectedMap.set(id, payload);
+                        selectedList.push(payload);
+                    }
+                } else {
+                    selectedMap.delete(id);
+                    const index = selectedList.findIndex(item => item.id === id);
+                    if (index !== -1) {
+                        selectedList.splice(index, 1);
+                    }
+                }
+
+                renderSelectedItems(selectedWrapper, selectedList);
+                syncHiddenInputs(hiddenInputs, selectedList);
             });
-                                                                                                                                                
-            attachSelectedHandlers(modal, selectedList, selectedMap, available);                                                                  
+
+            modal.on('click', '.remove-selected-item', function () {
+                const id = parseInt($(this).data('item-id'), 10);
+
+                selectedMap.delete(id);
+                const index = selectedList.findIndex(item => item.id === id);
+                if (index !== -1) {
+                    selectedList.splice(index, 1);
+                }
+
+                renderSelectedItems(selectedWrapper, selectedList);
+                syncHiddenInputs(hiddenInputs, selectedList);
+                available.find(`#item-${id}`).prop('checked', false);
+            });
         })();                                                                                                                                     
                                                                                                                                                 
         /**                                                                                                                                       

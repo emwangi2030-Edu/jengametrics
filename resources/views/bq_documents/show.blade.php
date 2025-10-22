@@ -165,6 +165,20 @@
                 return itemsRouteTemplate.replace('__LIBRARY__', libraryId);
             }
 
+            function formatQuantity(value) {
+                if (value === '' || value === null || value === undefined) {
+                    return '';
+                }
+
+                const numeric = parseFloat(value);
+                if (!Number.isFinite(numeric) || numeric <= 0) {
+                    return '';
+                }
+
+                const rounded = Math.round(numeric * 100) / 100;
+                return rounded.toFixed(2);
+            }
+
             function renderItems(items) {
                 if (!items || items.length === 0) {
                     resetItemsContainer('{{ __('No items found in the selected library.') }}');
@@ -199,7 +213,8 @@
                         name: `items[${item.id}][quantity]`,
                         class: 'form-control form-control-sm text-end',
                         step: '0.01',
-                        min: '0.0001',
+                        min: '0',
+                        inputmode: 'decimal',
                         disabled: true
                     });
 
@@ -212,6 +227,17 @@
                         disabled: true
                     });
 
+                    const sanitizeQuantity = function () {
+                        const formatted = formatQuantity($(this).val());
+                        if (formatted) {
+                            $(this).val(formatted);
+                        } else {
+                            $(this).val('');
+                        }
+                    };
+
+                    quantityInput.on('blur change', sanitizeQuantity);
+
                     checkbox.on('change', function () {
                         const checked = $(this).is(':checked');
                         quantityInput.prop('disabled', !checked);
@@ -219,7 +245,7 @@
 
                         if (checked) {
                             if (!quantityInput.val()) {
-                                quantityInput.val('1');
+                                quantityInput.val(formatQuantity('1'));
                             }
                             if (!rateInput.val()) {
                                 rateInput.val('0');
