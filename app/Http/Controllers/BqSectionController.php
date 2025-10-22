@@ -5,16 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\BqDocument;
 use App\Models\BqSection;
 use App\Models\Section;
-use App\Models\BomLabour;
-use App\Models\BomItem;
 use App\Models\Item;
-use App\Models\ItemMaterial;
-use App\Models\Product;
 use App\Models\Element;
 use Illuminate\Http\Request;
+use App\Services\BqItemCreator;
 
 class BqSectionController extends Controller
 {
+    protected BqItemCreator $bqItemCreator;
+
+    public function __construct(BqItemCreator $bqItemCreator)
+    {
+        $this->bqItemCreator = $bqItemCreator;
+    }
+
     public function create(BqDocument $bqDocument)
     {
         $this->assertDocumentAccess($bqDocument);
@@ -38,63 +42,31 @@ class BqSectionController extends Controller
         ]);
 
         // Retrieve the selected item
-        $selectedItem = Item::find($request->item_id);
-        $calculatedAmount = $request->amount ?? ($request->quantity * $request->rate);
+        $section = Section::findOrFail($request->section_id);
+        $element = Element::where('id', $request->element_id)
+            ->where('section_id', $section->id)
+            ->firstOrFail();
+        $item = Item::where('id', $request->item_id)
+            ->where('element_id', $element->id)
+            ->firstOrFail();
 
-        $data = [
-            'section_id' => $request->section_id,
-            'element_id' => $request->element_id,
-            'item_id' => $request->item_id,
-            'rate' => $request->rate,
-            'quantity' => $request->quantity,
-            'amount' => $calculatedAmount,
-            'project_id' => project_id(),
-            'item_name' => $selectedItem?->name,
-            'units' => $selectedItem?->unit_of_measurement,
-            'bq_document_id' => $bqDocument->id,
-        ];
+        $quantity = (float) $request->quantity;
+        $rate = (float) $request->rate;
+        $amount = $request->filled('amount')
+            ? (float) $request->amount
+            : null;
 
-        $section_created = BqSection::create($data);
-        if($section_created){
+        $this->bqItemCreator->create(
+            $bqDocument,
+            $section,
+            $element,
+            $item,
+            $quantity,
+            $rate,
+            (int) project_id(),
+            $amount
+        );
 
-            $materials = ItemMaterial::where('item_id', $request->item_id)->get();
-
-            $unit = Item::find($request->item_id);
-            $labour = $unit->labour ?? 0;
-            $labour = $labour * $request->quantity;
-
-                BomLabour::create([
-                    'section_id'       => $section_created->section_id,
-                    'item_id'          => $section_created->item_id,
-                    'quantity'         => $request->quantity,
-                    'rate'             => $unit->labour,
-                    'amount'           => $request->quantity*$unit->labour,
-                    'project_id'       => project_id(),
-                    'bq_section_id'    => $section_created->id,
-                    'bq_document_id'   => $section_created->bq_document_id,
-                ]);
-
-
-            foreach($materials as $material) {
-                $product = Product::find($material->product_id);
-                $conversionFactor = $material->conversion_factor ?? 0;
-                $quantity = $request->quantity * $conversionFactor;
-                $rate = $product->rate ?? 0;
-                $amount = $quantity * $rate;
-                BomItem::create([
-                    'section_id'       => $section_created->section_id,
-                    'item_id'          => $section_created->item_id,
-                    'item_material_id' => $material->id,
-                    'product_id'       => $material->product_id,
-                    'quantity'         => $quantity,
-                    'rate'             => $rate,
-                    'amount'           => $amount,
-                    'project_id'       => project_id(),
-                    'bq_section_id'    => $section_created->id,
-                    'bq_document_id'   => $section_created->bq_document_id,
-                ]);
-            }
-        }
         return redirect()->route('bq_documents.show', $bqDocument)->with('success', trans('Item added successfully.'));
     }
 
@@ -108,62 +80,33 @@ class BqSectionController extends Controller
             'quantity' => 'required|numeric',
         ]);
     
-        $item = BqSection::findOrFail($request->id);
+        $bqSection = BqSection::findOrFail($request->id);
 
-        if ($item->bqDocument) {
-            $this->assertDocumentAccess($item->bqDocument);
+        if ($bqSection->bqDocument) {
+            $this->assertDocumentAccess($bqSection->bqDocument);
         }
 
-        $item->element_id = $request->element_id;
-        $item->item_id = $request->item_id;
-        $item->item_name = Item::findOrFail($request->item_id)->name;
-        $item->units = Item::findOrFail($request->item_id)->unit_of_measurement;
-        $item->rate = $request->rate;
-        $item->quantity = $request->quantity;
-        $item->amount = $request->rate * $request->quantity;
-        $item->save();
+        $element = Element::where('id', $request->element_id)
+            ->where('section_id', $bqSection->section_id)
+            ->firstOrFail();
 
-        // Clear old BOM records
-        BomItem::where('bq_section_id', $item->id)->delete();
-        BomLabour::where('bq_section_id', $item->id)->delete();
+        $item = Item::where('id', $request->item_id)
+            ->where('element_id', $element->id)
+            ->firstOrFail();
 
-        // Fetch related data
-        $materials = ItemMaterial::where('item_id', $item->item_id)->get();
-        $unit = Item::findOrFail($item->item_id);
-    
-        // Create labour
-        BomLabour::create([
-            'section_id'    => $item->section_id,
-            'item_id'       => $item->item_id,
-            'quantity'      => $item->quantity,
-            'rate'          => $unit->labour,
-            'amount'        => $item->quantity * $unit->labour,
-            'project_id'    => project_id(),
-            'bq_section_id' => $item->id,
-            'bq_document_id'=> $item->bq_document_id,
-        ]);
+        $quantity = (float) $request->quantity;
+        $rate = (float) $request->rate;
 
-        // Create materials
-        foreach ($materials as $material) {
-            $product = Product::find($material->product_id);
-            $conversionFactor = $material->conversion_factor ?? 0;
-            $quantity = $item->quantity * $conversionFactor;
-            $rate = $product->rate ?? 0;
-            $amount = $quantity * $rate;
+        $bqSection->element_id = $element->id;
+        $bqSection->item_id = $item->id;
+        $bqSection->item_name = $item->name;
+        $bqSection->units = $item->unit_of_measurement;
+        $bqSection->rate = $rate;
+        $bqSection->quantity = $quantity;
+        $bqSection->amount = $rate * $quantity;
+        $bqSection->save();
 
-            BomItem::create([
-                'section_id'       => $item->section_id,
-                'item_id'          => $item->item_id,
-                'item_material_id' => $material->id,
-                'product_id'       => $material->product_id,
-                'quantity'         => $quantity,
-                'rate'             => $rate,
-                'amount'           => $amount,
-                'project_id'       => project_id(),
-                'bq_section_id'    => $item->id,
-                'bq_document_id'   => $item->bq_document_id,
-            ]);
-        }
+        $this->bqItemCreator->refresh($bqSection, $item, $quantity, (int) project_id());
 
         return redirect()->back()->with('success', 'Item updated successfully.');
     }

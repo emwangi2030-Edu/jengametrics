@@ -86,4 +86,9 @@ class User extends Authenticatable
         }
         return false;
     }
+
+    public function libraries()
+    {
+        return $this->hasMany(Library::class);
+    }
 }

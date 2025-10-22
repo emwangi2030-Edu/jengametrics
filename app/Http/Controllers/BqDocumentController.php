@@ -8,6 +8,10 @@ use App\Models\BomItem;
 use App\Models\BomLabour;
 use App\Models\Element;
 use App\Models\Item;
+use App\Models\Library;
+use App\Models\LibraryItem;
+use App\Models\Section;
+use App\Services\BqItemCreator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -75,11 +79,21 @@ class BqDocumentController extends Controller
             })
             ->sum();
 
+        $libraries = auth()->user()
+            ?->libraries()
+            ->withCount('items')
+            ->latest()
+            ->get() ?? collect();
+
+        $sections = Section::orderBy('name')->get();
+
         return view('bq_documents.index', [
             'project' => $project,
             'masterDocument' => $masterDocument,
             'subDocuments' => $subDocuments,
             'overallTotal' => $overallTotal,
+            'libraries' => $libraries,
+            'sections' => $sections,
         ]);
     }
 
@@ -109,6 +123,74 @@ class BqDocumentController extends Controller
     {
         $items = Item::where('element_id', $request->element_id)->pluck('name', 'id');
         return response()->json($items);
+    }
+
+    public function importLibrary(Request $request, BqDocument $bqDocument, BqItemCreator $bqItemCreator)
+    {
+        $projectId = (int) ($bqDocument->project_id ?? project_id());
+
+        $this->assertSubDocumentAccess($bqDocument, $projectId);
+
+        $validated = $request->validate([
+            'library_id' => 'required|exists:libraries,id',
+            'items' => 'required|array|min:1',
+            'items.*.quantity' => 'required|numeric|min:0.0001',
+            'items.*.rate' => 'required|numeric|min:0',
+        ]);
+
+        $library = Library::where('id', $validated['library_id'])
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (! $library) {
+            return redirect()
+                ->route('bq_documents.show', $bqDocument)
+                ->with('danger', __('You are not authorized to use the selected library.'));
+        }
+
+        $itemIds = array_keys($validated['items']);
+
+        $libraryItems = LibraryItem::where('library_id', $library->id)
+            ->whereIn('id', $itemIds)
+            ->with(['section', 'element', 'item'])
+            ->get();
+
+        if ($libraryItems->count() !== count($itemIds)) {
+            return redirect()
+                ->route('bq_documents.show', $bqDocument)
+                ->with('danger', __('Some selected library items were not found.'));
+        }
+
+        foreach ($libraryItems as $libraryItem) {
+            if (! $libraryItem->section || ! $libraryItem->element || ! $libraryItem->item) {
+                return redirect()
+                    ->route('bq_documents.show', $bqDocument)
+                    ->with('danger', __('One or more library items are missing linked records and cannot be imported.'));
+            }
+        }
+
+        DB::transaction(function () use ($libraryItems, $validated, $bqDocument, $bqItemCreator, $projectId) {
+            foreach ($libraryItems as $libraryItem) {
+                $payload = $validated['items'][$libraryItem->id];
+
+                $quantity = (float) $payload['quantity'];
+                $rate = (float) $payload['rate'];
+
+                $bqItemCreator->create(
+                    $bqDocument,
+                    $libraryItem->section,
+                    $libraryItem->element,
+                    $libraryItem->item,
+                    $quantity,
+                    $rate,
+                    $projectId
+                );
+            }
+        });
+
+        return redirect()
+            ->route('bq_documents.show', $bqDocument)
+            ->with('success', __('Library items imported successfully.'));
     }
 
     public function copyForm(BqDocument $bqDocument)
@@ -297,11 +379,18 @@ class BqDocumentController extends Controller
 
         $totalAmount = $sectionGroups->sum('total');
 
+        $libraries = auth()->user()
+            ?->libraries()
+            ->withCount('items')
+            ->latest()
+            ->get() ?? collect();
+
         return view('bq_documents.show', [
             'project' => $project,
             'bqDocument' => $bqDocument,
             'sectionGroups' => $sectionGroups,
             'totalAmount' => $totalAmount,
+            'libraries' => $libraries,
         ]);
     }
 

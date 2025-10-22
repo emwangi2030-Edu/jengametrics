@@ -22,6 +22,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\RequisitionController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\LibraryController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -87,6 +88,15 @@ Route::get('bq_documents/{bqDocument}/copy', [BqDocumentController::class, 'copy
     ->name('bq_documents.copy');
 Route::post('bq_documents/{bqDocument}/copy', [BqDocumentController::class, 'copyStore'])
     ->name('bq_documents.copy.store');
+
+Route::middleware('auth')->group(function () {
+    Route::post('libraries', [LibraryController::class, 'store'])->name('libraries.store');
+    Route::put('libraries/{library}', [LibraryController::class, 'update'])->name('libraries.update');
+    Route::delete('libraries/{library}', [LibraryController::class, 'destroy'])->name('libraries.destroy');
+    Route::get('libraries/{library}/items', [LibraryController::class, 'items'])->name('libraries.items');
+    Route::get('items/details', [ItemsController::class, 'getItemsDetails'])->name('items.details');
+    Route::post('bq_documents/{bqDocument}/import-library', [BqDocumentController::class, 'importLibrary'])->name('bq_documents.import-library');
+});
 
 // BoQ Sections Routes (scoped to BoQ documents)
 Route::get('bq_documents/{bqDocument}/sections/create', [BqSectionController::class, 'create'])->name('bq_sections.create');
