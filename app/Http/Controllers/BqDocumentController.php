@@ -402,7 +402,21 @@ class BqDocumentController extends Controller
             abort(404);
         }
 
-        $bqDocument->delete();
+        DB::transaction(function () use ($bqDocument) {
+            $sectionIds = BqSection::query()
+                ->where('bq_document_id', $bqDocument->id)
+                ->pluck('id');
+
+            if ($sectionIds->isNotEmpty()) {
+                BomItem::whereIn('bq_section_id', $sectionIds)->delete();
+                BomLabour::whereIn('bq_section_id', $sectionIds)->delete();
+            }
+
+            BomItem::where('bq_document_id', $bqDocument->id)->delete();
+            BomLabour::where('bq_document_id', $bqDocument->id)->delete();
+
+            $bqDocument->delete();
+        });
 
         return redirect()
             ->route('bq_documents.index')
