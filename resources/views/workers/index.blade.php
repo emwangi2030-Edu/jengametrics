@@ -33,7 +33,7 @@
                                     <th>{{ __('Work Type') }}</th>
                                     <th>{{ __('Phone') }}</th>
                                     <th>{{ __('Email') }}</th>
-                                    <th>{{ __('Payment Amount') }}</th>
+                                    <th>{{ __('Payment Rate') }}</th>
                                     <th>{{ __('Payment Frequency') }}</th>
                                     <th>{{ __('Mode of Payment') }}</th>
                                     <th>{{ __('Attended Days') }}</th>

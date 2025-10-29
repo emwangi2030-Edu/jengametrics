@@ -12,12 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Ensure no NULLs exist before making the column NOT NULL
-        DB::table('users')->whereNull('user_type')->update(['user_type' => 'user']);
-
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('user_type', 255)->default('user')->nullable(false)->change();
-        });
+        if (Schema::hasColumn('users', 'user_type')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('user_type')->default('user')->change();
+            });
+        }
     }
 
     /**
@@ -25,8 +24,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('user_type', 255)->nullable()->default(null)->change();
-        });
+        if (Schema::hasColumn('users', 'user_type')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('user_type')->default(null)->change();
+            });
+        }
     }
 };

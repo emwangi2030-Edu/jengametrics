@@ -15,7 +15,9 @@ class AddProductIdToBomItemsTable extends Migration
     {
         Schema::table('bom_items', function (Blueprint $table) {
             // Adding the product_id column as an unsigned big integer and making it nullable (adjust as needed)
-            $table->unsignedBigInteger('product_id')->nullable()->after('id');
+            if (!Schema::hasColumn('bom_items', 'product_id')) {
+                $table->unsignedBigInteger('product_id')->nullable()->after('id');
+            }
 
             // Optional: Add a foreign key constraint if needed
             // Uncomment the line below if 'products' table exists and you want a foreign key reference
@@ -32,7 +34,9 @@ class AddProductIdToBomItemsTable extends Migration
     {
         Schema::table('bom_items', function (Blueprint $table) {
             // Dropping the product_id column
-            $table->dropColumn('product_id');
+            if (Schema::hasColumn('bom_items', 'product_id')) {
+                $table->dropColumn('product_id');
+            }
 
             // If you added a foreign key constraint, also drop it
             // $table->dropForeign(['product_id']);

@@ -30,5 +30,14 @@ class BomItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
-}
 
+    public function bqDocument()
+    {
+        return $this->belongsTo(BqDocument::class);
+    }
+
+    public function bqSection()
+    {
+        return $this->belongsTo(BqSection::class);
+    }
+}

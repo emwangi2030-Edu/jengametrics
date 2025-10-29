@@ -74,4 +74,33 @@ class ItemsController extends Controller
         return response()->json($items);
     }
 
+    public function getItemsDetails(Request $request)
+    {
+        $validated = $request->validate([
+            'element_id' => 'required|exists:elements,id',
+        ]);
+
+        $items = Item::query()
+            ->with(['Element.section'])
+            ->where('element_id', $validated['element_id'])
+            ->orderBy('name')
+            ->get()
+            ->map(function (Item $item) {
+                $element = $item->Element;
+                $section = $element?->section;
+
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'unit' => $item->unit_of_measurement,
+                    'element_id' => $element?->id,
+                    'element_name' => $element?->name,
+                    'section_id' => $section?->id,
+                    'section_name' => $section?->name,
+                ];
+            });
+
+        return response()->json($items);
+    }
+
 }

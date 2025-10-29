@@ -93,7 +93,18 @@
 
     // Initialize button logic on first load
     document.addEventListener("DOMContentLoaded", function() {
-        loadAttendance(document.getElementById('datePicker').value);
+        const datePicker = document.getElementById('datePicker');
+        const attendanceForm = document.querySelector('form[action="{{ route('attendance.store') }}"]');
+
+        if (datePicker) {
+            loadAttendance(datePicker.value);
+        }
+
+        if (attendanceForm) {
+            attendanceForm.addEventListener('submit', function() {
+                localStorage.setItem('attendance:lastSaved', Date.now().toString());
+            });
+        }
     });
 </script>
 <script>

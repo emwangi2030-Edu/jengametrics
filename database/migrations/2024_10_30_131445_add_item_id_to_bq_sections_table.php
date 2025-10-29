@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bq_sections', function (Blueprint $table) {
-            $table->unsignedBigInteger('item_id')->nullable()->after('sub_element_id');
+            if (!Schema::hasColumn('bq_sections', 'item_id')) {
+                $table->unsignedBigInteger('item_id')->nullable()->after('sub_element_id');
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('bq_sections', function (Blueprint $table) {
-            $table->dropColumn('item_id');
+            if (Schema::hasColumn('bq_sections', 'item_id')) {
+                $table->dropColumn('item_id');
+            }
         });
     }
 };

@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('units_of_measurement', function (Blueprint $table) {
-            $table->dropTimestamps();
-        });
+        if (Schema::hasColumn('units_of_measurement', 'created_at') || Schema::hasColumn('units_of_measurement', 'updated_at')) {
+            Schema::table('units_of_measurement', function (Blueprint $table) {
+                $table->dropTimestamps();
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('units_of_measurement', function (Blueprint $table) {
-            $table->timestamps();
-        });
+        if (! Schema::hasColumn('units_of_measurement', 'created_at') && ! Schema::hasColumn('units_of_measurement', 'updated_at')) {
+            Schema::table('units_of_measurement', function (Blueprint $table) {
+                $table->timestamps();
+            });
+        }
     }
 };

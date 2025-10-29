@@ -30,8 +30,10 @@
                                 @foreach ($requisitionableItems as $item)
                                     <option value="{{ $item->id }}"
                                             data-max="{{ $item->remaining_quantity }}"
-                                            data-unit="{{ $item->unit }}">
-                                        {{ $item->item_material->name ?? 'N/A' }} (Available: {{ (int) $item->remaining_quantity }} {{ $item->unit }})
+                                            data-unit="{{ $item->unit }}"
+                                            data-document="{{ $item->bq_document->title ?? __('Unknown BoQ') }}">
+                                        {{ $item->item_material->name ?? 'N/A' }}
+                                        ({{ $item->bq_document->title ?? __('Unknown BoQ') }} · {{ (int) $item->remaining_quantity }} {{ $item->unit }})
                                     </option>
                                 @endforeach
                             @endif

@@ -13,7 +13,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($workers as $worker)
+            @forelse($workers as $worker)
             <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $worker->full_name }}</td>
@@ -26,8 +26,13 @@
                         {{ isset($existingAttendances[$worker->id]) ? 'checked' : '' }}>
                 </td>
             </tr>
-            @endforeach
+            @empty
+            <tr>
+                <td colspan="6" class="text-center text-muted">
+                    No workers were active on {{ \Carbon\Carbon::parse($date)->format('d M Y') }}.
+                </td>
+            </tr>
+            @endforelse
         </tbody>
     </table>
 </div>
-

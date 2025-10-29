@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('workers', function (Blueprint $table) {
-            $table->decimal('payment_amount', 10, 2)->nullable()->after('email');
-            $table->string('payment_frequency')->nullable()->after('payment_amount');
+            if (!Schema::hasColumn('workers', 'payment_amount')) {
+                $table->decimal('payment_amount', 10, 2)->nullable()->after('email');
+            }
+            if (!Schema::hasColumn('workers', 'payment_frequency')) {
+                $table->string('payment_frequency')->nullable()->after('payment_amount');
+            }
         });
     }
 
@@ -23,7 +27,17 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('workers', function (Blueprint $table) {
-            $table->dropColumn(['payment_amount', 'payment_frequency']);
+            $drops = [];
+            if (Schema::hasColumn('workers', 'payment_amount')) {
+                $drops[] = 'payment_amount';
+            }
+            if (Schema::hasColumn('workers', 'payment_frequency')) {
+                $drops[] = 'payment_frequency';
+            }
+
+            if ($drops !== []) {
+                $table->dropColumn($drops);
+            }
         });
     }
 };

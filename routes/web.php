@@ -22,6 +22,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\RequisitionController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\LibraryController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -81,16 +82,28 @@ Route::post('select-project', [ProjectController::class, 'selectProject'])->name
 
 
 // BoQ Documents Routes
-Route::resource('bq_documents', BqDocumentController::class);
 Route::get('boq', [BqDocumentController::class, 'index'])->name('boq');
-// Sections Routes
-Route::get('bq_documents/sections/create', [BqSectionController::class, 'create'])->name('bq_sections.create');
-Route::get('bq_documents/sections/bulk', [BqSectionController::class, 'bulkCreate'])->name('bq_sections.bulk_create');
-Route::post('bq_documents/sections', [BqSectionController::class, 'store'])->name('bq_sections.store');
-// Bulk add BoQ items into a section
-Route::post('bq_documents/sections/bulk', [BqSectionController::class, 'storeBulk'])->name('bq_sections.store_bulk');
-Route::post('bq_documents/sections/bulk/import', [BqSectionController::class, 'importCsv'])->name('bq_sections.import_csv');
-Route::get('section/{id}', [BqSectionController::class, 'show'])->name('section.show');
+Route::resource('bq_documents', BqDocumentController::class);
+Route::get('bq_documents/{bqDocument}/copy', [BqDocumentController::class, 'copyForm'])
+    ->name('bq_documents.copy');
+Route::post('bq_documents/{bqDocument}/copy', [BqDocumentController::class, 'copyStore'])
+    ->name('bq_documents.copy.store');
+
+Route::middleware('auth')->group(function () {
+    Route::post('libraries', [LibraryController::class, 'store'])->name('libraries.store');
+    Route::put('libraries/{library}', [LibraryController::class, 'update'])->name('libraries.update');
+    Route::delete('libraries/{library}', [LibraryController::class, 'destroy'])->name('libraries.destroy');
+    Route::get('libraries/{library}/items', [LibraryController::class, 'items'])->name('libraries.items');
+    Route::get('items/details', [ItemsController::class, 'getItemsDetails'])->name('items.details');
+    Route::post('bq_documents/{bqDocument}/import-library', [BqDocumentController::class, 'importLibrary'])->name('bq_documents.import-library');
+});
+
+// BoQ Sections Routes (scoped to BoQ documents)
+Route::get('bq_documents/{bqDocument}/sections/create', [BqSectionController::class, 'create'])->name('bq_sections.create');
+Route::post('bq_documents/{bqDocument}/sections', [BqSectionController::class, 'store'])->name('bq_sections.store');
+Route::get('bq_documents/{bqDocument}/sections/{section}', [BqSectionController::class, 'show'])
+    ->whereNumber('section')
+    ->name('bq_sections.show');
 
 Route::get('sections/{bqSection}/edit', [BqSectionController::class, 'edit'])->name('bq_sections.edit');
 Route::put('bq_documents/{bqDocument}/sections/{bqSection}', [BqSectionController::class, 'update'])->name('bq_sections.update');
@@ -116,6 +129,7 @@ Route::get('create-bq-item', ['as'=>'create_bq_item', 'uses' => '\App\Http\Contr
 
 
 
+Route::get('boms/documents/{bqDocument}', [BOMController::class, 'showDocument'])->name('boms.documents.show');
 Route::resource('boms', BOMController::class);
 
 // Rebuild BoM for a section from its BoQ items

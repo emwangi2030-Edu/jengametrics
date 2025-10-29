@@ -14,7 +14,9 @@ class AddLabourToItemsTable extends Migration
     public function up()
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->string('labour')->nullable()->after('id'); // Replace 'column_name' with the name of the column after which you want to add 'labour'
+            if (!Schema::hasColumn('items', 'labour')) {
+                $table->string('labour')->nullable()->after('id');
+            }
         });
     }
 
@@ -26,7 +28,9 @@ class AddLabourToItemsTable extends Migration
     public function down()
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->dropColumn('labour');
+            if (Schema::hasColumn('items', 'labour')) {
+                $table->dropColumn('labour');
+            }
         });
     }
 }

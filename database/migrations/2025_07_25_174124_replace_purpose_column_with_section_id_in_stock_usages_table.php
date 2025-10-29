@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::table('stock_usages', function (Blueprint $table) { 
             // Add section_id column
-            $table->unsignedBigInteger('section_id')->after('quantity_used');
+            if (!Schema::hasColumn('stock_usages', 'section_id')) {
+                $table->unsignedBigInteger('section_id')->after('quantity_used');
 
-            // Set up foreign key to sections table
-            $table->foreign('section_id')
-                ->references('id')
-                ->on('sections')
-                ->onDelete('cascade');
+                // Set up foreign key to sections table
+                $table->foreign('section_id')
+                    ->references('id')
+                    ->on('sections')
+                    ->onDelete('cascade');
+            }
         });
     }
 
@@ -30,8 +32,10 @@ return new class extends Migration
     {
         Schema::table('stock_usages', function (Blueprint $table) {
             // Drop the foreign key and section_id
-            $table->dropForeign(['section_id']);
-            $table->dropColumn('section_id');
+            if (Schema::hasColumn('stock_usages', 'section_id')) {
+                $table->dropForeign(['section_id']);
+                $table->dropColumn('section_id');
+            }
         });
     }
 };

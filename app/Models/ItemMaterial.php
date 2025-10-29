@@ -17,4 +17,9 @@ class ItemMaterial extends Model
     {
         return $this->belongsTo(Item::class, 'item_id');
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

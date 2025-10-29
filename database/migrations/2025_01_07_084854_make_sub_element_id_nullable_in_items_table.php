@@ -13,9 +13,11 @@ class MakeSubElementIdNullableInItemsTable extends Migration
      */
     public function up()
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->unsignedBigInteger('sub_element_id')->nullable()->change();
-        });
+        if (Schema::hasColumn('items', 'sub_element_id')) {
+            Schema::table('items', function (Blueprint $table) {
+                $table->unsignedBigInteger('sub_element_id')->nullable()->change();
+            });
+        }
     }
 
     /**
@@ -25,8 +27,10 @@ class MakeSubElementIdNullableInItemsTable extends Migration
      */
     public function down()
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->unsignedBigInteger('sub_element_id')->nullable(false)->change();
-        });
+        if (Schema::hasColumn('items', 'sub_element_id')) {
+            Schema::table('items', function (Blueprint $table) {
+                $table->unsignedBigInteger('sub_element_id')->nullable(false)->change();
+            });
+        }
     }
 }

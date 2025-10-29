@@ -1,5 +1,5 @@
 <!-- Edit Item Modal -->
-<div class="modal fade" id="editItemModal{{ $item->id }}" tabindex="-1" aria-labelledby="editItemModalLabel{{ $item->id }}" aria-hidden="true">
+<div class="modal fade" id="editItemModal{{ $item->id }}" tabindex="-1" aria-labelledby="editItemModalLabel{{ $item->id }}" aria-hidden="true" data-section-id="{{ $section->id }}">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -14,7 +14,7 @@
                     <input type="hidden" name="id" value="{{ $item->id }}">
 
                     <!-- Section Title -->
-                    <h6 class="text-muted mb-3">Section: {{ $bqSection->name }}</h6>
+                    <h6 class="text-muted mb-3">Section: {{ $section->name }}</h6>
 
                     <!-- Element Dropdown -->
                     <div class="form-floating mb-4">
@@ -66,70 +66,108 @@
 </div>
 
 <script>
-$(document).ready(function () {
-    const sectionId = "{{ $bqSection->id }}";
-
-    $('.element-dropdown').each(function () {
-        const elementDropdown = $(this);
-        const itemDropdown = elementDropdown.closest('.modal-body').find('.item-dropdown');
-        const selectedElementId = elementDropdown.data('selected-element');
-        const selectedItemId = elementDropdown.closest('.modal-body').find('.item-dropdown').data('selected-item');
-        const selectElementText = "{{ __('Select Element') }}";
-        const selectItemText = "{{ __('Select Item') }}";
-
-        // Populate element dropdown
-        $.ajax({
-            url: '{{ route('get.elements.by.section') }}',
-            type: 'GET',
-            data: { section_id: sectionId },
-            success: function (data) {
-                elementDropdown.empty().append('<option value="" disabled selected style="color: gray;">' + selectElementText + '</option>');
-                $.each(data, function (key, value) {
-                    elementDropdown.append('<option value="' + key + '">' + value + '</option>');
-                });
-
-                // Preselect element if available
-                if (selectedElementId) {
-                    elementDropdown.val(selectedElementId).trigger('change');
-                }
-            },
-            error: function () {
-                alert('Failed to load elements.');
+    document.addEventListener('DOMContentLoaded', function () {
+        (function initEditItemModal{{ $item->id }}() {
+            const modal = document.getElementById('editItemModal{{ $item->id }}');
+            if (!modal) {
+                return;
             }
-        });
 
-        // When element is changed
-        elementDropdown.on('change', function () {
-            const elementId = $(this).val();
-            itemDropdown.empty().append('<option value="">{{ __("Loading...") }}</option>');
+            const sectionId = modal.dataset.sectionId;
+            const elementSelect = modal.querySelector('#element{{ $item->id }}');
+            const itemSelect = modal.querySelector('#item{{ $item->id }}');
+            const rateInput = modal.querySelector('#rate{{ $item->id }}');
+            const quantityInput = modal.querySelector('#quantity{{ $item->id }}');
+            const amountInput = modal.querySelector('.amount-input');
 
-            if (elementId) {
+            const selectElementText = "{{ __('Select Element') }}";
+            const selectItemText = "{{ __('Select Item') }}";
+            const loadingText = "{{ __('Loading...') }}";
+
+            const initialElementId = elementSelect.dataset.selectedElement ? elementSelect.dataset.selectedElement.toString() : '';
+            const initialItemId = itemSelect.dataset.selectedItem ? itemSelect.dataset.selectedItem.toString() : '';
+
+            const isPresent = (value) => value !== null && value !== undefined && value !== '';
+
+            const renderOptions = (select, placeholder, data, selected) => {
+                select.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = placeholder;
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                defaultOption.style.color = 'gray';
+                select.appendChild(defaultOption);
+
+                Object.entries(data || {}).forEach(([value, label]) => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = label;
+                    if (isPresent(selected) && value.toString() === selected.toString()) {
+                        option.selected = true;
+                        defaultOption.selected = false;
+                    }
+                    select.appendChild(option);
+                });
+            };
+
+            const loadItems = (elementId, selectedItem) => {
+                renderOptions(itemSelect, selectItemText, {}, null);
+
+                if (!elementId) {
+                    return;
+                }
+
+                itemSelect.innerHTML = `<option value="" disabled selected style="color: gray;">${loadingText}</option>`;
+
                 $.ajax({
                     url: '{{ route('get.items.by.elements') }}',
                     type: 'GET',
                     data: { element_id: elementId },
-                    success: function (data) {
-                        itemDropdown.empty().append('<option value="" disabled selected style="color: gray;">' + selectItemText + '</option>');
-                        $.each(data, function (key, value) {
-                            itemDropdown.append('<option value="' + key + '">' + value + '</option>');
-                        });
-
-                        // Preselect item if available
-                        if (selectedItemId) {
-                            itemDropdown.val(selectedItemId);
-                        }
-                    },
+                }).done(function (data) {
+                    renderOptions(itemSelect, selectItemText, data, selectedItem);
                 });
-            }
-        });
-    });
+            };
 
-    // Live amount calculation
-    $('.rate-input, .quantity-input').on('input', function () {
-        let modalBody = $(this).closest('.modal-body');
-        let rate = parseFloat(modalBody.find('.rate-input').val()) || 0;
-        let quantity = parseFloat(modalBody.find('.quantity-input').val()) || 0;
-        modalBody.find('.amount-input').val((rate * quantity).toFixed(2));
+            const loadElements = (selectedElement, selectedItem) => {
+                elementSelect.innerHTML = `<option value="" disabled selected style="color: gray;">${loadingText}</option>`;
+
+                $.ajax({
+                    url: '{{ route('get.elements.by.section') }}',
+                    type: 'GET',
+                    data: { section_id: sectionId },
+                }).done(function (data) {
+                    renderOptions(elementSelect, selectElementText, data, selectedElement);
+
+                    const activeElement = elementSelect.value;
+                    loadItems(activeElement, selectedItem);
+                });
+            };
+
+            elementSelect.addEventListener('change', function () {
+                loadItems(this.value, null);
+            });
+
+            const updateAmount = () => {
+                if (!amountInput) {
+                    return;
+                }
+
+                const rate = rateInput ? parseFloat(rateInput.value) || 0 : 0;
+                const quantity = quantityInput ? parseFloat(quantityInput.value) || 0 : 0;
+                amountInput.value = (rate * quantity).toFixed(2);
+            };
+
+            if (rateInput) {
+                rateInput.addEventListener('input', updateAmount);
+            }
+
+            if (quantityInput) {
+                quantityInput.addEventListener('input', updateAmount);
+            }
+
+            loadElements(initialElementId, initialItemId);
+            updateAmount();
+        })();
     });
-});
 </script>

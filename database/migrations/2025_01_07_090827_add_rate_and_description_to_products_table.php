@@ -14,8 +14,13 @@ class AddRateAndDescriptionToProductsTable extends Migration
     public function up()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->decimal('rate', 10, 2)->default(0.00)->after('name'); // Adjust precision as needed
-            $table->text('description')->nullable()->after('rate');
+            if (!Schema::hasColumn('products', 'rate')) {
+                $table->decimal('rate', 10, 2)->default(0.00)->after('name');
+            }
+
+            if (!Schema::hasColumn('products', 'description')) {
+                $table->text('description')->nullable()->after('rate');
+            }
         });
     }
 
@@ -27,7 +32,17 @@ class AddRateAndDescriptionToProductsTable extends Migration
     public function down()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn(['rate', 'description']);
+            $drops = [];
+            if (Schema::hasColumn('products', 'rate')) {
+                $drops[] = 'rate';
+            }
+            if (Schema::hasColumn('products', 'description')) {
+                $drops[] = 'description';
+            }
+
+            if ($drops !== []) {
+                $table->dropColumn($drops);
+            }
         });
     }
 }

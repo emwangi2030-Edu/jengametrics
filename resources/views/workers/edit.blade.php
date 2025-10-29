@@ -16,7 +16,22 @@
 
     <div class="card shadow-sm w-75 m-auto">
         <div class="card-body">
-            <form method="POST" action="{{ route('workers.update', $worker->id) }}">
+@php
+    $photoUrl = null;
+    $picturePath = $worker->picture;
+
+    if (!empty($picturePath)) {
+        if (preg_match('/^https?:\/\//i', $picturePath)) {
+            $photoUrl = $picturePath;
+        } elseif (\Illuminate\Support\Str::startsWith($picturePath, ['storage/', '/storage/'])) {
+            $photoUrl = asset($picturePath);
+        } else {
+            $photoUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($picturePath);
+        }
+    }
+@endphp
+
+            <form method="POST" action="{{ route('workers.update', $worker->id) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -63,6 +78,19 @@
                 <div class="mb-4">
                     <label for="email" class="form-label">Email <span class="text-muted">(optional)</span></label>
                     <input type="email" name="email" class="form-control" value="{{ old('email', $worker->email) }}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="picture" class="form-label">Profile Photo <span class="text-muted">(optional)</span></label>
+                    @if ($photoUrl)
+                        <div class="mb-2">
+                            <img src="{{ $photoUrl }}" alt="{{ $worker->full_name }} current photo" class="img-fluid rounded shadow-sm" style="max-width: 200px;">
+                        </div>
+                        <p class="text-muted small mb-1">Upload a new image to replace the current photo.</p>
+                    @else
+                        <p class="text-muted small mb-1">Upload a photo for this worker.</p>
+                    @endif
+                    <input type="file" name="picture" id="picture" class="form-control" accept="image/*">
                 </div>
 
                 <div class="mb-3">

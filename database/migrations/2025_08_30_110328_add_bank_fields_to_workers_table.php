@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('workers', function (Blueprint $table) {
-            $table->string('bank_name')->nullable()->after('mode_of_payment');
-            $table->string('bank_account')->nullable()->after('bank_name');
+            if (!Schema::hasColumn('workers', 'bank_name')) {
+                $table->string('bank_name')->nullable()->after('mode_of_payment');
+            }
+            if (!Schema::hasColumn('workers', 'bank_account')) {
+                $table->string('bank_account')->nullable()->after('bank_name');
+            }
         });
     }
 
@@ -23,7 +27,17 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('workers', function (Blueprint $table) {
-            $table->dropColumn(['bank_name', 'bank_account']);
+            $drops = [];
+            if (Schema::hasColumn('workers', 'bank_name')) {
+                $drops[] = 'bank_name';
+            }
+            if (Schema::hasColumn('workers', 'bank_account')) {
+                $drops[] = 'bank_account';
+            }
+
+            if ($drops !== []) {
+                $table->dropColumn($drops);
+            }
         });
     }
 };

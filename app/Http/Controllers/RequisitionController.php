@@ -8,6 +8,7 @@ use App\Models\BomItem;
 use App\Models\Product;
 use App\Models\Section;
 use App\Models\UnitOfMeasurement;
+use App\Models\BqDocument;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Carbon\Unit;
@@ -34,7 +35,7 @@ class RequisitionController extends Controller
         });
 
         $requisitions = (clone $baseQuery)
-            ->with('bomItem', 'requester', 'approver', 'section')
+            ->with('bomItem.bqDocument', 'requester', 'approver', 'section')
             ->orderByDesc('created_at')
             ->get();
 
@@ -67,12 +68,16 @@ class RequisitionController extends Controller
         $requisitionableItems = collect();
 
         $products = Product::query()->whereIn('id', $groupedItems->keys()->toArray())->pluck('unit', 'id');
+        $documentMap = BqDocument::whereIn('id', $rawItems->pluck('bq_document_id')->filter()->unique())->get()->keyBy('id');
 
         foreach ($groupedItems as $product_id => $group) {
             $sampleItem = $group->first();
             $totalQty = $group->sum('quantity');
             $sampleItem->unit = $products[$product_id] ?? 'unit';
             $sampleItem->total_quantity = $totalQty;
+
+            $documentId = $group->pluck('bq_document_id')->filter()->first();
+            $sampleItem->bq_document = $documentId ? $documentMap->get($documentId) : null;
 
             $requisitionedQty = Requisition::whereIn('bom_item_id', $group->pluck('id'))
                 ->whereIn('status', ['pending', 'approved'])

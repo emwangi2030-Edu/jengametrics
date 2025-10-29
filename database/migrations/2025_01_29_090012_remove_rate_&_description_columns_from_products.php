@@ -12,7 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn(['rate','description']);
+            $drops = [];
+            if (Schema::hasColumn('products', 'rate')) {
+                $drops[] = 'rate';
+            }
+            if (Schema::hasColumn('products', 'description')) {
+                $drops[] = 'description';
+            }
+
+            if ($drops !== []) {
+                $table->dropColumn($drops);
+            }
         });
     }
 
@@ -22,8 +32,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->string('rate')->nullable();
-            $table->string('description')->nullable();
+            if (!Schema::hasColumn('products', 'rate')) {
+                $table->string('rate')->nullable();
+            }
+            if (!Schema::hasColumn('products', 'description')) {
+                $table->string('description')->nullable();
+            }
         });
     }
 };
