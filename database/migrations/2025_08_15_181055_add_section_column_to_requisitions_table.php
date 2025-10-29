@@ -12,11 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('requisitions', function (Blueprint $table) {
-            $table->unsignedBigInteger('section')->after('quantity_requested');
-            $table->foreign('section')
-                ->references('id')
-                ->on('sections')
-                ->onDelete('cascade');
+            if (!Schema::hasColumn('requisitions', 'section')) {
+                $table->unsignedBigInteger('section')->after('quantity_requested');
+                $table->foreign('section')
+                    ->references('id')
+                    ->on('sections')
+                    ->onDelete('cascade');
+            }
         });
     }
 
@@ -26,8 +28,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('requisitions', function (Blueprint $table) {
-            $table->dropForeign(['section']);
-            $table->dropColumn('section');
+            if (Schema::hasColumn('requisitions', 'section')) {
+                $table->dropForeign(['section']);
+                $table->dropColumn('section');
+            }
         });
     }
 };

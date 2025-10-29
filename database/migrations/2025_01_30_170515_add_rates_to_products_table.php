@@ -7,13 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up() {
         Schema::table('products', function (Blueprint $table) {
-            $table->decimal('rate')->nullable()->after('unit'); // Adjust precision as needed
+            if (!Schema::hasColumn('products', 'rate')) {
+                $table->decimal('rate')->nullable()->after('unit');
+            }
         });
     }
 
     public function down() {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('rate');
+            if (Schema::hasColumn('products', 'rate')) {
+                $table->dropColumn('rate');
+            }
         });
     }
 };

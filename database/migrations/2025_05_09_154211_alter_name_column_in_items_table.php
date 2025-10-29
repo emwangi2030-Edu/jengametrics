@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->text('name')->change();
-        });
+        if (Schema::hasColumn('items', 'name')) {
+            Schema::table('items', function (Blueprint $table) {
+                $table->text('name')->change();
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->string('name', 255)->change();
-        });
+        if (Schema::hasColumn('items', 'name')) {
+            Schema::table('items', function (Blueprint $table) {
+                $table->string('name', 255)->change();
+            });
+        }
     }
 };

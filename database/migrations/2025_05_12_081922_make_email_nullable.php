@@ -11,16 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('workers', function (Blueprint $table) {
-            // Drop the existing unique index
-            $table->dropUnique('workers_email_unique');
-        });
+        if (Schema::hasColumn('workers', 'email')) {
+            Schema::table('workers', function (Blueprint $table) {
+                try {
+                    $table->dropUnique('workers_email_unique');
+                } catch (\Throwable $e) {
+                    // Index already removed or does not exist.
+                }
+            });
 
-        Schema::table('workers', function (Blueprint $table) {
-            // Make email nullable and re-add unique index
-            $table->string('email')->nullable()->change();
-            $table->unique('email');
-        });
+            Schema::table('workers', function (Blueprint $table) {
+                $table->string('email')->nullable()->change();
+                $table->unique('email');
+            });
+        }
     }
 
     /**
@@ -28,15 +32,19 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('workers', function (Blueprint $table) {
-            // Drop current unique index
-            $table->dropUnique('workers_email_unique');
-        });
+        if (Schema::hasColumn('workers', 'email')) {
+            Schema::table('workers', function (Blueprint $table) {
+                try {
+                    $table->dropUnique('workers_email_unique');
+                } catch (\Throwable $e) {
+                    // Index already removed or does not exist.
+                }
+            });
 
-        Schema::table('workers', function (Blueprint $table) {
-            // Revert email to NOT NULL and re-add unique index
-            $table->string('email')->nullable(false)->change();
-            $table->unique('email');
-        });
+            Schema::table('workers', function (Blueprint $table) {
+                $table->string('email')->nullable(false)->change();
+                $table->unique('email');
+            });
+        }
     }
 };

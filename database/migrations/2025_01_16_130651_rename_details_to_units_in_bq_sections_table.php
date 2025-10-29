@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bq_sections', function (Blueprint $table) {
-            $table->renameColumn('details', 'units');
-        });
+        if (Schema::hasColumn('bq_sections', 'details') && ! Schema::hasColumn('bq_sections', 'units')) {
+            Schema::table('bq_sections', function (Blueprint $table) {
+                $table->renameColumn('details', 'units');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bq_sections', function (Blueprint $table) {
-            $table->renameColumn('units', 'details');
-        });
+        if (Schema::hasColumn('bq_sections', 'units') && ! Schema::hasColumn('bq_sections', 'details')) {
+            Schema::table('bq_sections', function (Blueprint $table) {
+                $table->renameColumn('units', 'details');
+            });
+        }
     }
 };

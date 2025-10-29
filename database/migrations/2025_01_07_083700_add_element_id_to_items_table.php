@@ -14,7 +14,9 @@ class AddElementIdToItemsTable extends Migration
     public function up()
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->unsignedBigInteger('element_id')->nullable()->after('id');
+            if (!Schema::hasColumn('items', 'element_id')) {
+                $table->unsignedBigInteger('element_id')->nullable()->after('id');
+            }
 
             // Optional: Add foreign key constraint if element_id references another table
             // $table->foreign('element_id')->references('id')->on('elements')->onDelete('cascade');
@@ -29,8 +31,9 @@ class AddElementIdToItemsTable extends Migration
     public function down()
     {
         Schema::table('items', function (Blueprint $table) {
-            $table->dropForeign(['element_id']); // Remove if foreign key was added
-            $table->dropColumn('element_id');
+            if (Schema::hasColumn('items', 'element_id')) {
+                $table->dropColumn('element_id');
+            }
         });
     }
 }

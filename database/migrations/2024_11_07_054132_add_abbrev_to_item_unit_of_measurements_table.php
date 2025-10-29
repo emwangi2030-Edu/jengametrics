@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('item_unit_of_measurements', function (Blueprint $table) {
-            $table->string('abbrev')->nullable()->after('name');
+            if (!Schema::hasColumn('item_unit_of_measurements', 'abbrev')) {
+                $table->string('abbrev')->nullable()->after('name');
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('item_unit_of_measurements', function (Blueprint $table) {
-            $table->dropColumn('abbrev');
+            if (Schema::hasColumn('item_unit_of_measurements', 'abbrev')) {
+                $table->dropColumn('abbrev');
+            }
         });
     }
 };

@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('elements', function (Blueprint $table) {
-            // Drop the existing foreign key
-            $table->dropForeign(['section_id']);
+        if (Schema::hasColumn('elements', 'section_id')) {
+            Schema::table('elements', function (Blueprint $table) {
+                $table->dropForeign(['section_id']);
 
-            // Recreate the foreign key with ON DELETE CASCADE
-            $table->foreign('section_id')
-                  ->references('id')
-                  ->on('sections')
-                  ->onDelete('cascade');
-        });
+                $table->foreign('section_id')
+                    ->references('id')
+                    ->on('sections')
+                    ->onDelete('cascade');
+            });
+        }
     }
 
     /**
@@ -28,14 +28,14 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('elements', function (Blueprint $table) {
-            // Drop the cascading foreign key
-            $table->dropForeign(['section_id']);
+        if (Schema::hasColumn('elements', 'section_id')) {
+            Schema::table('elements', function (Blueprint $table) {
+                $table->dropForeign(['section_id']);
 
-            // Recreate the original foreign key (without cascade)
-            $table->foreign('section_id')
-                  ->references('id')
-                  ->on('sections');
-        });
+                $table->foreign('section_id')
+                    ->references('id')
+                    ->on('sections');
+            });
+        }
     }
 };
