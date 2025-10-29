@@ -33,7 +33,11 @@
                 </div>
 
                 <br>
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                    <div class="btn-group" role="group" aria-label="Quick actions">
+                        <button type="button" id="markAllBtn" class="btn btn-outline-success btn-sm">Mark All Present</button>
+                        <button type="button" id="clearAllBtn" class="btn btn-outline-secondary btn-sm">Clear All</button>
+                    </div>
                     <button type="submit" class="btn btn-primary">Save Attendance</button>
                     <a href="{{ route('workers.index') }}" class="btn btn-secondary">Back</a>
                 </div>
@@ -100,6 +104,17 @@
             attendanceForm.addEventListener('submit', function() {
                 localStorage.setItem('attendance:lastSaved', Date.now().toString());
             });
+        }
+    });
+</script>
+<script>
+    // Mark all/clear all toggles
+    document.addEventListener('click', function(e){
+        if(e.target && e.target.id === 'markAllBtn'){
+            document.querySelectorAll('#attendance-container input[type=checkbox][name="present[]"]').forEach(cb=> cb.checked = true);
+        }
+        if(e.target && e.target.id === 'clearAllBtn'){
+            document.querySelectorAll('#attendance-container input[type=checkbox][name="present[]"]').forEach(cb=> cb.checked = false);
         }
     });
 </script>

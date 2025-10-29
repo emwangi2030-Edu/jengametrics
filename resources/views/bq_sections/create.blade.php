@@ -13,7 +13,7 @@
         <div class="col-md-8">
             <div class="card shadow-sm border-0 rounded">
                 <div class="card-body p-5">
-                    <form method="POST" action="{{ route('bq_sections.store', $bqDocument) }}">
+                    <form method="POST" action="{{ route('bq_sections.store') }}">
                         @csrf
 
                         {{-- Section Dropdown --}}

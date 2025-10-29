@@ -43,10 +43,12 @@ class Material extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function requisition()
+    public function itemMaterial()
     {
-        return $this->belongsTo(Requisition::class);
+        return $this->belongsTo(ItemMaterial::class, 'bom_item_id');
     }
+
+    // Requisition relationship removed: requisition_id column no longer present
 
     public function stockUsages()
     {

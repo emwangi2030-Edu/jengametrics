@@ -60,30 +60,35 @@
                                 <p class="text-muted">{{ __('No sections found.') }}</p>
                             @else
                                 <div class="table-responsive mt-3">
-                                    <table class="table">
+                                    <table class="table table-sm table-hover align-middle">
                                         <thead class="table-light">
                                             <tr>
                                                 <th>{{ __('Section') }}</th>
-                                                <th>{{ __('') }}</th>
-                                                <th>{{ __('Material Cost') }}</th>
-                                                <th>{{ __('Labour Cost') }}</th>
+                                                <th class="text-end">{{ __('Material Cost (KES)') }}</th>
+                                                <th class="text-end">{{ __('Labour Cost (KES)') }}</th>
+                                                <th class="text-end"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach($sections as $section)
                                                 @php
-                                                $total_section_material = \App\Models\BomItem::whereProjectId(project_id())->where('section_id', $section->id)->selectRaw('SUM(quantity * rate) as total')->value('total');
-                                                $total_section_labour = \App\Models\BomLabour::whereProjectId(project_id())->where('section_id', $section->id)->sum('amount');
+                                                    $total_section_material = \App\Models\BomItem::whereProjectId(project_id())
+                                                        ->where('section_id', $section->id)
+                                                        ->selectRaw('SUM(quantity * rate) as total')
+                                                        ->value('total');
+                                                    $total_section_labour = \App\Models\BomLabour::whereProjectId(project_id())
+                                                        ->where('section_id', $section->id)
+                                                        ->sum('amount');
                                                 @endphp
                                                 <tr>
-                                                    <td class="fw-bold p-2">{{ $section->name }}</td>
-                                                    <td>
+                                                    <td class="fw-semibold p-2">{{ $section->name }}</td>
+                                                    <td class="text-end fw-bold">{{ number_format($total_section_material, 2) }}</td>
+                                                    <td class="text-end fw-bold">{{ number_format($total_section_labour, 2) }}</td>
+                                                    <td class="text-end">
                                                         <a href="{{ route('boms.show', $section->id) }}" class="btn btn-outline-primary btn-sm">
                                                             {{ __('View Section') }}
                                                         </a>
                                                     </td>
-                                                    <td class="fw-bold">{{ number_format($total_section_material, 2) }}</td>
-                                                    <td class="fw-bold">{{ number_format($total_section_labour, 2) }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -103,17 +108,17 @@
                                         <tr>
                                             <td class="fw-bold">{{ __('TOTAL ESTIMATED MATERIAL COST') }}</td>
                                             <td></td>
-                                            <td class="fw-bold text-center">KES {{ number_format($totalAmount, 2) }}</td>
+                                            <td class="fw-bold text-end">KES {{ number_format($totalAmount, 2) }}</td>
                                         </tr>
                                         <tr>
                                             <td class="fw-bold">{{ __('TOTAL ESTIMATED LABOUR COST') }}</td>
                                             <td></td>
-                                            <td class="fw-bold text-center">KES {{ number_format($totalLabour, 2) }}</td>
+                                            <td class="fw-bold text-end">KES {{ number_format($totalLabour, 2) }}</td>
                                         </tr>
                                         <tr>
                                             <td class="fw-bold">{{ __('TOTAL ESTIMATED COMBINED COST') }}</td>
                                             <td></td>
-                                            <td class="fw-bold text-center">KES {{ number_format($totalAmount + $totalLabour, 2) }}</td>
+                                            <td class="fw-bold text-end">KES {{ number_format($totalAmount + $totalLabour, 2) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

@@ -14,6 +14,8 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Project;
 use App\Models\Requisition;
+use App\Models\Item;
+use App\Models\ItemMaterial;
 use Illuminate\Support\Facades\Auth;
 
 class BOMController extends Controller
@@ -101,7 +103,8 @@ class BOMController extends Controller
     {
         $bqSection = Section::find($id);
 
-        $rawItems = BomItem::whereProjectId(project_id())
+        $rawItems = BomItem::with(['product', 'item_material'])
+            ->whereProjectId(project_id())
             ->where('section_id', $id)
             ->get();
 
@@ -130,6 +133,57 @@ class BOMController extends Controller
             ->get();
 
         return view('boms.show', compact('bqSection', 'items', 'labours', 'section_name'));
+    }
+
+    public function rebuildSection($id)
+    {
+        $projectId = project_id();
+
+        // Clear existing BOM data for this section in this project
+        BomItem::whereProjectId($projectId)->where('section_id', $id)->delete();
+        BomLabour::whereProjectId($projectId)->where('section_id', $id)->delete();
+
+        // Recreate from BoQ items (bq_sections)
+        $bqItems = BqSection::whereProjectId($projectId)->where('section_id', $id)->get();
+
+        foreach ($bqItems as $bq) {
+            // Labour
+            $unitItem = Item::find($bq->item_id);
+            if ($unitItem) {
+                BomLabour::create([
+                    'section_id'    => $bq->section_id,
+                    'item_id'       => $bq->item_id,
+                    'quantity'      => $bq->quantity,
+                    'rate'          => $unitItem->labour ?? 0,
+                    'amount'        => ($unitItem->labour ?? 0) * ($bq->quantity ?? 0),
+                    'project_id'    => $projectId,
+                    'bq_section_id' => $bq->id,
+                ]);
+            }
+
+            // Materials
+            $materials = ItemMaterial::where('item_id', $bq->item_id)->get();
+            foreach ($materials as $material) {
+                $product = Product::find($material->product_id);
+                $qty = ($bq->quantity ?? 0) * ($material->conversion_factor ?? 0);
+                $rate = $product?->rate ?? 0;
+                $amt = $qty * $rate;
+
+                BomItem::create([
+                    'section_id'       => $bq->section_id,
+                    'item_id'          => $bq->item_id,
+                    'item_material_id' => $material->id,
+                    'product_id'       => $material->product_id,
+                    'quantity'         => $qty,
+                    'rate'             => $rate,
+                    'amount'           => $amt,
+                    'project_id'       => $projectId,
+                    'bq_section_id'    => $bq->id,
+                ]);
+            }
+        }
+
+        return redirect()->route('boms.show', $id)->with('success', 'BoM rebuilt for this section.');
     }
 
     public function destroy($id)
@@ -341,8 +395,6 @@ class BOMController extends Controller
         return (float) $rounded;
     }
 }
-
-
 
 
 
