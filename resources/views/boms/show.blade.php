@@ -7,11 +7,15 @@
                 <h2 class="fw-bold m-0" style="color:#027333">BoM • <span class="text-dark">{{ $bqSection->name }}</span></h2>
             </div>
             <div class="col-auto d-flex gap-2">
-                <a href="{{ route('section.show', $bqSection->id) }}" class="btn btn-outline-primary btn-sm">View BoQ Section</a>
-                <form action="{{ route('boms.sections.rebuild', $bqSection->id) }}" method="POST" onsubmit="return confirm('Rebuild BoM from BoQ for this section? This will overwrite existing BoM entries.');">
+                @if($bqDocumentForSection)
+                    <a href="{{ route('bq_sections.show', [$bqDocumentForSection, $bqSection]) }}" class="btn btn-outline-primary btn-sm">View BoQ Section</a>
+                @else
+                    <button type="button" class="btn btn-outline-primary btn-sm" disabled>View BoQ Section</button>
+                @endif
+                <!-- <form action="{{ route('boms.sections.rebuild', $bqSection->id) }}" method="POST" onsubmit="return confirm('Rebuild BoM from BoQ for this section? This will overwrite existing BoM entries.');">
                     @csrf
                     <button type="submit" class="btn btn-warning btn-sm">Rebuild BoM</button>
-                </form>
+                </form> -->
                 <a href="{{ route('boms.index') }}" class="btn btn-outline-secondary btn-sm">Back to Sections</a>
             </div>
         </div>

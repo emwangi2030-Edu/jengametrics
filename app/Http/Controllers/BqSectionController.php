@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\BqDocument;
 use App\Models\BqSection;
+use App\Models\BomItem;
+use App\Models\BomLabour;
+use App\Models\ItemMaterial;
+use App\Models\Product;
 use App\Models\Section;
 use App\Models\Item;
 use App\Models\Element;
@@ -24,6 +28,9 @@ class BqSectionController extends Controller
         $this->assertDocumentAccess($bqDocument);
 
         $sections = Section::orderBy('name')->get();
+
+        return view('bq_sections.create', compact('bqDocument', 'sections'));
+    }
 
     public function bulkCreate(Request $request)
     {

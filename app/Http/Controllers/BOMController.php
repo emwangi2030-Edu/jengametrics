@@ -111,6 +111,13 @@ class BOMController extends Controller
         $items = collect();
         $section_name = $bqSection?->name;
 
+        $primaryBqSection = BqSection::where('section_id', $id)
+            ->whereProjectId(project_id())
+            ->with('bqDocument')
+            ->first();
+
+        $bqDocumentForSection = $primaryBqSection?->bqDocument;
+
         $groupedItems = $rawItems->groupBy('product_id');
 
         foreach ($groupedItems as $product_id => $group) {
@@ -132,7 +139,7 @@ class BOMController extends Controller
             ->where('section_id', $id)
             ->get();
 
-        return view('boms.show', compact('bqSection', 'items', 'labours', 'section_name'));
+        return view('boms.show', compact('bqSection', 'items', 'labours', 'section_name', 'bqDocumentForSection'));
     }
 
     public function rebuildSection($id)
@@ -395,7 +402,6 @@ class BOMController extends Controller
         return (float) $rounded;
     }
 }
-
 
 
 

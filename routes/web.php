@@ -83,11 +83,11 @@ Route::post('select-project', [ProjectController::class, 'selectProject'])->name
 
 // BoQ Documents Routes
 Route::get('boq', [BqDocumentController::class, 'index'])->name('boq');
-Route::resource('bq_documents', BqDocumentController::class);
 Route::get('bq_documents/{bqDocument}/copy', [BqDocumentController::class, 'copyForm'])
     ->name('bq_documents.copy');
 Route::post('bq_documents/{bqDocument}/copy', [BqDocumentController::class, 'copyStore'])
     ->name('bq_documents.copy.store');
+Route::resource('bq_documents', BqDocumentController::class);
 
 Route::middleware('auth')->group(function () {
     Route::post('libraries', [LibraryController::class, 'store'])->name('libraries.store');

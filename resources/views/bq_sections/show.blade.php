@@ -47,8 +47,8 @@
                                 @endphp
                                 @forelse ($items as $item)
                                     @php
-                                        $totalQuantity = 0;
-                                        $totalAmount = 0;
+                                        $totalQuantity += (float) ($item->quantity ?? 0);
+                                        $totalAmount += (float) ($item->amount ?? 0);
                                     @endphp
                                     <tr>
                                         <td class="p-2">{{ $item->item_name }}</td>
@@ -93,66 +93,3 @@
         </div>
     </div>
 @endsection
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var addItemModal = document.getElementById('addItemModal');
-        if (!addItemModal) return;
-
-        var elementSelect = document.getElementById('modal_element');
-        var itemSelect = document.getElementById('modal_item_id');
-        var rateInput = document.getElementById('modal_rate');
-        var qtyInput = document.getElementById('modal_quantity');
-        var amountInput = document.getElementById('modal_amount');
-        var sectionId = {{ $bqSection->id }};
-
-        function computeAmount() {
-            var r = parseFloat(rateInput.value) || 0;
-            var q = parseFloat(qtyInput.value) || 0;
-            amountInput.value = (r * q).toFixed(2);
-        }
-
-        rateInput && rateInput.addEventListener('input', computeAmount);
-        qtyInput && qtyInput.addEventListener('input', computeAmount);
-
-        addItemModal.addEventListener('shown.bs.modal', function () {
-            // Load elements for this section
-            fetch(`{{ route('get.elements') }}?section_id=${sectionId}`)
-                .then(r => r.json())
-                .then(data => {
-                    elementSelect.innerHTML = '<option value="">{{ __('Choose Element') }}</option>';
-                    Object.keys(data).forEach(function (id) {
-                        var opt = document.createElement('option');
-                        opt.value = id;
-                        opt.textContent = data[id];
-                        elementSelect.appendChild(opt);
-                    });
-                    itemSelect.innerHTML = '<option value="">{{ __('Choose Item') }}</option>';
-                })
-                .catch(() => {
-                    elementSelect.innerHTML = '<option value="">{{ __('Failed to load elements') }}</option>';
-                });
-        });
-
-        elementSelect && elementSelect.addEventListener('change', function () {
-            var elementId = this.value;
-            itemSelect.innerHTML = '<option value="">{{ __('Choose Item') }}</option>';
-            if (!elementId) return;
-            fetch(`{{ route('get.items') }}?element_id=${elementId}`)
-                .then(r => r.json())
-                .then(data => {
-                    itemSelect.innerHTML = '<option value="">{{ __('Choose Item') }}</option>';
-                    Object.keys(data).forEach(function (id) {
-                        var opt = document.createElement('option');
-                        opt.value = id;
-                        opt.textContent = data[id];
-                        itemSelect.appendChild(opt);
-                    });
-                })
-                .catch(() => {
-                    itemSelect.innerHTML = '<option value="">{{ __('Failed to load items') }}</option>';
-                });
-        });
-    });
-</script>
-@endpush
