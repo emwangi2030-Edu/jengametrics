@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\BqDocument;
+use App\Models\BqLevel;
 use App\Models\Bom;
 use App\Models\BomLabour;
 use App\Models\BomItem;
@@ -43,15 +44,17 @@ class BOMController extends Controller
         $subDocuments = BqDocument::where('project_id', $project->id)
             ->whereNotNull('parent_id')
             ->orderBy('created_at')
-            ->get()
-            ->load(['sections' => function ($query) {
-                $query->orderBy('section_id')
-                    ->with([
-                        'section',
-                        'bomItems.item_material',
-                        'bomItems.product',
-                    ]);
+            ->with(['levels' => function ($levelQuery) {
+                $levelQuery->with(['sections' => function ($query) {
+                    $query->orderBy('section_id')
+                        ->with([
+                            'section',
+                            'bomItems.item_material',
+                            'bomItems.product',
+                        ]);
+                }]);
             }])
+            ->get()
             ->map(fn (BqDocument $document) => $this->transformDocumentForBom($document, $labourTotalsByDocument));
 
         $totalAmount = $subDocuments->sum('materials_total');
@@ -209,13 +212,15 @@ class BOMController extends Controller
             abort(404);
         }
 
-        $bqDocument->load(['sections' => function ($query) {
-            $query->orderBy('section_id')
-                ->with([
-                    'section',
-                    'bomItems.item_material',
-                    'bomItems.product',
-                ]);
+        $bqDocument->load(['levels' => function ($levelQuery) {
+            $levelQuery->with(['sections' => function ($query) {
+                $query->orderBy('section_id')
+                    ->with([
+                        'section',
+                        'bomItems.item_material',
+                        'bomItems.product',
+                    ]);
+            }]);
         }]);
 
         $labourTotal = BomLabour::where('project_id', project_id())
@@ -261,51 +266,63 @@ class BOMController extends Controller
 
     protected function transformDocumentForBom(BqDocument $document, $labourTotalsByDocument)
     {
-        $processedSections = $document->sections->map(function (BqSection $section) {
-            $materials = $section->bomItems->map(function (BomItem $item) {
-                $product = optional($item->product);
-                $itemMaterial = optional($item->item_material);
+        $levels = $document->levels ?? collect();
 
-                $name = $itemMaterial->name
-                    ?? $product->name
-                    ?? $item->item_description
-                    ?? __('Unknown Material');
+        if ($levels->isEmpty()) {
+            $sections = $document->sections ?? collect();
 
-                $unit = $itemMaterial->unit_of_measurement
-                    ?? $product->unit
-                    ?? $item->unit
-                    ?? 'N/A';
-
-                $quantity = (float) ($item->quantity ?? 0);
-                $rate = (float) ($item->rate ?? $product->rate ?? 0);
-                $amount = (float) ($item->amount ?? ($quantity * $rate));
-
-                return (object) [
-                    'product_id' => $item->product_id,
-                    'name' => $name,
-                    'unit' => $unit,
-                    'quantity' => $this->normalizeNumeric($quantity),
-                    'rate' => $rate,
-                    'amount' => $amount,
-                ];
-            });
-
-            $sectionModel = optional($section->section);
-            $key = $sectionModel?->id;
-
-            if (is_null($key)) {
-                $key = 'bq:' . $section->id;
+            if ($sections->isNotEmpty()) {
+                $fallbackLevel = new BqLevel(['name' => __('Ungrouped')]);
+                $fallbackLevel->setRelation('sections', $sections);
+                $levels = collect([$fallbackLevel]);
             }
+        }
 
-            return collect([
-                'group_key' => $key,
-                'section_id' => $sectionModel?->id,
-                'section_name' => $sectionModel?->name ?? ($section->item_name ?: __('Unassigned Section')),
-                'units' => $section->units,
-                'quantity' => (float) ($section->quantity ?? 0),
-                'amount' => (float) ($section->amount ?? 0),
-                'materials' => $materials,
-            ]);
+        $processedSections = $levels->flatMap(function (BqLevel $level) {
+            return $level->sections->map(function (BqSection $section) use ($level) {
+                $materials = $section->bomItems->map(function (BomItem $item) {
+                    $product = optional($item->product);
+                    $itemMaterial = optional($item->item_material);
+
+                    $name = $itemMaterial->name
+                        ?? $product->name
+                        ?? $item->item_description
+                        ?? __('Unknown Material');
+
+                    $unit = $itemMaterial->unit_of_measurement
+                        ?? $product->unit
+                        ?? $item->unit
+                        ?? 'N/A';
+
+                    $quantity = (float) ($item->quantity ?? 0);
+                    $rate = (float) ($item->rate ?? $product->rate ?? 0);
+                    $amount = (float) ($item->amount ?? ($quantity * $rate));
+
+                    return (object) [
+                        'product_id' => $item->product_id,
+                        'name' => $name,
+                        'unit' => $unit,
+                        'quantity' => $this->normalizeNumeric($quantity),
+                        'rate' => $rate,
+                        'amount' => $amount,
+                    ];
+                });
+
+                $sectionModel = optional($section->section);
+                $key = $sectionModel?->id ?? ('bq:' . $section->id);
+
+                return collect([
+                    'group_key' => $key,
+                    'level_id' => $level->id,
+                    'level_name' => $level->name,
+                    'section_id' => $sectionModel?->id,
+                    'section_name' => $sectionModel?->name ?? ($section->item_name ?: __('Unassigned Section')),
+                    'units' => $section->units,
+                    'quantity' => (float) ($section->quantity ?? 0),
+                    'amount' => (float) ($section->amount ?? 0),
+                    'materials' => $materials,
+                ]);
+            });
         });
 
         $aggregatedSections = $processedSections
@@ -313,9 +330,7 @@ class BOMController extends Controller
             ->map(function ($group) {
                 $first = $group->first();
 
-                $materialsCollection = $group
-                    ->pluck('materials')
-                    ->flatten(1);
+                $materialsCollection = $group->pluck('materials')->flatten(1);
 
                 $withProduct = $materialsCollection
                     ->filter(fn ($material) => ! is_null($material->product_id))
@@ -340,40 +355,55 @@ class BOMController extends Controller
                     })
                     ->values();
 
-                $withoutProduct = $materialsCollection
-                    ->filter(fn ($material) => is_null($material->product_id));
+        $withoutProduct = $materialsCollection
+            ->filter(fn ($material) => is_null($material->product_id));
 
-                if ($withoutProduct->isNotEmpty()) {
-                    $totalQuantity = $withoutProduct->sum(fn ($material) => (float) ($material->quantity ?? 0));
-                    $totalAmount = $withoutProduct->sum(fn ($material) => (float) ($material->amount ?? 0));
-                    $rate = $totalQuantity > 0 ? $totalAmount / $totalQuantity : 0;
+        if ($withoutProduct->isNotEmpty()) {
+            $totalQuantity = $withoutProduct->sum(fn ($material) => (float) ($material->quantity ?? 0));
+            $totalAmount = $withoutProduct->sum(fn ($material) => (float) ($material->amount ?? 0));
+            $rate = $totalQuantity > 0 ? $totalAmount / $totalQuantity : 0;
 
-                    $withProduct->push((object) [
-                        'product_id' => null,
-                        'name' => __('Unassigned Materials'),
-                        'unit' => 'N/A',
-                        'quantity' => $this->normalizeNumeric($totalQuantity),
-                        'rate' => $rate,
-                        'amount' => $totalAmount,
-                    ]);
-                }
+            $withProduct->push((object) [
+                'product_id' => null,
+                'name' => __('Unassigned Materials'),
+                'unit' => 'N/A',
+                'quantity' => $this->normalizeNumeric($totalQuantity),
+                'rate' => $rate,
+                'amount' => $totalAmount,
+            ]);
+        }
 
-                $materials = $withProduct;
+        $materials = $withProduct;
 
-                return (object) [
-                    'section_id' => $first->get('section_id'),
-                    'section_name' => $first->get('section_name'),
-                    'units' => $first->get('units') ?? 'N/A',
-                    'quantity' => $this->normalizeNumeric($group->sum(fn ($section) => (float) ($section->get('quantity') ?? 0))),
-                    'amount' => $group->sum(fn ($section) => (float) ($section->get('amount') ?? 0)),
-                    'materials' => $materials,
-                    'material_total' => $materials->sum('amount'),
-                    'item_count' => $group->count(),
-                ];
+        return (object) [
+            'level_id' => $first->get('level_id'),
+            'level_name' => $first->get('level_name'),
+            'section_id' => $first->get('section_id'),
+            'section_name' => $first->get('section_name'),
+            'units' => $first->get('units') ?? 'N/A',
+            'quantity' => $this->normalizeNumeric($group->sum(fn ($section) => (float) ($section->get('quantity') ?? 0))),
+            'amount' => $group->sum(fn ($section) => (float) ($section->get('amount') ?? 0)),
+            'materials' => $materials,
+            'material_total' => $materials->sum('amount'),
+            'item_count' => $group->count(),
+        ];
             })
             ->values();
 
         $document->sections = $aggregatedSections;
+        $document->level_summaries = $aggregatedSections
+            ->groupBy('level_id')
+            ->map(function ($sections, $levelId) use ($levels) {
+                $level = $levels->firstWhere('id', $levelId);
+
+                return (object) [
+                    'level_id' => $levelId,
+                    'level_name' => optional($level)->name ?? __('Ungrouped'),
+                    'material_total' => $sections->sum('material_total'),
+                    'section_count' => $sections->count(),
+                ];
+            })
+            ->values();
 
         $labourTotal = $labourTotalsByDocument[$document->id] ?? 0;
 
@@ -395,7 +425,3 @@ class BOMController extends Controller
         return (float) $rounded;
     }
 }
-
-
-
-

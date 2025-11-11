@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BqDocument;
+use App\Models\BqLevel;
 use App\Models\BqSection;
 use App\Models\BomItem;
 use App\Models\BomLabour;
@@ -18,6 +19,7 @@ use Illuminate\Validation\Rule;
 
 class BqDocumentController extends Controller
 {
+    protected array $levelReplicationCache = [];
     /**
      * Display a listing of the BQ documents.
      *
@@ -133,6 +135,10 @@ class BqDocumentController extends Controller
 
         $validated = $request->validate([
             'library_id' => 'required|exists:libraries,id',
+            'bq_level_id' => [
+                'required',
+                Rule::exists('bq_levels', 'id')->where(fn ($query) => $query->where('bq_document_id', $bqDocument->id)),
+            ],
             'items' => 'required|array|min:1',
             'items.*.quantity' => 'required|numeric|min:0.0001',
             'items.*.rate' => 'required|numeric|min:0',
@@ -147,6 +153,10 @@ class BqDocumentController extends Controller
                 ->route('bq_documents.show', $bqDocument)
                 ->with('danger', __('You are not authorized to use the selected library.'));
         }
+
+        $targetLevel = BqLevel::where('id', $validated['bq_level_id'])
+            ->where('bq_document_id', $bqDocument->id)
+            ->firstOrFail();
 
         $itemIds = array_keys($validated['items']);
 
@@ -169,7 +179,7 @@ class BqDocumentController extends Controller
             }
         }
 
-        DB::transaction(function () use ($libraryItems, $validated, $bqDocument, $bqItemCreator, $projectId) {
+        DB::transaction(function () use ($libraryItems, $validated, $bqDocument, $bqItemCreator, $projectId, $targetLevel) {
             foreach ($libraryItems as $libraryItem) {
                 $payload = $validated['items'][$libraryItem->id];
 
@@ -179,6 +189,7 @@ class BqDocumentController extends Controller
                 $bqItemCreator->create(
                     $bqDocument,
                     $libraryItem->section,
+                    $targetLevel,
                     $libraryItem->element,
                     $libraryItem->item,
                     $quantity,
@@ -189,7 +200,7 @@ class BqDocumentController extends Controller
         });
 
         return redirect()
-            ->route('bq_documents.show', $bqDocument)
+            ->route('bq_levels.show', [$bqDocument, $targetLevel])
             ->with('success', __('Library items imported successfully.'));
     }
 
@@ -327,57 +338,34 @@ class BqDocumentController extends Controller
             return redirect()->route('bq_documents.index');
         }
 
-        $sections = $bqDocument->sections()
-            ->with(['section'])
-            ->orderBy('section_id')
-            ->get();
-
-        $sectionGroups = $sections->groupBy('section_id')->map(function ($group) {
-            $aggregatedItems = $group
-                ->groupBy(function ($item) {
-                    if ($item->item_id) {
-                        return 'item:' . $item->item_id;
-                    }
-
-                    $key = implode('|', [
-                        strtolower(trim((string) $item->item_name)),
-                        strtolower(trim((string) $item->units)),
-                        number_format((float) ($item->rate ?? 0), 6, '.', ''),
-                    ]);
-
-                    return 'fallback:' . $key;
-                })
-                ->map(function ($items) {
-                    $first = $items->first();
-                    $quantity = $items->sum(function ($item) {
-                        return (float) ($item->quantity ?? 0);
-                    });
-                    $amount = $items->sum(function ($item) {
-                        return (float) ($item->amount ?? 0);
-                    });
-
-                    $rate = $quantity > 0
-                        ? $amount / $quantity
-                        : (float) ($first->rate ?? 0);
-
+        $levels = $bqDocument->levels()
+            ->with(['sections' => function ($query) {
+                $query->with('section')
+                    ->orderByDesc('created_at');
+            }])
+            ->orderBy('position')
+            ->get()
+            ->map(function (BqLevel $level) {
+                $items = $level->sections->map(function (BqSection $section) {
                     return (object) [
-                        'item_name' => $first->item_name ?? __('Unnamed Item'),
-                        'units' => $first->units ?? 'N/A',
-                        'quantity' => $this->normalizeNumeric($quantity),
-                        'rate' => $rate,
-                        'amount' => $amount,
+                        'id' => $section->id,
+                        'section_name' => optional($section->section)->name ?? __('Unassigned Section'),
+                        'item_name' => $section->item_name ?? __('Unnamed Item'),
+                        'units' => $section->units ?? 'N/A',
+                        'quantity' => $this->normalizeNumeric((float) ($section->quantity ?? 0)),
+                        'amount' => (float) ($section->amount ?? 0),
                     ];
-                })
-                ->values();
+                });
 
-            return [
-                'section' => $group->first()->section,
-                'items' => $aggregatedItems,
-                'total' => $aggregatedItems->sum('amount'),
-            ];
-        });
+                return [
+                    'level' => $level,
+                    'items' => $items,
+                    'items_count' => $items->count(),
+                    'total' => $items->sum('amount'),
+                ];
+            });
 
-        $totalAmount = $sectionGroups->sum('total');
+        $totalAmount = $levels->sum('total');
 
         $libraries = auth()->user()
             ?->libraries()
@@ -388,7 +376,7 @@ class BqDocumentController extends Controller
         return view('bq_documents.show', [
             'project' => $project,
             'bqDocument' => $bqDocument,
-            'sectionGroups' => $sectionGroups,
+            'levels' => $levels,
             'totalAmount' => $totalAmount,
             'libraries' => $libraries,
         ]);
@@ -472,6 +460,7 @@ class BqDocumentController extends Controller
         $newSection = $section->replicate();
         $newSection->bq_document_id = $targetDocument->id;
         $newSection->project_id = $targetDocument->project_id;
+        $newSection->bq_level_id = $this->replicateLevel($section->level, $targetDocument);
         $newSection->save();
 
         $bomItems = BomItem::query()
@@ -497,5 +486,33 @@ class BqDocumentController extends Controller
             $newBomLabour->project_id = $targetDocument->project_id;
             $newBomLabour->save();
         }
+    }
+
+    protected function replicateLevel(?BqLevel $sourceLevel, BqDocument $targetDocument): ?int
+    {
+        if (! $sourceLevel) {
+            return null;
+        }
+
+        $cacheKey = $sourceLevel->id . ':' . $targetDocument->id;
+        if (array_key_exists($cacheKey, $this->levelReplicationCache)) {
+            return $this->levelReplicationCache[$cacheKey];
+        }
+
+        $position = ($targetDocument->levels()->max('position') ?? 0) + 1;
+
+        $newLevel = BqLevel::firstOrCreate(
+            [
+                'bq_document_id' => $targetDocument->id,
+                'name' => $sourceLevel->name,
+            ],
+            [
+                'project_id' => $targetDocument->project_id,
+                'description' => $sourceLevel->description,
+                'position' => $position,
+            ]
+        );
+
+        return $this->levelReplicationCache[$cacheKey] = $newLevel->id;
     }
 }

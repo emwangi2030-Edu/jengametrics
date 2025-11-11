@@ -4,10 +4,14 @@
     <div class="container py-4">
         <div class="row mb-3 align-items-center">
             <div class="col">
-                <h2 class="fw-bold m-0" style="color:#027333">BoM â€¢ <span class="text-dark">{{ $bqSection->name }}</span></h2>
+                <h2 class="fw-bold m-0" style="color:#027333">BoM • <span class="text-dark">{{ $bqSection->name }}</span></h2>
             </div>
             <div class="col-auto d-flex gap-2">
-                <a href="{{ route('section.show', $bqSection->id) }}" class="btn btn-outline-primary btn-sm">View BoQ Section</a>
+                @if(isset($bqDocumentForSection) && $bqDocumentForSection && $bqSection->bq_level_id)
+                    <a href="{{ route('bq_levels.show', [$bqDocumentForSection, $bqSection->bq_level_id]) }}" class="btn btn-outline-primary btn-sm">View BoQ Level</a>
+                @else
+                    <button type="button" class="btn btn-outline-primary btn-sm" disabled>View BoQ Level</button>
+                @endif
                 <form action="{{ route('boms.sections.rebuild', $bqSection->id) }}" method="POST" onsubmit="return confirm('Rebuild BoM from BoQ for this section? This will overwrite existing BoM entries.');">
                     @csrf
                     <button type="submit" class="btn btn-warning btn-sm">Rebuild BoM</button>
@@ -112,3 +116,4 @@
     });
 </script>
 @endpush
+
