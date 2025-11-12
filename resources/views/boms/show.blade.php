@@ -4,25 +4,19 @@
     <div class="container py-4">
         <div class="row mb-3 align-items-center">
             <div class="col">
-                <h2 class="fw-bold m-0" style="color:#027333">BoM • <span class="text-dark">{{ $bqSection->name }}</span></h2>
+                <h2 class="fw-bold m-0" style="color:#027333">BoM Section: <span class="text-dark">{{ $bqSection->name }}</span></h2>
             </div>
             <div class="col-auto d-flex gap-2">
                 @if(isset($bqDocumentForSection) && $bqDocumentForSection && $bqSection->bq_level_id)
                     <a href="{{ route('bq_levels.show', [$bqDocumentForSection, $bqSection->bq_level_id]) }}" class="btn btn-outline-primary btn-sm">View BoQ Level</a>
-                @else
-                    <button type="button" class="btn btn-outline-primary btn-sm" disabled>View BoQ Level</button>
                 @endif
-                <form action="{{ route('boms.sections.rebuild', $bqSection->id) }}" method="POST" onsubmit="return confirm('Rebuild BoM from BoQ for this section? This will overwrite existing BoM entries.');">
-                    @csrf
-                    <button type="submit" class="btn btn-warning btn-sm">Rebuild BoM</button>
-                </form>
                 <a href="{{ route('boms.index') }}" class="btn btn-outline-secondary btn-sm">Back to Sections</a>
             </div>
         </div>
 
-        <div class="row justify-content-center">
-            <div class="col-md-11">
-                <div class="card shadow-sm border-0">
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="card shadow-sm border-0 h-100">
                     <div class="card-header bg-white">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="fw-semibold" style="color:#027333">Materials Summary</span>
@@ -63,7 +57,9 @@
                                 @endphp
                                 <tfoot>
                                     <tr class="table-secondary">
-                                        <th colspan="3" class="text-end text-uppercase small">{{ __('Total') }}</th>
+                                        <th class="text-uppercase small">{{ __('Total') }}</th>
+                                        <th></th>
+                                        <th></th>
                                         <th></th>
                                         <th class="text-end fw-bold">KES {{ number_format($totalAmount, 2) }}</th>
                                     </tr>
@@ -73,9 +69,19 @@
                     </div>
                 </div>
             </div>
+            <div class="col-12">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold" style="color:#027333">{{ __('Labour Summary') }}</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @include('boms.labours')
+                    </div>
+                </div>
+            </div>
         </div>
-
-        @include('boms.labours')
     </div>
 @endsection
 @push('scripts')
@@ -116,4 +122,3 @@
     });
 </script>
 @endpush
-

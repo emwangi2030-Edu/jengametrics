@@ -13,9 +13,12 @@
                     <p class="text-muted mb-0">{{ __('Master document aggregates all BoQs for requisitions and reporting.') }}</p>
                 </div>
                 <div class="d-flex flex-column flex-sm-row gap-2 mt-3 mt-md-0">
-                    <a href="{{ route('bq_documents.create') }}" class="btn btn-success">
+                    <button type="button"
+                        class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#createSubBoqModal">
                         {{ __('Create BoQ') }}
-                    </a>
+                    </button>
                     <button type="button"
                         class="btn btn-outline-primary"
                         data-bs-toggle="modal"
@@ -39,8 +42,6 @@
 
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <h5 class="fw-bold mb-3">{{ __('BoQs') }}</h5>
-
                     @if($subDocuments->isEmpty())
                         <p class="text-muted">{{ __('No BoQs created yet.') }}</p>
                     @else
@@ -66,6 +67,9 @@
                                                 <a href="{{ route('bq_documents.copy', $document) }}" class="btn btn-success btn-sm me-2" title="{{ __('Copy BoQ') }}">
                                                     +
                                                 </a>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editSubBoqModal{{ $document->id }}">
+                                                    {{ __('Edit') }}
+                                                </button>
                                                 <a href="{{ route('bq_documents.show', $document) }}" class="btn btn-primary btn-sm me-2">
                                                     {{ __('View') }}
                                                 </a>
@@ -85,6 +89,66 @@
                     @endif
                 </div>
             </div>
+
+    <!-- Create/Edit Sub BoQ Modals -->
+    <div class="modal fade" id="createSubBoqModal" tabindex="-1" aria-labelledby="createSubBoqModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('bq_documents.store') }}">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createSubBoqModalLabel">{{ __('Create Sub BoQ') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label" for="create-sub-boq-title">{{ __('Title') }}</label>
+                            <input type="text" class="form-control" id="create-sub-boq-title" name="title" required maxlength="255">
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label" for="create-sub-boq-description">{{ __('Description (optional)') }}</label>
+                            <textarea class="form-control" id="create-sub-boq-description" name="description" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @foreach($subDocuments as $document)
+        <div class="modal fade" id="editSubBoqModal{{ $document->id }}" tabindex="-1" aria-labelledby="editSubBoqModalLabel{{ $document->id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="{{ route('bq_documents.update', $document) }}">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editSubBoqModalLabel{{ $document->id }}">{{ __('Edit Sub BoQ') }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label" for="edit-sub-boq-title-{{ $document->id }}">{{ __('Title') }}</label>
+                                <input type="text" class="form-control" id="edit-sub-boq-title-{{ $document->id }}" name="title" value="{{ $document->title }}" required maxlength="255">
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label" for="edit-sub-boq-description-{{ $document->id }}">{{ __('Description (optional)') }}</label>
+                                <textarea class="form-control" id="edit-sub-boq-description-{{ $document->id }}" name="description" rows="3">{{ $document->description }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                            <button type="submit" class="btn btn-primary">{{ __('Save Changes') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
 
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-body">

@@ -106,10 +106,9 @@ class BqDocumentController extends Controller
      */
     public function create()
     {
-        $project = get_project();
-        $masterDocument = $this->ensureMasterDocument($project->id, $project->name);
-
-        return view('bq_documents.create', compact('project', 'masterDocument'));
+        return redirect()
+            ->route('bq_documents.index')
+            ->with('info', __('Use the Create BoQ button to open the modal.'));
     }
 
 
@@ -409,6 +408,35 @@ class BqDocumentController extends Controller
         return redirect()
             ->route('bq_documents.index')
             ->with('success', __('Sub BoQ deleted successfully.'));
+    }
+
+    public function edit(BqDocument $bqDocument)
+    {
+        $project = get_project();
+
+        $this->assertSubDocumentAccess($bqDocument, $project->id);
+
+        return redirect()
+            ->route('bq_documents.index')
+            ->with('info', __('Use the inline modal to edit sub BoQs.'));
+    }
+
+    public function update(Request $request, BqDocument $bqDocument)
+    {
+        $project = get_project();
+
+        $this->assertSubDocumentAccess($bqDocument, $project->id);
+
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $bqDocument->update($data);
+
+        return redirect()
+            ->route('bq_documents.index', $bqDocument)
+            ->with('success', __('Sub BoQ updated successfully.'));
     }
 
     protected function normalizeNumeric(float $value)

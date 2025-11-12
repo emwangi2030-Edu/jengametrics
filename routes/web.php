@@ -136,9 +136,6 @@ Route::get('create-bq-item', ['as'=>'create_bq_item', 'uses' => '\App\Http\Contr
 Route::get('boms/documents/{bqDocument}', [BOMController::class, 'showDocument'])->name('boms.documents.show');
 Route::resource('boms', BOMController::class);
 
-// Rebuild BoM for a section from its BoQ items
-Route::post('boms/sections/{section}/rebuild', [BOMController::class, 'rebuildSection'])->name('boms.sections.rebuild');
-
 Route::middleware(['auth'])->group(function () {
     Route::get('/requisitions', [RequisitionController::class, 'index'])->name('requisitions.index');
     Route::get('/requisitions/create', [RequisitionController::class, 'create'])->name('requisitions.create');
