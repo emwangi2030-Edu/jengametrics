@@ -3,16 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\BqDocument;
+use App\Models\BqLevel;
 use App\Models\BqSection;
 use App\Models\BomItem;
 use App\Models\BomLabour;
-use App\Models\ItemMaterial;
-use App\Models\Product;
 use App\Models\Section;
 use App\Models\Item;
 use App\Models\Element;
+use App\Models\ItemMaterial;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Services\BqItemCreator;
+use Illuminate\Support\Facades\Validator;
 
 class BqSectionController extends Controller
 {
@@ -23,13 +25,18 @@ class BqSectionController extends Controller
         $this->bqItemCreator = $bqItemCreator;
     }
 
-    public function create(BqDocument $bqDocument)
+    public function create(BqDocument $bqDocument, BqLevel $bqLevel)
     {
         $this->assertDocumentAccess($bqDocument);
+        $this->assertLevelAccess($bqLevel, $bqDocument);
 
         $sections = Section::orderBy('name')->get();
 
-        return view('bq_sections.create', compact('bqDocument', 'sections'));
+        return view('bq_sections.create', [
+            'bqDocument' => $bqDocument,
+            'bqLevel' => $bqLevel,
+            'sections' => $sections,
+        ]);
     }
 
     public function bulkCreate(Request $request)
@@ -41,9 +48,10 @@ class BqSectionController extends Controller
         ]);
     }
 
-    public function store(BqDocument $bqDocument, Request $request)
+    public function store(BqDocument $bqDocument, BqLevel $bqLevel, Request $request)
     {
         $this->assertDocumentAccess($bqDocument);
+        $this->assertLevelAccess($bqLevel, $bqDocument);
 
         $request->validate([
             'section_id' => 'required|exists:sections,id',
@@ -72,6 +80,7 @@ class BqSectionController extends Controller
         $this->bqItemCreator->create(
             $bqDocument,
             $section,
+            $bqLevel,
             $element,
             $item,
             $quantity,
@@ -80,19 +89,23 @@ class BqSectionController extends Controller
             $amount
         );
 
-        return redirect()->route('bq_documents.show', $bqDocument)->with('success', trans('Item added successfully.'));
+        return redirect()->route('bq_levels.show', [$bqDocument, $bqLevel])->with('success', trans('Item added successfully.'));
     }
 
     public function storeBulk(Request $request)
     {
         $request->validate([
             'section_id' => 'required|exists:sections,id',
+            'bq_level_id' => 'required|exists:bq_levels,id',
             'items' => 'required|array|min:1',
             'items.*.element_id' => 'required|exists:elements,id',
             'items.*.item_id' => 'required|exists:items,id',
             'items.*.rate' => 'required|numeric|min:0',
             'items.*.quantity' => 'required|numeric|min:0',
         ]);
+
+        $bqLevel = BqLevel::findOrFail($request->bq_level_id);
+        $this->assertLevelAccess($bqLevel);
 
         $sectionId = (int) $request->section_id;
         $count = 0;
@@ -104,6 +117,8 @@ class BqSectionController extends Controller
             $amount = $rate * $qty;
 
             $sectionCreated = BqSection::create([
+                'bq_document_id' => $bqLevel->bq_document_id,
+                'bq_level_id' => $bqLevel->id,
                 'section_id' => $sectionId,
                 'element_id' => $row['element_id'],
                 'item_id'    => $row['item_id'],
@@ -152,15 +167,19 @@ class BqSectionController extends Controller
             }
         }
 
-        return redirect()->route('section.show', $sectionId)->with('success', "$count items added to BoQ and BoM.");
+        return redirect()->route('bq_levels.show', [$bqLevel->bq_document_id, $bqLevel->id])->with('success', "$count items added to BoQ and BoM.");
     }
 
     public function importCsv(Request $request)
     {
         $request->validate([
             'section_id' => 'required|exists:sections,id',
+            'bq_level_id' => 'required|exists:bq_levels,id',
             'csv' => 'required|file|mimes:csv,txt',
         ]);
+
+        $bqLevel = BqLevel::findOrFail($request->bq_level_id);
+        $this->assertLevelAccess($bqLevel);
 
         $sectionId = (int) $request->section_id;
         $path = $request->file('csv')->getRealPath();
@@ -233,6 +252,8 @@ class BqSectionController extends Controller
             $amount = $rate * $qty;
 
             $sectionCreated = BqSection::create([
+                'bq_document_id' => $bqLevel->bq_document_id,
+                'bq_level_id' => $bqLevel->id,
                 'section_id' => $sectionId,
                 'element_id' => $row['element_id'],
                 'item_id'    => $row['item_id'],
@@ -279,7 +300,7 @@ class BqSectionController extends Controller
             }
         }
 
-        return redirect()->route('section.show', $sectionId)->with('success', "$count items imported into BoQ and BoM.");
+        return redirect()->route('bq_levels.show', [$bqLevel->bq_document_id, $bqLevel->id])->with('success', "$count items imported into BoQ and BoM.");
     }
 
     // Update the specified item in storage
@@ -350,22 +371,21 @@ class BqSectionController extends Controller
         return redirect()->route('bq_documents.show', $bqDocument);
     }
 
-    public function show(BqDocument $bqDocument, Section $section)
+    public function show(BqDocument $bqDocument, BqLevel $bqLevel)
     {
-        $this->assertDocumentAccess($bqDocument);
+        $this->assertLevelAccess($bqLevel, $bqDocument);
 
-        $items = BqSection::where('section_id', $section->id)
+        $items = BqSection::where('bq_level_id', $bqLevel->id)
             ->where('bq_document_id', $bqDocument->id)
             ->whereProjectId(project_id())
+            ->with('section')
+            ->orderByDesc('created_at')
             ->get();
-
-        $elements = Element::where('section_id', $section->id)->get();
 
         return view('bq_sections.show', [
             'bqDocument' => $bqDocument,
-            'section' => $section,
+            'bqLevel' => $bqLevel,
             'items' => $items,
-            'elements' => $elements,
         ]);
     }
 
@@ -383,11 +403,11 @@ class BqSectionController extends Controller
 
         // Delete the BQ section entry itself
         $documentId = $item->bq_document_id;
-        $sectionId = $item->section_id;
+        $levelId = $item->bq_level_id;
         $item->delete();
 
-        if ($documentId && $sectionId) {
-            return redirect()->route('bq_sections.show', [$documentId, $sectionId])->with('success', 'Item deleted successfully.');
+        if ($documentId && $levelId) {
+            return redirect()->route('bq_levels.show', [$documentId, $levelId])->with('success', 'Item deleted successfully.');
         }
 
         return redirect()->back()->with('success', 'Item deleted successfully.');
@@ -404,6 +424,21 @@ class BqSectionController extends Controller
         }
 
         if (is_null($bqDocument->parent_id)) {
+            abort(404);
+        }
+    }
+
+    protected function assertLevelAccess(BqLevel $bqLevel, ?BqDocument $bqDocument = null): void
+    {
+        $document = $bqDocument ?? $bqLevel->document;
+
+        if (! $document) {
+            abort(404);
+        }
+
+        $this->assertDocumentAccess($document);
+
+        if ($bqLevel->bq_document_id !== $document->id) {
             abort(404);
         }
     }

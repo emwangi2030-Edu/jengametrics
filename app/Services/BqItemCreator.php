@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\BqDocument;
+use App\Models\BqLevel;
 use App\Models\BqSection;
 use App\Models\BomItem;
 use App\Models\BomLabour;
@@ -18,6 +19,7 @@ class BqItemCreator
     public function create(
         BqDocument $document,
         Section $section,
+        BqLevel $level,
         Element $element,
         Item $item,
         float $quantity,
@@ -25,11 +27,12 @@ class BqItemCreator
         int $projectId,
         ?float $amount = null
     ): BqSection {
-        return DB::transaction(function () use ($document, $section, $element, $item, $quantity, $rate, $projectId, $amount) {
+        return DB::transaction(function () use ($document, $section, $level, $element, $item, $quantity, $rate, $projectId, $amount) {
             $computedAmount = $amount ?? ($quantity * $rate);
 
             $bqSection = BqSection::create([
                 'bq_document_id' => $document->id,
+                'bq_level_id' => $level->id,
                 'project_id' => $projectId,
                 'section_id' => $section->id,
                 'element_id' => $element->id,

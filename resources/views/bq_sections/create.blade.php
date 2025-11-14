@@ -4,8 +4,8 @@
 <div class="container py-5">
     <div class="row mb-5 text-center">
         <div class="col-12">
-            <h2 class="display-6 fw-bold" style="color:#027333;">{{ __('Add Item to :document', ['document' => $bqDocument->title]) }}</h2>
-            <p class="text-muted">{{ __('Select a section, element, and item to include in this sub BoQ.') }}</p>
+            <h2 class="display-6 fw-bold" style="color:#027333;">{{ __('Add Item to :level', ['level' => $bqLevel->name]) }}</h2>
+            <p class="text-muted">{{ __('Select a section, element, and item to include in this level.') }}</p>
         </div>
     </div>
 
@@ -13,7 +13,7 @@
         <div class="col-md-8">
             <div class="card shadow-sm border-0 rounded">
                 <div class="card-body p-5">
-                    <form method="POST" action="{{ route('bq_sections.store', $bqDocument) }}">
+                    <form method="POST" action="{{ route('bq_levels.items.store', [$bqDocument, $bqLevel]) }}">
                         @csrf
 
                         {{-- Section Dropdown --}}
@@ -67,7 +67,7 @@
                     </form>
                     <br>
                     <div class="d-flex justify-content-center">
-                        <a href="{{ route('bq_documents.show', $bqDocument) }}" class="btn btn-dark">{{ __('Back') }}</a>
+                        <a href="{{ route('bq_levels.show', [$bqDocument, $bqLevel]) }}" class="btn btn-dark">{{ __('Back') }}</a>
                     </div>
                 </div>
             </div>

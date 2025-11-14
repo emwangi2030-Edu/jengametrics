@@ -1,5 +1,10 @@
 @extends('layouts.app')
 
+@push('styles')
+<link rel="preload" href="{{ asset('assets/metrics/assets/css/theme.min.css') }}" as="style">
+<link rel="preload" href="{{ asset('assets/metrics/assets/css/user.min.css') }}" as="style">
+@endpush
+
 @section('content')
     <div class="container mt-4">
         <div class="row mb-4">
@@ -19,17 +24,21 @@
 
         <div class="row mb-4">
             <div class="col-12 d-flex flex-column flex-lg-row align-items-start gap-2">
-                <a href="{{ route('bq_sections.create', $bqDocument) }}" class="btn text-white" style="background-color:#027333">
-                    {{ __('Add BoQ Item') }}
-                </a>
-                @if($libraries->isNotEmpty())
+                <button type="button"
+                    class="btn text-white"
+                    style="background-color:#027333"
+                    data-bs-toggle="modal"
+                    data-bs-target="#createLevelModal">
+                    {{ __('Add Level') }}
+                </button>
+                @if($levels->isNotEmpty() && $libraries->isNotEmpty())
                     <button type="button"
                         class="btn btn-outline-primary"
                         data-bs-toggle="modal"
                         data-bs-target="#importLibraryModal">
                         {{ __('Import from Library') }}
                     </button>
-                @else
+                @elseif($libraries->isNotEmpty())
                     <button type="button" class="btn btn-outline-primary" disabled>
                         {{ __('Import from Library') }}
                     </button>
@@ -42,56 +51,56 @@
 
         <div class="row justify-content-center">
             <div class="col-md-10">
-                @if($sectionGroups->isEmpty())
+                @if($levels->isEmpty())
                     <div class="card shadow-sm border-0">
                         <div class="card-body text-center py-5">
-                            <p class="text-muted mb-0">{{ __('No sections added to this BoQ yet.') }}</p>
+                            <p class="text-muted mb-0">{{ __('No levels have been added to this sub BoQ yet.') }}</p>
                         </div>
                     </div>
                 @else
-                    @foreach($sectionGroups as $sectionId => $group)
+                    @foreach($levels as $levelData)
+                        @php
+                            $level = $levelData['level'];
+                        @endphp
                         <div class="card shadow-sm border-0 mb-4">
                             <div class="card-body">
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                                     <div>
-                                        <h5 class="fw-bold mb-1">{{ optional($group['section'])->name ?? __('Unnamed Section') }}</h5>
-                                    </div>
-                                    <div class="text-end">
-                                        <p class="fw-bold fs-5 mb-1">KES {{ number_format($group['total'], 2) }}</p>
-                                        @if($sectionId)
-                                            <a href="{{ route('bq_sections.show', [$bqDocument, $sectionId]) }}" class="btn btn-outline-primary btn-sm">
-                                                {{ __('Manage Items') }}
-                                            </a>
+                                        <h5 class="fw-bold mb-1">{{ $level->name }}</h5>
+                                        @if($level->description)
+                                            <p class="text-muted mb-0">{{ $level->description }}</p>
                                         @endif
                                     </div>
-                                </div>
-
-                                <div class="table-responsive mt-3">
-                                    <table class="table table-sm align-middle">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>{{ __('Item') }}</th>
-                                                <th>{{ __('Unit') }}</th>
-                                                <th class="text-end">{{ __('Quantity') }}</th>
-                                                <th class="text-end">{{ __('Rate (KES)') }}</th>
-                                                <th class="text-end">{{ __('Amount (KES)') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($group['items'] as $item)
-                                                @php
-                                                    $displayQuantity = $item->quantity ?? 0;
-                                                @endphp
-                                                <tr>
-                                                    <td>{{ $item->item_name }}</td>
-                                                    <td>{{ $item->units ?? 'N/A' }}</td>
-                                                    <td class="text-end">{{ is_int($displayQuantity) ? $displayQuantity : number_format($displayQuantity, 2) }}</td>
-                                                    <td class="text-end">{{ number_format((float) ($item->rate ?? 0), 2) }}</td>
-                                                    <td class="text-end">{{ number_format((float) ($item->amount ?? 0), 2) }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+                                    <div class="text-end">
+                                        <p class="fw-bold fs-5 mb-1">KES {{ number_format($levelData['total'], 2) }}</p>
+                                        <p class="text-muted small mb-2">{{ trans_choice(':count item|:count items', $levelData['items_count'], ['count' => $levelData['items_count']]) }}</p>
+                                        <div class="col-12 d-flex flex-column flex-lg-row align-items-start gap-2 justify-content-end">
+                                            <a href="{{ route('bq_levels.show', [$bqDocument, $level]) }}" class="btn btn-outline-primary btn-sm">
+                                                {{ __('Manage Items') }}
+                                            </a>
+                                            <a href="{{ route('bq_levels.items.create', [$bqDocument, $level]) }}" class="btn btn-success btn-sm text-white">
+                                                {{ __('Add Item') }}
+                                            </a>
+                                            <button
+                                                type="button"
+                                                class="btn btn-outline-secondary btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editLevelModal{{ $level->id }}">
+                                                {{ __('Edit') }}
+                                            </button>
+                                            <form
+                                                method="POST"
+                                                action="{{ route('bq_levels.destroy', [$bqDocument, $level]) }}"
+                                                class="d-inline"
+                                                onsubmit="return confirm('{{ __('Delete this level? This cannot be undone.') }}')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                    {{ __('Delete') }}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -100,6 +109,38 @@
             </div>
         </div>
     </div>
+
+    @foreach($levels as $levelData)
+        @php $level = $levelData['level']; @endphp
+        <div class="modal fade" id="editLevelModal{{ $level->id }}" tabindex="-1" aria-labelledby="editLevelModalLabel{{ $level->id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="{{ route('bq_levels.update', [$bqDocument, $level]) }}">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editLevelModalLabel{{ $level->id }}">{{ __('Edit Level') }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label" for="level-name-{{ $level->id }}">{{ __('Level Name') }}</label>
+                                <input type="text" class="form-control" id="level-name-{{ $level->id }}" name="name" value="{{ $level->name }}" required maxlength="255">
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label" for="level-description-{{ $level->id }}">{{ __('Description') }}</label>
+                                <textarea class="form-control" id="level-description-{{ $level->id }}" name="description" rows="3">{{ $level->description }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                            <button type="submit" class="btn btn-primary">{{ __('Save Changes') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
 
     @if($libraries->isNotEmpty())
         <div class="modal fade" id="importLibraryModal" tabindex="-1" aria-labelledby="importLibraryModalLabel" aria-hidden="true">
@@ -126,6 +167,21 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div class="col-md-6">
+                                    <label for="import-level-select" class="form-label">{{ __('Target Level') }}</label>
+                                    <select id="import-level-select"
+                                        name="bq_level_id"
+                                        class="form-select"
+                                        @if($levels->isEmpty()) disabled @else required @endif>
+                                        <option value="">{{ __('Select a level') }}</option>
+                                        @foreach($levels as $levelData)
+                                            <option value="{{ $levelData['level']->id }}">{{ $levelData['level']->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @if($levels->isEmpty())
+                                        <small class="text-danger">{{ __('Create a level before importing items.') }}</small>
+                                    @endif
+                                </div>
                             </div>
                             <div id="import-library-items" class="border rounded p-3" style="max-height: 420px; overflow-y: auto;">
                                 <p class="text-muted mb-0">{{ __('Select a library to load its items.') }}</p>
@@ -141,6 +197,35 @@
         </div>
     @endif
 @endsection
+
+<!-- Create Level Modal -->
+<div class="modal fade" id="createLevelModal" tabindex="-1" aria-labelledby="createLevelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ route('bq_levels.store', $bqDocument) }}">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createLevelModalLabel">{{ __('Create Level') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="level_name" class="form-label">{{ __('Level Name') }}</label>
+                        <input type="text" class="form-control" id="level_name" name="name" required maxlength="255">
+                    </div>
+                    <div class="mb-0">
+                        <label for="level_description" class="form-label">{{ __('Description (optional)') }}</label>
+                        <textarea class="form-control" id="level_description" name="description" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('Save Level') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @if($libraries->isNotEmpty())
     @push('scripts')

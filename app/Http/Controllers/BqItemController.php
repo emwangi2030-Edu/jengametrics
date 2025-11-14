@@ -38,8 +38,16 @@ $units = ['kg', 'litre', 'piece', 'meter', 'ton', 'gallon']; // Example units; r
 
         $bqSection = BqSection::find($request->input('bq_section_id'));
         $bqDocument = BqDocument::find($bqSection->bq_document_id);
-    
-        return redirect()->route('bq_sections.show', [$bqDocument, $bqSection])->with('success', 'Item added successfully.');
+
+        if ($bqSection && $bqSection->bq_level_id) {
+            return redirect()
+                ->route('bq_levels.show', [$bqDocument, $bqSection->bq_level_id])
+                ->with('success', 'Item added successfully.');
+        }
+
+        return redirect()
+            ->route('bq_documents.show', $bqDocument)
+            ->with('success', 'Item added successfully.');
     }
     
     
