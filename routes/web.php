@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BqDocumentController;
 use App\Http\Controllers\BqSectionController;
 use App\Http\Controllers\BqItemController;
+use App\Http\Controllers\BqLevelController;
 use App\Http\Controllers\BOMController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\WorkerController;
@@ -98,12 +99,15 @@ Route::middleware('auth')->group(function () {
     Route::post('bq_documents/{bqDocument}/import-library', [BqDocumentController::class, 'importLibrary'])->name('bq_documents.import-library');
 });
 
-// BoQ Sections Routes (scoped to BoQ documents)
-Route::get('bq_documents/{bqDocument}/sections/create', [BqSectionController::class, 'create'])->name('bq_sections.create');
-Route::post('bq_documents/{bqDocument}/sections', [BqSectionController::class, 'store'])->name('bq_sections.store');
-Route::get('bq_documents/{bqDocument}/sections/{section}', [BqSectionController::class, 'show'])
-    ->whereNumber('section')
-    ->name('bq_sections.show');
+// BoQ Level routes
+Route::post('bq_documents/{bqDocument}/levels', [BqLevelController::class, 'store'])->name('bq_levels.store');
+Route::put('bq_documents/{bqDocument}/levels/{bqLevel}', [BqLevelController::class, 'update'])->name('bq_levels.update');
+Route::delete('bq_documents/{bqDocument}/levels/{bqLevel}', [BqLevelController::class, 'destroy'])->name('bq_levels.destroy');
+
+// BoQ Sections Routes (scoped to BoQ documents & levels)
+Route::get('bq_documents/{bqDocument}/levels/{bqLevel}', [BqSectionController::class, 'show'])->name('bq_levels.show');
+Route::get('bq_documents/{bqDocument}/levels/{bqLevel}/items/create', [BqSectionController::class, 'create'])->name('bq_levels.items.create');
+Route::post('bq_documents/{bqDocument}/levels/{bqLevel}/items', [BqSectionController::class, 'store'])->name('bq_levels.items.store');
 
 Route::get('sections/{bqSection}/edit', [BqSectionController::class, 'edit'])->name('bq_sections.edit');
 Route::put('bq_documents/{bqDocument}/sections/{bqSection}', [BqSectionController::class, 'update'])->name('bq_sections.update');
@@ -131,9 +135,6 @@ Route::get('create-bq-item', ['as'=>'create_bq_item', 'uses' => '\App\Http\Contr
 
 Route::get('boms/documents/{bqDocument}', [BOMController::class, 'showDocument'])->name('boms.documents.show');
 Route::resource('boms', BOMController::class);
-
-// Rebuild BoM for a section from its BoQ items
-Route::post('boms/sections/{section}/rebuild', [BOMController::class, 'rebuildSection'])->name('boms.sections.rebuild');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/requisitions', [RequisitionController::class, 'index'])->name('requisitions.index');

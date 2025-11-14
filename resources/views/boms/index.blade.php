@@ -14,7 +14,9 @@
         <div class="col-md-10">
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body">
-                    <h5 class="fw-bold mb-3">{{ __('Sub BoQ Contribution') }}</h5>
+                    <div class="text-end">
+                        <p class="fw-bold text-dark mb-0">{{ __('Total') }}: KES {{ number_format($subDocuments->sum(fn($doc) => $doc->combined_total), 2) }}</p>
+                    </div>
                     @if($subDocuments->isEmpty())
                         <p class="text-muted mb-0">{{ __('No sub BoQs available yet.') }}</p>
                     @else
@@ -22,7 +24,7 @@
                             <table class="table align-middle">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>{{ __('Sub BoQ') }}</th>
+                                        <th>{{ __('BoQ') }}</th>
                                         <th class="text-end">{{ __('Material Cost (KES)') }}</th>
                                         <th class="text-end">{{ __('Labour Cost (KES)') }}</th>
                                         <th class="text-end">{{ __('Total (KES)') }}</th>
@@ -131,3 +133,4 @@
     </div>
 </div>
 @endsection
+

@@ -1,5 +1,5 @@
 <!-- Edit Item Modal -->
-<div class="modal fade" id="editItemModal{{ $item->id }}" tabindex="-1" aria-labelledby="editItemModalLabel{{ $item->id }}" aria-hidden="true" data-section-id="{{ $section->id }}">
+<div class="modal fade" id="editItemModal{{ $item->id }}" tabindex="-1" aria-labelledby="editItemModalLabel{{ $item->id }}" aria-hidden="true" data-section-id="{{ $item->section_id }}">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -14,7 +14,7 @@
                     <input type="hidden" name="id" value="{{ $item->id }}">
 
                     <!-- Section Title -->
-                    <h6 class="text-muted mb-3">Section: {{ $section->name }}</h6>
+                    <h6 class="text-muted mb-3">Section: {{ optional($item->section)->name ?? __('Unassigned') }}</h6>
 
                     <!-- Element Dropdown -->
                     <div class="form-floating mb-4">
@@ -130,6 +130,11 @@
             };
 
             const loadElements = (selectedElement, selectedItem) => {
+                if (!sectionId) {
+                    renderOptions(elementSelect, selectElementText, {}, null);
+                    return;
+                }
+
                 elementSelect.innerHTML = `<option value="" disabled selected style="color: gray;">${loadingText}</option>`;
 
                 $.ajax({

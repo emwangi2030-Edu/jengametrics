@@ -1,6 +1,3 @@
-<?php
-use Illuminate\Support\Facades\Auth;
-?>
 <!DOCTYPE html>
 <html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default">
 
@@ -25,6 +22,8 @@ use Illuminate\Support\Facades\Auth;
     <link rel="manifest" href="{{ favicon_url() }}">
     <meta name="msapplication-TileImage" content="{{ favicon_url() }}">
     <meta name="theme-color" content="#ffffff">
+
+    @stack('styles')
     <script src="{{ asset('assets/metrics/vendors/simplebar/simplebar.min.js') }}"></script>
     <script src="{{ asset('assets/metrics/assets/js/config.js') }}"></script>
 
@@ -340,7 +339,7 @@ use Illuminate\Support\Facades\Auth;
                                 </a>
                             </div>
 
-                            @if(Auth::user()->is_client())
+                            @if(\Illuminate\Support\Facades\Auth::user()->is_client())
                                 <!-- Bills of Quantities (BQ) -->
                                 <div class="nav-item-wrapper">
                                     <a class="nav-link label-1" href="{{ route('boq') }}" role="button" aria-expanded="false">
@@ -468,7 +467,7 @@ use Illuminate\Support\Facades\Auth;
                                 </div>
                             @endif             
 
-                            @if(Auth::user()->is_admin())
+                            @if(\Illuminate\Support\Facades\Auth::user()->is_admin())
                                 <!-- Sales & Payment Section -->
                                 <div class="nav-item-wrapper">
                                     <a class="nav-link dropdown-indicator label-1" href="#sidebarSalesPayment" role="button" data-bs-toggle="collapse" aria-expanded="false" aria-controls="sidebarSalesPayment">
@@ -611,19 +610,19 @@ use Illuminate\Support\Facades\Auth;
                             <div class="card-body p-0">
                                 <div class="text-center pt-4 pb-3">
                                     <div class="avatar avatar-xl ">
-                                        <img class="rounded-circle " src="{{ Auth::user()->get_gravatar(150) }}"
+                                        <img class="rounded-circle " src="{{ \Illuminate\Support\Facades\Auth::user()->get_gravatar(150) }}"
                                         alt="" />
                                     </div>
                                     <h6 class="mt-2 text-body-emphasis">{{ project() }}</h6>
                                 </div>
                             </div>
                             <div>
-                                @if(Auth::user()->is_client())
-                                    @if(Auth::user()->package)
-                                        @if(package(Auth::user()->package)->name == "Basic")
+                                @if(\Illuminate\Support\Facades\Auth::user()->is_client())
+                                    @if(\Illuminate\Support\Facades\Auth::user()->package)
+                                        @if(package(\Illuminate\Support\Facades\Auth::user()->package)->name == "Basic")
                                             <div class="help-box text-center">
                                                 <p class="mb-3 mt-2 text-muted">
-                                                    <strong>{{ package(Auth::user()->package)->name }}</strong><br>
+                                                    <strong>{{ package(\Illuminate\Support\Facades\Auth::user()->package)->name }}</strong><br>
                                                     Upgrade your plan and get the most out of JengaMetrics
                                                 </p>
                                                 <div class="mt-3">
@@ -637,8 +636,8 @@ use Illuminate\Support\Facades\Auth;
 
 
                                 <ul class="nav d-flex flex-column mb-2 pb-1">
-                                    @if(Auth::user()->is_client())
-                                    @if(Auth::user()->project_id)
+                                    @if(\Illuminate\Support\Facades\Auth::user()->is_client())
+                                    @if(\Illuminate\Support\Facades\Auth::user()->project_id)
                                     <li class="nav-item"><a class="nav-link px-3 d-block"
                                         href="/admin/settings"><span class="me-2 text-body align-bottom"
                                         data-feather="pie-chart"></span>Project settings</a></li>
@@ -666,7 +665,7 @@ use Illuminate\Support\Facades\Auth;
                             </div>
                             <div class="card-footer p-0 border-top border-translucent">
                                 <ul class="nav d-flex flex-column my-3">
-                                    @if(Auth::user()->is_client())
+                                    @if(\Illuminate\Support\Facades\Auth::user()->is_client())
                                         <a class="dropdown-item" href="{{ url('account') }}">
                                             <i class="fa fa-user"></i> 
                                             <span key="t-profile">Profile</span>
@@ -828,7 +827,7 @@ use Illuminate\Support\Facades\Auth;
                         </div>
 
                         <?php
-                        $projects = \App\Models\Project::whereUserId(Auth::user()->id)->get();
+                        $projects = \App\Models\Project::whereUserId(\Illuminate\Support\Facades\Auth::user()->id)->get();
                         ?>
                         <div class="modal-body">
                             <table class="table">
@@ -1078,3 +1077,11 @@ use Illuminate\Support\Facades\Auth;
     @stack('scripts')
 </body>
 </html>
+
+
+
+
+
+
+
+

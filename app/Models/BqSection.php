@@ -15,6 +15,11 @@ class BqSection extends Model
         return $this->belongsTo(BqDocument::class);
     }
 
+    public function level()
+    {
+        return $this->belongsTo(BqLevel::class, 'bq_level_id');
+    }
+
     public function items()
     {
         return $this->hasMany(BqItem::class);
