@@ -329,13 +329,11 @@ class BqDocumentController extends Controller
     {
         $project = get_project();
 
-        if ($bqDocument->project_id !== $project->id) {
-            abort(404);
-        }
-
         if (is_null($bqDocument->parent_id)) {
             return redirect()->route('bq_documents.index');
         }
+
+        $this->assertSubDocumentAccess($bqDocument, $project->id);
 
         $levels = $bqDocument->levels()
             ->with(['sections' => function ($query) {

@@ -40,8 +40,8 @@
                                 </thead>
                                 <tbody>
                                     @php
-                                        $totalQuantity += (float) ($item->quantity ?? 0);
-                                        $totalAmount += (float) ($item->amount ?? 0);
+                                        $totalQuantity = 0;
+                                        $totalAmount = 0;
                                     @endphp
                                     @forelse ($items as $item)
                                         @php
