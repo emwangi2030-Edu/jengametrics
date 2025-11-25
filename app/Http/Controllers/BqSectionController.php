@@ -420,10 +420,26 @@ class BqSectionController extends Controller
         }
 
         if ((int) $bqDocument->project_id !== (int) project_id()) {
+            \Log::warning('BqSection access blocked (doc mismatch)', [
+                'user_id' => auth()->id(),
+                'user_project_id' => project_id(),
+                'bq_document_id' => $bqDocument->id,
+                'bq_document_project_id' => $bqDocument->project_id,
+                'bq_document_parent_id' => $bqDocument->parent_id,
+                'route' => request()->fullUrl(),
+            ]);
             abort(404);
         }
 
         if (is_null($bqDocument->parent_id)) {
+            \Log::warning('BqSection access blocked (parent missing)', [
+                'user_id' => auth()->id(),
+                'user_project_id' => project_id(),
+                'bq_document_id' => $bqDocument->id,
+                'bq_document_project_id' => $bqDocument->project_id,
+                'bq_document_parent_id' => $bqDocument->parent_id,
+                'route' => request()->fullUrl(),
+            ]);
             abort(404);
         }
     }
@@ -433,12 +449,28 @@ class BqSectionController extends Controller
         $document = $bqDocument ?? $bqLevel->document;
 
         if (! $document) {
+            \Log::warning('BqSection access blocked (no document on level)', [
+                'user_id' => auth()->id(),
+                'user_project_id' => project_id(),
+                'bq_level_id' => $bqLevel->id,
+                'bq_level_document_id' => $bqLevel->bq_document_id,
+                'route' => request()->fullUrl(),
+            ]);
             abort(404);
         }
 
         $this->assertDocumentAccess($document);
 
         if ($bqLevel->bq_document_id !== $document->id) {
+            \Log::warning('BqSection access blocked (level/doc mismatch)', [
+                'user_id' => auth()->id(),
+                'user_project_id' => project_id(),
+                'bq_level_id' => $bqLevel->id,
+                'bq_level_document_id' => $bqLevel->bq_document_id,
+                'bq_document_id' => $document->id,
+                'bq_document_project_id' => $document->project_id,
+                'route' => request()->fullUrl(),
+            ]);
             abort(404);
         }
     }

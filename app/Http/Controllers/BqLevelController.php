@@ -82,6 +82,14 @@ class BqLevelController extends Controller
         }
 
         if ((int) $bqDocument->project_id !== (int) project_id() || is_null($bqDocument->parent_id)) {
+            \Log::warning('BqLevel access blocked', [
+                'user_id' => auth()->id(),
+                'user_project_id' => project_id(),
+                'bq_document_id' => $bqDocument->id,
+                'bq_document_project_id' => $bqDocument->project_id,
+                'bq_document_parent_id' => $bqDocument->parent_id,
+                'route' => request()->fullUrl(),
+            ]);
             abort(404);
         }
     }
