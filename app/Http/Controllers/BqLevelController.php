@@ -68,7 +68,16 @@ class BqLevelController extends Controller
     {
         $this->assertDocumentAccess($bqDocument);
 
-        if ($bqLevel->bq_document_id !== $bqDocument->id) {
+        if ((int) $bqLevel->bq_document_id !== (int) $bqDocument->id) {
+            \Log::warning('BqLevel access blocked (level/doc mismatch)', [
+                'user_id' => auth()->id(),
+                'user_project_id' => project_id(),
+                'bq_level_id' => $bqLevel->id,
+                'bq_level_document_id' => $bqLevel->bq_document_id,
+                'bq_document_id' => $bqDocument->id,
+                'bq_document_project_id' => $bqDocument->project_id,
+                'route' => request()->fullUrl(),
+            ]);
             abort(404);
         }
 
