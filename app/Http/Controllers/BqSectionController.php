@@ -461,7 +461,7 @@ class BqSectionController extends Controller
 
         $this->assertDocumentAccess($document);
 
-        if ($bqLevel->bq_document_id !== $document->id) {
+        if ((int) $bqLevel->bq_document_id !== (int) $document->id) {
             \Log::warning('BqSection access blocked (level/doc mismatch)', [
                 'user_id' => auth()->id(),
                 'user_project_id' => project_id(),
