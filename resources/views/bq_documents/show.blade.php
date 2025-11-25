@@ -17,7 +17,7 @@
                 </div>
                 <div class="text-end mt-3 mt-md-0">
                     <p class="fs-4 fw-bold mb-1">KES {{ number_format($totalAmount, 2) }}</p>
-                    <p class="text-muted mb-0">{{ __('Sub BoQ total') }}</p>
+                    <p class="text-muted mb-0">{{ __('BoQ total') }}</p>
                 </div>
             </div>
         </div>
@@ -54,7 +54,7 @@
                 @if($levels->isEmpty())
                     <div class="card shadow-sm border-0">
                         <div class="card-body text-center py-5">
-                            <p class="text-muted mb-0">{{ __('No levels have been added to this sub BoQ yet.') }}</p>
+                            <p class="text-muted mb-0">{{ __('No levels have been added to this BoQ yet.') }}</p>
                         </div>
                     </div>
                 @else
