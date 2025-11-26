@@ -51,20 +51,9 @@ Route::post('/wizard/complete', [ProjectWizardController::class, 'complete'])->n
 Route::post('/wizard/step1', [ProjectWizardController::class, 'step1Post'])->name('wizard.step1.post');
 // Route for Step 2 POST request
 Route::post('/wizard/step2', [ProjectWizardController::class, 'step2Post'])->name('wizard.step2.post');
-// Route to handle form submission and complete the wizard
-Route::post('/wizard/complete', [ProjectWizardController::class, 'complete'])->name('wizard.complete');
 
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        $user = Auth::user();
-        if (!$user->has_project) {
-            return redirect()->route('wizard.step1');
-        }
-
-        return view('dashboard');
-    })->name('dashboard');
-
     Route::get('/users', function () {
         $user = Auth::user();
         if (!$user->has_school) {
@@ -76,8 +65,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-Route::resource('projects', ProjectController::class);
 
 Route::post('select-project', [ProjectController::class, 'selectProject'])->name('select_project');
 

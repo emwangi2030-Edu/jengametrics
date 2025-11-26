@@ -23,8 +23,15 @@ use Illuminate\Support\Str;
 
      function sendsms2($phone, $message){
 
-      $username   = 'awasam';
-      $apikey     = '9da7fdbdb519f722b5960f809451c72c98bfd6a6915f9b0ca72d52bb6d5ff4c6';
+      $username   = env('SMS_AT_USERNAME');
+      $apikey     = env('SMS_AT_APIKEY');
+      $from       = env('SMS_AT_FROM', 'AWASAM');
+
+      if (!$username || !$apikey) {
+        \Log::warning('SMS skipped: missing Africa\'s Talking credentials');
+        return null;
+      }
+
       $AT         = new AfricasTalking($username, $apikey);
       $sms        = $AT->sms();
       $phone = $phone;
@@ -38,7 +45,6 @@ use Illuminate\Support\Str;
 
      $recipients = $phone;
      $message    = $message;
-     $from       = "AWASAM";
 //  dd($recipients);
      $result     = $sms->send([
        'to'      => $recipients,
@@ -178,12 +184,17 @@ function get_text_tpl($text = ''){
 function sendsms($phone, $message){
 
     // Define your API credentials
-    $userid = 'havishomes';
-    $password = 'Havishomes2030';
-    $apikey = '9b14bc21c3b1a72bc75d78f3b784592d490dfed9'; // Replace 'your_api_key' with your actual API key
+    $userid = env('SMS_HP_USERID');
+    $password = env('SMS_HP_PASSWORD');
+    $apikey = env('SMS_HP_APIKEY');
 
     // Define the sender ID
-    $senderid = 'HAVISHOME';
+    $senderid = env('SMS_HP_SENDER', 'HAVISHOME');
+
+    if (!$userid || !$password || !$apikey) {
+        \Log::warning('SMS skipped: missing HostPinnacle credentials');
+        return null;
+    }
 
    $phone = $phone;
       $phone = ltrim($phone,'0');///phone remove 0
@@ -281,29 +292,36 @@ function project_name(){
 
 
     $user = Auth::user();
-    if($user->is_client()){
-        $bussiness = User::whereId($user->id)->first();
-    } else{
-      
-        $user = User::find($user->user_id);
-        $bussiness = User::whereId($user->id)->first();
+    if(!$user){
+        return null;
     }
 
-    return $bussiness;
+    if($user->is_client()){
+        return User::whereId($user->id)->first();
+    }
+
+    $owner = $user->user_id ? User::find($user->user_id) : null;
+    return $owner;
 }
 
 
 function project(){
 
     $user = Auth::user();
-    $project_count = Project::whereUserId($user->id)->count();
-    if($project_count>0){
-        $business = Project::find($user->project_id)->name;
-    } else{
-        $business = 'Personal';    
+    if(!$user){
+        return null;
     }
 
- return $business;
+    $project_count = Project::whereUserId($user->id)->count();
+    if($project_count>0){
+        $project = $user->project_id ? Project::find($user->project_id) : null;
+        if($project){
+            return $project->name;
+        }
+        return 'Project';
+    }
+
+ return 'Personal';
 
 }
 
@@ -311,6 +329,9 @@ function project(){
 function get_project(){
 
     $user = Auth::user();
+    if(!$user || !$user->project_id){
+        return null;
+    }
     $business = Project::find($user->project_id);
 
  return $business;
@@ -321,6 +342,9 @@ function get_project(){
 function project_id(){
 
     $user = Auth::user();
+    if(!$user){
+        return null;
+    }
     $project = $user->project_id;
 
     return $project;
@@ -344,6 +368,9 @@ function user_id(){
 
 
     $user = Auth::user();
+    if(!$user){
+        return null;
+    }
     $user_id = $user->business_id;
 
     return $user_id;
@@ -605,169 +632,7 @@ function invoice_total($id){
 }
 
  function themeqx_classifieds_currencies(){
-    return array(
-        'AED' => 'United Arab Emirates dirham',
-        'AFN' => 'Afghan afghani',
-        'ALL' => 'Albanian lek',
-        'AMD' => 'Armenian dram',
-        'ANG' => 'Netherlands Antillean guilder',
-        'AOA' => 'Angolan kwanza',
-        'ARS' => 'Argentine peso',
-        'AUD' => 'Australian dollar',
-        'AWG' => 'Aruban florin',
-        'AZN' => 'Azerbaijani manat',
-        'BAM' => 'Bosnia and Herzegovina convertible mark',
-        'BBD' => 'Barbadian dollar',
-        'BDT' => 'Bangladeshi taka',
-        'BGN' => 'Bulgarian lev',
-        'BHD' => 'Bahraini dinar',
-        'BIF' => 'Burundian franc',
-        'BMD' => 'Bermudian dollar',
-        'BND' => 'Brunei dollar',
-        'BOB' => 'Bolivian boliviano',
-        'BRL' => 'Brazilian real',
-        'BSD' => 'Bahamian dollar',
-        'BTC' => 'Bitcoin',
-        'BTN' => 'Bhutanese ngultrum',
-        'BWP' => 'Botswana pula',
-        'BYR' => 'Belarusian ruble',
-        'BZD' => 'Belize dollar',
-        'CAD' => 'Canadian dollar',
-        'CDF' => 'Congolese franc',
-        'CHF' => 'Swiss franc',
-        'CLP' => 'Chilean peso',
-        'CNY' => 'Chinese yuan',
-        'COP' => 'Colombian peso',
-        'CRC' => 'Costa Rican col&oacute;n',
-        'CUC' => 'Cuban convertible peso',
-        'CUP' => 'Cuban peso',
-        'CVE' => 'Cape Verdean escudo',
-        'CZK' => 'Czech koruna',
-        'DJF' => 'Djiboutian franc',
-        'DKK' => 'Danish krone',
-        'DOP' => 'Dominican peso',
-        'DZD' => 'Algerian dinar',
-        'EGP' => 'Egyptian pound',
-        'ERN' => 'Eritrean nakfa',
-        'ETB' => 'Ethiopian birr',
-        'EUR' => 'Euro',
-        'FJD' => 'Fijian dollar',
-        'FKP' => 'Falkland Islands pound',
-        'GBP' => 'Pound sterling',
-        'GEL' => 'Georgian lari',
-        'GGP' => 'Guernsey pound',
-        'GHS' => 'Ghana cedi',
-        'GIP' => 'Gibraltar pound',
-        'GMD' => 'Gambian dalasi',
-        'GNF' => 'Guinean franc',
-        'GTQ' => 'Guatemalan quetzal',
-        'GYD' => 'Guyanese dollar',
-        'HKD' => 'Hong Kong dollar',
-        'HNL' => 'Honduran lempira',
-        'HRK' => 'Croatian kuna',
-        'HTG' => 'Haitian gourde',
-        'HUF' => 'Hungarian forint',
-        'IDR' => 'Indonesian rupiah',
-        'ILS' => 'Israeli new shekel',
-        'IMP' => 'Manx pound',
-        'INR' => 'Indian rupee',
-        'IQD' => 'Iraqi dinar',
-        'IRR' => 'Iranian rial',
-        'ISK' => 'Icelandic kr&oacute;na',
-        'JEP' => 'Jersey pound',
-        'JMD' => 'Jamaican dollar',
-        'JOD' => 'Jordanian dinar',
-        'JPY' => 'Japanese yen',
-        'KES' => 'Kenyan shilling',
-        'KGS' => 'Kyrgyzstani som',
-        'KHR' => 'Cambodian riel',
-        'KMF' => 'Comorian franc',
-        'KPW' => 'North Korean won',
-        'KRW' => 'South Korean won',
-        'KWD' => 'Kuwaiti dinar',
-        'KYD' => 'Cayman Islands dollar',
-        'KZT' => 'Kazakhstani tenge',
-        'LAK' => 'Lao kip',
-        'LBP' => 'Lebanese pound',
-        'LKR' => 'Sri Lankan rupee',
-        'LRD' => 'Liberian dollar',
-        'LSL' => 'Lesotho loti',
-        'LYD' => 'Libyan dinar',
-        'MAD' => 'Moroccan dirham',
-        'MDL' => 'Moldovan leu',
-        'MGA' => 'Malagasy ariary',
-        'MKD' => 'Macedonian denar',
-        'MMK' => 'Burmese kyat',
-        'MNT' => 'Mongolian t&ouml;gr&ouml;g',
-        'MOP' => 'Macanese pataca',
-        'MRO' => 'Mauritanian ouguiya',
-        'MUR' => 'Mauritian rupee',
-        'MVR' => 'Maldivian rufiyaa',
-        'MWK' => 'Malawian kwacha',
-        'MXN' => 'Mexican peso',
-        'MYR' => 'Malaysian ringgit',
-        'MZN' => 'Mozambican metical',
-        'NAD' => 'Namibian dollar',
-        'NGN' => 'Nigerian naira',
-        'NIO' => 'Nicaraguan c&oacute;rdoba',
-        'NOK' => 'Norwegian krone',
-        'NPR' => 'Nepalese rupee',
-        'NZD' => 'New Zealand dollar',
-        'OMR' => 'Omani rial',
-        'PAB' => 'Panamanian balboa',
-        'PEN' => 'Peruvian nuevo sol',
-        'PGK' => 'Papua New Guinean kina',
-        'PHP' => 'Philippine peso',
-        'PKR' => 'Pakistani rupee',
-        'PLN' => 'Polish z&#x142;oty',
-        'PRB' => 'Transnistrian ruble',
-        'PYG' => 'Paraguayan guaran&iacute;',
-        'QAR' => 'Qatari riyal',
-        'RON' => 'Romanian leu',
-        'RSD' => 'Serbian dinar',
-        'RUB' => 'Russian ruble',
-        'RWF' => 'Rwandan franc',
-        'SAR' => 'Saudi riyal',
-        'SBD' => 'Solomon Islands dollar',
-        'SCR' => 'Seychellois rupee',
-        'SDG' => 'Sudanese pound',
-        'SEK' => 'Swedish krona',
-        'SGD' => 'Singapore dollar',
-        'SHP' => 'Saint Helena pound',
-        'SLL' => 'Sierra Leonean leone',
-        'SOS' => 'Somali shilling',
-        'SRD' => 'Surinamese dollar',
-        'SSP' => 'South Sudanese pound',
-        'STD' => 'S&atilde;o Tom&eacute; and Pr&iacute;ncipe dobra',
-        'SYP' => 'Syrian pound',
-        'SZL' => 'Swazi lilangeni',
-        'THB' => 'Thai baht',
-        'TJS' => 'Tajikistani somoni',
-        'TMT' => 'Turkmenistan manat',
-        'TND' => 'Tunisian dinar',
-        'TOP' => 'Tongan pa&#x2bb;anga',
-        'TRY' => 'Turkish lira',
-        'TTD' => 'Trinidad and Tobago dollar',
-        'TWD' => 'New Taiwan dollar',
-        'TZS' => 'Tanzanian shilling',
-        'UAH' => 'Ukrainian hryvnia',
-        'UGX' => 'Ugandan shilling',
-        'USD' => 'United States dollar',
-        'UYU' => 'Uruguayan peso',
-        'UZS' => 'Uzbekistani som',
-        'VEF' => 'Venezuelan bol&iacute;var',
-        'VND' => 'Vietnamese &#x111;&#x1ed3;ng',
-        'VUV' => 'Vanuatu vatu',
-        'WST' => 'Samoan t&#x101;l&#x101;',
-        'XAF' => 'Central African CFA franc',
-        'XCD' => 'East Caribbean dollar',
-        'XOF' => 'West African CFA franc',
-        'XPF' => 'CFP franc',
-        'YER' => 'Yemeni rial',
-        'ZAR' => 'South African rand',
-        'ZMW' => 'Zambian kwacha',
-    );
-    
+    return currencies();
 }
 
 
