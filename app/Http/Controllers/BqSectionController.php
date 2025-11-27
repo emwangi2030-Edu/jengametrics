@@ -12,6 +12,7 @@ use App\Models\Item;
 use App\Models\Element;
 use App\Models\ItemMaterial;
 use App\Models\Product;
+use App\Models\UnitOfMeasurement;
 use Illuminate\Http\Request;
 use App\Services\BqItemCreator;
 use Illuminate\Support\Facades\Validator;
@@ -31,11 +32,13 @@ class BqSectionController extends Controller
         $this->assertLevelAccess($bqLevel, $bqDocument);
 
         $sections = Section::orderBy('name')->get();
+        $units = UnitOfMeasurement::orderBy('abbrev')->get();
 
         return view('bq_sections.create', [
             'bqDocument' => $bqDocument,
             'bqLevel' => $bqLevel,
             'sections' => $sections,
+            'units' => $units,
         ]);
     }
 
@@ -52,6 +55,68 @@ class BqSectionController extends Controller
     {
         $this->assertDocumentAccess($bqDocument);
         $this->assertLevelAccess($bqLevel, $bqDocument);
+
+        $units = max(1, (int) ($bqDocument->units ?? 1));
+        $isManual = $request->boolean('manual_item');
+
+        if ($isManual) {
+            $request->validate([
+                'section_id' => 'required|exists:sections,id',
+                'manual_name' => 'required|string|max:255',
+                'manual_unit' => 'required|string|max:50',
+                'rate' => 'required|numeric|min:0',
+                'quantity' => 'required|numeric|min:0',
+            ]);
+
+            $quantity = (float) $request->quantity;
+            $rate = (float) $request->rate;
+            $amount = $quantity * $rate;
+
+            $bqSection = BqSection::create([
+                'bq_document_id' => $bqDocument->id,
+                'bq_level_id' => $bqLevel->id,
+                'project_id' => (int) project_id(),
+                'section_id' => $request->section_id,
+                'item_id' => null,
+                'item_name' => $request->manual_name,
+                'units' => $request->manual_unit,
+                'quantity' => $quantity,
+                'rate' => $rate,
+                'amount' => $amount,
+            ]);
+
+            // Derive material and labour from total amount
+            $materialAmount = round($amount * 0.65, 2);
+            $labourAmount = round($amount * 0.19, 2);
+            $scaledMaterialAmount = $materialAmount * $units;
+            $scaledLabourAmount = $labourAmount * $units;
+
+            BomItem::create([
+                'section_id' => $bqSection->section_id,
+                'item_id' => null,
+                'item_material_id' => null,
+                'product_id' => null,
+                'quantity' => $units,
+                'rate' => $materialAmount,
+                'amount' => $scaledMaterialAmount,
+                'project_id' => (int) project_id(),
+                'bq_section_id' => $bqSection->id,
+                'bq_document_id' => $bqSection->bq_document_id,
+            ]);
+
+            BomLabour::create([
+                'section_id' => $bqSection->section_id,
+                'item_id' => null,
+                'quantity' => $units,
+                'rate' => $labourAmount,
+                'amount' => $scaledLabourAmount,
+                'project_id' => (int) project_id(),
+                'bq_section_id' => $bqSection->id,
+                'bq_document_id' => $bqSection->bq_document_id,
+            ]);
+
+            return redirect()->route('bq_levels.show', [$bqDocument, $bqLevel])->with('success', trans('Item added successfully.'));
+        }
 
         $request->validate([
             'section_id' => 'required|exists:sections,id',
@@ -108,6 +173,7 @@ class BqSectionController extends Controller
         $this->assertLevelAccess($bqLevel);
 
         $sectionId = (int) $request->section_id;
+        $units = max(1, (int) ($bqLevel->document?->units ?? 1));
         $count = 0;
 
         foreach ($request->items as $row) {
@@ -133,21 +199,23 @@ class BqSectionController extends Controller
             if ($sectionCreated) {
                 // Labour
                 $unit = Item::find($row['item_id']);
+                $scaledLabourQty = $qty * $units;
                 BomLabour::create([
                     'section_id'    => $sectionCreated->section_id,
                     'item_id'       => $sectionCreated->item_id,
-                    'quantity'      => $qty,
+                    'quantity'      => $scaledLabourQty,
                     'rate'          => $unit->labour ?? 0,
-                    'amount'        => $qty * ($unit->labour ?? 0),
+                    'amount'        => $scaledLabourQty * ($unit->labour ?? 0),
                     'project_id'    => project_id(),
                     'bq_section_id' => $sectionCreated->id,
+                    'bq_document_id' => $sectionCreated->bq_document_id,
                 ]);
 
                 // Materials
                 $materials = ItemMaterial::where('item_id', $row['item_id'])->get();
                 foreach ($materials as $material) {
                     $product = Product::find($material->product_id);
-                    $quantity = $qty * ($material->conversion_factor ?? 0);
+                    $quantity = $qty * ($material->conversion_factor ?? 0) * $units;
                     $matRate = $product?->rate ?? 0;
                     $matAmt = $quantity * $matRate;
 
@@ -161,6 +229,7 @@ class BqSectionController extends Controller
                         'amount'           => $matAmt,
                         'project_id'       => project_id(),
                         'bq_section_id'    => $sectionCreated->id,
+                        'bq_document_id'   => $sectionCreated->bq_document_id,
                     ]);
                 }
                 $count++;
@@ -244,6 +313,7 @@ class BqSectionController extends Controller
         }
 
         // Reuse creation logic from storeBulk
+        $units = max(1, (int) ($bqLevel->document?->units ?? 1));
         $count = 0;
         foreach ($rows as $row) {
             $selectedItem = Item::find($row['item_id']);
@@ -267,20 +337,22 @@ class BqSectionController extends Controller
 
             if ($sectionCreated) {
                 $unit = Item::find($row['item_id']);
+                $scaledLabourQty = $qty * $units;
                 BomLabour::create([
                     'section_id'    => $sectionCreated->section_id,
                     'item_id'       => $sectionCreated->item_id,
-                    'quantity'      => $qty,
+                    'quantity'      => $scaledLabourQty,
                     'rate'          => $unit->labour ?? 0,
-                    'amount'        => $qty * ($unit->labour ?? 0),
+                    'amount'        => $scaledLabourQty * ($unit->labour ?? 0),
                     'project_id'    => project_id(),
                     'bq_section_id' => $sectionCreated->id,
+                    'bq_document_id' => $sectionCreated->bq_document_id,
                 ]);
 
                 $materials = ItemMaterial::where('item_id', $row['item_id'])->get();
                 foreach ($materials as $material) {
                     $product = Product::find($material->product_id);
-                    $quantity = $qty * ($material->conversion_factor ?? 0);
+                    $quantity = $qty * ($material->conversion_factor ?? 0) * $units;
                     $matRate = $product?->rate ?? 0;
                     $matAmt = $quantity * $matRate;
 
@@ -294,6 +366,7 @@ class BqSectionController extends Controller
                         'amount'           => $matAmt,
                         'project_id'       => project_id(),
                         'bq_section_id'    => $sectionCreated->id,
+                        'bq_document_id'   => $sectionCreated->bq_document_id,
                     ]);
                 }
                 $count++;
@@ -339,7 +412,13 @@ class BqSectionController extends Controller
         $bqSection->amount = $rate * $quantity;
         $bqSection->save();
 
-        $this->bqItemCreator->refresh($bqSection, $item, $quantity, (int) project_id());
+        $this->bqItemCreator->refresh(
+            $bqSection,
+            $item,
+            $quantity,
+            (int) project_id(),
+            max(1, (int) ($bqSection->bqDocument?->units ?? 1))
+        );
 
         return redirect()->back()->with('success', 'Item updated successfully.');
     }

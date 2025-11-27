@@ -5,7 +5,7 @@
     <div class="row mb-5 text-center">
         <div class="col-12">
             <h2 class="display-6 fw-bold" style="color:#027333;">{{ __('Add Item to :level', ['level' => $bqLevel->name]) }}</h2>
-            <p class="text-muted">{{ __('Select a section, element, and item to include in this level.') }}</p>
+            <p class="text-muted">{{ __('Select a section, element, and item to include in this level, or add a manual item.') }}</p>
         </div>
     </div>
 
@@ -15,6 +15,11 @@
                 <div class="card-body p-5">
                     <form method="POST" action="{{ route('bq_levels.items.store', [$bqDocument, $bqLevel]) }}">
                         @csrf
+
+                        <div class="form-check form-switch mb-4">
+                            <input class="form-check-input" type="checkbox" id="manual_item" name="manual_item" value="1">
+                            <label class="form-check-label fw-semibold" for="manual_item">{{ __('Add as manual item (not from library)') }}</label>
+                        </div>
 
                         {{-- Section Dropdown --}}
                         <div class="form-floating mb-4">
@@ -28,7 +33,7 @@
                         </div>
 
                         {{-- Element Dropdown --}}
-                        <div class="form-floating mb-4">
+                        <div class="form-floating mb-4 standard-only">
                             <select name="element_id" id="element" class="form-select" required>
                                 <option value="">{{ __('Choose Element') }}</option>
                             </select>
@@ -36,11 +41,28 @@
                         </div>
 
                         {{-- Item Dropdown --}}
-                        <div class="form-floating mb-4">
+                        <div class="form-floating mb-4 standard-only">
                             <select name="item_id" id="item_id" class="form-select" required>
                                 <option value="">{{ __('Choose Item') }}</option>
                             </select>
                             <label for="item_id">{{ __('Select Item') }}</label>
+                        </div>
+
+                        {{-- Manual item name --}}
+                        <div class="form-floating mb-4 manual-only d-none">
+                            <input type="text" name="manual_name" id="manual_name" class="form-control" placeholder="{{ __('Item name') }}">
+                            <label for="manual_name">{{ __('Manual item name') }}</label>
+                        </div>
+
+                        {{-- Manual unit --}}
+                        <div class="form-floating mb-4 manual-only d-none">
+                            <select name="manual_unit" id="manual_unit" class="form-select">
+                                <option disabled value="">{{ __('Choose Unit') }}</option>
+                                @foreach($units ?? [] as $unit)
+                                    <option value="{{ $unit->abbrev }}">{{ $unit->abbrev }}</option>
+                                @endforeach
+                            </select>
+                            <label for="manual_unit">{{ __('Unit of measure') }}</label>
                         </div>
 
                         {{-- Rate Input --}}
@@ -85,6 +107,27 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+
+        function toggleManualMode() {
+            const manual = $('#manual_item').is(':checked');
+            $('.standard-only').toggleClass('d-none', manual);
+            $('.manual-only').toggleClass('d-none', !manual);
+
+            $('#element, #item_id').prop('required', !manual);
+            $('#manual_name').prop('required', manual);
+            $('#manual_unit').prop('required', manual);
+
+            if (manual) {
+                $('#element').val('');
+                $('#item_id').val('');
+            } else {
+                $('#manual_name').val('');
+                $('#manual_unit').val('');
+            }
+        }
+
+        $('#manual_item').on('change', toggleManualMode);
+        toggleManualMode();
 
         // Function to display error message
         function showError(message) {

@@ -36,6 +36,9 @@ class BqDocumentController extends Controller
             ->orderBy('created_at')
             ->get()
             ->map(function (BqDocument $document) {
+                $units = $this->normalizeUnits($document->units ?? 1);
+                $document->units = $units;
+
                 $aggregated = $document->sections
                     ->groupBy(function (BqSection $section) {
                         if ($section->item_id) {
@@ -60,26 +63,12 @@ class BqDocumentController extends Controller
 
                 $document->unique_items_count = $aggregated->count();
                 $document->aggregated_amount = $aggregated->sum('amount');
+                $document->aggregated_amount_with_units = $document->aggregated_amount * $units;
 
                 return $document;
             });
 
-        $overallTotal = BqSection::where('project_id', $project->id)->get()
-            ->groupBy(function (BqSection $section) {
-                if ($section->item_id) {
-                    return 'item:' . $section->item_id;
-                }
-
-                $name = strtolower(trim((string) $section->item_name));
-                $unit = strtolower(trim((string) $section->units));
-                $rate = number_format((float) ($section->rate ?? 0), 6, '.', '');
-
-                return implode('|', ['fallback', $name, $unit, $rate]);
-            })
-            ->map(function ($sections) {
-                return $sections->sum(fn ($section) => (float) ($section->amount ?? 0));
-            })
-            ->sum();
+        $overallTotal = $subDocuments->sum(fn ($document) => (float) ($document->aggregated_amount_with_units ?? 0));
 
         $libraries = auth()->user()
             ?->libraries()
@@ -277,6 +266,7 @@ class BqDocumentController extends Controller
                 'user_id' => auth()->id() ?: $bqDocument->user_id,
                 'project_id' => $project->id,
                 'parent_id' => $masterDocument->id,
+                'units' => $this->normalizeUnits($bqDocument->units ?? 1),
             ]);
 
             foreach ($sections as $section) {
@@ -301,6 +291,7 @@ class BqDocumentController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'units' => 'nullable|integer|min:1',
         ]);
 
         $project = get_project();
@@ -313,6 +304,7 @@ class BqDocumentController extends Controller
             'user_id' => auth()->id(),
             'project_id' => $project->id,
             'parent_id' => $masterDocument->id,
+            'units' => $this->normalizeUnits($request->input('units', 1)),
         ]);
 
         return redirect()->route('bq_documents.show', $document)
@@ -419,7 +411,7 @@ class BqDocumentController extends Controller
             ->with('info', __('Use the inline modal to edit sub BoQs.'));
     }
 
-    public function update(Request $request, BqDocument $bqDocument)
+    public function update(Request $request, BqDocument $bqDocument, BqItemCreator $bqItemCreator)
     {
         $project = get_project();
 
@@ -428,9 +420,17 @@ class BqDocumentController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'units' => 'nullable|integer|min:1',
         ]);
 
+        $previousUnits = $this->normalizeUnits($bqDocument->units ?? 1);
+        $data['units'] = $this->normalizeUnits($data['units'] ?? $previousUnits);
+
         $bqDocument->update($data);
+
+        if ($data['units'] !== $previousUnits) {
+            $this->rebuildBomForDocument($bqDocument, $bqItemCreator);
+        }
 
         return redirect()
             ->route('bq_documents.index', $bqDocument)
@@ -446,6 +446,11 @@ class BqDocumentController extends Controller
         }
 
         return (float) $rounded;
+    }
+
+    protected function normalizeUnits($units): int
+    {
+        return max(1, (int) $units);
     }
 
     protected function ensureMasterDocument(int $projectId, ?string $projectName = null): BqDocument
@@ -467,6 +472,7 @@ class BqDocumentController extends Controller
             'user_id' => auth()->id(),
             'project_id' => $projectId,
             'parent_id' => null,
+            'units' => 1,
         ]);
     }
 
@@ -478,6 +484,60 @@ class BqDocumentController extends Controller
 
         if ((int) $bqDocument->project_id !== (int) $projectId || is_null($bqDocument->parent_id)) {
             abort(404);
+        }
+    }
+
+    protected function rebuildBomForDocument(BqDocument $bqDocument, BqItemCreator $bqItemCreator): void
+    {
+        $units = $this->normalizeUnits($bqDocument->units ?? 1);
+
+        $sections = $bqDocument->sections()
+            ->with(['item'])
+            ->get();
+
+        foreach ($sections as $section) {
+            // Skip if no item and no manual amount to re-derive
+            if ($section->item) {
+                $bqItemCreator->refresh(
+                    $section,
+                    $section->item,
+                    (float) ($section->quantity ?? 0),
+                    (int) ($bqDocument->project_id ?? project_id()),
+                    $units
+                );
+                continue;
+            }
+
+            // Manual sections: reapply percentage split with new units
+            $materialAmount = round(((float) ($section->amount ?? 0)) * 0.65, 2);
+            $labourAmount = round(((float) ($section->amount ?? 0)) * 0.19, 2);
+
+            BomItem::where('bq_section_id', $section->id)->delete();
+            BomLabour::where('bq_section_id', $section->id)->delete();
+
+            BomItem::create([
+                'section_id' => $section->section_id,
+                'item_id' => null,
+                'item_material_id' => null,
+                'product_id' => null,
+                'quantity' => $units,
+                'rate' => $materialAmount,
+                'amount' => $materialAmount * $units,
+                'project_id' => (int) ($bqDocument->project_id ?? project_id()),
+                'bq_section_id' => $section->id,
+                'bq_document_id' => $bqDocument->id,
+            ]);
+
+            BomLabour::create([
+                'section_id' => $section->section_id,
+                'item_id' => null,
+                'quantity' => $units,
+                'rate' => $labourAmount,
+                'amount' => $labourAmount * $units,
+                'project_id' => (int) ($bqDocument->project_id ?? project_id()),
+                'bq_section_id' => $section->id,
+                'bq_document_id' => $bqDocument->id,
+            ]);
         }
     }
 

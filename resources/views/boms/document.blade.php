@@ -29,7 +29,7 @@
                     <div class="card-body">
                         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                             <div>
-                                <h5 class="fw-bold mb-1">{{ $section->section_name ?? __('Unassigned Section') }}</h5>
+                                <h5 class="fw-bold mb-1 text-success">{{ $section->section_name ?? __('Unassigned Section') }}</h5>
                                 <p class="text-muted mb-0">{{ __('BoQ Items: :count', ['count' => $section->item_count ?? 0]) }}</p>
                             </div>
                             <div class="text-end mt-3 mt-md-0">

@@ -51,6 +51,7 @@
                                     <tr>
                                         <th>{{ __('Title') }}</th>
                                         <th class="text-center">{{ __('Items') }}</th>
+                                        <th class="text-center">{{ __('Units') }}</th>
                                         <th class="text-end">{{ __('Total Amount (KES)') }}</th>
                                         <th class="text-end">{{ __('Created') }}</th>
                                         <th></th>
@@ -61,7 +62,8 @@
                                         <tr>
                                             <td class="fw-semibold">{{ $document->title }}</td>
                                             <td class="text-center">{{ $document->unique_items_count ?? 0 }}</td>
-                                            <td class="text-end">{{ number_format($document->aggregated_amount ?? 0, 2) }}</td>
+                                            <td class="text-center">{{ number_format($document->units ?? 1) }}</td>
+                                            <td class="text-end">{{ number_format($document->aggregated_amount_with_units ?? 0, 2) }}</td>
                                             <td class="text-end">{{ $document->created_at->format('d M Y') }}</td>
                                             <td class="text-end">
                                                 <a href="{{ route('bq_documents.copy', $document) }}" class="btn btn-success btn-sm me-2" title="{{ __('Copy BoQ') }}">
@@ -97,13 +99,17 @@
                 <form method="POST" action="{{ route('bq_documents.store') }}">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createSubBoqModalLabel">{{ __('Create Sub BoQ') }}</h5>
+                        <h5 class="modal-title" id="createSubBoqModalLabel">{{ __('Create BoQ') }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label" for="create-sub-boq-title">{{ __('Title') }}</label>
                             <input type="text" class="form-control" id="create-sub-boq-title" name="title" required maxlength="255">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="create-sub-boq-units">{{ __('No. of Units') }}</label>
+                            <input type="number" class="form-control" id="create-sub-boq-units" name="units" min="1" step="1" value="{{ old('units', 1) }}">
                         </div>
                         <div class="mb-0">
                             <label class="form-label" for="create-sub-boq-description">{{ __('Description (optional)') }}</label>
@@ -134,6 +140,10 @@
                             <div class="mb-3">
                                 <label class="form-label" for="edit-sub-boq-title-{{ $document->id }}">{{ __('Title') }}</label>
                                 <input type="text" class="form-control" id="edit-sub-boq-title-{{ $document->id }}" name="title" value="{{ $document->title }}" required maxlength="255">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="edit-sub-boq-units-{{ $document->id }}">{{ __('No. of Units') }}</label>
+                                <input type="number" class="form-control" id="edit-sub-boq-units-{{ $document->id }}" name="units" min="1" step="1" value="{{ $document->units ?? 1 }}">
                             </div>
                             <div class="mb-0">
                                 <label class="form-label" for="edit-sub-boq-description-{{ $document->id }}">{{ __('Description (optional)') }}</label>

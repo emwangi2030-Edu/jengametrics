@@ -15,6 +15,11 @@ class BqDocument extends Model
         'user_id',
         'project_id',
         'parent_id',
+        'units',
+    ];
+
+    protected $casts = [
+        'units' => 'integer',
     ];
 
     public function sections()

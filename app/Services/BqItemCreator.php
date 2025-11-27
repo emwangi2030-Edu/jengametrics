@@ -27,7 +27,9 @@ class BqItemCreator
         int $projectId,
         ?float $amount = null
     ): BqSection {
-        return DB::transaction(function () use ($document, $section, $level, $element, $item, $quantity, $rate, $projectId, $amount) {
+        $units = $this->normalizeUnits($document->units ?? 1);
+
+        return DB::transaction(function () use ($document, $section, $level, $element, $item, $quantity, $rate, $projectId, $amount, $units) {
             $computedAmount = $amount ?? ($quantity * $rate);
 
             $bqSection = BqSection::create([
@@ -44,32 +46,35 @@ class BqItemCreator
                 'amount' => $computedAmount,
             ]);
 
-            $this->syncBom($bqSection, $item, $quantity, $projectId);
+            $this->syncBom($bqSection, $item, $quantity, $projectId, $units);
 
             return $bqSection;
         });
     }
 
-    public function refresh(BqSection $bqSection, Item $item, float $quantity, int $projectId): void
+    public function refresh(BqSection $bqSection, Item $item, float $quantity, int $projectId, ?int $units = null): void
     {
-        DB::transaction(function () use ($bqSection, $item, $quantity, $projectId) {
-            $this->syncBom($bqSection, $item, $quantity, $projectId);
+        $units = $this->normalizeUnits($units ?? optional($bqSection->bqDocument)->units ?? 1);
+
+        DB::transaction(function () use ($bqSection, $item, $quantity, $projectId, $units) {
+            $this->syncBom($bqSection, $item, $quantity, $projectId, $units);
         });
     }
 
-    protected function syncBom(BqSection $bqSection, Item $item, float $quantity, int $projectId): void
+    protected function syncBom(BqSection $bqSection, Item $item, float $quantity, int $projectId, int $units = 1): void
     {
         BomItem::where('bq_section_id', $bqSection->id)->delete();
         BomLabour::where('bq_section_id', $bqSection->id)->delete();
 
         $labourRate = (float) ($item->labour ?? 0);
+        $scaledQuantity = $quantity * $units;
 
         BomLabour::create([
             'section_id' => $bqSection->section_id,
             'item_id' => $bqSection->item_id,
-            'quantity' => $quantity,
+            'quantity' => $scaledQuantity,
             'rate' => $labourRate,
-            'amount' => $quantity * $labourRate,
+            'amount' => $scaledQuantity * $labourRate,
             'project_id' => $projectId,
             'bq_section_id' => $bqSection->id,
             'bq_document_id' => $bqSection->bq_document_id,
@@ -80,7 +85,7 @@ class BqItemCreator
         foreach ($materials as $material) {
             $product = Product::find($material->product_id);
             $conversionFactor = (float) ($material->conversion_factor ?? 0);
-            $materialQuantity = $quantity * $conversionFactor;
+            $materialQuantity = $scaledQuantity * $conversionFactor;
             $rate = $product?->rate ?? 0;
             $amount = $materialQuantity * $rate;
 
@@ -97,5 +102,10 @@ class BqItemCreator
                 'bq_document_id' => $bqSection->bq_document_id,
             ]);
         }
+    }
+
+    protected function normalizeUnits($units): int
+    {
+        return max(1, (int) $units);
     }
 }
