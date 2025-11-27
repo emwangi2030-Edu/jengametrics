@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\BqDocument;
 use App\Models\BqLevel;
+use App\Models\BqSection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\BomItem;
+use App\Models\BomLabour;
 
 class BqLevelController extends Controller
 {
@@ -31,6 +35,60 @@ class BqLevelController extends Controller
             ->with('success', __('Level created successfully.'));
     }
 
+    public function copy(BqDocument $bqDocument, BqLevel $bqLevel, Request $request)
+    {
+        $level = $this->ensureLevel($bqDocument, $bqLevel);
+
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $newLevel = null;
+
+        DB::transaction(function () use (&$newLevel, $bqDocument, $level, $data) {
+            $position = ($bqDocument->levels()->max('position') ?? 0) + 1;
+
+            $newLevel = BqLevel::create([
+                'bq_document_id' => $bqDocument->id,
+                'project_id' => $bqDocument->project_id,
+                'name' => $data['name'],
+                'description' => $data['description'] ?? null,
+                'position' => $position,
+            ]);
+
+            $sections = $level->sections()->with(['bomItems', 'bomLabours'])->get();
+
+            foreach ($sections as $section) {
+                $newSection = $section->replicate();
+                $newSection->bq_level_id = $newLevel->id;
+                $newSection->bq_document_id = $bqDocument->id;
+                $newSection->project_id = $bqDocument->project_id;
+                $newSection->save();
+
+                foreach ($section->bomItems as $bomItem) {
+                    $cloned = $bomItem->replicate();
+                    $cloned->bq_section_id = $newSection->id;
+                    $cloned->bq_document_id = $bqDocument->id;
+                    $cloned->project_id = $bqDocument->project_id;
+                    $cloned->save();
+                }
+
+                foreach ($section->bomLabours as $bomLabour) {
+                    $cloned = $bomLabour->replicate();
+                    $cloned->bq_section_id = $newSection->id;
+                    $cloned->bq_document_id = $bqDocument->id;
+                    $cloned->project_id = $bqDocument->project_id;
+                    $cloned->save();
+                }
+            }
+        });
+
+        return redirect()
+            ->route('bq_documents.show', $bqDocument)
+            ->with('success', __('Level copied successfully.'));
+    }
+
     public function update(BqDocument $bqDocument, BqLevel $bqLevel, Request $request)
     {
         $level = $this->ensureLevel($bqDocument, $bqLevel);
@@ -51,13 +109,17 @@ class BqLevelController extends Controller
     {
         $level = $this->ensureLevel($bqDocument, $bqLevel);
 
-        if ($level->sections()->exists()) {
-            return redirect()
-                ->route('bq_documents.show', $bqDocument)
-                ->with('error', __('Cannot delete a level that still has items.'));
-        }
+        DB::transaction(function () use ($level) {
+            $sectionIds = $level->sections()->pluck('id');
 
-        $level->delete();
+            if ($sectionIds->isNotEmpty()) {
+                BomItem::whereIn('bq_section_id', $sectionIds)->delete();
+                BomLabour::whereIn('bq_section_id', $sectionIds)->delete();
+                BqSection::whereIn('id', $sectionIds)->delete();
+            }
+
+            $level->delete();
+        });
 
         return redirect()
             ->route('bq_documents.show', $bqDocument)

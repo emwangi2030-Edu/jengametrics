@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
 // BoQ Level routes
 Route::post('bq_documents/{bqDocument}/levels', [BqLevelController::class, 'store'])->name('bq_levels.store');
 Route::put('bq_documents/{bqDocument}/levels/{bqLevel}', [BqLevelController::class, 'update'])->name('bq_levels.update');
+Route::post('bq_documents/{bqDocument}/levels/{bqLevel}/copy', [BqLevelController::class, 'copy'])->name('bq_levels.copy');
 Route::delete('bq_documents/{bqDocument}/levels/{bqLevel}', [BqLevelController::class, 'destroy'])->name('bq_levels.destroy');
 
 // BoQ Sections Routes (scoped to BoQ documents & levels)

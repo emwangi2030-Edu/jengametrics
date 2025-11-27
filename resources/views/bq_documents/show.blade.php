@@ -83,6 +83,13 @@
                                             </a>
                                             <button
                                                 type="button"
+                                                class="btn btn-outline-success btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#copyLevelModal{{ $level->id }}">
+                                                {{ __('+') }}
+                                            </button>
+                                            <button
+                                                type="button"
                                                 class="btn btn-outline-secondary btn-sm"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#editLevelModal{{ $level->id }}">
@@ -135,6 +142,44 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
                             <button type="submit" class="btn btn-primary">{{ __('Save Changes') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="copyLevelModal{{ $level->id }}" tabindex="-1" aria-labelledby="copyLevelModalLabel{{ $level->id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="{{ route('bq_levels.copy', [$bqDocument, $level]) }}">
+                        @csrf
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="copyLevelModalLabel{{ $level->id }}">{{ __('Copy Level') }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label" for="copy-level-name-{{ $level->id }}">{{ __('Level Name') }}</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="copy-level-name-{{ $level->id }}"
+                                    name="name"
+                                    value="{{ trim($level->name . ' Copy') }}"
+                                    required
+                                    maxlength="255">
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label" for="copy-level-description-{{ $level->id }}">{{ __('Description (optional)') }}</label>
+                                <textarea
+                                    class="form-control"
+                                    id="copy-level-description-{{ $level->id }}"
+                                    name="description"
+                                    rows="3">{{ $level->description }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                            <button type="submit" class="btn btn-primary">{{ __('Copy Level') }}</button>
                         </div>
                     </form>
                 </div>
