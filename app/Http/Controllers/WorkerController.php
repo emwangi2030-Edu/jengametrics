@@ -33,6 +33,7 @@ class WorkerController extends Controller
         $workers = Worker::withTrashed()
             ->withCount('attendances')
             ->where('project_id', $projectId)
+            ->where('terminated', false)
             ->get()
             ->map(function (Worker $worker) {
                 $worker->amount_owed = $this->calculateAmountOwed($worker);
@@ -47,7 +48,7 @@ class WorkerController extends Controller
 
     public function show(Request $request, $id)
     {
-        $worker = Worker::findOrFail($id);
+        $worker = Worker::withTrashed()->findOrFail($id);
 
         // Selected or current month/year
         $month = $request->input('month', now()->month);
@@ -206,12 +207,23 @@ class WorkerController extends Controller
 
     public function destroy($id)
     {
-        $worker = Worker::findOrFail($id);
-        $worker->delete();
+        $worker = Worker::withTrashed()->findOrFail($id);
+
+        if (! $worker->trashed()) {
+            $worker->delete();
+
+            return redirect()
+                ->route('workers.index')
+                ->with('success', 'Worker archived. Attendance and payment records are retained.');
+        }
+
+        // Second delete: mark as terminated but keep for historical attendance display
+        $worker->terminated = true;
+        $worker->save();
 
         return redirect()
             ->route('workers.index')
-            ->with('success', 'Worker archived. Attendance and payment records are retained.');
+            ->with('success', 'Worker removed after clearing debts. Attendance history retained as terminated.');
     }
 
     public function update(Request $request, $id)

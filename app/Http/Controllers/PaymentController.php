@@ -10,7 +10,7 @@ class PaymentController extends Controller
 {
     public function index($workerId)
     {
-        $worker = Worker::findOrFail($workerId);
+        $worker = Worker::withTrashed()->findOrFail($workerId);
 
         // Get all payments for this worker, most recent first
         $payments = $worker->payments()
@@ -20,8 +20,9 @@ class PaymentController extends Controller
         return view('payments.index', compact('worker', 'payments'));
     }
 
-    public function store(Request $request, Worker $worker)
+    public function store(Request $request, $workerId)
     {
+        $worker = Worker::withTrashed()->findOrFail($workerId);
         $projectId = Auth::user()->project_id;
         $amount = $request->input('amount');
 

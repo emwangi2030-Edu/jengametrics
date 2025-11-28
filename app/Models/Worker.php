@@ -24,7 +24,12 @@ class Worker extends Model
         'bank_name', 
         'bank_account',
         'details', 
-        'project_id'
+        'project_id',
+        'terminated',
+    ];
+
+    protected $casts = [
+        'terminated' => 'boolean',
     ];
 
     // Define the relationship to Project

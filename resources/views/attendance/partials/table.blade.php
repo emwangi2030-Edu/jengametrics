@@ -16,7 +16,12 @@
             @forelse($workers as $worker)
             <tr>
                 <td>{{ $loop->iteration }}</td>
-                <td>{{ $worker->full_name }}</td>
+                <td>
+                    {{ $worker->full_name }}
+                    @if($worker->trashed() || ($worker->terminated ?? false))
+                        <span class="badge bg-secondary ms-1">{{ __('Terminated') }}</span>
+                    @endif
+                </td>
                 <td>{{ $worker->job_category }}</td>
                 <td>{{ $worker->work_type }}</td>
                 <td>{{ $worker->payment_frequency }}</td>

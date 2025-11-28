@@ -41,6 +41,7 @@
                                 @foreach($workers as $worker)
                                     @php
                                         $nameClasses = ($worker->trashed() && $worker->amount_owed > 0) ? 'text-muted' : '';
+                                        $isArchived = $worker->trashed();
                                     @endphp
                                     <tr>
                                         <td>{{ $loop->iteration }}. </td>
@@ -48,7 +49,7 @@
                                             <a href="{{ route('workers.show', $worker->id) }}" class="text-decoration-none {{ $nameClasses }}">
                                                 {{ $worker->full_name }}
                                             </a>
-                                            @if($worker->trashed())
+                                            @if($isArchived)
                                                 <span class="badge bg-secondary ms-1">{{ __('Archived') }}</span>
                                                 @if($worker->amount_owed > 0)
                                                     <span class="badge bg-warning text-dark ms-1">{{ __('Owed') }}: {{ number_format($worker->amount_owed, 2) }}</span>
@@ -65,11 +66,11 @@
                                             <a href="{{ route('workers.edit', $worker->id) }}" class="btn btn-warning btn-sm">
                                                 Edit
                                             </a>
-                                            <form action="{{ route('workers.destroy', $worker->id) }}" method="POST" onsubmit="return confirm('{{ __('Archive this worker? Attendance and payments will be kept.') }}')">
+                                            <form action="{{ route('workers.destroy', $worker->id) }}" method="POST" onsubmit="return confirm('{{ $isArchived ? __('All outstanding debts have been cleared. Remove this worker? Attendance history will remain marked as terminated.') : __('Archive this worker? Attendance and payments will be kept.') }}')">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger btn-sm">
-                                                    {{ __('Delete') }}
+                                                    {{ $isArchived ? __('Remove') : __('Delete') }}
                                                 </button>
                                             </form>
                                         </td>

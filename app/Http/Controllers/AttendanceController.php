@@ -16,7 +16,8 @@ class AttendanceController extends Controller
         $dateInput = $request->input('date') ?? $request->input('selected_date') ?? now()->toDateString();
         $selectedDate = Carbon::parse($dateInput)->endOfDay();
 
-        $workers = Worker::where('project_id', $projectId)
+        $workers = Worker::withTrashed()
+            ->where('project_id', $projectId)
             ->where('created_at', '<=', $selectedDate)
             ->orderBy('full_name')
             ->get();
@@ -66,7 +67,8 @@ class AttendanceController extends Controller
         $dateInput = $request->input('date') ?? now()->toDateString();
         $selectedDate = Carbon::parse($dateInput)->endOfDay();
 
-        $workers = Worker::where('project_id', $projectId)
+        $workers = Worker::withTrashed()
+            ->where('project_id', $projectId)
             ->where('created_at', '<=', $selectedDate)
             ->orderBy('full_name')
             ->get();
