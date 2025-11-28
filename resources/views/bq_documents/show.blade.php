@@ -66,7 +66,11 @@
                             <div class="card-body">
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                                     <div>
-                                        <h5 class="fw-bold mb-1">{{ $level->name }}</h5>
+                                        <h5 class="fw-bold mb-1">
+                                            <a href="{{ route('bq_levels.show', [$bqDocument, $level]) }}" class="text-decoration-none">
+                                                {{ $level->name }}
+                                            </a>
+                                        </h5>
                                         @if($level->description)
                                             <p class="text-muted mb-0">{{ $level->description }}</p>
                                         @endif
@@ -75,9 +79,6 @@
                                         <p class="fw-bold fs-5 mb-1">KES {{ number_format($levelData['total'], 2) }}</p>
                                         <p class="text-muted small mb-2">{{ trans_choice(':count item|:count items', $levelData['items_count'], ['count' => $levelData['items_count']]) }}</p>
                                         <div class="col-12 d-flex flex-column flex-lg-row align-items-start gap-2 justify-content-end">
-                                            <a href="{{ route('bq_levels.show', [$bqDocument, $level]) }}" class="btn btn-outline-primary btn-sm">
-                                                {{ __('Manage Items') }}
-                                            </a>
                                             <a href="{{ route('bq_levels.items.create', [$bqDocument, $level]) }}" class="btn btn-success btn-sm text-white">
                                                 {{ __('Add Item') }}
                                             </a>

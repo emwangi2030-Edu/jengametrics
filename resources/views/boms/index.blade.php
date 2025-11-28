@@ -34,15 +34,15 @@
                                 <tbody>
                                     @foreach($subDocuments as $document)
                                         <tr>
-                                            <td class="fw-semibold">{{ $document->title }}</td>
+                                            <td class="fw-semibold">
+                                                <a href="{{ route('boms.documents.show', $document) }}" class="text-decoration-none">
+                                                    {{ $document->title }}
+                                                </a>
+                                            </td>
                                            <td class="text-end">{{ number_format($document->materials_total, 2) }}</td>
                                            <td class="text-end">{{ number_format($document->labour_total, 2) }}</td>
                                            <td class="text-end">{{ number_format($document->combined_total, 2) }}</td>
-                                           <td class="text-end">
-                                                <a href="{{ route('boms.documents.show', $document) }}" class="btn btn-outline-primary btn-sm">
-                                                    {{ __('Open BoM') }}
-                                                </a>
-                                            </td>
+                                           <td class="text-end"></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -81,17 +81,17 @@
                                                     $total_section_labour = \App\Models\BomLabour::whereProjectId(project_id())
                                                         ->where('section_id', $section->id)
                                                         ->sum('amount');
-                                                @endphp
-                                                <tr>
-                                                    <td class="fw-semibold p-2">{{ $section->name }}</td>
-                                                    <td class="text-end fw-bold">{{ number_format($total_section_material, 2) }}</td>
-                                                    <td class="text-end fw-bold">{{ number_format($total_section_labour, 2) }}</td>
-                                                    <td class="text-end">
-                                                        <a href="{{ route('boms.show', $section->id) }}" class="btn btn-outline-primary btn-sm">
-                                                            {{ __('View Section') }}
-                                                        </a>
-                                                    </td>
-                                                </tr>
+                                            @endphp
+                                            <tr>
+                                                <td class="fw-semibold p-2">
+                                                    <a href="{{ route('boms.show', $section->id) }}" class="text-decoration-none">
+                                                        {{ $section->name }}
+                                                    </a>
+                                                </td>
+                                                <td class="text-end fw-bold">{{ number_format($total_section_material, 2) }}</td>
+                                                <td class="text-end fw-bold">{{ number_format($total_section_labour, 2) }}</td>
+                                                <td class="text-end"></td>
+                                            </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
@@ -133,4 +133,3 @@
     </div>
 </div>
 @endsection
-

@@ -450,21 +450,31 @@ class BqSectionController extends Controller
         return redirect()->route('bq_documents.show', $bqDocument);
     }
 
-    public function show(BqDocument $bqDocument, BqLevel $bqLevel)
+    public function show(BqDocument $bqDocument, BqLevel $bqLevel, Request $request)
     {
         $this->assertLevelAccess($bqLevel, $bqDocument);
 
-        $items = BqSection::where('bq_level_id', $bqLevel->id)
+        $sectionFilter = $request->input('section_id');
+
+        $itemsQuery = BqSection::where('bq_level_id', $bqLevel->id)
             ->where('bq_document_id', $bqDocument->id)
             ->whereProjectId(project_id())
             ->with('section')
-            ->orderByDesc('created_at')
-            ->get();
+            ->orderByDesc('created_at');
+
+        if ($sectionFilter) {
+            $itemsQuery->where('section_id', (int) $sectionFilter);
+        }
+
+        $items = $itemsQuery->get();
+        $sections = Section::orderBy('name')->get();
 
         return view('bq_sections.show', [
             'bqDocument' => $bqDocument,
             'bqLevel' => $bqLevel,
             'items' => $items,
+            'sections' => $sections,
+            'selectedSectionId' => $sectionFilter,
         ]);
     }
 

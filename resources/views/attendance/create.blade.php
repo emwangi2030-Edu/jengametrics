@@ -33,13 +33,15 @@
                 </div>
 
                 <br>
-                <div class="d-flex justify-content-between align-items-center gap-2">
+                <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
                     <div class="btn-group" role="group" aria-label="Quick actions">
                         <button type="button" id="markAllBtn" class="btn btn-outline-success btn-sm">Mark All Present</button>
                         <button type="button" id="clearAllBtn" class="btn btn-outline-secondary btn-sm">Clear All</button>
                     </div>
-                    <button type="submit" class="btn btn-primary">Save Attendance</button>
-                    <a href="{{ route('workers.index') }}" class="btn btn-secondary">Back</a>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Save Attendance</button>
+                        <a href="{{ route('workers.index') }}" class="btn btn-secondary">Back</a>
+                    </div>
                 </div>
             </form>
         </div>

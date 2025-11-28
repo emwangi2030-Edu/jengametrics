@@ -52,19 +52,23 @@
                                         <th>{{ __('Title') }}</th>
                                         <th class="text-center">{{ __('Items') }}</th>
                                         <th class="text-center">{{ __('Units') }}</th>
+                                        <th class="text-end">{{ __('Total per Unit (KES)') }}</th>
                                         <th class="text-end">{{ __('Total Amount (KES)') }}</th>
-                                        <th class="text-end">{{ __('Created') }}</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($subDocuments as $document)
                                         <tr>
-                                            <td class="fw-semibold">{{ $document->title }}</td>
+                                            <td class="fw-semibold">
+                                                <a href="{{ route('bq_documents.show', $document) }}" class="text-decoration-none">
+                                                    {{ $document->title }}
+                                                </a>
+                                            </td>
                                             <td class="text-center">{{ $document->unique_items_count ?? 0 }}</td>
                                             <td class="text-center">{{ number_format($document->units ?? 1) }}</td>
+                                            <td class="text-end">{{ number_format($document->aggregated_amount ?? 0, 2) }}</td>
                                             <td class="text-end">{{ number_format($document->aggregated_amount_with_units ?? 0, 2) }}</td>
-                                            <td class="text-end">{{ $document->created_at->format('d M Y') }}</td>
                                             <td class="text-end">
                                                 <a href="{{ route('bq_documents.copy', $document) }}" class="btn btn-success btn-sm me-2" title="{{ __('Copy BoQ') }}">
                                                     +
@@ -72,9 +76,6 @@
                                                 <button type="button" class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editSubBoqModal{{ $document->id }}">
                                                     {{ __('Edit') }}
                                                 </button>
-                                                <a href="{{ route('bq_documents.show', $document) }}" class="btn btn-primary btn-sm me-2">
-                                                    {{ __('View') }}
-                                                </a>
                                                 <form action="{{ route('bq_documents.destroy', $document) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('Are you sure you want to delete this BoQ?') }}');">
                                                     @csrf
                                                     @method('DELETE')
@@ -182,7 +183,14 @@
                                 <tbody>
                                     @foreach($libraries as $library)
                                         <tr>
-                                            <td class="fw-semibold">{{ $library->name }}</td>
+                                            <td class="fw-semibold">
+                                                <a href="#"
+                                                    class="text-decoration-none view-library-items"
+                                                    data-library-name="{{ $library->name }}"
+                                                    data-library-url="{{ route('libraries.items', $library) }}">
+                                                    {{ $library->name }}
+                                                </a>
+                                            </td>
                                             <td class="text-center">{{ $library->items_count }}</td>
                                             <td class="text-end">{{ $library->created_at->format('d M Y') }}</td>
                                             <td class="text-end">                                                                                                                             
@@ -194,12 +202,6 @@
                                                         data-library-update="{{ route('libraries.update', $library) }}">                                                                      
                                                         {{ __('Edit') }}                                                                                                                      
                                                     </button>                                                                                                                                 
-                                                    <button type="button"                                                                                                                     
-                                                        class="btn btn-outline-primary view-library-items"                                                                                    
-                                                        data-library-name="{{ $library->name }}"                                                                                              
-                                                        data-library-url="{{ route('libraries.items', $library) }}">                                                                          
-                                                        {{ __('View') }}                                                                                                                      
-                                                    </button>
                                                 </div>                                                                                                                                        
                                                 <form action="{{ route('libraries.destroy', $library) }}" method="POST" class="d-inline ms-2"                                                 
                                                     onsubmit="return confirm('{{ __('Delete this library? This action cannot be undone.') }}');">                                             

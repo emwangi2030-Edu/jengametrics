@@ -15,14 +15,16 @@
             @endphp
             @forelse ($labours as $item)
                 @php
-                    $totalQuantity += $item->quantity;
-                    $totalAmount += $item->amount;
+                    $qty = (float) ($item->quantity ?? 0);
+                    $amt = (float) ($item->amount ?? 0);
+                    $totalQuantity += $qty;
+                    $totalAmount += $amt;
                 @endphp
                 <tr>
-                    <td class="px-2">{{ $item->item->name }}</td>
-                    <td class="text-end">{{ $item->quantity }}</td>
-                    <td class="text-end">{{ number_format($item->rate, 2) }}</td>
-                    <td class="text-end">{{ number_format($item->amount, 2) }}</td>
+                    <td class="px-2">{{ optional($item->item)->name ?? __('Labour') }}</td>
+                    <td class="text-end">{{ $qty }}</td>
+                    <td class="text-end">{{ number_format((float) ($item->rate ?? 0), 2) }}</td>
+                    <td class="text-end">{{ number_format($amt, 2) }}</td>
                 </tr>
             @empty
                 <tr>

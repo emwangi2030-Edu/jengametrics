@@ -4,7 +4,7 @@
     <div class="container py-4">
         <div class="row mb-3 align-items-center">
             <div class="col">
-                <h2 class="fw-bold m-0" style="color:#027333">BoM Section: <span class="text-dark">{{ $bqSection->name }}</span></h2>
+                <h2 class="fw-bold m-0" style="color:#027333">BoM Section: <span class="text-dark">{{ $section_name ?? $bqSection->name ?? __('Section') }}</span></h2>
             </div>
             <div class="col-auto d-flex gap-2">
                 @if(isset($bqDocumentForSection) && $bqDocumentForSection && $bqSection->bq_level_id)

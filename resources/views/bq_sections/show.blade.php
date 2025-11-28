@@ -26,10 +26,30 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         <h3 class="text-lg font-weight-bold mb-3">{{ __('Items') }}</h3>
+                        <form method="GET" class="row g-3 align-items-end mb-3">
+                            <div class="col-md-6 col-lg-4">
+                                <label for="section-filter" class="form-label mb-1">{{ __('Section') }}</label>
+                                <select name="section_id" id="section-filter" class="form-select">
+                                    <option value="">{{ __('All Sections') }}</option>
+                                    @foreach($sections as $section)
+                                        <option value="{{ $section->id }}" @selected((string)$selectedSectionId === (string)$section->id)>
+                                            {{ $section->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 col-lg-4 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary mt-auto">{{ __('Filter') }}</button>
+                                <a href="{{ route('bq_levels.show', [$bqDocument, $bqLevel]) }}" class="btn btn-outline-secondary mt-auto">
+                                    {{ __('Reset') }}
+                                </a>
+                            </div>
+                        </form>
                         <div class="table-responsive">
                             <table class="table table-hover mt-2">
                                 <thead class="table-light">
                                     <tr>
+                                        <th scope="col">{{ __('Section') }}</th>
                                         <th scope="col">{{ __('Name') }}</th>
                                         <th scope="col">{{ __('Unit') }}</th>
                                         <th scope="col" class="text-end">{{ __('Quantity') }}</th>
@@ -49,6 +69,7 @@
                                             $totalAmount += (float) ($item->amount ?? 0);
                                         @endphp
                                         <tr>
+                                            <td>{{ optional($item->section)->name ?? __('Unassigned') }}</td>
                                             <td>{{ $item->item_name }}</td>
                                             <td>{{ $item->units }}</td>
                                             <td class="text-end">{{ number_format((float) $item->quantity, 2) }}</td>
@@ -70,16 +91,14 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center">{{ __('No items found.') }}</td>
+                                            <td colspan="7" class="text-center">{{ __('No items found.') }}</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                                 <tfoot>
                                     <tr class="bg-secondary bg-opacity-10 border-0 rounded">
                                         <th>{{ __('Total') }}</th>
-                                        <td></td>
-                                        <td class="fw-bold text-end">{{ number_format($totalQuantity, 2) }}</td>
-                                        <td></td>
+                                        <td colspan="4"></td>
                                         <td class="fw-bold text-end">{{ number_format($totalAmount, 2) }}</td>
                                         <td></td>
                                     </tr>

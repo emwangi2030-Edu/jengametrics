@@ -106,13 +106,17 @@ class BOMController extends Controller
     {
         $bqSection = Section::find($id);
 
+        if (! $bqSection) {
+            abort(404);
+        }
+
         $rawItems = BomItem::with(['product', 'item_material'])
             ->whereProjectId(project_id())
             ->where('section_id', $id)
             ->get();
 
         $items = collect();
-        $section_name = $bqSection?->name;
+        $section_name = $bqSection->name;
 
         $primaryBqSection = BqSection::where('section_id', $id)
             ->whereProjectId(project_id())
