@@ -18,7 +18,7 @@
                         <p class="fw-bold text-dark mb-0">{{ __('Total') }}: KES {{ number_format($subDocuments->sum(fn($doc) => $doc->combined_total), 2) }}</p>
                     </div>
                     @if($subDocuments->isEmpty())
-                        <p class="text-muted mb-0">{{ __('No sub BoQs available yet.') }}</p>
+                        <p class="text-muted mb-0">{{ __('No BoQs available yet.') }}</p>
                     @else
                         <div class="table-responsive">
                             <table class="table align-middle">

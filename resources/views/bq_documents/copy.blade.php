@@ -7,10 +7,10 @@
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
                     <div>
                         <h2 class="fw-bold text-primary mb-1">
-                            {{ __('Copy Sub BoQ') }}
+                            {{ __('Copy BoQ') }}
                         </h2>
                         <p class="text-muted mb-0">
-                            {{ __('Copy items from ":title" into a new sub BoQ.', ['title' => $sourceDocument->title]) }}
+                            {{ __('Copy items from ":title" into a new BoQ.', ['title' => $sourceDocument->title]) }}
                         </p>
                     </div>
                     <a href="{{ route('bq_documents.index') }}" class="btn btn-outline-secondary mt-3 mt-md-0">
@@ -59,7 +59,7 @@
                     <div class="card shadow-sm border-0 mb-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between flex-column flex-md-row align-items-md-center mb-3">
-                                <h5 class="fw-bold mb-2 mb-md-0">{{ __('Select Items to Copy') }}</h5>
+                            <h5 class="fw-bold mb-2 mb-md-0">{{ __('Select Items to Copy') }}</h5>
                                 <div class="text-muted">{{ __('Uncheck any items you do not want to include.') }}</div>
                             </div>
 
@@ -128,7 +128,7 @@
 
                     <div class="d-flex justify-content-end">
                         <button type="submit" class="btn btn-success">
-                            {{ __('Create Sub BoQ') }}
+                            {{ __('Create BoQ') }}
                         </button>
                     </div>
                 </form>

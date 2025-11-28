@@ -228,24 +228,27 @@ class BqDocumentController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'items' => 'required|array|min:1',
+            'items' => 'nullable|array',
             'items.*' => [
                 'integer',
                 Rule::exists('bq_sections', 'id')->where('bq_document_id', $bqDocument->id),
             ],
         ]);
 
-        $selectedItemIds = collect($validated['items'])->map(fn ($id) => (int) $id)->unique()->values();
+        $selectedItemIds = collect($validated['items'] ?? [])->map(fn ($id) => (int) $id)->unique()->values();
 
-        $sections = BqSection::query()
-            ->where('bq_document_id', $bqDocument->id)
-            ->whereIn('id', $selectedItemIds)
-            ->get();
+        $sections = collect();
+        if ($selectedItemIds->isNotEmpty()) {
+            $sections = BqSection::query()
+                ->where('bq_document_id', $bqDocument->id)
+                ->whereIn('id', $selectedItemIds)
+                ->get();
 
-        if ($sections->count() !== $selectedItemIds->count()) {
-            return back()
-                ->withInput()
-                ->withErrors(['items' => __('One or more selected items could not be found.')]);
+            if ($sections->count() !== $selectedItemIds->count()) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['items' => __('One or more selected items could not be found.')]);
+            }
         }
 
         $masterDocument = $this->ensureMasterDocument($project->id, $project->name);
@@ -397,7 +400,7 @@ class BqDocumentController extends Controller
 
         return redirect()
             ->route('bq_documents.index')
-            ->with('success', __('Sub BoQ deleted successfully.'));
+            ->with('success', __('BoQ deleted successfully.'));
     }
 
     public function edit(BqDocument $bqDocument)
@@ -434,7 +437,7 @@ class BqDocumentController extends Controller
 
         return redirect()
             ->route('bq_documents.index', $bqDocument)
-            ->with('success', __('Sub BoQ updated successfully.'));
+            ->with('success', __('BoQ updated successfully.'));
     }
 
     protected function normalizeNumeric(float $value)

@@ -93,7 +93,7 @@
                 </div>
             </div>
 
-    <!-- Create/Edit Sub BoQ Modals -->
+    <!-- Create/Edit BoQ Modals -->
     <div class="modal fade" id="createSubBoqModal" tabindex="-1" aria-labelledby="createSubBoqModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -134,7 +134,7 @@
                         @csrf
                         @method('PUT')
                         <div class="modal-header">
-                            <h5 class="modal-title" id="editSubBoqModalLabel{{ $document->id }}">{{ __('Edit Sub BoQ') }}</h5>
+                            <h5 class="modal-title" id="editSubBoqModalLabel{{ $document->id }}">{{ __('Edit BoQ') }}</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                         </div>
                         <div class="modal-body">

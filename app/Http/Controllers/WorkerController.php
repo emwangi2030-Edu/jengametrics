@@ -29,10 +29,15 @@ class WorkerController extends Controller
                 ->with('warning', 'Select or create a project before managing workers.');
         }
 
-        // Retrieve workers only for the user's current project
-        $workers = Worker::withCount('attendances')
+        // Retrieve workers (including archived) only for the user's current project
+        $workers = Worker::withTrashed()
+            ->withCount('attendances')
             ->where('project_id', $projectId)
-            ->get();
+            ->get()
+            ->map(function (Worker $worker) {
+                $worker->amount_owed = $this->calculateAmountOwed($worker);
+                return $worker;
+            });
 
         $project = Project::find($projectId);
 
@@ -199,6 +204,16 @@ class WorkerController extends Controller
         return view('workers.edit', compact('worker'));
     }
 
+    public function destroy($id)
+    {
+        $worker = Worker::findOrFail($id);
+        $worker->delete();
+
+        return redirect()
+            ->route('workers.index')
+            ->with('success', 'Worker archived. Attendance and payment records are retained.');
+    }
+
     public function update(Request $request, $id)
     {
         $worker = Worker::findOrFail($id);
@@ -323,5 +338,29 @@ class WorkerController extends Controller
             'statuses' => $statuses,
             'title' => "Attendance for " . Carbon::create()->month((int) $month)->format('F') . " $year"
         ]);
+    }
+
+    protected function calculateAmountOwed(Worker $worker): float
+    {
+        $paymentsTotal = (float) $worker->payments()->sum('amount');
+
+        $frequency = $worker->payment_frequency;
+        $rate = (float) ($worker->payment_amount ?? 0);
+        $earned = 0.0;
+
+        if ($frequency === 'per day') {
+            $daysPresent = $worker->attendances()->where('present', true)->count();
+            $earned = $daysPresent * $rate;
+        } elseif ($frequency === 'per month') {
+            $start = $worker->created_at ? $worker->created_at->copy()->startOfDay() : now()->startOfDay();
+            $today = now()->startOfDay();
+            $daysWorked = max(0, $start->diffInDays($today) + 1);
+            $months = $daysWorked / 30;
+            $earned = $months * $rate;
+        } elseif ($frequency === 'one-time payment') {
+            $earned = $rate;
+        }
+
+        return round(max(0.0, $earned - $paymentsTotal), 2);
     }
 }
