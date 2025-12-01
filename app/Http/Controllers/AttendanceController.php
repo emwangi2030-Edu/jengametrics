@@ -19,6 +19,11 @@ class AttendanceController extends Controller
         $workers = Worker::withTrashed()
             ->where('project_id', $projectId)
             ->where('created_at', '<=', $selectedDate)
+            ->where(function ($query) use ($selectedDate) {
+                $query->where('terminated', false)
+                    ->orWhereNull('terminated_at')
+                    ->orWhereDate('terminated_at', '>', $selectedDate->toDateString());
+            })
             ->orderBy('full_name')
             ->get();
 
@@ -70,6 +75,11 @@ class AttendanceController extends Controller
         $workers = Worker::withTrashed()
             ->where('project_id', $projectId)
             ->where('created_at', '<=', $selectedDate)
+            ->where(function ($query) use ($selectedDate) {
+                $query->where('terminated', false)
+                    ->orWhereNull('terminated_at')
+                    ->orWhereDate('terminated_at', '>', $selectedDate->toDateString());
+            })
             ->orderBy('full_name')
             ->get();
         $existingAttendances = Attendance::whereDate('date', $dateInput)->get()

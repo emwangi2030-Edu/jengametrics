@@ -13,7 +13,9 @@ class CostTrackingController extends Controller
     {
         $materials = Material::whereProjectId(project_id())->get();
 
-        $payments = Payment::whereProjectId(project_id())->get();
+        $payments = Payment::with('worker')
+            ->whereProjectId(project_id())
+            ->get();
 
         $totalCost = $materials->sum(function ($material) {
             return $material->unit_price * $material->quantity_purchased;
@@ -30,4 +32,3 @@ class CostTrackingController extends Controller
         return view('cost-tracking.index', compact('materials', 'totalCost','project','payments','totalPayments'));
     }
 }
-

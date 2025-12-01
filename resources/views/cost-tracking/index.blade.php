@@ -56,7 +56,13 @@
                     <tbody>
                         @foreach($payments as $payment)
                         <tr>
-                            <td>{{ $payment->worker->full_name }}</td>
+                            <td>
+                                @php $payee = $payment->worker; @endphp
+                                {{ $payee->full_name ?? __('Unknown Worker') }}
+                                @if($payee && $payee->trashed())
+                                    <span class="badge bg-secondary ms-1">{{ __('Terminated') }}</span>
+                                @endif
+                            </td>
                             <td>{{ \Carbon\Carbon::parse($payment->payment_date)->format('d M Y') }}</td>
                             <td>{{ number_format($payment->amount, 2) }}</td>
                         </tr>

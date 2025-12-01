@@ -219,6 +219,7 @@ class WorkerController extends Controller
 
         // Second delete: mark as terminated but keep for historical attendance display
         $worker->terminated = true;
+        $worker->terminated_at = now();
         $worker->save();
 
         return redirect()

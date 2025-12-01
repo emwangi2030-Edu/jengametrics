@@ -30,6 +30,7 @@ class Worker extends Model
 
     protected $casts = [
         'terminated' => 'boolean',
+        'terminated_at' => 'datetime',
     ];
 
     // Define the relationship to Project

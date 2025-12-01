@@ -18,8 +18,8 @@ class Payment extends Model
         'project_id',
     ];
 
-    public function worker()
-    {
-        return $this->belongsTo(Worker::class);
-    }
+    public function worker()                                                                                                                          
+    {                                                                                                                                                 
+        return $this->belongsTo(Worker::class)->withTrashed();                                                                                        
+    }   
 }
