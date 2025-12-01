@@ -22,67 +22,19 @@
         <div class="col-md-12">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table mt-3 text-center">
-                            <thead class="table-light">
-                                <tr>
-                                    <th></th>
-                                    <th>{{ __('Full Name') }}</th>
-                                    <th>{{ __('ID Number') }}</th>
-                                    <th>{{ __('Job Category') }}</th>
-                                    <th>{{ __('Work Type') }}</th>
-                                    <th>{{ __('Phone') }}</th>
-                                    <th>{{ __('Email') }}</th>
-                                    <th>{{ __('Attended Days') }}</th>
-                                    <th>{{ __('Actions') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($workers as $worker)
-                                    @php
-                                        $nameClasses = ($worker->trashed() && $worker->amount_owed > 0) ? 'text-muted' : '';
-                                        $isArchived = $worker->trashed();
-                                    @endphp
-                                    <tr>
-                                        <td>{{ $loop->iteration }}. </td>
-                                        <td class="{{ $nameClasses }}">
-                                            <a href="{{ route('workers.show', $worker->id) }}" class="text-decoration-none {{ $nameClasses }}">
-                                                {{ $worker->full_name }}
-                                            </a>
-                                            @if($isArchived)
-                                                <span class="badge bg-secondary ms-1">{{ __('Archived') }}</span>
-                                                @if($worker->amount_owed > 0)
-                                                    <span class="badge bg-warning text-dark ms-1">{{ __('Owed') }}: {{ number_format($worker->amount_owed, 2) }}</span>
-                                                @endif
-                                            @endif
-                                        </td>
-                                        <td>{{ $worker->id_number }}</td>
-                                        <td>{{ $worker->job_category }}</td>
-                                        <td>{{ $worker->work_type }}</td>
-                                        <td>{{ $worker->phone }}</td>
-                                        <td>{{ $worker->email ?? 'N/A' }}</td>
-                                        <td>{{ $worker->attendances_count }}</td>
-                                        <td class="d-flex gap-1">
-                                            <a href="{{ route('workers.edit', $worker->id) }}" class="btn btn-warning btn-sm">
-                                                Edit
-                                            </a>
-                                            <form action="{{ route('workers.destroy', $worker->id) }}" method="POST" onsubmit="return confirm('{{ $isArchived ? __('All outstanding debts have been cleared. Remove this worker? Attendance history will remain marked as terminated.') : __('Archive this worker? Attendance and payments will be kept.') }}')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    {{ $isArchived ? __('Remove') : __('Delete') }}
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    <form method="GET" class="row g-3 align-items-end mb-3" id="statusFilterForm">
+                        <div class="col-md-4 col-lg-3">
+                            <label for="status-filter" class="form-label mb-1">{{ __('Status') }}</label>
+                            <select id="status-filter" name="status" class="form-select">
+                                <option value="active" @selected(($status ?? '') === 'active')>{{ __('Active') }}</option>
+                                <option value="terminated" @selected(($status ?? '') === 'terminated')>{{ __('Terminated') }}</option>
+                                <option value="all" @selected(($status ?? '') === 'all')>{{ __('All') }}</option>
+                            </select>
+                        </div>
+                    </form>
+                    <div id="workers-table-wrapper">
+                        @include('workers.partials.table', ['workers' => $workers])
                     </div>
-
-                    @if($workers->isEmpty())
-                        <p class="text-center mt-4 text-muted">{{ __('No workers found.') }}</p>
-                    @endif
                 </div>
             </div>
         </div>
@@ -99,6 +51,30 @@
                 alertBox.classList.remove('show');
                 alertBox.classList.add('fade');
             }, 4000);
+        }
+
+        const statusSelect = document.getElementById('status-filter');
+        const filterForm = document.getElementById('statusFilterForm');
+        if (statusSelect && filterForm) {
+            statusSelect.addEventListener('change', () => {
+                const wrapper = document.getElementById('workers-table-wrapper');
+                if (!wrapper) {
+                    filterForm.submit();
+                    return;
+                }
+                const params = new URLSearchParams(new FormData(filterForm));
+                fetch(`{{ route('workers.index') }}?${params.toString()}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    cache: 'no-store'
+                })
+                    .then(res => res.text())
+                    .then(html => {
+                        wrapper.innerHTML = html;
+                    })
+                    .catch(() => filterForm.submit());
+            });
         }
     });
 </script>

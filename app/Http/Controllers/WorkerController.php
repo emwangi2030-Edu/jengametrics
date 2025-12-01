@@ -29,11 +29,21 @@ class WorkerController extends Controller
                 ->with('warning', 'Select or create a project before managing workers.');
         }
 
-        // Retrieve workers (including archived) only for the user's current project
-        $workers = Worker::withTrashed()
+        $status = request('status', 'active');
+
+        $workersQuery = Worker::withTrashed()
             ->withCount('attendances')
-            ->where('project_id', $projectId)
-            ->where('terminated', false)
+            ->where('project_id', $projectId);
+
+        if ($status === 'active') {
+            $workersQuery->where('terminated', false)->whereNull('deleted_at');
+        } elseif ($status === 'terminated') {
+            $workersQuery->where(function ($query) {
+                $query->where('terminated', true)->orWhereNotNull('deleted_at');
+            });
+        } // 'all' returns all (including deleted)
+
+        $workers = $workersQuery
             ->get()
             ->map(function (Worker $worker) {
                 $worker->amount_owed = $this->calculateAmountOwed($worker);
@@ -42,7 +52,11 @@ class WorkerController extends Controller
 
         $project = Project::find($projectId);
 
-        return view('workers.index', compact('workers', 'project'));
+        if (request()->ajax()) {
+            return view('workers.partials.table', ['workers' => $workers]);
+        }
+
+        return view('workers.index', compact('workers', 'project', 'status'));
     }
 
 
@@ -129,13 +143,16 @@ class WorkerController extends Controller
             // fallback to previous amountOwed if anything goes wrong
         }
 
+        $lastPayment = $worker->payments()->orderByDesc('payment_date')->first();
+
         return view('workers.show', compact(
             'worker',
             'month',
             'year',
             'availableMonths',
             'availableYears',
-            'amountOwed'
+            'amountOwed',
+            'lastPayment'
         ));
     }
 
@@ -279,7 +296,7 @@ class WorkerController extends Controller
 
     public function attendanceData(Request $request, $id)
     {
-        $worker = Worker::findOrFail($id);
+        $worker = Worker::withTrashed()->findOrFail($id);
 
         $month = $request->input('month', now()->month);
         $year = $request->input('year', now()->year);
@@ -300,12 +317,14 @@ class WorkerController extends Controller
         $daysInMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
         $today = Carbon::today();
         $workerCreatedAt = $worker->created_at->startOfDay();
+        $terminationDate = $worker->terminated_at ? $worker->terminated_at->startOfDay() : null;
 
         $colors = [
             'present' => ['bg' => 'rgba(40, 167, 69, 0.6)', 'border' => 'rgba(40, 167, 69, 1)'],
             'absent' => ['bg' => 'rgba(220, 53, 69, 0.6)', 'border' => 'rgba(220, 53, 69, 1)'],
             'weekend' => ['bg' => 'rgba(173, 216, 230, 0.8)', 'border' => 'rgba(100, 149, 237, 0.9)'],
             'inactive' => ['bg' => 'rgba(200, 200, 200, 0.5)', 'border' => 'rgba(200, 200, 200, 0.8)'],
+            'termination' => ['bg' => 'rgba(255, 193, 7, 0.7)', 'border' => 'rgba(255, 193, 7, 1)'],
         ];
 
         for ($day = 1; $day <= $daysInMonth; $day++) {
@@ -313,6 +332,13 @@ class WorkerController extends Controller
             $formattedDate = $date->format('d-m-Y');
             $labels[] = $date->format('M d');
             $values[] = 1;
+
+            if ($terminationDate && $date->equalTo($terminationDate)) {
+                $backgroundColors[] = $colors['termination']['bg'];
+                $borderColors[] = $colors['termination']['border'];
+                $statuses[] = 'Termination';
+                continue;
+            }
 
             if ($date->lt($workerCreatedAt) || $date->gt($today)) {
                 $backgroundColors[] = $colors['inactive']['bg'];

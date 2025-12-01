@@ -31,18 +31,32 @@
                         <p><strong>Phone:</strong> {{ $worker->phone }}</p>
                         <p><strong>Email:</strong> {{ $worker->email ?? 'N/A' }}</p>
                         <p><strong>Start Date:</strong> {{ $worker->created_at->format('d F, Y') }}</p>
-                        <p><strong>Payment Rate:</strong> {{ $worker->payment_amount }}</p>
-                        <p><strong>Payment Frequency:</strong> {{ $worker->payment_frequency }}</p>
+                        <p><strong>Status:</strong>
+                            @if($worker->terminated || $worker->trashed())
+                                <span class="badge bg-secondary">{{ __('Terminated') }}</span>
+                            @else
+                                <span class="badge bg-success">{{ __('Active') }}</span>
+                            @endif
+                        </p>
+                        <p><strong>Remuneration:</strong> {{ $worker->payment_amount }}</p>
+                        <p><strong>Rate:</strong> {{ $worker->payment_frequency }}</p>
                         <p><strong>Mode of Payment:</strong> {{ $worker->mode_of_payment }}</p>
                         @if ($worker->mode_of_payment == 'Bank')
                             <p><strong>Bank Name:</strong> {{ $worker->bank_name }}</p>
                             <p><strong>Bank Account:</strong> {{ $worker->bank_account }}</p>
                         @endif
+                        <p><strong>Last Paid:</strong>
+                            @if($lastPayment)
+                                {{ \Carbon\Carbon::parse($lastPayment->payment_date)->format('d M Y') }}
+                            @else
+                                {{ __('Never') }}
+                            @endif
+                        </p>
                         <p><strong>Amount Owed:</strong> {{ number_format($amountOwed, 2) }}</p>
                         <a href="{{ route('payments.index', $worker->id) }}" class="btn btn-primary mb-3">
                             View Payment History
                         </a>
-                        <form action="{{ route('payments.store', $worker->id) }}" method="POST">
+                        <form id="recordPaymentForm" action="{{ route('payments.store', $worker->id) }}" method="POST">
                             @csrf
                             <input type="hidden" name="amount" value="{{ $amountOwed }}">
                             <button type="submit" class="btn btn-success"
@@ -122,6 +136,7 @@
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     const ctx = document.getElementById('attendanceChart').getContext('2d');
     const attendanceDataUrl = `/workers/{{ $worker->id }}/attendance-data`;
@@ -173,14 +188,13 @@
             }
         }
     });
-    // Override tooltip labels to avoid encoding glitches
+    // Override tooltip labels to use statuses (includes termination)
     if (attendanceChart && attendanceChart.options && attendanceChart.options.plugins && attendanceChart.options.plugins.tooltip) {
         attendanceChart.options.plugins.tooltip.callbacks = {
             label: function(context) {
-                if (context.dataset.label === 'Present') return 'Present';
-                if (context.dataset.label === 'Absent') return 'Absent';
-                if (context.dataset.label === 'Inactive') return 'Inactive';
-                return '';
+                const statuses = context.dataset.customStatuses || [];
+                const status = statuses[context.dataIndex];
+                return status || '';
             }
         };
     }
@@ -245,6 +259,26 @@
         link.download = 'attendance_chart_{{ $worker->full_name }}.png';
         link.href = document.getElementById('attendanceChart').toDataURL('image/png');
         link.click();
+    }
+
+    const paymentForm = document.getElementById('recordPaymentForm');
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            Swal.fire({
+                title: '{{ __('Record payment?') }}',
+                text: '{{ __('This will log the payment for this worker.') }}',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#027333',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '{{ __('Yes, record it') }}'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    paymentForm.submit();
+                }
+            });
+        });
     }
 </script>
 @endsection
