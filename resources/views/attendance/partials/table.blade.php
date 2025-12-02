@@ -8,7 +8,7 @@
                 <th>Full Name</th>
                 <th>Job Category</th>
                 <th>Work Type</th>
-                <th>Payment Frequency</th>
+                <th>Payment Rate</th>
                 <th>Present?</th>
             </tr>
         </thead>
