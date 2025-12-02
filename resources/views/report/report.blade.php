@@ -4,10 +4,13 @@
 <div class="container py-4">
     <!-- Header -->
     <div class="row mb-4">
-        <div class="col-12">
-            <h2 class="font-weight-bold" style="color:#027333">
+        <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+            <h2 class="font-weight-bold mb-2 mb-md-0" style="color:#027333">
                 Total Costs: <span class="text-black">{{ $project->name }}</span>
             </h2>
+            <a href="{{ route('reports.wages') }}" class="btn btn-outline-primary btn-sm">
+                {{ __('Wages Report') }}
+            </a>
         </div>
     </div>
 

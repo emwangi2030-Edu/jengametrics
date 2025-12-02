@@ -21,5 +21,11 @@ class Payment extends Model
     public function worker()                                                                                                                          
     {                                                                                                                                                 
         return $this->belongsTo(Worker::class)->withTrashed();                                                                                        
-    }   
+    }
+
+    protected $casts = [
+        'payment_date' => 'datetime',
+        'period_start' => 'date',
+        'period_end' => 'date',
+    ];
 }

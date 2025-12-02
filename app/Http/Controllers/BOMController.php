@@ -197,7 +197,6 @@ class BOMController extends Controller
 
     public function report()
     {
-
         // Calculate the total estimated cost across all sections
        $totalEstimatedCost = BomItem::whereProjectId(project_id())
             ->selectRaw('SUM(quantity * rate) as total')
@@ -207,7 +206,10 @@ class BOMController extends Controller
 
         $materials = Material::whereProjectId(project_id())->get();
 
-        $payments = Payment::whereProjectId(project_id())->get();
+        $payments = Payment::with(['worker' => fn ($q) => $q->withTrashed()])
+            ->whereProjectId(project_id())
+            ->orderByDesc('payment_date')
+            ->get();
 
         // Calculate total cost of all materials and labour
         $total_actual_cost = $materials->sum(function ($material) {
@@ -221,7 +223,14 @@ class BOMController extends Controller
 
         $project = Project::find($projectId);
 
-        return view('report.report', compact('totalEstimatedCost', 'totalEstimatedCost_labour', 'total_actual_cost', 'total_actual_payments','project'));
+        return view('report.report', compact(
+            'totalEstimatedCost',
+            'totalEstimatedCost_labour',
+            'total_actual_cost',
+            'total_actual_payments',
+            'project',
+            'payments'
+        ));
     }
 
     protected function transformDocumentForBom(BqDocument $document, $labourTotalsByDocument)

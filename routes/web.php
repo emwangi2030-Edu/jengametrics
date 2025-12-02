@@ -139,6 +139,7 @@ Route::patch('/requisitions/{requisition}/toggle-status', [RequisitionController
 Route::post('/requisitions/store-adhoc', [RequisitionController::class, 'storeAdhoc'])->name('requisitions.storeAdhoc');
 
 Route::get('reports', [BOMController::class, 'report'])->name('reports');
+Route::get('reports/wages', \App\Http\Controllers\WagesReportController::class)->name('reports.wages');
 
 Route::resource('projects', ProjectController::class);
 
