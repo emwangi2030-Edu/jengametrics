@@ -11,6 +11,7 @@ use App\Models\Project;
 use App\Models\Requisition;
 use App\Models\StockUsage;
 use App\Models\Section;
+use App\Models\BqDocument;
 use App\Models\Product;
 use App\Models\UnitOfMeasurement;
 use Illuminate\Support\Facades\Storage;
@@ -71,7 +72,9 @@ class MaterialController extends Controller
         $stockUsageQuery->whereYear('created_at', $year);
         $stockUsages = $stockUsageQuery->orderBy('created_at', 'desc')->get();
 
-        $rawItems = BomItem::whereProjectId($projectId)->get();
+        $rawItems = BomItem::whereProjectId($projectId)
+            ->with(['item_material', 'bqDocument'])
+            ->get();
         $groupedItems = $rawItems->groupBy('product_id');
 
         $requisitionableItems = collect();
@@ -144,29 +147,34 @@ class MaterialController extends Controller
 
         $project = Project::find($projectId);
 
-        $bomItems = BomItem::select(
-                'product_id',
-                DB::raw('SUM(quantity) as total_quantity')
-            )
-            ->where('project_id', $projectId)
-            ->whereNotNull('product_id')
-            ->groupBy('product_id')
-            ->with('product:id,name,unit')
-            ->get();
+        $rawItems = BomItem::whereProjectId($projectId)->get();
+        $groupedItems = $rawItems->groupBy('product_id');
 
+        $requisitionableItems = collect();
 
-        foreach ($bomItems as $item) {
-            $approvedQty = Requisition::whereIn('status', ['approved', 'pending'])
-                ->whereHas('bomItem', function ($query) use ($projectId, $item) {
-                    $query->where('product_id', $item->product_id)
-                        ->where('project_id', $projectId);
-                })
+        $products = Product::query()->whereIn('id', $groupedItems->keys()->toArray())->pluck('unit', 'id');
+        $documentMap = BqDocument::whereIn('id', $rawItems->pluck('bq_document_id')->filter()->unique())->get()->keyBy('id');
+
+        foreach ($groupedItems as $product_id => $group) {
+            $sampleItem = $group->first();
+            $totalQty = $group->sum('quantity');
+            $sampleItem->unit = $products[$product_id] ?? 'unit';
+            $sampleItem->total_quantity = $totalQty;
+
+            $documentId = $group->pluck('bq_document_id')->filter()->first();
+            $sampleItem->bq_document = $documentId ? $documentMap->get($documentId) : null;
+
+            $requisitionedQty = Requisition::whereIn('bom_item_id', $group->pluck('id'))
+                ->whereIn('status', ['pending', 'approved'])
                 ->sum('quantity_requested');
 
-            $item->remaining_quantity = $item->total_quantity - $approvedQty;
-        }
+            $remaining = max(0, $totalQty - $requisitionedQty);
+            $sampleItem->remaining_quantity = $remaining;
 
-        $requisitionableItems = $bomItems->filter(fn($item) => $item->remaining_quantity > 0);
+            if ($remaining >= 1) {
+                $requisitionableItems->push(clone $sampleItem);
+            }
+        }
 
         $sections = Section::all();
         $suppliers = Supplier::orderBy('name')->get();

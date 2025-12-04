@@ -140,6 +140,7 @@ Route::post('/requisitions/store-adhoc', [RequisitionController::class, 'storeAd
 
 Route::get('reports', [BOMController::class, 'report'])->name('reports');
 Route::get('reports/wages', \App\Http\Controllers\WagesReportController::class)->name('reports.wages');
+Route::get('reports/purchases', \App\Http\Controllers\PurchasesReportController::class)->name('reports.purchases');
 
 Route::resource('projects', ProjectController::class);
 

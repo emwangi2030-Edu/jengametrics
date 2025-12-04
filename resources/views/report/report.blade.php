@@ -8,9 +8,14 @@
             <h2 class="font-weight-bold mb-2 mb-md-0" style="color:#027333">
                 Total Costs: <span class="text-black">{{ $project->name }}</span>
             </h2>
-            <a href="{{ route('reports.wages') }}" class="btn btn-outline-primary btn-sm">
-                {{ __('Wages Report') }}
-            </a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('reports.purchases') }}" class="btn btn-outline-primary btn-sm">
+                    {{ __('Purchases Report') }}
+                </a>
+                <a href="{{ route('reports.wages') }}" class="btn btn-outline-primary btn-sm">
+                    {{ __('Wages Report') }}
+                </a>
+            </div>
         </div>
     </div>
 

@@ -15,9 +15,6 @@
             <a href="{{ route('materials.create') }}" class="btn btn-success me-2">
                 {{ __('Receive Approved Materials') }}
             </a>
-            <!-- <a href="{{ route('suppliers.index') }}" class="btn btn-warning">
-                {{ __('Suppliers List') }}
-            </a> -->
         </div>
     </div>
 </div>

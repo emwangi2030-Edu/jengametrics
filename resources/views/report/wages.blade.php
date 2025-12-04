@@ -7,7 +7,7 @@
             <h2 class="font-weight-bold mb-1" style="color:#027333">
                 {{ __('Wages Report') }}
             </h2>
-            <p class="text-muted mb-0">{{ __('Payments recorded for this project.') }}</p>
+            <p class="text-muted mb-0">{{ __('Wages recorded for this project.') }}</p>
         </div>
         <div class="mt-3 mt-md-0 d-flex gap-2">
             <a href="{{ route('reports.wages', ['download' => 1]) }}" class="btn btn-outline-primary btn-sm">

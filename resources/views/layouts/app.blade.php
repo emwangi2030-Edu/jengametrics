@@ -43,6 +43,7 @@
     <link href="{{ asset('assets/metrics/assets/css/user.min.css') }}" type="text/css" rel="stylesheet"
     id="user-style-default">
     <link href="{{ asset('assets/metrics/vendors/prism/prism-okaidia.css') }}" rel="stylesheet">
+    <script src="https://cdn.skypack.dev/@hotwired/turbo@7.3.0"></script>
 
     <!-- ===============================================-->
     <!--    Additional Scripts and Styles-->
@@ -182,7 +183,7 @@
     <!--    Main Content-->
     <!-- ===============================================-->
     <main class="main" id="top">
-        <nav class="navbar navbar-vertical navbar-expand-lg" style="display:none;">
+        <nav class="navbar navbar-vertical navbar-expand-lg" style="display:none;" data-turbo-permanent>
             <div class="collapse navbar-collapse" id="navbarVerticalCollapse">
                 <!-- scrollbar removed-->
                 <div class="navbar-vertical-content">
@@ -563,7 +564,7 @@
                 </button>
             </div>
         </nav>
-        <nav class="navbar navbar-top fixed-top navbar-expand" id="navbarDefault" style="display:none;">
+        <nav class="navbar navbar-top fixed-top navbar-expand" id="navbarDefault" style="display:none;" data-turbo-permanent>
             <div class="collapse navbar-collapse justify-content-between">
                 <div class="navbar-logo">
                     <button class="btn navbar-toggler navbar-toggler-humburger-icon hover-bg-transparent" type="button"
@@ -1007,6 +1008,8 @@
             const collapsedIcon = toggleBtn.querySelector('.navbar-vertical-toggle-icon--collapsed');
             const text = toggleBtn.querySelector('.navbar-vertical-footer-text');
             const chevron = toggleBtn.querySelector('.navbar-vertical-toggle-chevron');
+            const navKey = 'navbarVerticalCollapsed';
+            const dropdownKey = 'navbarVerticalOpenIds';
 
             function syncToggleButton() {
                 const isCollapsed = htmlEl.classList.contains('navbar-vertical-collapsed');
@@ -1032,6 +1035,8 @@
 
                 toggleBtn.setAttribute('aria-label', isCollapsed ? 'Expand navigation menu' : 'Collapse navigation menu');
                 toggleBtn.setAttribute('aria-expanded', (!isCollapsed).toString());
+
+                localStorage.setItem(navKey, isCollapsed ? '1' : '0');
             }
 
             syncToggleButton();
@@ -1042,6 +1047,41 @@
             toggleBtn.addEventListener('click', function () {
                 requestAnimationFrame(syncToggleButton);
             });
+
+            // Restore persisted nav collapsed state
+            const stored = localStorage.getItem(navKey);
+            if (stored !== null && stored === '1') {
+                htmlEl.classList.add('navbar-vertical-collapsed');
+                requestAnimationFrame(syncToggleButton);
+            }
+
+            // Persist dropdown open state
+            const navContainer = document.querySelector('#navbarVerticalCollapse');
+            if (navContainer) {
+                const persistDropdowns = () => {
+                    const openIds = Array.from(navContainer.querySelectorAll('.collapse.show'))
+                        .map(el => el.id)
+                        .filter(Boolean);
+                    localStorage.setItem(dropdownKey, JSON.stringify(openIds));
+                };
+
+                navContainer.addEventListener('shown.bs.collapse', persistDropdowns);
+                navContainer.addEventListener('hidden.bs.collapse', persistDropdowns);
+
+                const storedDropdowns = localStorage.getItem(dropdownKey);
+                if (storedDropdowns) {
+                    try {
+                        const ids = JSON.parse(storedDropdowns);
+                        ids.forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el && !el.classList.contains('show')) {
+                                const collapseInstance = bootstrap.Collapse.getOrCreateInstance(el, { toggle: false });
+                                collapseInstance.show();
+                            }
+                        });
+                    } catch (_) {}
+                }
+            }
         })();
     </script>
 
@@ -1077,10 +1117,6 @@
     @stack('scripts')
 </body>
 </html>
-
-
-
-
 
 
 
