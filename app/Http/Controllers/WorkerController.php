@@ -324,7 +324,7 @@ class WorkerController extends Controller
             'absent' => ['bg' => 'rgba(220, 53, 69, 0.6)', 'border' => 'rgba(220, 53, 69, 1)'],
             'weekend' => ['bg' => 'rgba(173, 216, 230, 0.8)', 'border' => 'rgba(100, 149, 237, 0.9)'],
             'inactive' => ['bg' => 'rgba(200, 200, 200, 0.5)', 'border' => 'rgba(200, 200, 200, 0.8)'],
-            'termination' => ['bg' => 'rgba(255, 193, 7, 0.7)', 'border' => 'rgba(255, 193, 7, 1)'],
+            'termination' => ['bg' => 'rgba(0, 0, 0, 0.8)', 'border' => 'rgba(0, 0, 0, 1)'],
         ];
 
         for ($day = 1; $day <= $daysInMonth; $day++) {
@@ -333,10 +333,17 @@ class WorkerController extends Controller
             $labels[] = $date->format('M d');
             $values[] = 1;
 
-            if ($terminationDate && $date->equalTo($terminationDate)) {
+            if ($terminationDate && $date->isSameDay($terminationDate)) {
                 $backgroundColors[] = $colors['termination']['bg'];
                 $borderColors[] = $colors['termination']['border'];
-                $statuses[] = 'Termination';
+                $statuses[] = 'Terminated';
+                continue;
+            }
+
+            if ($terminationDate && $date->gt($terminationDate)) {
+                $backgroundColors[] = $colors['inactive']['bg'];
+                $borderColors[] = $colors['inactive']['border'];
+                $statuses[] = 'Inactive';
                 continue;
             }
 

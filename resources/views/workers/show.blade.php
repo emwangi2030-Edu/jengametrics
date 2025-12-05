@@ -16,7 +16,7 @@
 @endphp
 
 @section('content')
-<div class="container py-4">
+<div class="container py-4" data-turbo-cache-control="no-cache">
     <h2 class="mb-4" style="color:#027333;">Worker Profile</h2>
 
     <div class="row">
@@ -38,6 +38,9 @@
                                 <span class="badge bg-success">{{ __('Active') }}</span>
                             @endif
                         </p>
+                        @if($worker->terminated_at)
+                            <p><strong>Termination Date:</strong> {{ $worker->terminated_at->format('d F, Y') }}</p>
+                        @endif
                         <p><strong>Remuneration:</strong> {{ $worker->payment_amount }}</p>
                         <p><strong>Rate:</strong> {{ $worker->payment_frequency }}</p>
                         <p><strong>Mode of Payment:</strong> {{ $worker->mode_of_payment }}</p>
