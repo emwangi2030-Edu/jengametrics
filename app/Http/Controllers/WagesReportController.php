@@ -10,10 +10,21 @@ class WagesReportController extends Controller
 {
     public function __invoke(Request $request)
     {
-        $payments = Payment::with(['worker' => fn ($q) => $q->withTrashed()])
+        $paymentsQuery = Payment::with(['worker' => fn ($q) => $q->withTrashed()])
             ->whereProjectId(project_id())
-            ->orderByDesc('payment_date')
-            ->get();
+            ->orderByDesc('payment_date');
+
+        $year = $request->input('year');
+        $month = $request->input('month');
+
+        if ($year) {
+            $paymentsQuery->whereYear('payment_date', $year);
+        }
+        if ($month) {
+            $paymentsQuery->whereMonth('payment_date', $month);
+        }
+
+        $payments = $paymentsQuery->get();
 
         $headers = [
             'Payee',
@@ -48,9 +59,23 @@ class WagesReportController extends Controller
             ]);
         }
 
+        $years = Payment::whereProjectId(project_id())
+            ->selectRaw('DISTINCT YEAR(payment_date) as y')
+            ->orderByDesc('y')
+            ->pluck('y');
+
+        if ($request->ajax()) {
+            return view('report.partials.wages_table', [
+                'payments' => $payments,
+            ]);
+        }
+
         return view('report.wages', [
             'payments' => $payments,
             'headers' => $headers,
+            'selectedYear' => $year,
+            'selectedMonth' => $month,
+            'years' => $years,
         ]);
     }
 

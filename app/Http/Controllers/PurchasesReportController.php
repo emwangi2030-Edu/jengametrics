@@ -10,10 +10,21 @@ class PurchasesReportController extends Controller
 {
     public function __invoke(Request $request)
     {
-        $materials = Material::with('supplier')
+        $materialsQuery = Material::with('supplier')
             ->whereProjectId(project_id())
-            ->orderByDesc('created_at')
-            ->get();
+            ->orderByDesc('created_at');
+
+        $year = $request->input('year');
+        $month = $request->input('month');
+
+        if ($year) {
+            $materialsQuery->whereYear('created_at', $year);
+        }
+        if ($month) {
+            $materialsQuery->whereMonth('created_at', $month);
+        }
+
+        $materials = $materialsQuery->get();
 
         $headers = [
             'Material',
@@ -48,8 +59,20 @@ class PurchasesReportController extends Controller
             ]);
         }
 
+        $years = Material::whereProjectId(project_id())
+            ->selectRaw('DISTINCT YEAR(created_at) as y')
+            ->orderByDesc('y')
+            ->pluck('y');
+
+        if ($request->ajax()) {
+            return view('report.partials.purchases_table', ['materials' => $materials]);
+        }
+
         return view('report.purchases', [
             'materials' => $materials,
+            'selectedYear' => $year,
+            'selectedMonth' => $month,
+            'years' => $years,
         ]);
     }
 

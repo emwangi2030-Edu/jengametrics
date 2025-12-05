@@ -21,48 +21,72 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-sm align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>{{ __('Payee') }}</th>
-                            <th>{{ __('Payment Date') }}</th>
-                            <th>{{ __('Amount (KES)') }}</th>
-                            <th>{{ __('Period Start') }}</th>
-                            <th>{{ __('Period End') }}</th>
-                            <th>{{ __('Status') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($payments as $payment)
-                            @php
-                                $worker = $payment->worker;
-                                $isTerminated = $worker && ($worker->terminated || $worker->trashed());
-                            @endphp
-                            <tr>
-                                <td>
-                                    {{ $worker->full_name ?? __('Unknown') }}
-                                    @if($isTerminated)
-                                        <span class="badge bg-secondary ms-1">{{ __('Terminated') }}</span>
-                                    @endif
-                                </td>
-                                <td>{{ $payment->payment_date ? $payment->payment_date->format('d M Y') : __('N/A') }}</td>
-                                <td>{{ number_format((float) $payment->amount, 2) }}</td>
-                                <td>{{ $payment->period_start ? $payment->period_start->format('d M Y') : __('N/A') }}</td>
-                                <td>{{ $payment->period_end ? $payment->period_end->format('d M Y') : __('N/A') }}</td>
-                                <td>{{ $isTerminated ? __('Terminated') : __('Active') }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center text-muted py-4">
-                                    {{ __('No payments found.') }}
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+            <form method="GET" class="row g-3 align-items-end mb-3" id="wagesFilterForm">
+                <div class="col-md-3">
+                    <label class="form-label mb-1" for="wages-year">{{ __('Year') }}</label>
+                    <select name="year" id="wages-year" class="form-select">
+                        <option value="">{{ __('All Years') }}</option>
+                        @foreach($years as $y)
+                            <option value="{{ $y }}" @selected($selectedYear == $y)>{{ $y }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label mb-1" for="wages-month">{{ __('Month') }}</label>
+                    <select name="month" id="wages-month" class="form-select">
+                        <option value="">{{ __('All Months') }}</option>
+                        @foreach(range(1,12) as $m)
+                            <option value="{{ $m }}" @selected($selectedMonth == $m)>{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <a href="{{ route('reports.wages') }}" class="btn btn-outline-secondary mt-auto">{{ __('Reset') }}</a>
+                </div>
+            </form>
+            <div id="wages-table-wrapper">
+                @include('report.partials.wages_table', ['payments' => $payments])
             </div>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('wagesFilterForm');
+        const year = document.getElementById('wages-year');
+        const month = document.getElementById('wages-month');
+        const tableWrapper = document.querySelector('.card .table-responsive')?.parentElement;
+
+        const submitAjax = () => {
+            if (!form || !tableWrapper) return;
+            const params = new URLSearchParams(new FormData(form));
+            const url = `{{ route('reports.wages') }}?${params.toString()}`;
+
+            tableWrapper.innerHTML = '<div class="py-4 text-center text-muted">{{ __('Loading...') }}</div>';
+
+            fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                cache: 'no-store'
+            })
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newTable = doc.querySelector('.card .table-responsive')?.parentElement;
+                    if (newTable) {
+                        tableWrapper.innerHTML = newTable.innerHTML;
+                    } else {
+                        window.location.href = url;
+                    }
+                })
+                .catch(() => window.location.href = url);
+        };
+
+        if (year) year.addEventListener('change', submitAjax);
+        if (month) month.addEventListener('change', submitAjax);
+    });
+</script>
+@endpush
