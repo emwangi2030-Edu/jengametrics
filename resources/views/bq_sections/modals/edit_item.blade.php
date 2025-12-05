@@ -44,6 +44,11 @@
                         <label for="rate{{ $item->id }}">{{ __('Rate') }}</label>
                     </div>
 
+                    <div class="form-floating mb-4">
+                        <input type="text" class="form-control unit-input" id="unit{{ $item->id }}" value="{{ $item->units }}" readonly>
+                        <label for="unit{{ $item->id }}">{{ __('Unit') }}</label>
+                    </div>
+
                     <!-- Quantity Input -->
                     <div class="form-floating mb-4">
                         <input type="number" name="quantity" id="quantity{{ $item->id }}" class="form-control quantity-input" value="{{ $item->quantity }}" required>
@@ -79,6 +84,8 @@
             const rateInput = modal.querySelector('#rate{{ $item->id }}');
             const quantityInput = modal.querySelector('#quantity{{ $item->id }}');
             const amountInput = modal.querySelector('.amount-input');
+            const unitInput = modal.querySelector('#unit{{ $item->id }}');
+            const initialUnitValue = unitInput ? unitInput.value : '';
 
             const selectElementText = "{{ __('Select Element') }}";
             const selectItemText = "{{ __('Select Item') }}";
@@ -99,10 +106,18 @@
                 defaultOption.style.color = 'gray';
                 select.appendChild(defaultOption);
 
-                Object.entries(data || {}).forEach(([value, label]) => {
+                const list = Array.isArray(data)
+                    ? data
+                    : Object.entries(data || {}).map(([id, label]) => ({ id, name: label, unit: '' }));
+
+                list.forEach((item) => {
+                    const value = item.id ?? item.value ?? '';
+                    const label = item.name ?? item.label ?? '';
+                    const unit = item.unit ?? '';
                     const option = document.createElement('option');
                     option.value = value;
                     option.textContent = label;
+                    if (unit) option.dataset.unit = unit;
                     if (isPresent(selected) && value.toString() === selected.toString()) {
                         option.selected = true;
                         defaultOption.selected = false;
@@ -126,6 +141,8 @@
                     data: { element_id: elementId },
                 }).done(function (data) {
                     renderOptions(itemSelect, selectItemText, data, selectedItem);
+                    const selectedOpt = itemSelect.options[itemSelect.selectedIndex];
+                    setUnitFromSelect(selectedOpt);
                 });
             };
 
@@ -152,6 +169,10 @@
             elementSelect.addEventListener('change', function () {
                 loadItems(this.value, null);
             });
+            itemSelect.addEventListener('change', function () {
+                const selectedOpt = itemSelect.options[itemSelect.selectedIndex];
+                setUnitFromSelect(selectedOpt);
+            });
 
             const updateAmount = () => {
                 if (!amountInput) {
@@ -173,6 +194,17 @@
 
             loadElements(initialElementId, initialItemId);
             updateAmount();
+
+            function setUnitFromSelect(optionEl) {
+                if (!unitInput) return;
+                if (optionEl && optionEl.dataset && optionEl.dataset.unit) {
+                    unitInput.value = optionEl.dataset.unit;
+                    return;
+                }
+                if (initialUnitValue) {
+                    unitInput.value = initialUnitValue;
+                }
+            }
         })();
     });
 </script>

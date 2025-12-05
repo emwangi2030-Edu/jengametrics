@@ -69,7 +69,16 @@ class ItemsController extends Controller
             return response()->json([], 400);
         }
 
-        $items = Item::where('element_id', $elementId)->pluck('name', 'id');
+        $items = Item::where('element_id', $elementId)
+            ->orderBy('name')
+            ->get()
+            ->map(function (Item $item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'unit' => $item->unit_of_measurement,
+                ];
+            });
 
         return response()->json($items);
     }

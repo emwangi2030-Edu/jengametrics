@@ -87,7 +87,7 @@
                                             <label for="editUnitOfMeasurementInput{{ $item->id }}">Unit of Measurement</label>
                                             <select class="form-control" id="editUnitOfMeasurementInput{{ $item->id }}" name="unit_of_measurement" required>
                                                 @foreach($units as $unit)
-                                                    <option value="{{ $unit->abbrev }}" {{ $unit->name == $item->unit_of_measurement ? 'selected' : '' }}>{{ $unit->abbrev }}
+                                                    <option value="{{ $unit->abbrev }}" {{ $unit->abbrev == $item->unit_of_measurement ? 'selected' : '' }}>{{ $unit->abbrev }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -95,7 +95,7 @@
 
                                         <div class="form-group">
                                             <label for="editItemNameInput{{ $item->id }}">Labour</label>
-                                            <input type="text" class="form-control" id="editItemNameInput{{ $item->labour }}" name="labour" value="{{ $item->labour }}" >
+                                            <input type="text" class="form-control" id="editItemNameInput{{ $item->id }}_labour" name="labour" value="{{ $item->labour }}" >
                                         </div>
                                         <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
                                     </form>
