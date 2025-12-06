@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Requisition;
 use App\Models\BomItem;
-use App\Models\Product;
 use App\Models\Section;
 use App\Models\UnitOfMeasurement;
 use App\Models\BqDocument;
@@ -62,18 +61,39 @@ class RequisitionController extends Controller
 
         $sections = Section::all();
 
-        $rawItems = BomItem::whereProjectId($projectId)->get();
-        $groupedItems = $rawItems->groupBy('product_id');
+        $rawItems = BomItem::whereProjectId($projectId)
+            ->with(['item_material', 'product', 'bqDocument', 'bqSection'])
+            ->get();
+
+        $groupedItems = $rawItems->groupBy(function (BomItem $item) {
+            return $item->product_id
+                ? 'product:' . $item->product_id
+                : 'manual:' . $item->id;
+        });
 
         $requisitionableItems = collect();
 
-        $products = Product::query()->whereIn('id', $groupedItems->keys()->toArray())->pluck('unit', 'id');
         $documentMap = BqDocument::whereIn('id', $rawItems->pluck('bq_document_id')->filter()->unique())->get()->keyBy('id');
 
-        foreach ($groupedItems as $product_id => $group) {
+        foreach ($groupedItems as $key => $group) {
             $sampleItem = $group->first();
             $totalQty = $group->sum('quantity');
-            $sampleItem->unit = $products[$product_id] ?? 'unit';
+
+            $displayName = optional($sampleItem->item_material)->name
+                ?? optional($sampleItem->product)->name
+                ?? $sampleItem->item_description
+                ?? optional($sampleItem->bqSection)->item_name
+                ?? __('Unassigned Material');
+
+            $displayUnit = optional($sampleItem->item_material)->unit_of_measurement
+                ?? optional($sampleItem->product)->unit
+                ?? $sampleItem->unit
+                ?? optional($sampleItem->bqSection)->units
+                ?? 'unit';
+
+            $sampleItem->display_name = $displayName;
+            $sampleItem->display_unit = $displayUnit;
+            $sampleItem->unit = $displayUnit;
             $sampleItem->total_quantity = $totalQty;
 
             $documentId = $group->pluck('bq_document_id')->filter()->first();

@@ -249,18 +249,20 @@ class BOMController extends Controller
 
         $processedSections = $levels->flatMap(function (BqLevel $level) {
             return $level->sections->map(function (BqSection $section) use ($level) {
-                $materials = $section->bomItems->map(function (BomItem $item) {
+                $materials = $section->bomItems->map(function (BomItem $item) use ($section) {
                     $product = optional($item->product);
                     $itemMaterial = optional($item->item_material);
 
                     $name = $itemMaterial->name
                         ?? $product->name
                         ?? $item->item_description
+                        ?? $section->item_name
                         ?? __('Unknown Material');
 
                     $unit = $itemMaterial->unit_of_measurement
                         ?? $product->unit
                         ?? $item->unit
+                        ?? $section->units
                         ?? 'N/A';
 
                     $quantity = (float) ($item->quantity ?? 0);
@@ -328,18 +330,29 @@ class BOMController extends Controller
             ->filter(fn ($material) => is_null($material->product_id));
 
         if ($withoutProduct->isNotEmpty()) {
-            $totalQuantity = $withoutProduct->sum(fn ($material) => (float) ($material->quantity ?? 0));
-            $totalAmount = $withoutProduct->sum(fn ($material) => (float) ($material->amount ?? 0));
-            $rate = $totalQuantity > 0 ? $totalAmount / $totalQuantity : 0;
+            $grouped = $withoutProduct->groupBy(function ($material) {
+                $name = $material->name ?? __('Unassigned Materials');
+                $unit = $material->unit ?? 'N/A';
+                return $name . '|' . $unit;
+            });
 
-            $withProduct->push((object) [
-                'product_id' => null,
-                'name' => __('Unassigned Materials'),
-                'unit' => 'N/A',
-                'quantity' => $this->normalizeNumeric($totalQuantity),
-                'rate' => $rate,
-                'amount' => $totalAmount,
-            ]);
+            foreach ($grouped as $key => $materials) {
+                $sample = $materials->first();
+                $name = $sample->name ?? __('Unassigned Materials');
+                $unit = $sample->unit ?? 'N/A';
+                $totalQuantity = $materials->sum(fn ($material) => (float) ($material->quantity ?? 0));
+                $totalAmount = $materials->sum(fn ($material) => (float) ($material->amount ?? 0));
+                $rate = $totalQuantity > 0 ? $totalAmount / $totalQuantity : 0;
+
+                $withProduct->push((object) [
+                    'product_id' => null,
+                    'name' => $name,
+                    'unit' => $unit,
+                    'quantity' => $this->normalizeNumeric($totalQuantity),
+                    'rate' => $rate,
+                    'amount' => $totalAmount,
+                ]);
+            }
         }
 
         $materials = $withProduct;

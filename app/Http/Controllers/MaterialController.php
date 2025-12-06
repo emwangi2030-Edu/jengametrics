@@ -73,17 +73,36 @@ class MaterialController extends Controller
         $stockUsages = $stockUsageQuery->orderBy('created_at', 'desc')->get();
 
         $rawItems = BomItem::whereProjectId($projectId)
-            ->with(['item_material', 'bqDocument'])
+            ->with(['item_material', 'product', 'bqDocument', 'bqSection'])
             ->get();
-        $groupedItems = $rawItems->groupBy('product_id');
+
+        $groupedItems = $rawItems->groupBy(function (BomItem $item) {
+            return $item->product_id
+                ? 'product:' . $item->product_id
+                : 'manual:' . $item->id;
+        });
 
         $requisitionableItems = collect();
 
-        foreach ($groupedItems as $product_id => $group) {
+        foreach ($groupedItems as $key => $group) {
             $sampleItem = $group->first();
             $totalQty = $group->sum('quantity');
-            $product = Product::find($product_id);
-            $sampleItem->unit = $product?->unit ?? 'unit';
+
+            $displayName = optional($sampleItem->item_material)->name
+                ?? optional($sampleItem->product)->name
+                ?? $sampleItem->item_description
+                ?? optional($sampleItem->bqSection)->item_name
+                ?? __('Unassigned Material');
+
+            $displayUnit = optional($sampleItem->item_material)->unit_of_measurement
+                ?? optional($sampleItem->product)->unit
+                ?? $sampleItem->unit
+                ?? optional($sampleItem->bqSection)->units
+                ?? 'unit';
+
+            $sampleItem->display_name = $displayName;
+            $sampleItem->display_unit = $displayUnit;
+            $sampleItem->unit = $displayUnit;
             $sampleItem->total_quantity = $totalQty;
 
             $requisitionedQty = Requisition::whereIn('bom_item_id', $group->pluck('id'))
@@ -147,18 +166,39 @@ class MaterialController extends Controller
 
         $project = Project::find($projectId);
 
-        $rawItems = BomItem::whereProjectId($projectId)->get();
-        $groupedItems = $rawItems->groupBy('product_id');
+        $rawItems = BomItem::whereProjectId($projectId)
+            ->with(['item_material', 'product', 'bqDocument', 'bqSection'])
+            ->get();
+
+        $groupedItems = $rawItems->groupBy(function (BomItem $item) {
+            return $item->product_id
+                ? 'product:' . $item->product_id
+                : 'manual:' . $item->id;
+        });
 
         $requisitionableItems = collect();
 
-        $products = Product::query()->whereIn('id', $groupedItems->keys()->toArray())->pluck('unit', 'id');
         $documentMap = BqDocument::whereIn('id', $rawItems->pluck('bq_document_id')->filter()->unique())->get()->keyBy('id');
 
-        foreach ($groupedItems as $product_id => $group) {
+        foreach ($groupedItems as $key => $group) {
             $sampleItem = $group->first();
             $totalQty = $group->sum('quantity');
-            $sampleItem->unit = $products[$product_id] ?? 'unit';
+
+            $displayName = optional($sampleItem->item_material)->name
+                ?? optional($sampleItem->product)->name
+                ?? $sampleItem->item_description
+                ?? optional($sampleItem->bqSection)->item_name
+                ?? __('Unassigned Material');
+
+            $displayUnit = optional($sampleItem->item_material)->unit_of_measurement
+                ?? optional($sampleItem->product)->unit
+                ?? $sampleItem->unit
+                ?? optional($sampleItem->bqSection)->units
+                ?? 'unit';
+
+            $sampleItem->display_name = $displayName;
+            $sampleItem->display_unit = $displayUnit;
+            $sampleItem->unit = $displayUnit;
             $sampleItem->total_quantity = $totalQty;
 
             $documentId = $group->pluck('bq_document_id')->filter()->first();

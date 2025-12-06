@@ -99,6 +99,8 @@ class BqSectionController extends Controller
                 'quantity' => $units,
                 'rate' => $materialAmount,
                 'amount' => $scaledMaterialAmount,
+                'item_description' => $bqSection->item_name,
+                'unit' => $bqSection->units,
                 'project_id' => (int) project_id(),
                 'bq_section_id' => $bqSection->id,
                 'bq_document_id' => $bqSection->bq_document_id,
