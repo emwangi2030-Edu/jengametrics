@@ -5,6 +5,11 @@
     <div class="col-md-6">
         <div class="card shadow-lg">
             <div class="card-body">
+                <div class="d-flex justify-content-end">
+                    <a href="{{ route('dashboard') }}" class="btn btn-outline-danger btn-sm">
+                        X
+                    </a>
+                </div>
                 <h2 class="text-center mb-4">Step 3: Confirm and Submit</h2>
 
                 <form action="{{ route('wizard.complete') }}" method="POST">
@@ -35,7 +40,10 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <div class="d-flex justify-content-end">
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ route('wizard.step1') }}" class="btn btn-warning">
+                            Edit
+                        </a>
                         <button type="submit" class="btn btn-success">Complete</button>
                     </div>
                 </form>

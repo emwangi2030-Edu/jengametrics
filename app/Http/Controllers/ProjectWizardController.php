@@ -20,39 +20,36 @@ class ProjectWizardController extends Controller
 
     public function step3()
     {
-        return view('wizard.step3');
+        // Legacy route; keep redirecting to the confirmation step.
+        return redirect()->route('wizard.step2');
     }
 
 
 
     public function step1Post(Request $request)
-{
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'description' => 'required',
-    ]);
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required',
+            'address' => 'required|string|max:255',
+            'budget' => 'required|string|max:255',
+        ]);
 
-    // Store in session
-    $request->session()->put('name', $validatedData['name']);
-    $request->session()->put('description', $validatedData['description']);
+        // Store in session
+        $request->session()->put('name', $validatedData['name']);
+        $request->session()->put('description', $validatedData['description']);
+        $request->session()->put('address', $validatedData['address']);
+        $request->session()->put('budget', $validatedData['budget']);
 
-    // Redirect to the next step
-    return redirect()->route('wizard.step2');
-}
-public function step2Post(Request $request)
-{
-    $validatedData = $request->validate([
-        'address' => 'required|string|max:255',
-        'budget' => 'required|string|max:255',
-    ]);
+        // Redirect to the confirmation step
+        return redirect()->route('wizard.step2');
+    }
 
-    // Store in session
-    $request->session()->put('address', $validatedData['address']);
-    $request->session()->put('budget', $validatedData['budget']);
-
-    // Redirect to the next step
-    return redirect()->route('wizard.step3');
-}
+    public function step2Post(Request $request)
+    {
+        // Step 2 is merged into step 1; keep for backward compatibility.
+        return redirect()->route('wizard.step1');
+    }
 
 public function complete(Request $request)
 {

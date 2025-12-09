@@ -41,9 +41,6 @@ Route::get('/wizard/step1', [ProjectWizardController::class, 'step1'])->name('wi
 // Route for the second step
 Route::get('/wizard/step2', [ProjectWizardController::class, 'step2'])->name('wizard.step2');
 
-// Route for the third step
-Route::get('/wizard/step3', [ProjectWizardController::class, 'step3'])->name('wizard.step3');
-
 // Route to handle form submission
 Route::post('/wizard/complete', [ProjectWizardController::class, 'complete'])->name('wizard.complete');
 
