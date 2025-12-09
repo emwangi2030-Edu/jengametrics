@@ -18,14 +18,6 @@ class ProjectWizardController extends Controller
         return view('wizard.step2');
     }
 
-    public function step3()
-    {
-        // Legacy route; keep redirecting to the confirmation step.
-        return redirect()->route('wizard.step2');
-    }
-
-
-
     public function step1Post(Request $request)
     {
         $validatedData = $request->validate([

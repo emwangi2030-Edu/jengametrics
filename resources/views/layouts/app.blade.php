@@ -568,9 +568,9 @@
             <div class="collapse navbar-collapse justify-content-between">
                 <div class="navbar-logo">
                     <button class="btn navbar-toggler navbar-toggler-humburger-icon hover-bg-transparent" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse"
-                    aria-controls="navbarVerticalCollapse" aria-expanded="false"
-                    aria-label="Toggle Navigation">
+                        data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse"
+                        aria-controls="navbarVerticalCollapse" aria-expanded="false"
+                        aria-label="Toggle Navigation">
                         <span class="navbar-toggle-icon">
                             <span class="toggle-line"></span>
                         </span>
@@ -604,220 +604,199 @@
                             <span class="fs-8">{{ project() }}</span>
                             <i class="fas fa-angle-down"></i>
                         </a>
-
-
                         <div class="dropdown-menu dropdown-menu-end navbar-dropdown-caret py-0 dropdown-profile shadow border" aria-labelledby="navbarDropdownUser">
-                        <div class="card position-relative border-0">
-                            <div class="card-body p-0">
-                                <div class="text-center pt-4 pb-3">
-                                    <div class="avatar avatar-xl ">
-                                        <img class="rounded-circle " src="{{ \Illuminate\Support\Facades\Auth::user()->get_gravatar(150) }}"
-                                        alt="" />
+                            <div class="card position-relative border-0">
+                                <div class="card-body p-0">
+                                    <div class="text-center pt-4 pb-3">
+                                        <div class="avatar avatar-xl ">
+                                            <img class="rounded-circle " src="{{ \Illuminate\Support\Facades\Auth::user()->get_gravatar(150) }}"
+                                            alt="" />
+                                        </div>
+                                        <h6 class="mt-2 text-body-emphasis">{{ project() }}</h6>
                                     </div>
-                                    <h6 class="mt-2 text-body-emphasis">{{ project() }}</h6>
                                 </div>
-                            </div>
-                            <div>
-                                @if(\Illuminate\Support\Facades\Auth::user()->is_client())
-                                    @if(\Illuminate\Support\Facades\Auth::user()->package)
-                                        @if(package(\Illuminate\Support\Facades\Auth::user()->package)->name == "Basic")
-                                            <div class="help-box text-center">
-                                                <p class="mb-3 mt-2 text-muted">
-                                                    <strong>{{ package(\Illuminate\Support\Facades\Auth::user()->package)->name }}</strong><br>
-                                                    Upgrade your plan and get the most out of JengaMetrics
-                                                </p>
-                                                <div class="mt-3">
-                                                    <a href="{{ route('subscribe') }}" class="btn btn-success"> Upgrade now</a>
+                                <div>
+                                    @if(\Illuminate\Support\Facades\Auth::user()->is_client())
+                                        @if(\Illuminate\Support\Facades\Auth::user()->package)
+                                            @if(package(\Illuminate\Support\Facades\Auth::user()->package)->name == "Basic")
+                                                <div class="help-box text-center">
+                                                    <p class="mb-3 mt-2 text-muted">
+                                                        <strong>{{ package(\Illuminate\Support\Facades\Auth::user()->package)->name }}</strong><br>
+                                                        Upgrade your plan and get the most out of JengaMetrics
+                                                    </p>
+                                                    <div class="mt-3">
+                                                        <a href="{{ route('subscribe') }}" class="btn btn-success"> Upgrade now</a>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endif
                                         @endif
                                     @endif
-                                @endif
 
+                                    <ul class="nav d-flex flex-column mb-2 pb-1">
+                                        @if(\Illuminate\Support\Facades\Auth::user()->is_client())
+                                            @if(\Illuminate\Support\Facades\Auth::user()->project_id)
+                                                <li class="nav-item">
+                                                    <a class="nav-link px-3 d-block" href="/admin/settings">
+                                                        <span class="me-2 text-body align-bottom" data-feather="pie-chart"></span>
+                                                        Project settings
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link px-3 d-block" href="#" data-bs-toggle="modal" data-bs-target="#switchbusinesses">
+                                                        <span class="me-2 text-body align-bottom" data-feather="pie-chart"></span>
+                                                        Switch Projects
+                                                    </a>
+                                                </li>
+                                            @endif 
+                                        @endif
+                                    </ul>
+                                </div>
+                                <div class="card-footer p-0 border-top border-translucent">
+                                    <ul class="nav d-flex flex-column my-3">
+                                        @if(\Illuminate\Support\Facades\Auth::user()->is_client())
+                                            <a class="dropdown-item" href="{{ url('account') }}">
+                                                <i class="fa fa-user"></i> 
+                                                <span key="t-profile">Profile</span>
+                                            </a>
+                                            <a class="dropdown-item" href="{{ url('businesses') }}">
+                                                <i class="fa fa-users"></i> 
+                                                <span key="t-profile">Manage your projects</span>
+                                            </a>
+                                            <a class="dropdown-item" href="{{ url('billings') }}">
+                                                <i class="fa fa-users"></i>
+                                                <span key="t-profile">Manage your billings</span>
+                                            </a>
+                                            <a class="dropdown-item" href="{{ url('subscribe') }}">
+                                                <i class="fa fa-users"></i>
+                                                <span key="t-profile">Manage your subscriptions</span>
+                                            </a>
+                                        @endif
+                                    </ul>
+                                    <hr />
+                                    <div class="px-3"> 
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <x-responsive-nav-link :href="route('logout')" class="btn btn-phoenix-secondary d-flex flex-center w-100"
+                                                onclick="event.preventDefault();
+                                                this.closest('form').submit();">
+                                                <span class="me-2" data-feather="log-out"></span>
+                                                    Sign out
+                                                </a>
+                                            </x-responsive-nav-link>
+                                        </form>
+                                    </div>
 
-
-                                <ul class="nav d-flex flex-column mb-2 pb-1">
-                                    @if(\Illuminate\Support\Facades\Auth::user()->is_client())
-                                    @if(\Illuminate\Support\Facades\Auth::user()->project_id)
-                                    <li class="nav-item"><a class="nav-link px-3 d-block"
-                                        href="/admin/settings"><span class="me-2 text-body align-bottom"
-                                        data-feather="pie-chart"></span>Project settings</a></li>
-                                        <li class="nav-item">
-
-
-                                            <a class="nav-link px-3 d-block" href="#" data-bs-toggle="modal"
-                                            data-bs-target="#switchbusinesses">
-                                            <span class="me-2 text-body align-bottom" data-feather="pie-chart">
-
-                                            </span>Switch Projects
-                                        </a>
-
-
-
-
-
-
-
-                                    </li>
-                                    @endif 
-
-                                    @endif
-                                </ul>
+                                    <div class="my-2 text-center fw-bold fs-10 text-body-quaternary"><a
+                                        class="text-body-quaternary me-1" href="#!">Privacy policy</a>&bull;<a
+                                        class="text-body-quaternary mx-1" href="#!">Terms</a>&bull;<a
+                                        class="text-body-quaternary ms-1" href="#!">Cookies</a></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-footer p-0 border-top border-translucent">
-                                <ul class="nav d-flex flex-column my-3">
-                                    @if(\Illuminate\Support\Facades\Auth::user()->is_client())
-                                        <a class="dropdown-item" href="{{ url('account') }}">
-                                            <i class="fa fa-user"></i> 
-                                            <span key="t-profile">Profile</span>
-                                        </a>
-                                        <a class="dropdown-item" href="{{ url('businesses') }}">
-                                            <i class="fa fa-users"></i> 
-                                            <span key="t-profile">Manage your projects</span>
-                                        </a>
-                                        <a class="dropdown-item" href="{{ url('billings') }}">
-                                            <i class="fa fa-users"></i>
-                                            <span key="t-profile">Manage your billings</span>
-                                        </a>
-                                        <a class="dropdown-item" href="{{ url('subscribe') }}">
-                                            <i class="fa fa-users"></i>
-                                            <span key="t-profile">Manage your subscriptions</span>
-                                        </a>
-                                    @endif
-
-
-                                                </ul>
-                                                <hr />
-                                                <div class="px-3"> 
-
-
-                                                <form method="POST" action="{{ route('logout') }}">
-                                                    @csrf
-
-                                                    <x-responsive-nav-link :href="route('logout')" class="btn btn-phoenix-secondary d-flex flex-center w-100"
-                                                    onclick="event.preventDefault();
-                                                    this.closest('form').submit();">
-                                                    <span class="me-2" data-feather="log-out">
-                                                    </span>Sign out</a>
-                                                </x-responsive-nav-link>
-                                            </form>
-                                        </div>
-                                        <div class="my-2 text-center fw-bold fs-10 text-body-quaternary"><a
-                                            class="text-body-quaternary me-1" href="#!">Privacy policy</a>&bull;<a
-                                            class="text-body-quaternary mx-1" href="#!">Terms</a>&bull;<a
-                                            class="text-body-quaternary ms-1" href="#!">Cookies</a></div>
-                                        </div>
-                        </div>
                         </div>
                     </li>
                 </ul>
             </div>
         </nav>
+        <script>
+            var navbarTopShape = window.config.config.phoenixNavbarTopShape;
+            var navbarPosition = window.config.config.phoenixNavbarPosition;
+            var body = document.querySelector('body');
+            var navbarDefault = document.querySelector('#navbarDefault');
+            var navbarTop = document.querySelector('#navbarTop');
+            var topNavSlim = document.querySelector('#topNavSlim');
+            var navbarTopSlim = document.querySelector('#navbarTopSlim');
+            var navbarCombo = document.querySelector('#navbarCombo');
+            var navbarComboSlim = document.querySelector('#navbarComboSlim');
+            var dualNav = document.querySelector('#dualNav');
 
+            var documentElement = document.documentElement;
+            var navbarVertical = document.querySelector('.navbar-vertical');
 
+            if (navbarPosition === 'dual-nav') {
+                topNavSlim?.remove();
+                navbarTop?.remove();
+                navbarTopSlim?.remove();
+                navbarCombo?.remove();
+                navbarComboSlim?.remove();
+                navbarDefault?.remove();
+                navbarVertical?.remove();
+                dualNav.removeAttribute('style');
+                document.documentElement.setAttribute('data-navigation-type', 'dual');
 
+            } else if (navbarTopShape === 'slim' && navbarPosition === 'vertical') {
+                navbarDefault?.remove();
+                navbarTop?.remove();
+                navbarTopSlim?.remove();
+                navbarCombo?.remove();
+                navbarComboSlim?.remove();
+                topNavSlim.style.display = 'block';
+                navbarVertical.style.display = 'inline-block';
+                document.documentElement.setAttribute('data-navbar-horizontal-shape', 'slim');
 
+            } else if (navbarTopShape === 'slim' && navbarPosition === 'horizontal') {
+                navbarDefault?.remove();
+                navbarVertical?.remove();
+                navbarTop?.remove();
+                topNavSlim?.remove();
+                navbarCombo?.remove();
+                navbarComboSlim?.remove();
+                dualNav?.remove();
+                navbarTopSlim.removeAttribute('style');
+                document.documentElement.setAttribute('data-navbar-horizontal-shape', 'slim');
+            } else if (navbarTopShape === 'slim' && navbarPosition === 'combo') {
+                navbarDefault?.remove();
+                navbarTop?.remove();
+                topNavSlim?.remove();
+                navbarCombo?.remove();
+                navbarTopSlim?.remove();
+                dualNav?.remove();
+                navbarComboSlim.removeAttribute('style');
+                navbarVertical.removeAttribute('style');
+                document.documentElement.setAttribute('data-navbar-horizontal-shape', 'slim');
+            } else if (navbarTopShape === 'default' && navbarPosition === 'horizontal') {
+                navbarDefault?.remove();
+                topNavSlim?.remove();
+                navbarVertical?.remove();
+                navbarTopSlim?.remove();
+                navbarCombo?.remove();
+                navbarComboSlim?.remove();
+                dualNav?.remove();
+                navbarTop.removeAttribute('style');
+                document.documentElement.setAttribute('data-navigation-type', 'horizontal');
+            } else if (navbarTopShape === 'default' && navbarPosition === 'combo') {
+                topNavSlim?.remove();
+                navbarTop?.remove();
+                navbarTopSlim?.remove();
+                navbarDefault?.remove();
+                navbarComboSlim?.remove();
+                dualNav?.remove();
+                navbarCombo.removeAttribute('style');
+                navbarVertical.removeAttribute('style');
+                document.documentElement.setAttribute('data-navigation-type', 'combo');
+            } else {
+                topNavSlim?.remove();
+                navbarTop?.remove();
+                navbarTopSlim?.remove();
+                navbarCombo?.remove();
+                navbarComboSlim?.remove();
+                dualNav?.remove();
+                navbarDefault.removeAttribute('style');
+                navbarVertical.removeAttribute('style');
+            }
 
+            var navbarTopStyle = window.config.config.phoenixNavbarTopStyle;
+            var navbarTop = document.querySelector('.navbar-top');
+            if (navbarTopStyle === 'darker') {
+                navbarTop.setAttribute('data-navbar-appearance', 'darker');
+            }
 
-            <script>
-                var navbarTopShape = window.config.config.phoenixNavbarTopShape;
-                var navbarPosition = window.config.config.phoenixNavbarPosition;
-                var body = document.querySelector('body');
-                var navbarDefault = document.querySelector('#navbarDefault');
-                var navbarTop = document.querySelector('#navbarTop');
-                var topNavSlim = document.querySelector('#topNavSlim');
-                var navbarTopSlim = document.querySelector('#navbarTopSlim');
-                var navbarCombo = document.querySelector('#navbarCombo');
-                var navbarComboSlim = document.querySelector('#navbarComboSlim');
-                var dualNav = document.querySelector('#dualNav');
-
-                var documentElement = document.documentElement;
-                var navbarVertical = document.querySelector('.navbar-vertical');
-
-                if (navbarPosition === 'dual-nav') {
-                    topNavSlim?.remove();
-                    navbarTop?.remove();
-                    navbarTopSlim?.remove();
-                    navbarCombo?.remove();
-                    navbarComboSlim?.remove();
-                    navbarDefault?.remove();
-                    navbarVertical?.remove();
-                    dualNav.removeAttribute('style');
-                    document.documentElement.setAttribute('data-navigation-type', 'dual');
-
-                } else if (navbarTopShape === 'slim' && navbarPosition === 'vertical') {
-                    navbarDefault?.remove();
-                    navbarTop?.remove();
-                    navbarTopSlim?.remove();
-                    navbarCombo?.remove();
-                    navbarComboSlim?.remove();
-                    topNavSlim.style.display = 'block';
-                    navbarVertical.style.display = 'inline-block';
-                    document.documentElement.setAttribute('data-navbar-horizontal-shape', 'slim');
-
-                } else if (navbarTopShape === 'slim' && navbarPosition === 'horizontal') {
-                    navbarDefault?.remove();
-                    navbarVertical?.remove();
-                    navbarTop?.remove();
-                    topNavSlim?.remove();
-                    navbarCombo?.remove();
-                    navbarComboSlim?.remove();
-                    dualNav?.remove();
-                    navbarTopSlim.removeAttribute('style');
-                    document.documentElement.setAttribute('data-navbar-horizontal-shape', 'slim');
-                } else if (navbarTopShape === 'slim' && navbarPosition === 'combo') {
-                    navbarDefault?.remove();
-                    navbarTop?.remove();
-                    topNavSlim?.remove();
-                    navbarCombo?.remove();
-                    navbarTopSlim?.remove();
-                    dualNav?.remove();
-                    navbarComboSlim.removeAttribute('style');
-                    navbarVertical.removeAttribute('style');
-                    document.documentElement.setAttribute('data-navbar-horizontal-shape', 'slim');
-                } else if (navbarTopShape === 'default' && navbarPosition === 'horizontal') {
-                    navbarDefault?.remove();
-                    topNavSlim?.remove();
-                    navbarVertical?.remove();
-                    navbarTopSlim?.remove();
-                    navbarCombo?.remove();
-                    navbarComboSlim?.remove();
-                    dualNav?.remove();
-                    navbarTop.removeAttribute('style');
-                    document.documentElement.setAttribute('data-navigation-type', 'horizontal');
-                } else if (navbarTopShape === 'default' && navbarPosition === 'combo') {
-                    topNavSlim?.remove();
-                    navbarTop?.remove();
-                    navbarTopSlim?.remove();
-                    navbarDefault?.remove();
-                    navbarComboSlim?.remove();
-                    dualNav?.remove();
-                    navbarCombo.removeAttribute('style');
-                    navbarVertical.removeAttribute('style');
-                    document.documentElement.setAttribute('data-navigation-type', 'combo');
-                } else {
-                    topNavSlim?.remove();
-                    navbarTop?.remove();
-                    navbarTopSlim?.remove();
-                    navbarCombo?.remove();
-                    navbarComboSlim?.remove();
-                    dualNav?.remove();
-                    navbarDefault.removeAttribute('style');
-                    navbarVertical.removeAttribute('style');
-                }
-
-                var navbarTopStyle = window.config.config.phoenixNavbarTopStyle;
-                var navbarTop = document.querySelector('.navbar-top');
-                if (navbarTopStyle === 'darker') {
-                    navbarTop.setAttribute('data-navbar-appearance', 'darker');
-                }
-
-                var navbarVerticalStyle = window.config.config.phoenixNavbarVerticalStyle;
-                var navbarVertical = document.querySelector('.navbar-vertical');
-                if (navbarVerticalStyle === 'darker') {
-                    navbarVertical.setAttribute('data-navbar-appearance', 'darker');
-                }
-            </script>
+            var navbarVerticalStyle = window.config.config.phoenixNavbarVerticalStyle;
+            var navbarVertical = document.querySelector('.navbar-vertical');
+            if (navbarVerticalStyle === 'darker') {
+                navbarVertical.setAttribute('data-navbar-appearance', 'darker');
+            }
+        </script>
 
             <div class="modal modal-blur fade" id="switchbusinesses" tabindex="-1" role="dialog" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
@@ -826,7 +805,6 @@
                             <h5 class="modal-title">Select project</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-
                         <?php
                         $projects = \App\Models\Project::whereUserId(\Illuminate\Support\Facades\Auth::user()->id)->get();
                         ?>
@@ -946,8 +924,8 @@
                                 {!! \Session::get('warning') !!}
                             </div>
                         </div>
-                    @endif 
-
+                    @endif
+                    
                     @if (\Session::has('danger'))
                         <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
                             <div class="toast-header">
@@ -964,10 +942,7 @@
                             </div>
                         </div>
                     @endif 
-                </div>
-
-
-
+            </div>
     </main>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
