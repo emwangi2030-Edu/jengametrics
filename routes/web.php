@@ -31,9 +31,8 @@ use Illuminate\Support\Facades\Auth;
 
 // Home Route
 Route::get('/', function () {
-    return view('auth.login');
+    return redirect()->route('login');
 });
-
 
 // Route for the first step
 Route::get('/wizard/step1', [ProjectWizardController::class, 'step1'])->name('wizard.step1');

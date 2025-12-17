@@ -95,14 +95,20 @@ class WorkerController extends Controller
             // Worker start date
             $startDate = $worker->created_at->startOfDay();
             $today = now()->startOfDay();
+            $endDate = $worker->terminated_at ? $worker->terminated_at->copy()->startOfDay() : $today;
+            if ($endDate->gt($today)) {
+                $endDate = $today;
+            }
 
             // Total days worked since start
-            $daysWorked = $startDate->diffInDays($today);
+            if ($endDate->lt($startDate)) {
+                $daysWorked = 0;
+            } else {
+                $daysWorked = max(0, $startDate->diffInDays($endDate) + 1);
+            }
+            $dailyRate = ((float) $worker->payment_amount) / 30;
 
-            // Count full 30-day periods as "months"
-            $monthsCount = floor($daysWorked / 30);
-
-            $totalOwed = $monthsCount * $worker->payment_amount;
+            $totalOwed = $daysWorked * $dailyRate;
 
         } elseif ($worker->payment_frequency === 'one-time payment') {
             $totalOwed = $worker->payment_amount;
@@ -122,11 +128,27 @@ class WorkerController extends Controller
             if ($worker->payment_frequency === 'per day') {
                 $totalOwedPeriod = $attendanceCount * (float) $worker->payment_amount;
             } elseif ($worker->payment_frequency === 'per month') {
-                $activeStart = $worker->created_at->gt($periodStart) ? $worker->created_at->copy()->startOfDay() : $periodStart;
-                $activeDays = max(0, $activeStart->diffInDays($periodEnd->copy()->addDay()));
-                $daysInMonth = $periodStart->daysInMonth;
-                $prorataFactor = $daysInMonth > 0 ? ($activeDays / $daysInMonth) : 0;
-                $totalOwedPeriod = (float) $worker->payment_amount * $prorataFactor;
+                $today = now()->startOfDay();
+                if ($periodStart->gt($today)) {
+                    $totalOwedPeriod = 0.0;
+                } else {
+                    $cutoff = $periodEnd->lt($today) ? $periodEnd : $today;
+                    if ($worker->terminated_at) {
+                        $terminationDate = $worker->terminated_at->copy()->startOfDay();
+                        if ($terminationDate->lt($cutoff)) {
+                            $cutoff = $terminationDate;
+                        }
+                    }
+                    $startDate = $worker->created_at?->copy()->startOfDay() ?? $periodStart;
+
+                    if ($startDate->gt($cutoff)) {
+                        $totalOwedPeriod = 0.0;
+                    } else {
+                        $daysWorked = max(0, $startDate->diffInDays($cutoff) + 1);
+                        $dailyRate = ((float) $worker->payment_amount) / 30;
+                        $totalOwedPeriod = $daysWorked * $dailyRate;
+                    }
+                }
             } elseif ($worker->payment_frequency === 'one-time payment') {
                 $hasAnyPayment = $worker->payments()->exists();
                 $totalOwedPeriod = $hasAnyPayment ? 0.0 : (float) $worker->payment_amount;
@@ -134,8 +156,16 @@ class WorkerController extends Controller
             if ($worker->payment_frequency === 'one-time payment') {
                 $alreadyPaidPeriod = (float) $worker->payments()->sum('amount');
             } else {
+                $today = now()->startOfDay();
+                $cutoff = $periodEnd->lt($today) ? $periodEnd : $today;
+                if ($worker->terminated_at) {
+                    $terminationDate = $worker->terminated_at->copy()->startOfDay();
+                    if ($terminationDate->lt($cutoff)) {
+                        $cutoff = $terminationDate;
+                    }
+                }
                 $alreadyPaidPeriod = (float) $worker->payments()
-                    ->whereBetween('payment_date', [$periodStart, $periodEnd])
+                    ->whereDate('payment_date', '<=', $cutoff)
                     ->sum('amount');
             }
             $amountOwed = max($totalOwedPeriod - $alreadyPaidPeriod, 0.0);
@@ -398,11 +428,19 @@ class WorkerController extends Controller
             $daysPresent = $worker->attendances()->where('present', true)->count();
             $earned = $daysPresent * $rate;
         } elseif ($frequency === 'per month') {
-            $start = $worker->created_at ? $worker->created_at->copy()->startOfDay() : now()->startOfDay();
             $today = now()->startOfDay();
-            $daysWorked = max(0, $start->diffInDays($today) + 1);
-            $months = $daysWorked / 30;
-            $earned = $months * $rate;
+            $startDate = $worker->created_at ? $worker->created_at->copy()->startOfDay() : $today;
+            $endDate = $worker->terminated_at ? $worker->terminated_at->copy()->startOfDay() : $today;
+            if ($endDate->gt($today)) {
+                $endDate = $today;
+            }
+            if ($endDate->lt($startDate)) {
+                $daysWorked = 0;
+            } else {
+                $daysWorked = max(0, $startDate->diffInDays($endDate) + 1);
+            }
+            $dailyRate = $rate / 30;
+            $earned = $daysWorked * $dailyRate;
         } elseif ($frequency === 'one-time payment') {
             $earned = $rate;
         }

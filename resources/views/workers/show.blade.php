@@ -52,7 +52,7 @@
                             @if($lastPayment)
                                 {{ \Carbon\Carbon::parse($lastPayment->payment_date)->format('d M Y') }}
                             @else
-                                {{ __('Never') }}
+                                {{ __('Not Yet Paid') }}
                             @endif
                         </p>
                         <p><strong>Amount Owed:</strong> {{ number_format($amountOwed, 2) }}</p>
