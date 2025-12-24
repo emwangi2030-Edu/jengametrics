@@ -138,6 +138,28 @@
             $('.card-body').prepend(alertDiv);
         }
 
+        function normalizeOptions(data) {
+            if (Array.isArray(data)) {
+                return data.map(function (item) {
+                    return {
+                        id: item.id ?? item.value ?? '',
+                        name: item.name ?? item.label ?? '',
+                        unit: item.unit ?? ''
+                    };
+                });
+            }
+
+            return Object.entries(data || {}).map(function ([id, name]) {
+                return { id: id, name: name, unit: '' };
+            });
+        }
+
+        function sortOptionsByName(options) {
+            return options.slice().sort(function (a, b) {
+                return String(a.name).localeCompare(String(b.name));
+            });
+        }
+
         // Load elements based on selected section
         $('#section').on('change', function () {
             let sectionId = $(this).val();
@@ -153,8 +175,9 @@
                     },
                     success: function (data) {
                         $('#element').html('<option value="">{{ __("Choose Element") }}</option>');
-                        $.each(data, function (key, value) {
-                            $('#element').append('<option value="' + key + '">' + value + '</option>');
+                        const options = sortOptionsByName(normalizeOptions(data));
+                        $.each(options, function (_, option) {
+                            $('#element').append('<option value="' + option.id + '">' + option.name + '</option>');
                         });
                     },
                     error: function() {
@@ -180,8 +203,9 @@
                     },
                     success: function (data) {
                         $('#item_id').html('<option value="">{{ __("Choose Item") }}</option>');
-                        $.each(data, function (key, value) {
-                            $('#item_id').append('<option value="' + key + '">' + value + '</option>');
+                        const options = sortOptionsByName(normalizeOptions(data));
+                        $.each(options, function (_, option) {
+                            $('#item_id').append('<option value="' + option.id + '">' + option.name + '</option>');
                         });
                     },
                     error: function() {

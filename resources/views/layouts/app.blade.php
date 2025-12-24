@@ -557,10 +557,8 @@
             </div>
             <div class="navbar-vertical-footer px-3 py-2">
                 <button class="navbar-vertical-toggle nav-link w-100 d-flex align-items-center px-3 py-2 text-start border-0 bg-transparent" type="button" role="button">
-                    <span class="navbar-vertical-toggle-icon navbar-vertical-toggle-icon--expanded uil uil-left-arrow-to-left me-2 fs-6" aria-hidden="true"></span>
+                    <span class="navbar-vertical-toggle-icon navbar-vertical-toggle-icon--expanded me-2 fs-4 d-none" aria-hidden="true">&lsaquo;</span>
                     <span class="navbar-vertical-toggle-icon navbar-vertical-toggle-icon--collapsed fs-4 me-2 d-none" aria-hidden="true">&rsaquo;</span>
-                    <span class="navbar-vertical-toggle-chevron me-2" aria-hidden="true">&lsaquo;</span>
-                    <span class="navbar-vertical-footer-text flex-grow-1" data-expanded-text="Collapse Menu" data-collapsed-text="Expand Menu">Collapse Menu</span>
                 </button>
             </div>
         </nav>

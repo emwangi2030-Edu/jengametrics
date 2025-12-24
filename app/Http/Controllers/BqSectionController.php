@@ -471,6 +471,12 @@ class BqSectionController extends Controller
         $items = $itemsQuery->get();
         $sections = Section::orderBy('name')->get();
 
+        if ($request->ajax()) {
+            return view('bq_sections.partials.items_table', [
+                'items' => $items,
+            ]);
+        }
+
         return view('bq_sections.show', [
             'bqDocument' => $bqDocument,
             'bqLevel' => $bqLevel,
