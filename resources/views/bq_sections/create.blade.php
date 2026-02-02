@@ -54,6 +54,77 @@
                             <label for="manual_name">{{ __('Manual item name') }}</label>
                         </div>
 
+                        {{-- Manual item materials --}}
+                        <div class="manual-only d-none mb-4">
+                            <label class="form-label fw-semibold">{{ __('Manual item materials') }}</label>
+                            <div id="manual-materials" class="d-flex flex-column gap-3">
+                                <div class="row g-3 align-items-end manual-material-row" data-index="0">
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label">{{ __('Material name') }}</label>
+                                        <input type="text" name="manual_materials[0][name]" class="form-control manual-material-name" placeholder="{{ __('e.g. Cement') }}">
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <label class="form-label">{{ __('Unit') }}</label>
+                                        <select name="manual_materials[0][unit]" class="form-select manual-material-unit">
+                                            <option value="">{{ __('Choose Unit') }}</option>
+                                            @foreach($units ?? [] as $unit)
+                                                <option value="{{ $unit->abbrev }}">{{ $unit->abbrev }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label class="form-label">{{ __('Quantity') }}</label>
+                                        <input type="number" step="0.01" min="0" name="manual_materials[0][quantity]" class="form-control manual-material-quantity" placeholder="0">
+                                    </div>
+                                    <div class="col-6 col-md-2">
+                                        <label class="form-label">{{ __('Unit rate') }}</label>
+                                        <input type="number" step="0.01" min="0" name="manual_materials[0][rate]" class="form-control manual-material-rate" placeholder="0.00">
+                                    </div>
+                                    <div class="col-12 col-md-1 d-grid">
+                                        <button type="button" class="btn btn-outline-danger btn-sm manual-material-remove" disabled>
+                                            <i data-feather="x"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="button" id="manual-material-add" class="btn btn-outline-success btn-sm">
+                                    {{ __('Add material') }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <template id="manual-material-template">
+                            <div class="row g-3 align-items-end manual-material-row" data-index="__INDEX__">
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label">{{ __('Material name') }}</label>
+                                    <input type="text" name="manual_materials[__INDEX__][name]" class="form-control manual-material-name" placeholder="{{ __('e.g. Cement') }}">
+                                </div>
+                                <div class="col-12 col-md-3">
+                                    <label class="form-label">{{ __('Unit') }}</label>
+                                    <select name="manual_materials[__INDEX__][unit]" class="form-select manual-material-unit">
+                                        <option value="">{{ __('Choose Unit') }}</option>
+                                        @foreach($units ?? [] as $unit)
+                                            <option value="{{ $unit->abbrev }}">{{ $unit->abbrev }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-6 col-md-2">
+                                    <label class="form-label">{{ __('Quantity') }}</label>
+                                    <input type="number" step="0.01" min="0" name="manual_materials[__INDEX__][quantity]" class="form-control manual-material-quantity" placeholder="0">
+                                </div>
+                                <div class="col-6 col-md-2">
+                                    <label class="form-label">{{ __('Unit rate') }}</label>
+                                    <input type="number" step="0.01" min="0" name="manual_materials[__INDEX__][rate]" class="form-control manual-material-rate" placeholder="0.00">
+                                </div>
+                                <div class="col-12 col-md-1 d-grid">
+                                    <button type="button" class="btn btn-outline-danger btn-sm manual-material-remove">
+                                        <i data-feather="x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+
                         {{-- Manual unit --}}
                         <div class="form-floating mb-4 manual-only d-none">
                             <select name="manual_unit" id="manual_unit" class="form-select">
@@ -116,6 +187,7 @@
             $('#element, #item_id').prop('required', !manual);
             $('#manual_name').prop('required', manual);
             $('#manual_unit').prop('required', manual);
+            setManualMaterialRequired(manual);
 
             if (manual) {
                 $('#element').val('');
@@ -123,11 +195,64 @@
             } else {
                 $('#manual_name').val('');
                 $('#manual_unit').val('');
+                resetManualMaterials();
             }
         }
 
         $('#manual_item').on('change', toggleManualMode);
         toggleManualMode();
+
+        function setManualMaterialRequired(required) {
+            $('#manual-materials').find('input, select').prop('required', required);
+        }
+
+        function createManualMaterialRow(index) {
+            const template = $('#manual-material-template').html();
+            return template.replace(/__INDEX__/g, index);
+        }
+
+        function updateManualMaterialButtons() {
+            const rows = $('#manual-materials .manual-material-row');
+            rows.find('.manual-material-remove').prop('disabled', rows.length <= 1);
+        }
+
+        function refreshFeatherIcons() {
+            if (window.feather && typeof window.feather.replace === 'function') {
+                window.feather.replace();
+            }
+        }
+
+        function renumberManualMaterials() {
+            $('#manual-materials .manual-material-row').each(function (index) {
+                $(this).attr('data-index', index);
+                $(this).find('[name]').each(function () {
+                    const name = $(this).attr('name');
+                    const updated = name.replace(/manual_materials\\[\\d+\\]/, 'manual_materials[' + index + ']');
+                    $(this).attr('name', updated);
+                });
+            });
+        }
+
+        function resetManualMaterials() {
+            $('#manual-materials').html(createManualMaterialRow(0));
+            updateManualMaterialButtons();
+            refreshFeatherIcons();
+        }
+
+        $('#manual-material-add').on('click', function () {
+            const nextIndex = $('#manual-materials .manual-material-row').length;
+            $('#manual-materials').append(createManualMaterialRow(nextIndex));
+            setManualMaterialRequired($('#manual_item').is(':checked'));
+            updateManualMaterialButtons();
+            refreshFeatherIcons();
+        });
+
+        $('#manual-materials').on('click', '.manual-material-remove', function () {
+            $(this).closest('.manual-material-row').remove();
+            renumberManualMaterials();
+            updateManualMaterialButtons();
+            refreshFeatherIcons();
+        });
 
         // Function to display error message
         function showError(message) {

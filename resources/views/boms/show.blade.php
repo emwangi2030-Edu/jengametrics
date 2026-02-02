@@ -37,11 +37,11 @@
                                 <tbody>
                                     @forelse ($items as $item)
                                         <tr>
-                                            <td class="px-2">{{ $item->product->name ?? ($item->item_material->name ?? '') }}</td>
+                                            <td class="px-2">{{ $item->display_name ?? ($item->product->name ?? ($item->item_material->name ?? ($item->item_description ?? ''))) }}</td>
                                             <td class="text-end">{{ number_format($item->total_quantity, 2) }}</td>
-                                            <td class="text-nowrap">{{ $item->unit ?? ($item->product->unit ?? ($item->item_material->unit_of_measurement ?? '')) }}</td>
+                                            <td class="text-nowrap">{{ $item->display_unit ?? ($item->unit ?? ($item->product->unit ?? ($item->item_material->unit_of_measurement ?? ''))) }}</td>
                                             <td class="text-end">{{ number_format($item->rate, 2) }}</td>
-                                            <td class="text-end">{{ number_format($item->total_quantity * $item->rate, 2) }}</td>
+                                            <td class="text-end">{{ number_format($item->total_amount ?? ($item->total_quantity * $item->rate), 2) }}</td>
                                         </tr>
                                     @empty
                                         <tr>
@@ -52,7 +52,7 @@
                                 @php
                                     $totalAmount = 0;
                                     foreach($items as $item){
-                                        $totalAmount += $item->total_quantity * $item->rate;
+                                        $totalAmount += $item->total_amount ?? ($item->total_quantity * $item->rate);
                                     }
                                 @endphp
                                 <tfoot>

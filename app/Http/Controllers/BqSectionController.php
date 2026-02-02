@@ -60,51 +60,69 @@ class BqSectionController extends Controller
         $isManual = $request->boolean('manual_item');
 
         if ($isManual) {
-            $request->validate([
+            $validated = $request->validate([
                 'section_id' => 'required|exists:sections,id',
                 'manual_name' => 'required|string|max:255',
                 'manual_unit' => 'required|string|max:50',
                 'rate' => 'required|numeric|min:0',
                 'quantity' => 'required|numeric|min:0',
+                'manual_materials' => 'required|array|min:1',
+                'manual_materials.*.name' => 'required|string|max:255',
+                'manual_materials.*.unit' => 'required|string|max:50',
+                'manual_materials.*.quantity' => 'required|numeric|min:0.0001',
+                'manual_materials.*.rate' => 'required|numeric|min:0',
             ]);
 
-            $quantity = (float) $request->quantity;
-            $rate = (float) $request->rate;
+            $quantity = (float) $validated['quantity'];
+            $rate = (float) $validated['rate'];
             $amount = $quantity * $rate;
 
             $bqSection = BqSection::create([
                 'bq_document_id' => $bqDocument->id,
                 'bq_level_id' => $bqLevel->id,
                 'project_id' => (int) project_id(),
-                'section_id' => $request->section_id,
+                'section_id' => $validated['section_id'],
                 'item_id' => null,
-                'item_name' => $request->manual_name,
-                'units' => $request->manual_unit,
+                'item_name' => $validated['manual_name'],
+                'units' => $validated['manual_unit'],
                 'quantity' => $quantity,
                 'rate' => $rate,
                 'amount' => $amount,
             ]);
 
-            // Derive material and labour from total amount
-            $materialAmount = round($amount * 0.65, 2);
-            $labourAmount = round($amount * 0.19, 2);
-            $scaledMaterialAmount = $materialAmount * $units;
-            $scaledLabourAmount = $labourAmount * $units;
+            $manualMaterials = collect($validated['manual_materials'])
+                ->values();
 
-            BomItem::create([
-                'section_id' => $bqSection->section_id,
-                'item_id' => null,
-                'item_material_id' => null,
-                'product_id' => null,
-                'quantity' => $units,
-                'rate' => $materialAmount,
-                'amount' => $scaledMaterialAmount,
-                'item_description' => $bqSection->item_name,
-                'unit' => $bqSection->units,
-                'project_id' => (int) project_id(),
-                'bq_section_id' => $bqSection->id,
-                'bq_document_id' => $bqSection->bq_document_id,
-            ]);
+            $materialTotalPerUnit = 0.0;
+
+            foreach ($manualMaterials as $material) {
+                $materialName = trim((string) $material['name']);
+                $materialUnit = trim((string) $material['unit']);
+                $materialQty = (float) $material['quantity'];
+                $materialRate = (float) $material['rate'];
+                $materialAmount = $materialQty * $materialRate;
+
+                $materialTotalPerUnit += $materialAmount;
+
+                BomItem::create([
+                    'section_id' => $bqSection->section_id,
+                    'item_id' => null,
+                    'item_material_id' => null,
+                    'product_id' => null,
+                    'quantity' => $materialQty * $units,
+                    'rate' => $materialRate,
+                    'amount' => $materialAmount * $units,
+                    'item_description' => $materialName,
+                    'unit' => $materialUnit,
+                    'project_id' => (int) project_id(),
+                    'bq_section_id' => $bqSection->id,
+                    'bq_document_id' => $bqSection->bq_document_id,
+                ]);
+            }
+
+            // Labour equals 19% of manual materials total
+            $labourAmount = round($materialTotalPerUnit * 0.19, 2);
+            $scaledLabourAmount = $labourAmount * $units;
 
             BomLabour::create([
                 'section_id' => $bqSection->section_id,

@@ -125,18 +125,37 @@ class BOMController extends Controller
 
         $bqDocumentForSection = $primaryBqSection?->bqDocument;
 
-        $groupedItems = $rawItems->groupBy('product_id');
+        $groupedItems = $rawItems->groupBy(function (BomItem $item) {
+            if ($item->product_id) {
+                return 'product:' . $item->product_id;
+            }
 
-        foreach ($groupedItems as $product_id => $group) {
+            $name = strtolower(trim((string) ($item->item_description ?? 'manual')));
+            $unit = strtolower(trim((string) ($item->unit ?? 'unit')));
+
+            return 'manual:' . $name . '|' . $unit;
+        });
+
+        foreach ($groupedItems as $groupKey => $group) {
             $sampleItem = $group->first();
-            $totalQty = $group->sum('quantity');
-            $totalAmt = $group->sum('amount');
+            $totalQty = (float) $group->sum('quantity');
+            $totalAmt = (float) $group->sum('amount');
 
-            $product = Product::find($product_id);
+            $product = $sampleItem?->product_id ? Product::find($sampleItem->product_id) : null;
+
+            $displayName = $product?->name
+                ?? $sampleItem->item_description
+                ?? __('Unknown Material');
+            $displayUnit = $product?->unit
+                ?? $sampleItem->unit
+                ?? 'N/A';
 
             $sampleItem->total_quantity = $totalQty;
             $sampleItem->total_amount = $totalAmt;
-            $sampleItem->unit = $product?->unit ?? 'N/A';
+            $sampleItem->rate = $totalQty > 0 ? $totalAmt / $totalQty : (float) ($sampleItem->rate ?? 0);
+            $sampleItem->display_name = $displayName;
+            $sampleItem->display_unit = $displayUnit;
+            $sampleItem->unit = $displayUnit;
 
             // Push for BoM table
             $items->push($sampleItem);
