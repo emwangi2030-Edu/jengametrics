@@ -187,10 +187,6 @@ class BOMController extends Controller
     {
         $project = get_project();
 
-        if ($bqDocument->project_id !== $project->id || is_null($bqDocument->parent_id)) {
-            abort(404);
-        }
-
         $bqDocument->load(['levels' => function ($levelQuery) {
             $levelQuery->with(['sections' => function ($query) {
                 $query->orderBy('section_id')
