@@ -10,7 +10,7 @@
         Are you sure you want to delete "<strong>{{ $item->item_name }}</strong>"?
       </div>
       <div class="modal-footer">
-        <form method="POST" action="{{ route('bq_sections.item.destroy', $item->id) }}">
+        <form method="POST" action="{{ route('bq_sections.item.destroy', $item->id) }}" data-confirm-bypass>
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger">Delete</button>

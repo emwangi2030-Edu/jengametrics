@@ -42,7 +42,7 @@
                         <a href="{{ route('workers.edit', $worker->id) }}" class="btn btn-warning btn-sm">
                             Edit
                         </a>
-                        <form action="{{ route('workers.destroy', $worker->id) }}" method="POST" onsubmit="return confirm('{{ $isArchived ? __('All outstanding debts have been cleared. Remove this worker? Attendance history will remain marked as terminated.') : __('Archive this worker? Attendance and payments will be kept.') }}')">
+                        <form action="{{ route('workers.destroy', $worker->id) }}" method="POST" data-confirm-message="{{ $isArchived ? __('All outstanding debts have been cleared. Remove this worker? Attendance history will remain marked as terminated.') : __('Archive this worker? Attendance and payments will be kept.') }}">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger btn-sm">

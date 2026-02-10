@@ -13,7 +13,7 @@
         <div class="col-md-8">
             <div class="card shadow-sm border-0 rounded">
                 <div class="card-body p-5">
-                    <form method="POST" action="{{ route('bq_levels.items.store', [$bqDocument, $bqLevel]) }}">
+                    <form id="bq-section-form" method="POST" action="{{ route('bq_levels.items.store', [$bqDocument, $bqLevel]) }}">
                         @csrf
 
                         <div class="form-check form-switch mb-4">
@@ -155,12 +155,33 @@
                         </div>
 
                         <div class="d-flex justify-content-center">
-                            <button type="submit" class="btn w-50 py-2 text-white" style="background-color:#027333;">{{ __('Save to BQ') }}</button>
+                            <button type="button" class="btn w-50 py-2 text-white" style="background-color:#027333;" data-bs-toggle="modal" data-bs-target="#confirmSaveToBoqModal">
+                                {{ __('Save to BoQ') }}
+                            </button>
                         </div>
                     </form>
                     <br>
                     <div class="d-flex justify-content-center">
                         <a href="{{ route('bq_levels.show', [$bqDocument, $bqLevel]) }}" class="btn btn-dark">{{ __('Back') }}</a>
+                    </div>
+
+                    <!-- Confirm Save Modal -->
+                    <div class="modal fade" id="confirmSaveToBoqModal" tabindex="-1" aria-labelledby="confirmSaveToBoqModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmSaveToBoqModalLabel">{{ __('Confirm Save') }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
+                                </div>
+                                <div class="modal-body">
+                                    {{ __('Save this item to the BoQ?') }}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                                    <button type="button" class="btn btn-success" id="confirm-save-to-boq">{{ __('Yes, Save') }}</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -171,6 +192,10 @@
 <script>
     $(document).ready(function () {
         console.log('Page loaded, jQuery is ready');
+
+        $('#confirm-save-to-boq').on('click', function () {
+            $('#bq-section-form').trigger('submit');
+        });
 
         // CSRF token for AJAX
         $.ajaxSetup({

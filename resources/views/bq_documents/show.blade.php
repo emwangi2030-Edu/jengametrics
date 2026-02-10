@@ -100,7 +100,7 @@
                                                 method="POST"
                                                 action="{{ route('bq_levels.destroy', [$bqDocument, $level]) }}"
                                                 class="d-inline"
-                                                onsubmit="return confirm('{{ __('Delete this level? This cannot be undone.') }}')">
+                                                data-confirm-message="{{ __('Do you wish to delete this level?') }}">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-outline-danger btn-sm">

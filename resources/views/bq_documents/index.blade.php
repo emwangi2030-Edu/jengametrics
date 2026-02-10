@@ -76,7 +76,7 @@
                                                 <button type="button" class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editSubBoqModal{{ $document->id }}">
                                                     {{ __('Edit') }}
                                                 </button>
-                                                <form action="{{ route('bq_documents.destroy', $document) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('Are you sure you want to delete this BoQ?') }}');">
+                                                <form action="{{ route('bq_documents.destroy', $document) }}" method="POST" class="d-inline" data-confirm-message="{{ __('Do you wish to delete this BoQ?') }}">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm">
@@ -203,8 +203,7 @@
                                                         {{ __('Edit') }}                                                                                                                      
                                                     </button>                                                                                                                                 
                                                 </div>                                                                                                                                        
-                                                <form action="{{ route('libraries.destroy', $library) }}" method="POST" class="d-inline ms-2"                                                 
-                                                    onsubmit="return confirm('{{ __('Delete this library? This action cannot be undone.') }}');">                                             
+                                                <form action="{{ route('libraries.destroy', $library) }}" method="POST" class="d-inline ms-2" data-confirm-message="{{ __('Do you wish to delete this library?') }}">                                             
                                                     @csrf                                                                                                                                     
                                                     @method('DELETE')                                                                                                                         
                                                     <button type="submit" class="btn btn-danger btn-sm">                                                                                      
