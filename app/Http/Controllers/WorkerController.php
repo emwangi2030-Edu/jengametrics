@@ -274,6 +274,33 @@ class WorkerController extends Controller
             ->with('success', 'Worker removed after clearing debts. Attendance history retained as terminated.');
     }
 
+    public function restore($id)
+    {
+        $user = Auth::user();
+        if ($user && $user->isSubAccount() && ! $user->can_manage_labour) {
+            return redirect()
+                ->route('workers.index')
+                ->with('warning', 'You do not have access to manage labour.');
+        }
+
+        $worker = Worker::withTrashed()->findOrFail($id);
+
+        if (! $worker->trashed()) {
+            return redirect()
+                ->route('workers.index')
+                ->with('info', 'Worker is already active.');
+        }
+
+        $worker->restore();
+        $worker->terminated = false;
+        $worker->terminated_at = null;
+        $worker->save();
+
+        return redirect()
+            ->route('workers.index')
+            ->with('success', 'Worker reinstated successfully.');
+    }
+
     public function update(Request $request, $id)
     {
         $worker = Worker::findOrFail($id);

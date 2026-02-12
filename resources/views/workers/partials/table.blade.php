@@ -46,6 +46,14 @@
                         <a href="{{ route('workers.edit', $worker->id) }}" class="btn btn-warning btn-sm">
                             Edit
                         </a>
+                        @if($isArchived && auth()->check() && (!auth()->user()->isSubAccount() || auth()->user()->can_manage_labour))
+                            <form action="{{ route('workers.restore', $worker->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    {{ __('Restore') }}
+                                </button>
+                            </form>
+                        @endif
                         <form action="{{ route('workers.destroy', $worker->id) }}" method="POST" data-confirm-message="{{ $isArchived ? __('All outstanding debts have been cleared. Remove this worker? Attendance history will remain marked as terminated.') : __('Archive this worker? Attendance and payments will be kept.') }}">
                             @csrf
                             @method('DELETE')

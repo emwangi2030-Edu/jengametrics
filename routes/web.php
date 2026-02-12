@@ -157,6 +157,7 @@ Route::post('/documents', [DocumentController::class, 'store'])->name('documents
 // Workers Table Route
 Route::get('/workers/{id}/attendance-data', [WorkerController::class, 'attendanceData'])->name('workers.attendanceData');
 Route::resource('workers', WorkerController::class)->only(['index', 'show']);
+Route::post('/workers/{worker}/restore', [WorkerController::class, 'restore'])->name('workers.restore');
 Route::get('/workers/create', [WorkerController::class, 'create'])->name('workers.create');
 Route::post('/workers', [WorkerController::class, 'store'])->name('workers.store');
 Route::get('/workers/{worker}/edit', [WorkerController::class, 'edit'])->name('workers.edit');
