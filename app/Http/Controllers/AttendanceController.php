@@ -16,14 +16,11 @@ class AttendanceController extends Controller
         $dateInput = $request->input('date') ?? $request->input('selected_date') ?? now()->toDateString();
         $selectedDate = Carbon::parse($dateInput)->endOfDay();
 
-        $workers = Worker::withTrashed()
+        $workers = Worker::query()
             ->where('project_id', $projectId)
             ->where('created_at', '<=', $selectedDate)
-            ->where(function ($query) use ($selectedDate) {
-                $query->where('terminated', false)
-                    ->orWhereNull('terminated_at')
-                    ->orWhereDate('terminated_at', '>', $selectedDate->toDateString());
-            })
+            ->where('terminated', false)
+            ->whereNull('terminated_at')
             ->orderBy('full_name')
             ->get();
 
@@ -72,14 +69,11 @@ class AttendanceController extends Controller
         $dateInput = $request->input('date') ?? now()->toDateString();
         $selectedDate = Carbon::parse($dateInput)->endOfDay();
 
-        $workers = Worker::withTrashed()
+        $workers = Worker::query()
             ->where('project_id', $projectId)
             ->where('created_at', '<=', $selectedDate)
-            ->where(function ($query) use ($selectedDate) {
-                $query->where('terminated', false)
-                    ->orWhereNull('terminated_at')
-                    ->orWhereDate('terminated_at', '>', $selectedDate->toDateString());
-            })
+            ->where('terminated', false)
+            ->whereNull('terminated_at')
             ->orderBy('full_name')
             ->get();
         $existingAttendances = Attendance::whereDate('date', $dateInput)->get()

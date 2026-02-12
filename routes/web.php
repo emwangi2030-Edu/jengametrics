@@ -156,13 +156,13 @@ Route::post('/documents', [DocumentController::class, 'store'])->name('documents
 
 // Workers Table Route
 Route::get('/workers/{id}/attendance-data', [WorkerController::class, 'attendanceData'])->name('workers.attendanceData');
-Route::resource('workers', WorkerController::class)->only(['index', 'show']);
 Route::post('/workers/{worker}/restore', [WorkerController::class, 'restore'])->name('workers.restore');
 Route::get('/workers/create', [WorkerController::class, 'create'])->name('workers.create');
 Route::post('/workers', [WorkerController::class, 'store'])->name('workers.store');
 Route::get('/workers/{worker}/edit', [WorkerController::class, 'edit'])->name('workers.edit');
 Route::put('/workers/{worker}', [WorkerController::class, 'update'])->name('workers.update');
 Route::delete('/workers/{worker}', [WorkerController::class, 'destroy'])->name('workers.destroy');
+Route::resource('workers', WorkerController::class)->only(['index', 'show']);
 
 // Route to show the worker's attendance
 Route::get('/attendance', [AttendanceController::class, 'create'])->name('attendance.create');
@@ -180,12 +180,13 @@ Route::get('/materials/delivered', [MaterialController::class, 'materialsDeliver
 Route::get('/materials/inventory', [MaterialController::class, 'inventoryManagement'])->name('materials.inventory');
 Route::get('/materials/usage', [MaterialController::class, 'stockUsageHistory'])->name('materials.usage');
 Route::get('/materials/view-document/{id}', [MaterialController::class, 'viewDocument'])->name('materials.viewDocument');
-Route::resource('materials', MaterialController::class)->only(['index', 'show']);
 Route::get('/materials/create', [MaterialController::class, 'create'])->name('materials.create');
 Route::post('/materials', [MaterialController::class, 'store'])->name('materials.store');
 Route::get('/materials/{material}/edit', [MaterialController::class, 'edit'])->name('materials.edit');
 Route::put('/materials/{material}', [MaterialController::class, 'update'])->name('materials.update');
 Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
+Route::resource('materials', MaterialController::class)->only(['index', 'show']);
+
 
 // Routes for Supplier Name and Contact Autocomplete Feature
 Route::get('/suppliers/autocomplete', [SupplierController::class, 'autocomplete'])->name('suppliers.autocomplete');

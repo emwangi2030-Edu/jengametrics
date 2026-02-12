@@ -30,7 +30,11 @@
                             <span class="{{ $nameClasses }}">{{ $worker->full_name }}</span>
                         @endif
                         @if($isArchived)
-                            <span class="badge bg-secondary ms-1">{{ __('Archived') }}</span>
+                            @if($worker->terminated ?? false)
+                                <span class="badge bg-secondary ms-1">{{ __('Terminated') }}</span>
+                            @else
+                                <span class="badge bg-secondary ms-1">{{ __('Archived') }}</span>
+                            @endif
                             @if($worker->amount_owed > 0)
                                 <span class="badge bg-warning text-dark ms-1">{{ __('Owed') }}: {{ number_format($worker->amount_owed, 2) }}</span>
                             @endif
@@ -43,24 +47,36 @@
                     <td>{{ $worker->email ?? 'N/A' }}</td>
                     <td>{{ $worker->attendances_count }}</td>
                     <td class="d-flex gap-1">
-                        <a href="{{ route('workers.edit', $worker->id) }}" class="btn btn-warning btn-sm">
-                            Edit
-                        </a>
-                        @if($isArchived && auth()->check() && (!auth()->user()->isSubAccount() || auth()->user()->can_manage_labour))
-                            <form action="{{ route('workers.restore', $worker->id) }}" method="POST" class="d-inline">
+                        @if($isArchived && ($worker->terminated ?? false))
+                            <span class="text-muted">{{ __('Terminated, Dues Paid') }}</span>
+                        @elseif($isArchived)
+                            @if(auth()->check() && (!auth()->user()->isSubAccount() || auth()->user()->can_manage_labour))
+                                <form action="{{ route('workers.restore', $worker->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        {{ __('Restore') }}
+                                    </button>
+                                </form>
+                            @endif
+                            <form action="{{ route('workers.destroy', $worker->id) }}" method="POST" data-confirm-message="{{ __('All outstanding debts have been cleared. Remove this worker? Attendance history will remain marked as terminated.') }}">
                                 @csrf
-                                <button type="submit" class="btn btn-success btn-sm">
-                                    {{ __('Restore') }}
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    {{ __('Remove') }}
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('workers.edit', $worker->id) }}" class="btn btn-warning btn-sm">
+                                Edit
+                            </a>
+                            <form action="{{ route('workers.destroy', $worker->id) }}" method="POST" data-confirm-message="{{ __('Archive this worker? Attendance and payments will be kept.') }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    {{ __('Delete') }}
                                 </button>
                             </form>
                         @endif
-                        <form action="{{ route('workers.destroy', $worker->id) }}" method="POST" data-confirm-message="{{ $isArchived ? __('All outstanding debts have been cleared. Remove this worker? Attendance history will remain marked as terminated.') : __('Archive this worker? Attendance and payments will be kept.') }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">
-                                {{ $isArchived ? __('Remove') : __('Delete') }}
-                            </button>
-                        </form>
                     </td>
                 </tr>
             @endforeach
