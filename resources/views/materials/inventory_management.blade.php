@@ -1,7 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="row mt-5">
+@php
+    $canManageMaterials = auth()->check() && (!auth()->user()->isSubAccount() || auth()->user()->can_manage_materials);
+@endphp
+<div class="row mt-5 {{ $canManageMaterials ? '' : 'materials-readonly' }}">
     <div class="col-12">
         <h3 class="font-weight-bold" style="color:#027333;">Inventory Management</h3>
         <div class="row mt-5">
@@ -130,15 +133,138 @@
                         form.reset();
                     }
                 })
-                .catch(() => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Something went wrong!',
-                        confirmButtonColor: '#027333'
-                    });
-                });
             });
         });
     });
 </script>
+
+@if(!$canManageMaterials)
+    @push('styles')
+        <style>
+            .materials-readonly .btn {
+                opacity: 0.55;
+                cursor: not-allowed;
+            }
+
+            .materials-readonly .btn.allow-readonly {
+                opacity: 1;
+                cursor: pointer;
+            }
+
+            .materials-readonly a.btn:hover,
+            .materials-readonly button:hover {
+                transform: none !important;
+            }
+
+            .materials-readonly .btn.allow-readonly:hover {
+                cursor: pointer;
+            }
+
+            .materials-readonly .btn:hover {
+                cursor: not-allowed;
+            }
+        </style>
+    @endpush
+
+    @push('scripts')
+        <script>
+            (function () {
+                const container = document.querySelector('.materials-readonly');
+                if (!container) {
+                    return;
+                }
+
+                const allowedLabels = ['back', 'cancel', 'close', 'return', 'reset'];
+                container.querySelectorAll('.btn').forEach((btn) => {
+                    const text = (btn.textContent || '').trim().toLowerCase();
+                    if (allowedLabels.includes(text) || btn.hasAttribute('data-allow-readonly')) {
+                        btn.classList.add('allow-readonly');
+                    }
+                });
+
+                container.querySelectorAll('[data-bs-toggle="modal"]').forEach((trigger) => {
+                    if (trigger.classList.contains('allow-readonly')) {
+                        return;
+                    }
+                    trigger.setAttribute('data-bs-toggle-disabled', 'true');
+                    if (trigger.hasAttribute('data-bs-target')) {
+                        trigger.setAttribute('data-bs-target-disabled', trigger.getAttribute('data-bs-target'));
+                        trigger.removeAttribute('data-bs-target');
+                    }
+                    trigger.removeAttribute('data-bs-toggle');
+                });
+
+                let hoverToast = null;
+                function showNoAccessToast() {
+                    const toastContainer = document.getElementById('toast-container');
+                    if (!toastContainer || hoverToast) {
+                        return;
+                    }
+
+                    const toast = document.createElement('div');
+                    toast.className = 'toast show';
+                    toast.setAttribute('role', 'alert');
+                    toast.setAttribute('aria-live', 'assertive');
+                    toast.setAttribute('aria-atomic', 'true');
+
+                    toast.innerHTML = `
+                        <div class="toast-header">
+                            <strong class="me-auto">System</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            <span class="badge bg-warning">Warning</span>
+                            You do not have access
+                        </div>
+                    `;
+
+                    toastContainer.appendChild(toast);
+                    hoverToast = toast;
+                }
+
+                function hideNoAccessToast() {
+                    if (!hoverToast) {
+                        return;
+                    }
+                    hoverToast.remove();
+                    hoverToast = null;
+                }
+
+                container.addEventListener('mouseenter', function (event) {
+                    const target = event.target.closest('.btn');
+                    if (!target) {
+                        return;
+                    }
+                    if (target.classList.contains('allow-readonly')) {
+                        return;
+                    }
+                    showNoAccessToast();
+                }, true);
+
+                container.addEventListener('mouseleave', function (event) {
+                    const target = event.target.closest('.btn');
+                    if (!target) {
+                        return;
+                    }
+                    if (target.classList.contains('allow-readonly')) {
+                        return;
+                    }
+                    hideNoAccessToast();
+                }, true);
+
+                container.addEventListener('click', function (event) {
+                    const target = event.target.closest('.btn');
+                    if (!target) {
+                        return;
+                    }
+                    if (target.classList.contains('allow-readonly')) {
+                        return;
+                    }
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                }, true);
+            })();
+        </script>
+    @endpush
+@endif

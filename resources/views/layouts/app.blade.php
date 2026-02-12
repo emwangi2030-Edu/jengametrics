@@ -175,10 +175,20 @@
         .green_text {
             color: #027333;
         }
+
+        .write-disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
-<body>
+<body
+    data-user-is-subaccount="{{ auth()->check() && auth()->user()->isSubAccount() ? '1' : '0' }}"
+    data-can-manage-boq="{{ auth()->check() && auth()->user()->can_manage_boq ? '1' : '0' }}"
+    data-can-manage-materials="{{ auth()->check() && auth()->user()->can_manage_materials ? '1' : '0' }}"
+    data-can-manage-labour="{{ auth()->check() && auth()->user()->can_manage_labour ? '1' : '0' }}"
+>
     <!-- ===============================================-->
     <!--    Main Content-->
     <!-- ===============================================-->
@@ -656,6 +666,12 @@
                                                 <i class="fa fa-user"></i> 
                                                 <span key="t-profile">Profile</span>
                                             </a>
+                                            @if(!\Illuminate\Support\Facades\Auth::user()->isSubAccount())
+                                                <a class="dropdown-item" href="{{ route('sub_accounts.index') }}">
+                                                    <i class="fa fa-users"></i>
+                                                    <span key="t-profile">Sub-Accounts</span>
+                                                </a>
+                                            @endif
                                             <a class="dropdown-item" href="{{ url('businesses') }}">
                                                 <i class="fa fa-users"></i> 
                                                 <span key="t-profile">Manage your projects</span>
@@ -1077,6 +1093,226 @@
         })();
     </script>
 
+    <script>
+        (function () {
+            const body = document.body;
+            if (!body || body.dataset.userIsSubaccount !== '1') {
+                return;
+            }
+
+            const access = {
+                boq: body.dataset.canManageBoq === '1',
+                materials: body.dataset.canManageMaterials === '1',
+                labour: body.dataset.canManageLabour === '1',
+            };
+            const isReadOnlyUser = !access.boq && !access.materials && !access.labour;
+
+            function inferRoleFromAction(action) {
+                const path = (action || '').toLowerCase();
+                if (path.includes('/materials') || path.includes('/suppliers') || path.includes('/requisitions')) {
+                    return 'materials';
+                }
+                if (path.includes('/workers') || path.includes('/attendance') || path.includes('/payments')) {
+                    return 'labour';
+                }
+                if (
+                    path.includes('/bq') ||
+                    path.includes('bq_') ||
+                    path.includes('/boms') ||
+                    path.includes('/sections') ||
+                    path.includes('/elements') ||
+                    path.includes('/items') ||
+                    path.includes('/products') ||
+                    path.includes('/libraries')
+                ) {
+                    return 'boq';
+                }
+                return null;
+            }
+
+            let lastDeniedAt = 0;
+            function showWriteDeniedToast() {
+                if (window.suppressWriteDeniedToast) {
+                    return;
+                }
+                const now = Date.now();
+                if (now - lastDeniedAt < 2000) {
+                    return;
+                }
+                lastDeniedAt = now;
+
+                const container = document.getElementById('toast-container');
+                if (!container) {
+                    alert('Write Access Denied');
+                    return;
+                }
+
+                const toast = document.createElement('div');
+                toast.className = 'toast show';
+                toast.setAttribute('role', 'alert');
+                toast.setAttribute('aria-live', 'assertive');
+                toast.setAttribute('aria-atomic', 'true');
+                toast.setAttribute('data-bs-autohide', 'true');
+
+                toast.innerHTML = `
+                    <div class="toast-header">
+                        <strong class="me-auto">System</strong>
+                        <small>Just now</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        <span class="badge bg-warning">Warning</span>
+                        Write Access Denied
+                    </div>
+                `;
+
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    toast.remove();
+                }, 3500);
+            }
+
+            function isBackButton(field) {
+                if (!field || field.tagName !== 'BUTTON') {
+                    return false;
+                }
+                const label = (field.textContent || '').trim().toLowerCase();
+                return label === 'back';
+            }
+
+            function shouldAllowReadonlyButton(button) {
+                if (!button) {
+                    return false;
+                }
+                if (button.hasAttribute('data-allow-readonly')) {
+                    return true;
+                }
+                return isBackButton(button);
+            }
+
+            function disableFormFields(form) {
+                const fields = form.querySelectorAll('input, select, textarea, button');
+                fields.forEach((field) => {
+                    if (field.type === 'hidden') {
+                        return;
+                    }
+                    if (shouldAllowReadonlyButton(field)) {
+                        return;
+                    }
+                    if (field.matches('button[type="submit"], input[type="submit"]')) {
+                        field.classList.add('write-disabled');
+                        field.setAttribute('aria-disabled', 'true');
+                        return;
+                    }
+                    field.classList.add('write-disabled');
+                    field.setAttribute('aria-disabled', 'true');
+                    field.setAttribute('disabled', 'disabled');
+                });
+            }
+
+            function markWriteButtons(form) {
+                const method = (form.getAttribute('method') || 'get').toLowerCase();
+                if (method === 'get') {
+                    return;
+                }
+
+                if (isReadOnlyUser) {
+                    form.dataset.writeDenied = '1';
+                    disableFormFields(form);
+                    return;
+                }
+
+                const role = form.dataset.writeRole || inferRoleFromAction(form.getAttribute('action'));
+                if (!role || access[role]) {
+                    return;
+                }
+
+                form.dataset.writeDenied = '1';
+
+                const buttons = form.querySelectorAll('button[type="submit"], input[type="submit"]');
+                buttons.forEach((btn) => {
+                    btn.classList.add('write-disabled');
+                    btn.setAttribute('aria-disabled', 'true');
+                });
+
+                disableFormFields(form);
+            }
+
+            document.querySelectorAll('form').forEach(markWriteButtons);
+
+            function isNavbarElement(el) {
+                return !!(el && el.closest && el.closest('.navbar, .navbar-vertical, .navbar-top, #navbarVerticalCollapse'));
+            }
+
+            function disableAllButtonsExceptBack() {
+                const buttons = document.querySelectorAll('button');
+                buttons.forEach((button) => {
+                    if (isNavbarElement(button)) {
+                        return;
+                    }
+                    if (shouldAllowReadonlyButton(button)) {
+                        return;
+                    }
+                    button.classList.add('write-disabled');
+                    button.setAttribute('aria-disabled', 'true');
+                    button.setAttribute('data-readonly-disabled', 'true');
+                });
+            }
+
+            if (isReadOnlyUser) {
+                disableAllButtonsExceptBack();
+            }
+
+            document.addEventListener('submit', function (event) {
+                const form = event.target;
+                if (!form || form.tagName !== 'FORM') {
+                    return;
+                }
+
+                if (form.dataset.writeDenied !== '1') {
+                    return;
+                }
+
+                event.preventDefault();
+                showWriteDeniedToast();
+            });
+
+            document.addEventListener('focusin', function (event) {
+                const form = event.target ? event.target.closest('form') : null;
+                if (!form || form.dataset.writeDenied !== '1') {
+                    return;
+                }
+                showWriteDeniedToast();
+            });
+
+            document.addEventListener('click', function (event) {
+                const target = event.target;
+                if (isNavbarElement(target)) {
+                    return;
+                }
+                const form = target ? target.closest('form') : null;
+                if (form && form.dataset.writeDenied === '1' && target.matches('input, select, textarea, button')) {
+                    if (shouldAllowReadonlyButton(target.closest('button'))) {
+                        return;
+                    }
+                    showWriteDeniedToast();
+                    return;
+                }
+
+                const button = target ? target.closest('button') : null;
+                if (button && button.hasAttribute('data-readonly-disabled')) {
+                    if (shouldAllowReadonlyButton(button)) {
+                        return;
+                    }
+                    event.preventDefault();
+                    event.stopPropagation();
+                    showWriteDeniedToast();
+                }
+            });
+        })();
+    </script>
+
     <!-- Custom Theme Script -->
     <script>
         document.addEventListener('click', function (event) {
@@ -1181,6 +1417,3 @@
     @stack('scripts')
 </body>
 </html>
-
-
-

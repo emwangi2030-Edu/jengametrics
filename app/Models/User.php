@@ -25,6 +25,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'parent_user_id',
+        'user_type',
+        'project_id',
+        'has_project',
+        'can_manage_boq',
+        'can_manage_materials',
+        'can_manage_labour',
     ];
 
     /**
@@ -47,6 +54,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'can_manage_boq' => 'boolean',
+            'can_manage_materials' => 'boolean',
+            'can_manage_labour' => 'boolean',
         ];
     }
 
@@ -90,5 +100,38 @@ class User extends Authenticatable
     public function libraries()
     {
         return $this->hasMany(Library::class);
+    }
+
+    public function parentUser()
+    {
+        return $this->belongsTo(self::class, 'parent_user_id');
+    }
+
+    public function subAccounts()
+    {
+        return $this->hasMany(self::class, 'parent_user_id');
+    }
+
+    public function isSubAccount(): bool
+    {
+        return !is_null($this->parent_user_id);
+    }
+
+    public function hasRoleAccess(string $role): bool
+    {
+        if (!$this->isSubAccount()) {
+            return true;
+        }
+
+        switch ($role) {
+            case 'boq':
+                return (bool) $this->can_manage_boq;
+            case 'materials':
+                return (bool) $this->can_manage_materials;
+            case 'labour':
+                return (bool) $this->can_manage_labour;
+            default:
+                return false;
+        }
     }
 }

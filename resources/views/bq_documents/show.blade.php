@@ -6,7 +6,10 @@
 @endpush
 
 @section('content')
-    <div class="container mt-4">
+    @php
+        $canManageBoq = auth()->check() && (!auth()->user()->isSubAccount() || auth()->user()->can_manage_boq);
+    @endphp
+    <div class="container mt-4 {{ $canManageBoq ? '' : 'boq-readonly' }}">
         <div class="row mb-4">
             <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                 <div>
@@ -43,7 +46,7 @@
                         {{ __('Import from Library') }}
                     </button>
                 @endif
-                <a href="{{ route('bq_documents.index') }}" class="btn btn-outline-secondary ms-lg-2">
+                <a href="{{ route('bq_documents.index') }}" class="btn btn-outline-secondary ms-lg-2 allow-readonly" data-allow-readonly>
                     {{ __('Back to Master BoQ') }}
                 </a>
             </div>
@@ -243,6 +246,150 @@
         </div>
     @endif
 @endsection
+
+@if(!$canManageBoq)
+    @push('styles')
+        <style>
+            .boq-readonly .btn {
+                opacity: 0.55;
+                cursor: not-allowed;
+            }
+
+            .boq-readonly .btn.allow-readonly {
+                opacity: 1;
+                cursor: pointer;
+                pointer-events: auto;
+            }
+
+            .boq-readonly a.btn:hover,
+            .boq-readonly button:hover {
+                transform: none !important;
+            }
+
+            .boq-readonly .btn.allow-readonly:hover {
+                cursor: pointer;
+            }
+
+            .boq-readonly .btn:hover {
+                cursor: not-allowed;
+            }
+        </style>
+    @endpush
+
+    @push('scripts')
+        <script>
+            (function () {
+                const container = document.querySelector('.boq-readonly');
+                if (!container) {
+                    return;
+                }
+
+                const allowedLabels = ['back', 'cancel', 'close', 'return'];
+                container.querySelectorAll('.btn').forEach((btn) => {
+                    const text = (btn.textContent || '').trim().toLowerCase();
+                    if (allowedLabels.includes(text)) {
+                        btn.classList.add('allow-readonly');
+                    }
+                });
+
+                container.querySelectorAll('[data-bs-toggle="modal"]').forEach((trigger) => {
+                    if (trigger.classList.contains('allow-readonly')) {
+                        return;
+                    }
+                    trigger.setAttribute('data-bs-toggle-disabled', 'true');
+                    if (trigger.hasAttribute('data-bs-target')) {
+                        trigger.setAttribute('data-bs-target-disabled', trigger.getAttribute('data-bs-target'));
+                        trigger.removeAttribute('data-bs-target');
+                    }
+                    trigger.removeAttribute('data-bs-toggle');
+                });
+
+                let hoverToast = null;
+                function ensureToastContainer() {
+                    return document.getElementById('toast-container');
+                }
+
+                function showNoAccessToast() {
+                    const toastContainer = ensureToastContainer();
+                    if (!toastContainer) {
+                        return;
+                    }
+                    if (hoverToast) {
+                        return;
+                    }
+
+                    const toast = document.createElement('div');
+                    toast.className = 'toast show';
+                    toast.setAttribute('role', 'alert');
+                    toast.setAttribute('aria-live', 'assertive');
+                    toast.setAttribute('aria-atomic', 'true');
+
+                    toast.innerHTML = `
+                        <div class="toast-header">
+                            <strong class="me-auto">System</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            <span class="badge bg-warning">Warning</span>
+                            You do not have access
+                        </div>
+                    `;
+
+                    toastContainer.appendChild(toast);
+                    hoverToast = toast;
+                }
+
+                function hideNoAccessToast() {
+                    if (!hoverToast) {
+                        return;
+                    }
+                    hoverToast.remove();
+                    hoverToast = null;
+                }
+
+                container.addEventListener('mouseenter', function (event) {
+                    const target = event.target.closest('.btn');
+                    if (!target) {
+                        return;
+                    }
+                    if (target.classList.contains('allow-readonly')) {
+                        return;
+                    }
+                    showNoAccessToast();
+                }, true);
+
+                container.addEventListener('mouseleave', function (event) {
+                    const target = event.target.closest('.btn');
+                    if (!target) {
+                        return;
+                    }
+                    if (target.classList.contains('allow-readonly')) {
+                        return;
+                    }
+                    hideNoAccessToast();
+                }, true);
+
+                container.addEventListener('click', function (event) {
+                    const target = event.target.closest('.btn');
+                    if (!target) {
+                        return;
+                    }
+                    if (target.classList.contains('allow-readonly')) {
+                        return;
+                    }
+                    if (target.hasAttribute('data-bs-toggle-disabled')) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        event.stopImmediatePropagation();
+                        return;
+                    }
+                    event.preventDefault();
+                    event.stopPropagation();
+                }, true);
+            })();
+        </script>
+    @endpush
+@endif
 
 <!-- Create Level Modal -->
 <div class="modal fade" id="createLevelModal" tabindex="-1" aria-labelledby="createLevelModalLabel" aria-hidden="true">

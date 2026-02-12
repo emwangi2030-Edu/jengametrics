@@ -24,6 +24,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\RequisitionController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\LibraryController;
+use App\Http\Controllers\SubAccountController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -71,7 +72,10 @@ Route::get('bq_documents/{bqDocument}/copy', [BqDocumentController::class, 'copy
     ->name('bq_documents.copy');
 Route::post('bq_documents/{bqDocument}/copy', [BqDocumentController::class, 'copyStore'])
     ->name('bq_documents.copy.store');
-Route::resource('bq_documents', BqDocumentController::class);
+Route::resource('bq_documents', BqDocumentController::class)->only(['index', 'show']);
+Route::post('bq_documents', [BqDocumentController::class, 'store'])->name('bq_documents.store');
+Route::put('bq_documents/{bqDocument}', [BqDocumentController::class, 'update'])->name('bq_documents.update');
+Route::delete('bq_documents/{bqDocument}', [BqDocumentController::class, 'destroy'])->name('bq_documents.destroy');
 
 Route::middleware('auth')->group(function () {
     Route::post('libraries', [LibraryController::class, 'store'])->name('libraries.store');
@@ -118,7 +122,10 @@ Route::get('create-bq-item', ['as'=>'create_bq_item', 'uses' => '\App\Http\Contr
 
 
 Route::get('boms/documents/{bqDocument}', [BOMController::class, 'showDocument'])->name('boms.documents.show');
-Route::resource('boms', BOMController::class);
+Route::resource('boms', BOMController::class)->only(['index', 'show']);
+Route::get('boms/create', [BOMController::class, 'create'])->name('boms.create');
+Route::post('boms', [BOMController::class, 'store'])->name('boms.store');
+Route::delete('boms/{bom}', [BOMController::class, 'destroy'])->name('boms.destroy');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/requisitions', [RequisitionController::class, 'index'])->name('requisitions.index');
@@ -132,7 +139,8 @@ Route::middleware(['auth'])->group(function () {
 
 Route::patch('/requisitions/{requisition}/toggle-status', [RequisitionController::class, 'toggleStatus'])
     ->name('requisitions.toggleStatus');
-Route::post('/requisitions/store-adhoc', [RequisitionController::class, 'storeAdhoc'])->name('requisitions.storeAdhoc');
+Route::post('/requisitions/store-adhoc', [RequisitionController::class, 'storeAdhoc'])
+    ->name('requisitions.storeAdhoc');
 
 Route::get('reports', [BOMController::class, 'report'])->name('reports');
 Route::get('reports/wages', \App\Http\Controllers\WagesReportController::class)->name('reports.wages');
@@ -148,7 +156,12 @@ Route::post('/documents', [DocumentController::class, 'store'])->name('documents
 
 // Workers Table Route
 Route::get('/workers/{id}/attendance-data', [WorkerController::class, 'attendanceData'])->name('workers.attendanceData');
-Route::resource('workers', WorkerController::class);
+Route::resource('workers', WorkerController::class)->only(['index', 'show']);
+Route::get('/workers/create', [WorkerController::class, 'create'])->name('workers.create');
+Route::post('/workers', [WorkerController::class, 'store'])->name('workers.store');
+Route::get('/workers/{worker}/edit', [WorkerController::class, 'edit'])->name('workers.edit');
+Route::put('/workers/{worker}', [WorkerController::class, 'update'])->name('workers.update');
+Route::delete('/workers/{worker}', [WorkerController::class, 'destroy'])->name('workers.destroy');
 
 // Route to show the worker's attendance
 Route::get('/attendance', [AttendanceController::class, 'create'])->name('attendance.create');
@@ -158,7 +171,7 @@ Route::post('/workers/{worker}/payments', [PaymentController::class, 'store'])->
 Route::get('/workers/{worker}/payments', [PaymentController::class, 'index'])->name('payments.index');
 
 // Route to Suppliers page
-Route::resource('suppliers', SupplierController::class);
+Route::resource('suppliers', SupplierController::class)->only(['index', 'show']);
 
 // Route to Materials page
 Route::post('/materials/{id}/use', [MaterialController::class, 'useMaterial'])->name('materials.use');
@@ -166,7 +179,12 @@ Route::get('/materials/delivered', [MaterialController::class, 'materialsDeliver
 Route::get('/materials/inventory', [MaterialController::class, 'inventoryManagement'])->name('materials.inventory');
 Route::get('/materials/usage', [MaterialController::class, 'stockUsageHistory'])->name('materials.usage');
 Route::get('/materials/view-document/{id}', [MaterialController::class, 'viewDocument'])->name('materials.viewDocument');
-Route::resource('materials', MaterialController::class);
+Route::resource('materials', MaterialController::class)->only(['index', 'show']);
+Route::get('/materials/create', [MaterialController::class, 'create'])->name('materials.create');
+Route::post('/materials', [MaterialController::class, 'store'])->name('materials.store');
+Route::get('/materials/{material}/edit', [MaterialController::class, 'edit'])->name('materials.edit');
+Route::put('/materials/{material}', [MaterialController::class, 'update'])->name('materials.update');
+Route::delete('/materials/{material}', [MaterialController::class, 'destroy'])->name('materials.destroy');
 
 // Routes for Supplier Name and Contact Autocomplete Feature
 Route::get('/suppliers/autocomplete', [SupplierController::class, 'autocomplete'])->name('suppliers.autocomplete');
@@ -183,11 +201,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/sub-accounts', [SubAccountController::class, 'index'])->name('sub_accounts.index');
+    Route::post('/sub-accounts', [SubAccountController::class, 'store'])->name('sub_accounts.store');
+    Route::put('/sub-accounts/{user}', [SubAccountController::class, 'update'])->name('sub_accounts.update');
+    Route::delete('/sub-accounts/{user}', [SubAccountController::class, 'destroy'])->name('sub_accounts.destroy');
 });
 
 // Admin Sections Routes
-Route::resource('sections', SectionController::class);
+Route::resource('sections', SectionController::class)->only(['index']);
 Route::get('/sections/{section}/elements', [SectionController::class, 'elements'])->name('sections.elements');
+Route::post('/sections', [SectionController::class, 'store'])->name('sections.store');
+Route::put('/sections/{section}', [SectionController::class, 'update'])->name('sections.update');
+Route::delete('/sections/{section}', [SectionController::class, 'destroy'])->name('sections.destroy');
 
 // Elements Routes
 Route::post('/elements', [ElementController::class, 'store'])->name('elements.store');
@@ -214,8 +240,14 @@ Route::get('admin/sections/products', [ItemMaterialController::class, 'index_mat
 
 
 // routes/web.php
-Route::resource('products', ProductController::class);
+Route::resource('products', ProductController::class)->only(['index', 'show']);
+Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
+Route::post('products', [ProductController::class, 'store'])->name('products.store');
+Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
+Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
 
 // Auth Routes
 require __DIR__.'/auth.php';
+

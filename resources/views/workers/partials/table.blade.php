@@ -22,9 +22,13 @@
                 <tr>
                     <td>{{ $loop->iteration }}. </td>
                     <td class="{{ $nameClasses }}">
-                        <a href="{{ route('workers.show', $worker->id) }}" class="text-decoration-none {{ $nameClasses }}">
-                            {{ $worker->full_name }}
-                        </a>
+                        @if(auth()->check() && (!auth()->user()->isSubAccount() || auth()->user()->can_manage_labour))
+                            <a href="{{ route('workers.show', $worker->id) }}" class="text-decoration-none {{ $nameClasses }}">
+                                {{ $worker->full_name }}
+                            </a>
+                        @else
+                            <span class="{{ $nameClasses }}">{{ $worker->full_name }}</span>
+                        @endif
                         @if($isArchived)
                             <span class="badge bg-secondary ms-1">{{ __('Archived') }}</span>
                             @if($worker->amount_owed > 0)
