@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -51,6 +52,11 @@ class SubAccountController extends Controller
             'can_manage_materials' => (bool) ($request->input('can_manage_materials') ?? false),
             'can_manage_labour' => (bool) ($request->input('can_manage_labour') ?? false),
         ]);
+
+        $parentProjectIds = Project::where('user_id', $user->id)->pluck('id');
+        if ($parentProjectIds->isNotEmpty()) {
+            $subAccount->projects()->sync($parentProjectIds->all());
+        }
 
         return redirect()->route('sub_accounts.index')->with('success', 'Sub-account created successfully.');
     }

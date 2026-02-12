@@ -71,7 +71,7 @@ class BqDocumentController extends Controller
         $overallTotal = $subDocuments->sum(fn ($document) => (float) ($document->aggregated_amount_with_units ?? 0));
 
         $libraries = auth()->user()
-            ?->libraries()
+            ?->accessibleLibraries()
             ->withCount('items')
             ->latest()
             ->get() ?? collect();
@@ -132,8 +132,10 @@ class BqDocumentController extends Controller
             'items.*.rate' => 'required|numeric|min:0',
         ]);
 
+        $libraryOwnerId = auth()->user()?->libraryOwner()->id;
+
         $library = Library::where('id', $validated['library_id'])
-            ->where('user_id', auth()->id())
+            ->where('user_id', $libraryOwnerId)
             ->first();
 
         if (! $library) {
@@ -360,7 +362,7 @@ class BqDocumentController extends Controller
         $totalAmount = $levels->sum('total');
 
         $libraries = auth()->user()
-            ?->libraries()
+            ?->accessibleLibraries()
             ->withCount('items')
             ->latest()
             ->get() ?? collect();

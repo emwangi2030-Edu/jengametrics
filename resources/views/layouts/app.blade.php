@@ -620,7 +620,7 @@
                                             <img class="rounded-circle " src="{{ \Illuminate\Support\Facades\Auth::user()->get_gravatar(150) }}"
                                             alt="" />
                                         </div>
-                                        <h6 class="mt-2 text-body-emphasis">{{ project() }}</h6>
+                                        <h6 class="mt-2 text-body-emphasis">{{ \Illuminate\Support\Facades\Auth::user()->name }}</h6>
                                     </div>
                                 </div>
                                 <div>
@@ -820,7 +820,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <?php
-                        $projects = \App\Models\Project::whereUserId(\Illuminate\Support\Facades\Auth::user()->id)->get();
+                        $projects = \Illuminate\Support\Facades\Auth::user()->projects()->get();
                         ?>
                         <div class="modal-body">
                             <table class="table">

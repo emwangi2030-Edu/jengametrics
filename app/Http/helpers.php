@@ -312,7 +312,7 @@ function project(){
         return null;
     }
 
-    $project_count = Project::whereUserId($user->id)->count();
+    $project_count = $user->projects()->count();
     if($project_count>0){
         $project = $user->project_id ? Project::find($user->project_id) : null;
         if($project){
@@ -330,6 +330,9 @@ function get_project(){
 
     $user = Auth::user();
     if(!$user || !$user->project_id){
+        return null;
+    }
+    if (! $user->projects()->where('projects.id', $user->project_id)->exists()) {
         return null;
     }
     $business = Project::find($user->project_id);

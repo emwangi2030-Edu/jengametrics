@@ -102,6 +102,31 @@ class User extends Authenticatable
         return $this->hasMany(Library::class);
     }
 
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class)->withTimestamps();
+    }
+
+    public function ownedProjects()
+    {
+        return $this->hasMany(Project::class, 'user_id');
+    }
+
+    public function accessibleProjects()
+    {
+        return $this->projects();
+    }
+
+    public function libraryOwner(): self
+    {
+        return $this->isSubAccount() ? ($this->parentUser ?: $this) : $this;
+    }
+
+    public function accessibleLibraries()
+    {
+        return $this->libraryOwner()->libraries();
+    }
+
     public function parentUser()
     {
         return $this->belongsTo(self::class, 'parent_user_id');

@@ -54,12 +54,11 @@ class LibraryController extends Controller
         }
 
         DB::transaction(function () use ($validated, $items) {
-            $library = Auth::user()
-                ->libraries()
-                ->create([
-                    'name' => $validated['name'],
-                    'description' => $validated['description'] ?? null,
-                ]);
+            $owner = Auth::user()->libraryOwner();
+            $library = $owner->libraries()->create([
+                'name' => $validated['name'],
+                'description' => $validated['description'] ?? null,
+            ]);
 
             foreach ($items as $item) {
                 $element = $item->Element;
@@ -199,7 +198,9 @@ class LibraryController extends Controller
 
     protected function authorizeLibrary(Library $library): void
     {
-        if ($library->user_id !== Auth::id()) {
+        $user = Auth::user();
+        $ownerId = $user?->libraryOwner()->id;
+        if (! $ownerId || $library->user_id !== $ownerId) {
             abort(403);
         }
     }

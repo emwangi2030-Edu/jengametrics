@@ -5,16 +5,23 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class ProjectWizardController extends Controller
 {
     public function step1()
     {
+        if (Auth::check() && Auth::user()->isSubAccount()) {
+            return redirect()->route('dashboard')->with('warning', 'Sub-accounts cannot create projects.');
+        }
         return view('wizard.step1');
     }
 
     public function step2()
     {
+        if (Auth::check() && Auth::user()->isSubAccount()) {
+            return redirect()->route('dashboard')->with('warning', 'Sub-accounts cannot create projects.');
+        }
         return view('wizard.step2');
     }
 
@@ -45,6 +52,9 @@ class ProjectWizardController extends Controller
 
 public function complete(Request $request)
 {
+    if (Auth::check() && Auth::user()->isSubAccount()) {
+        return redirect()->route('dashboard')->with('warning', 'Sub-accounts cannot create projects.');
+    }
     // Retrieve data from session
     $name = $request->session()->get('name');
     $address = $request->session()->get('address');
@@ -69,6 +79,11 @@ public function complete(Request $request)
     $user->project_id=  $project_created->id;
     $user->save();
 
+    $project_created->users()->syncWithoutDetaching([$user->id]);
+    $subAccountIds = User::where('parent_user_id', $user->id)->pluck('id');
+    if ($subAccountIds->isNotEmpty()) {
+        $project_created->users()->syncWithoutDetaching($subAccountIds->all());
+    }
    }
 
     // Clear session data
