@@ -615,9 +615,23 @@
                         <div class="dropdown-menu dropdown-menu-end navbar-dropdown-caret py-0 dropdown-profile shadow border" aria-labelledby="navbarDropdownUser">
                             <div class="card position-relative border-0">
                                 <div class="card-body p-0">
+                                    @php
+                                        $photoUrl = null;
+                                        $picturePath = \Illuminate\Support\Facades\Auth::user()->photo ?? null;
+
+                                        if (!empty($picturePath)) {
+                                            if (preg_match('/^https?:\/\//i', $picturePath)) {
+                                                $photoUrl = $picturePath;
+                                            } elseif (\Illuminate\Support\Str::startsWith($picturePath, ['storage/', '/storage/'])) {
+                                                $photoUrl = asset($picturePath);
+                                            } else {
+                                                $photoUrl = asset('storage/' . ltrim($picturePath, '/'));
+                                            }
+                                        }
+                                    @endphp
                                     <div class="text-center pt-4 pb-3">
                                         <div class="avatar avatar-xl ">
-                                            <img class="rounded-circle " src="{{ \Illuminate\Support\Facades\Auth::user()->get_gravatar(150) }}"
+                                            <img class="rounded-circle " src="{{ $photoUrl ?? asset('assets/media/svg/avatars/blank.svg') }}"
                                             alt="" />
                                         </div>
                                         <h6 class="mt-2 text-body-emphasis">{{ \Illuminate\Support\Facades\Auth::user()->name }}</h6>
@@ -669,13 +683,9 @@
                                             @if(!\Illuminate\Support\Facades\Auth::user()->isSubAccount())
                                                 <a class="dropdown-item" href="{{ route('sub_accounts.index') }}">
                                                     <i class="fa fa-users"></i>
-                                                    <span key="t-profile">Sub-Accounts</span>
+                                                    <span key="t-profile">Add Users</span>
                                                 </a>
                                             @endif
-                                            <a class="dropdown-item" href="{{ url('businesses') }}">
-                                                <i class="fa fa-users"></i> 
-                                                <span key="t-profile">Manage your projects</span>
-                                            </a>
                                             <a class="dropdown-item" href="{{ url('billings') }}">
                                                 <i class="fa fa-users"></i>
                                                 <span key="t-profile">Manage your billings</span>

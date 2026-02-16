@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 use Laravel\Sanctum\HasApiTokens;
 
@@ -32,6 +33,8 @@ class User extends Authenticatable
         'can_manage_boq',
         'can_manage_materials',
         'can_manage_labour',
+        'photo',
+        'photo_storage',
     ];
 
     /**
@@ -68,8 +71,13 @@ class User extends Authenticatable
         $url .= md5( strtolower( trim( $email ) ) );
         $url .= "?s=$s&d=$d&r=$r";
 
-        if( ! empty($this->photo)) {
-            $url = avatar_img_url($this->photo, $this->photo_storage);
+        if (!empty($this->photo)) {
+            $storage = $this->photo_storage ?: 'public';
+            if ($storage === 'public') {
+                $url = Storage::disk('public')->url($this->photo);
+            } else {
+                $url = avatar_img_url($storage, $this->photo);
+            }
         }
 
         if ( $img ) {

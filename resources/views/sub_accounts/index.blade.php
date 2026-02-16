@@ -6,18 +6,18 @@
         <div class="col-lg-10">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
                 <div>
-                    <h2 class="fw-bold text-primary mb-1">{{ __('Sub-Accounts') }}</h2>
-                    <p class="text-muted mb-0">{{ __('Create and manage users linked to your account.') }}</p>
+                    <h2 class="fw-bold text-primary mb-1">{{ __('Add Users') }}</h2>
+                    <p class="text-muted mb-0">{{ __('Add and manage users linked to your account.') }}</p>
                 </div>
                 <button type="button" class="btn btn-success mt-3 mt-md-0" data-bs-toggle="modal" data-bs-target="#createSubAccountModal">
-                    {{ __('Add Sub-Account') }}
+                    {{ __('Add User') }}
                 </button>
             </div>
 
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     @if($subAccounts->isEmpty())
-                        <p class="text-muted mb-0">{{ __('No sub-accounts created yet.') }}</p>
+                        <p class="text-muted mb-0">{{ __('No users added yet.') }}</p>
                     @else
                         <div class="table-responsive">
                             <table class="table align-middle">
@@ -85,7 +85,7 @@
             <form method="POST" action="{{ route('sub_accounts.store') }}">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createSubAccountModalLabel">{{ __('Add Sub-Account') }}</h5>
+                    <h5 class="modal-title" id="createSubAccountModalLabel">{{ __('Add User') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                 </div>
                 <div class="modal-body">
@@ -137,7 +137,7 @@
                     @csrf
                     @method('PUT')
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editSubAccountModalLabel{{ $subAccount->id }}">{{ __('Edit Sub-Account') }}</h5>
+                        <h5 class="modal-title" id="editSubAccountModalLabel{{ $subAccount->id }}">{{ __('Edit User') }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                     </div>
                     <div class="modal-body">

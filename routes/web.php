@@ -200,6 +200,10 @@ Route::get('/cost-tracking', [CostTrackingController::class, 'index'])->name('co
 
 // Profile Routes
 Route::middleware('auth')->group(function () {
+    Route::get('/account', function () {
+        return view('account');
+    })->name('account');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -252,4 +256,3 @@ Route::delete('products/{product}', [ProductController::class, 'destroy'])->name
 
 // Auth Routes
 require __DIR__.'/auth.php';
-
