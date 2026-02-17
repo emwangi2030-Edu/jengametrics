@@ -140,28 +140,34 @@
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body">
                     <h5 class="fw-bold mb-3" style="color:#027333;">{{ __('Security') }}</h5>
-                    <form method="POST" action="{{ route('password.update') }}">
+                    <form method="POST" action="{{ route('password.update') }}" id="password-update-form" novalidate>
                         @csrf
                         @method('PUT')
                         <div class="mb-3">
                             <label class="form-label" for="current-password">{{ __('Current Password') }}</label>
-                            <input type="password" class="form-control" id="current-password" name="current_password" autocomplete="current-password">
+                            <input type="password" class="form-control" id="current-password" name="current_password" autocomplete="current-password" required>
                             @error('current_password')
                                 <div class="text-danger mt-1">{{ $message }}</div>
                             @enderror
+                            <div class="invalid-feedback" id="current-password-feedback"></div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="new-password">{{ __('New Password') }}</label>
-                            <input type="password" class="form-control" id="new-password" name="password" autocomplete="new-password">
+                            <input type="password" class="form-control" id="new-password" name="password" autocomplete="new-password" minlength="8" required>
                             @error('password')
                                 <div class="text-danger mt-1">{{ $message }}</div>
                             @enderror
+                            <div class="invalid-feedback" id="new-password-feedback"></div>
+                            <small class="text-muted d-block mt-1">
+                                {{ __('Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.') }}
+                            </small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="password-confirmation">{{ __('Confirm Password') }}</label>
-                            <input type="password" class="form-control" id="password-confirmation" name="password_confirmation" autocomplete="new-password">
+                            <input type="password" class="form-control" id="password-confirmation" name="password_confirmation" autocomplete="new-password" minlength="8" required>
+                            <div class="invalid-feedback" id="password-confirmation-feedback"></div>
                         </div>
-                        <button type="submit" class="btn btn-success">
+                        <button type="submit" class="btn btn-success" id="password-update-submit">
                             {{ __('Update Password') }}
                         </button>
                     </form>
@@ -250,84 +256,173 @@
             const cropperImage = document.getElementById('profile-cropper-image');
             const applyButton = document.getElementById('profile-cropper-apply');
 
-            if (!fileInput || !cropperModalEl || !cropperImage || !applyButton || !window.bootstrap) {
-                return;
-            }
+            if (fileInput && cropperModalEl && cropperImage && applyButton && window.bootstrap) {
+                let cropper = null;
+                let objectUrl = null;
+                let applyingCrop = false;
+                const modal = new bootstrap.Modal(cropperModalEl, { backdrop: 'static' });
 
-            let cropper = null;
-            let objectUrl = null;
-            let applyingCrop = false;
-            const modal = new bootstrap.Modal(cropperModalEl, { backdrop: 'static' });
-
-            fileInput.addEventListener('change', function () {
-                const file = this.files && this.files[0];
-                if (!file) {
-                    return;
-                }
-
-                if (objectUrl) {
-                    URL.revokeObjectURL(objectUrl);
-                }
-                objectUrl = URL.createObjectURL(file);
-                cropperImage.src = objectUrl;
-                applyingCrop = false;
-                modal.show();
-            });
-
-            cropperModalEl.addEventListener('shown.bs.modal', function () {
-                if (cropper) {
-                    cropper.destroy();
-                }
-                cropper = new Cropper(cropperImage, {
-                    viewMode: 1,
-                    autoCropArea: 0.9,
-                    dragMode: 'move',
-                    responsive: true,
-                    movable: true,
-                    zoomable: true,
-                    rotatable: false,
-                    scalable: false
-                });
-            });
-
-            cropperModalEl.addEventListener('hidden.bs.modal', function () {
-                if (cropper) {
-                    cropper.destroy();
-                    cropper = null;
-                }
-                if (objectUrl) {
-                    URL.revokeObjectURL(objectUrl);
-                    objectUrl = null;
-                }
-                if (!applyingCrop) {
-                    fileInput.value = '';
-                }
-            });
-
-            applyButton.addEventListener('click', function () {
-                if (!cropper) {
-                    return;
-                }
-
-                cropper.getCroppedCanvas({
-                    imageSmoothingQuality: 'high'
-                }).toBlob(function (blob) {
-                    if (!blob) {
+                fileInput.addEventListener('change', function () {
+                    const file = this.files && this.files[0];
+                    if (!file) {
                         return;
                     }
 
-                    const file = new File([blob], 'profile-photo.jpg', { type: 'image/jpeg', lastModified: Date.now() });
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    fileInput.files = dataTransfer.files;
+                    if (objectUrl) {
+                        URL.revokeObjectURL(objectUrl);
+                    }
+                    objectUrl = URL.createObjectURL(file);
+                    cropperImage.src = objectUrl;
+                    applyingCrop = false;
+                    modal.show();
+                });
 
-                    const newPreviewUrl = URL.createObjectURL(file);
-                    previewImage.src = newPreviewUrl;
+                cropperModalEl.addEventListener('shown.bs.modal', function () {
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    cropper = new Cropper(cropperImage, {
+                        viewMode: 1,
+                        autoCropArea: 0.9,
+                        dragMode: 'move',
+                        responsive: true,
+                        movable: true,
+                        zoomable: true,
+                        rotatable: false,
+                        scalable: false
+                    });
+                });
 
-                    applyingCrop = true;
-                    modal.hide();
-                }, 'image/jpeg', 0.9);
+                cropperModalEl.addEventListener('hidden.bs.modal', function () {
+                    if (cropper) {
+                        cropper.destroy();
+                        cropper = null;
+                    }
+                    if (objectUrl) {
+                        URL.revokeObjectURL(objectUrl);
+                        objectUrl = null;
+                    }
+                    if (!applyingCrop) {
+                        fileInput.value = '';
+                    }
+                });
+
+                applyButton.addEventListener('click', function () {
+                    if (!cropper) {
+                        return;
+                    }
+
+                    cropper.getCroppedCanvas({
+                        imageSmoothingQuality: 'high'
+                    }).toBlob(function (blob) {
+                        if (!blob) {
+                            return;
+                        }
+
+                        const file = new File([blob], 'profile-photo.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(file);
+                        fileInput.files = dataTransfer.files;
+
+                        const newPreviewUrl = URL.createObjectURL(file);
+                        previewImage.src = newPreviewUrl;
+
+                        applyingCrop = true;
+                        modal.hide();
+                    }, 'image/jpeg', 0.9);
+                });
+            }
+
+            const passwordForm = document.getElementById('password-update-form');
+            const currentPasswordInput = document.getElementById('current-password');
+            const newPasswordInput = document.getElementById('new-password');
+            const confirmPasswordInput = document.getElementById('password-confirmation');
+            const passwordSubmit = document.getElementById('password-update-submit');
+
+            if (!passwordForm || !currentPasswordInput || !newPasswordInput || !confirmPasswordInput || !passwordSubmit) {
+                return;
+            }
+
+            const currentPasswordFeedback = document.getElementById('current-password-feedback');
+            const newPasswordFeedback = document.getElementById('new-password-feedback');
+            const confirmPasswordFeedback = document.getElementById('password-confirmation-feedback');
+
+            const meetsPasswordPolicy = (value) => {
+                return /[a-z]/.test(value)
+                    && /[A-Z]/.test(value)
+                    && /\d/.test(value)
+                    && /[^A-Za-z0-9]/.test(value)
+                    && value.length >= 8;
+            };
+
+            const setFieldState = (input, feedbackNode, isValid, message) => {
+                input.classList.remove('is-valid', 'is-invalid');
+                if (isValid) {
+                    input.classList.add('is-valid');
+                    if (feedbackNode) {
+                        feedbackNode.textContent = '';
+                    }
+                } else {
+                    input.classList.add('is-invalid');
+                    if (feedbackNode) {
+                        feedbackNode.textContent = message || '';
+                    }
+                }
+            };
+
+            const validatePasswordForm = () => {
+                const currentPassword = currentPasswordInput.value || '';
+                const newPassword = newPasswordInput.value || '';
+                const confirmPassword = confirmPasswordInput.value || '';
+
+                let isFormValid = true;
+
+                if (!currentPassword.trim()) {
+                    setFieldState(currentPasswordInput, currentPasswordFeedback, false, '{{ __('Current password is required.') }}');
+                    isFormValid = false;
+                } else {
+                    setFieldState(currentPasswordInput, currentPasswordFeedback, true, '');
+                }
+
+                if (!newPassword) {
+                    setFieldState(newPasswordInput, newPasswordFeedback, false, '{{ __('New password is required.') }}');
+                    isFormValid = false;
+                } else if (!meetsPasswordPolicy(newPassword)) {
+                    setFieldState(newPasswordInput, newPasswordFeedback, false, '{{ __('Use at least 8 characters with uppercase, lowercase, number, and symbol.') }}');
+                    isFormValid = false;
+                } else if (newPassword === currentPassword) {
+                    setFieldState(newPasswordInput, newPasswordFeedback, false, '{{ __('New password must be different from current password.') }}');
+                    isFormValid = false;
+                } else {
+                    setFieldState(newPasswordInput, newPasswordFeedback, true, '');
+                }
+
+                if (!confirmPassword) {
+                    setFieldState(confirmPasswordInput, confirmPasswordFeedback, false, '{{ __('Please confirm your new password.') }}');
+                    isFormValid = false;
+                } else if (confirmPassword !== newPassword) {
+                    setFieldState(confirmPasswordInput, confirmPasswordFeedback, false, '{{ __('Password confirmation does not match.') }}');
+                    isFormValid = false;
+                } else {
+                    setFieldState(confirmPasswordInput, confirmPasswordFeedback, true, '');
+                }
+
+                passwordSubmit.disabled = !isFormValid;
+                return isFormValid;
+            };
+
+            currentPasswordInput.addEventListener('input', validatePasswordForm);
+            newPasswordInput.addEventListener('input', validatePasswordForm);
+            confirmPasswordInput.addEventListener('input', validatePasswordForm);
+
+            passwordForm.addEventListener('submit', function (event) {
+                if (!validatePasswordForm()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
             });
+
+            validatePasswordForm();
         });
     </script>
 @endpush
