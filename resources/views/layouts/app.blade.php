@@ -607,10 +607,12 @@
                         </div>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link lh-1 pe-0" id="navbarDropdownUser" href="#!" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true"
+                        <a class="nav-link lh-1 pe-2" id="navbarDropdownUser" href="#!" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true"
                             aria-expanded="false">
-                            <span class="fs-8">{{ project() }}</span>
-                            <i class="fas fa-angle-down"></i>
+                            <div class="d-flex align-items-center">
+                                <span class="fs-8">{{ project() }}</span>
+                                <span class="ms-2 fs-8"><span data-feather="menu"></span></span>
+                            </div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end navbar-dropdown-caret py-0 dropdown-profile shadow border" aria-labelledby="navbarDropdownUser">
                             <div class="card position-relative border-0">
@@ -657,16 +659,18 @@
                                     <ul class="nav d-flex flex-column mb-2 pb-1">
                                         @if(\Illuminate\Support\Facades\Auth::user()->is_client())
                                             @if(\Illuminate\Support\Facades\Auth::user()->project_id)
-                                                <li class="nav-item">
-                                                    <a class="nav-link px-3 d-block" href="/admin/settings">
-                                                        <span class="me-2 text-body align-bottom" data-feather="pie-chart"></span>
-                                                        Project settings
-                                                    </a>
-                                                </li>
+                                                @if(!\Illuminate\Support\Facades\Auth::user()->isSubAccount())
+                                                    <li class="nav-item">
+                                                        <a class="nav-link px-3 d-block" href="/admin/settings">
+                                                            <span class="me-2 text-body align-bottom" data-feather="settings"></span>
+                                                            Project settings
+                                                        </a>
+                                                    </li>
+                                                @endif
                                                 <li class="nav-item">
                                                     <a class="nav-link px-3 d-block" href="#" data-bs-toggle="modal" data-bs-target="#switchbusinesses">
-                                                        <span class="me-2 text-body align-bottom" data-feather="pie-chart"></span>
-                                                        Switch Projects
+                                                        <span class="me-2 text-body align-bottom" data-feather="menu"></span>
+                                                        Projects
                                                     </a>
                                                 </li>
                                             @endif 
@@ -686,14 +690,16 @@
                                                     <span key="t-profile">Add Users</span>
                                                 </a>
                                             @endif
-                                            <a class="dropdown-item" href="{{ url('billings') }}">
-                                                <i class="fa fa-users"></i>
-                                                <span key="t-profile">Manage your billings</span>
-                                            </a>
-                                            <a class="dropdown-item" href="{{ url('subscribe') }}">
-                                                <i class="fa fa-users"></i>
-                                                <span key="t-profile">Manage your subscriptions</span>
-                                            </a>
+                                            @if(!\Illuminate\Support\Facades\Auth::user()->isSubAccount())
+                                                <a class="dropdown-item" href="{{ url('billings') }}">
+                                                    <i class="fa fa-users"></i>
+                                                    <span key="t-profile">Manage your billings</span>
+                                                </a>
+                                                <a class="dropdown-item" href="{{ url('subscribe') }}">
+                                                    <i class="fa fa-users"></i>
+                                                    <span key="t-profile">Manage your subscriptions</span>
+                                                </a>
+                                            @endif
                                         @endif
                                     </ul>
                                     <hr />
@@ -855,7 +861,7 @@
                                                 <span key="t-profile">Manage your projects</span>
                                             </a>
                                             <br> -->
-                                            <a class="btn btn-success btn-small" href="{{ route('wizard.step1') }}">
+                                            <a class="btn btn-success btn-small" href="{{ route('wizard') }}">
                                                 <i class="fa fa-users"></i>
                                                 <span key="t-profile">Create new project</span>
                                             </a>

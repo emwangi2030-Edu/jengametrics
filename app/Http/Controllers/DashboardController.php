@@ -17,7 +17,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         if (!$user->has_project) {
-            return redirect()->route('wizard.step1');
+            return redirect()->route('wizard');
         }
 
         $projectId = $user->project_id;

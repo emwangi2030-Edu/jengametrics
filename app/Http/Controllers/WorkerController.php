@@ -25,7 +25,7 @@ class WorkerController extends Controller
 
         if (!$projectId) {
             return redirect()
-                ->route('wizard.step1')
+                ->route('wizard')
                 ->with('warning', 'Select or create a project before managing workers.');
         }
 
@@ -193,7 +193,7 @@ class WorkerController extends Controller
 
         if (!$projectId) {
             return redirect()
-                ->route('wizard.step1')
+                ->route('wizard')
                 ->with('warning', 'Select or create a project before adding workers.');
         }
 
@@ -208,7 +208,7 @@ class WorkerController extends Controller
 
         if (!$projectId) {
             return redirect()
-                ->route('wizard.step1')
+                ->route('wizard')
                 ->with('warning', 'Select or create a project before adding workers.');
         }
 

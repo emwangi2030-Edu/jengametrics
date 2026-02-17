@@ -2,7 +2,7 @@
 
 @section('content')
     <h1>Projects</h1>
-    <a href="{{ route('wizard.step1') }}" project="btn btn-primary mb-3">Add project</a>
+    <a href="{{ route('wizard') }}" project="btn btn-primary mb-3">Add project</a>
     <table project="table table-bordered">
         <thead>
             <tr>

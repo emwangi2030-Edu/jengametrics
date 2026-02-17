@@ -35,11 +35,12 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Route for the first step
+// Wizard entry + ajax step fragments
+Route::get('/wizard', [ProjectWizardController::class, 'wizard'])->name('wizard');
 Route::get('/wizard/step1', [ProjectWizardController::class, 'step1'])->name('wizard.step1');
-
-// Route for the second step
 Route::get('/wizard/step2', [ProjectWizardController::class, 'step2'])->name('wizard.step2');
+Route::get('/wizard/step1-fragment', [ProjectWizardController::class, 'step1Fragment'])->name('wizard.step1.fragment');
+Route::get('/wizard/step2-fragment', [ProjectWizardController::class, 'step2Fragment'])->name('wizard.step2.fragment');
 
 // Route to handle form submission
 Route::post('/wizard/complete', [ProjectWizardController::class, 'complete'])->name('wizard.complete');
@@ -203,6 +204,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/account', function () {
         return view('account');
     })->name('account');
+
+    Route::get('/admin/settings', [ProjectController::class, 'settings'])->name('projects.settings');
+    Route::patch('/admin/settings', [ProjectController::class, 'updateSettings'])->name('projects.settings.update');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

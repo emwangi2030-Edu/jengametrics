@@ -57,9 +57,6 @@
                     @endif
                     <div class="d-flex justify-content-center gap-2">
                         <span class="badge bg-success">{{ auth()->user()->isSubAccount() ? __('Sub-Account') : __('Primary Account') }}</span>
-                        @if(auth()->user()->isSubAccount())
-                            <span class="badge bg-success">{{ __('Role Access') }}</span>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -71,20 +68,32 @@
                         <ul class="list-unstyled mb-0">
                             <li class="d-flex justify-content-between py-2 border-bottom">
                                 <span>{{ __('Manage BoQ & BoM') }}</span>
-                                <span class="badge {{ auth()->user()->can_manage_boq ? 'bg-success' : 'bg-secondary' }}">
-                                    {{ auth()->user()->can_manage_boq ? __('Write') : __('Read') }}
+                                <span class="badge border-0 p-0">
+                                    @if(auth()->user()->can_manage_boq)
+                                        <span class="text-success" aria-label="{{ __('Write') }}"><span data-feather="check"></span></span>
+                                    @else
+                                        <span class="text-danger" aria-label="{{ __('Read') }}"><span data-feather="x"></span></span>
+                                    @endif
                                 </span>
                             </li>
                             <li class="d-flex justify-content-between py-2 border-bottom">
                                 <span>{{ __('Manage Materials') }}</span>
-                                <span class="badge {{ auth()->user()->can_manage_materials ? 'bg-success' : 'bg-secondary' }}">
-                                    {{ auth()->user()->can_manage_materials ? __('Write') : __('Read') }}
+                                <span class="badge border-0 p-0">
+                                    @if(auth()->user()->can_manage_materials)
+                                        <span class="text-success" aria-label="{{ __('Write') }}"><span data-feather="check"></span></span>
+                                    @else
+                                        <span class="text-danger" aria-label="{{ __('Read') }}"><span data-feather="x"></span></span>
+                                    @endif
                                 </span>
                             </li>
                             <li class="d-flex justify-content-between py-2">
                                 <span>{{ __('Manage Labour') }}</span>
-                                <span class="badge {{ auth()->user()->can_manage_labour ? 'bg-success' : 'bg-secondary' }}">
-                                    {{ auth()->user()->can_manage_labour ? __('Write') : __('Read') }}
+                                <span class="badge border-0 p-0">
+                                    @if(auth()->user()->can_manage_labour)
+                                        <span class="text-success" aria-label="{{ __('Write') }}"><span data-feather="check"></span></span>
+                                    @else
+                                        <span class="text-danger" aria-label="{{ __('Read') }}"><span data-feather="x"></span></span>
+                                    @endif
                                 </span>
                             </li>
                         </ul>
@@ -159,17 +168,19 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="fw-bold mb-3 text-danger">{{ __('Delete Account') }}</h5>
-                    <p class="text-muted">
-                        {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}
-                    </p>
-                    <button type="button" class="btn btn-danger text-white" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
-                        {{ __('Delete Account') }}
-                    </button>
+            @if(!auth()->user()->isSubAccount())
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3 text-danger">{{ __('Delete Account') }}</h5>
+                        <p class="text-muted">
+                            {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}
+                        </p>
+                        <button type="button" class="btn btn-danger text-white" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                            {{ __('Delete Account') }}
+                        </button>
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 </div>
@@ -195,36 +206,38 @@
     </div>
 </div>
 
-<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="POST" action="{{ route('profile.destroy') }}">
-                @csrf
-                @method('DELETE')
-                <div class="modal-header">
-                    <h5 class="modal-title text-danger" id="deleteAccountModalLabel">{{ __('Delete Account') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="text-muted">
-                        {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
-                    </p>
-                    <div class="mb-3">
-                        <label class="form-label" for="delete-password">{{ __('Password') }}</label>
-                        <input type="password" class="form-control" id="delete-password" name="password" required>
-                        @error('password')
-                            <div class="text-danger mt-1">{{ $message }}</div>
-                        @enderror
+@if(!auth()->user()->isSubAccount())
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('profile.destroy') }}">
+                    @csrf
+                    @method('DELETE')
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger" id="deleteAccountModalLabel">{{ __('Delete Account') }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                    <button type="submit" class="btn btn-danger text-white">{{ __('Delete Account') }}</button>
-                </div>
-            </form>
+                    <div class="modal-body">
+                        <p class="text-muted">
+                            {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
+                        </p>
+                        <div class="mb-3">
+                            <label class="form-label" for="delete-password">{{ __('Password') }}</label>
+                            <input type="password" class="form-control" id="delete-password" name="password" required>
+                            @error('password')
+                                <div class="text-danger mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button type="submit" class="btn btn-danger text-white">{{ __('Delete Account') }}</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+@endif
 @endsection
 
 @push('scripts')

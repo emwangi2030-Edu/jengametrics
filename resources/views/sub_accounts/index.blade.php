@@ -38,23 +38,23 @@
                                             <td>{{ $subAccount->email }}</td>
                                             <td class="text-center">
                                                 @if($subAccount->can_manage_boq)
-                                                    <span class="badge bg-success">{{ __('Write') }}</span>
+                                                    <span class="badge border-0 p-0"><span class="text-success" aria-label="{{ __('Write') }}"><span data-feather="check"></span></span></span>
                                                 @else
-                                                    <span class="badge bg-secondary">{{ __('Read') }}</span>
+                                                    <span class="badge border-0 p-0"><span class="text-danger" aria-label="{{ __('Read') }}"><span data-feather="x"></span></span></span>
                                                 @endif
                                             </td>
                                             <td class="text-center">
                                                 @if($subAccount->can_manage_materials)
-                                                    <span class="badge bg-success">{{ __('Write') }}</span>
+                                                    <span class="badge border-0 p-0"><span class="text-success" aria-label="{{ __('Write') }}"><span data-feather="check"></span></span></span>
                                                 @else
-                                                    <span class="badge bg-secondary">{{ __('Read') }}</span>
+                                                    <span class="badge border-0 p-0"><span class="text-danger" aria-label="{{ __('Read') }}"><span data-feather="x"></span></span></span>
                                                 @endif
                                             </td>
                                             <td class="text-center">
                                                 @if($subAccount->can_manage_labour)
-                                                    <span class="badge bg-success">{{ __('Write') }}</span>
+                                                    <span class="badge border-0 p-0"><span class="text-success" aria-label="{{ __('Write') }}"><span data-feather="check"></span></span></span>
                                                 @else
-                                                    <span class="badge bg-secondary">{{ __('Read') }}</span>
+                                                    <span class="badge border-0 p-0"><span class="text-danger" aria-label="{{ __('Read') }}"><span data-feather="x"></span></span></span>
                                                 @endif
                                             </td>
                                             <td class="text-end">

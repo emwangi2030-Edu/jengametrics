@@ -39,7 +39,7 @@
 
                     <!-- Submit Button -->
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route('wizard.step1') }}" class="btn btn-warning">
+                        <a href="{{ route('wizard') }}" class="btn btn-warning">
                             Edit
                         </a>
                         <button type="submit" class="btn btn-success">Complete</button>

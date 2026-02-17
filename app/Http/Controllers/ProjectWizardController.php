@@ -9,12 +9,24 @@ use App\Models\User;
 
 class ProjectWizardController extends Controller
 {
+    public function wizard(Request $request)
+    {
+        if (Auth::check() && Auth::user()->isSubAccount()) {
+            return redirect()->route('dashboard')->with('warning', 'Sub-accounts cannot create projects.');
+        }
+
+        $step = (int) $request->query('step', 1);
+        $step = $step === 2 ? 2 : 1;
+
+        return view('wizard.index', compact('step'));
+    }
+
     public function step1()
     {
         if (Auth::check() && Auth::user()->isSubAccount()) {
             return redirect()->route('dashboard')->with('warning', 'Sub-accounts cannot create projects.');
         }
-        return view('wizard.step1');
+        return redirect()->route('wizard');
     }
 
     public function step2()
@@ -22,7 +34,25 @@ class ProjectWizardController extends Controller
         if (Auth::check() && Auth::user()->isSubAccount()) {
             return redirect()->route('dashboard')->with('warning', 'Sub-accounts cannot create projects.');
         }
-        return view('wizard.step2');
+        return redirect()->route('wizard', ['step' => 2]);
+    }
+
+    public function step1Fragment()
+    {
+        if (Auth::check() && Auth::user()->isSubAccount()) {
+            return response()->json(['error' => 'Sub-accounts cannot create projects.'], 403);
+        }
+
+        return view('wizard.partials.step1');
+    }
+
+    public function step2Fragment()
+    {
+        if (Auth::check() && Auth::user()->isSubAccount()) {
+            return response()->json(['error' => 'Sub-accounts cannot create projects.'], 403);
+        }
+
+        return view('wizard.partials.step2');
     }
 
     public function step1Post(Request $request)
@@ -41,13 +71,13 @@ class ProjectWizardController extends Controller
         $request->session()->put('budget', $validatedData['budget']);
 
         // Redirect to the confirmation step
-        return redirect()->route('wizard.step2');
+        return redirect()->route('wizard', ['step' => 2]);
     }
 
     public function step2Post(Request $request)
     {
         // Step 2 is merged into step 1; keep for backward compatibility.
-        return redirect()->route('wizard.step1');
+        return redirect()->route('wizard');
     }
 
 public function complete(Request $request)

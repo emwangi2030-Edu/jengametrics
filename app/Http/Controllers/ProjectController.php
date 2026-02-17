@@ -76,6 +76,10 @@ class ProjectController extends Controller
 
     public function destroy(Project $project)
     {
+        if (Auth::check() && Auth::user()->isSubAccount()) {
+            return redirect()->route('projects.settings')->with('warning', 'Sub-accounts cannot delete projects.');
+        }
+
         $project->delete();
         return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');
     }
@@ -93,6 +97,35 @@ class ProjectController extends Controller
         $user->save();
 
         return redirect()->route('dashboard')->with('success', 'Project selected successfully.');
+    }
+
+    public function settings()
+    {
+        $project = get_project();
+        if (! $project) {
+            return redirect()->route('dashboard')->with('warning', 'No project selected.');
+        }
+
+        return view('projects.settings', compact('project'));
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $project = get_project();
+        if (! $project) {
+            return redirect()->route('dashboard')->with('warning', 'No project selected.');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'budget' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:255',
+        ]);
+
+        $project->update($validated);
+
+        return redirect()->route('projects.settings')->with('success', 'Project settings updated successfully.');
     }
 
 }
