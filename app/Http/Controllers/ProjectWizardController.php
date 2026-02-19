@@ -61,6 +61,7 @@ class ProjectWizardController extends Controller
             'project_uid' => 'required|string|max:100|alpha_dash|unique:projects,project_uid',
             'name' => 'required|string|max:255',
             'description' => 'required',
+            'project_duration' => 'required|integer|min:1',
             'address' => 'required|string|max:255',
             'budget' => 'required|string|max:255',
         ]);
@@ -69,6 +70,7 @@ class ProjectWizardController extends Controller
         $request->session()->put('project_uid', $validatedData['project_uid']);
         $request->session()->put('name', $validatedData['name']);
         $request->session()->put('description', $validatedData['description']);
+        $request->session()->put('project_duration', $validatedData['project_duration']);
         $request->session()->put('address', $validatedData['address']);
         $request->session()->put('budget', $validatedData['budget']);
 
@@ -92,6 +94,7 @@ public function complete(Request $request)
         'project_uid' => 'required|string|max:100|alpha_dash|unique:projects,project_uid',
         'name' => 'required|string|max:255',
         'description' => 'required',
+        'project_duration' => 'required|integer|min:1',
         'address' => 'required|string|max:255',
         'budget' => 'required|string|max:255',
     ]);
@@ -106,6 +109,7 @@ public function complete(Request $request)
         'user_id' => $user->id,
         'address' => $validated['address'],
         'description' => $validated['description'],
+        'project_duration' => $validated['project_duration'],
         'budget' => $validated['budget'],
     ];
 
@@ -123,7 +127,7 @@ public function complete(Request $request)
    }
 
     // Clear session data
-    $request->session()->forget(['project_uid', 'name', 'address', 'description', 'budget']);
+    $request->session()->forget(['project_uid', 'name', 'address', 'description', 'project_duration', 'budget']);
 
     return redirect()->to(url('dashboard'))->with('success', 'Project added successfully!');
 }

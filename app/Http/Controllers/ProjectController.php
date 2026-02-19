@@ -128,6 +128,7 @@ class ProjectController extends Controller
             ],
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'project_duration' => 'nullable|integer|min:1',
             'budget' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
         ]);

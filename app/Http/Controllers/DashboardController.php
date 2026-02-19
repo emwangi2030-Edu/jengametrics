@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Worker;
 use App\Models\Material;
 use App\Models\Payment;
+use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -21,11 +22,39 @@ class DashboardController extends Controller
         }
 
         $projectId = $user->project_id;
+        $project = Project::find($projectId);
         $totalWorkers = Worker::where('project_id', $projectId)->count();
         $totalMaterialExpenses = Material::where('project_id', $projectId)
                                         ->sum(DB::raw('unit_price * quantity_purchased'));
         $totalPayments = Payment::where('project_id', $projectId)
                                         ->sum('amount');
+
+        $projectRunningWeeks = 0;
+        $projectEstimatedWeeks = $project?->project_duration ? (int) $project->project_duration : null;
+        $projectDurationColorClass = 'text-success';
+        $projectDurationExceeded = false;
+
+        if ($project && $project->created_at) {
+            $projectRunningWeeks = max(
+                0,
+                (int) floor($project->created_at->startOfDay()->diffInDays(now()->startOfDay()) / 7)
+            );
+        }
+
+        if ($projectEstimatedWeeks && $projectEstimatedWeeks > 0) {
+            $ratio = $projectRunningWeeks / $projectEstimatedWeeks;
+
+            if ($ratio >= 1) {
+                $projectDurationColorClass = 'text-danger';
+                $projectDurationExceeded = true;
+            } elseif ($ratio >= 0.8) {
+                $projectDurationColorClass = 'text-danger';
+            } elseif ($ratio >= 0.5) {
+                $projectDurationColorClass = 'text-warning';
+            } else {
+                $projectDurationColorClass = 'text-success';
+            }
+        }
 
         // Get selected year or default to current year
         $selectedYear = $request->input('year', now()->year);
@@ -94,7 +123,11 @@ class DashboardController extends Controller
             'data',
             'labourData',
             'availableYears',
-            'selectedYear'
+            'selectedYear',
+            'projectRunningWeeks',
+            'projectEstimatedWeeks',
+            'projectDurationColorClass',
+            'projectDurationExceeded'
         ));
     }
 }

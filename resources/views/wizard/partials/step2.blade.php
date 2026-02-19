@@ -6,6 +6,7 @@
         $projectUid = old('project_uid', session('project_uid'));
         $projectName = old('name', session('name'));
         $projectDescription = old('description', session('description'));
+        $projectDuration = old('project_duration', session('project_duration'));
         $projectAddress = old('address', session('address'));
         $projectBudgetRaw = old('budget', session('budget'));
         $projectBudgetNormalized = preg_replace('/,/', '', (string) $projectBudgetRaw);
@@ -37,6 +38,14 @@
         <label for="description" class="form-label">{{ __('Project Description:') }}</label>
         <textarea id="description" name="description" class="form-control" rows="3" readonly>{{ $projectDescription }}</textarea>
         @error('description')
+            <div class="text-danger mt-1">{{ $message }}</div>
+        @enderror
+    </div>
+
+    <div class="mb-3">
+        <label for="project_duration" class="form-label">{{ __('Project Duration (Weeks):') }}</label>
+        <input type="text" id="project_duration" name="project_duration" class="form-control" value="{{ $projectDuration }}" readonly>
+        @error('project_duration')
             <div class="text-danger mt-1">{{ $message }}</div>
         @enderror
     </div>

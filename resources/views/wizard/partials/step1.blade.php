@@ -29,11 +29,20 @@
     </div>
 
     <div class="mb-3">
+        <label for="project_duration" class="form-label">{{ __('Project Duration:') }}</label>
+        <input type="number" id="project_duration" name="project_duration" class="form-control" required min="1"
+            placeholder="Enter project duration in weeks"
+            value="{{ old('project_duration', session('project_duration')) }}">
+        @error('project_duration')
+            <div class="text-danger mt-1">{{ $message }}</div>
+        @enderror
+    </div>
+
+    <div class="mb-3">
         <label for="budget_display" class="form-label">{{ __('Project Budget:') }}</label>
         <input type="text" id="budget_display" class="form-control" required placeholder="{{ __('Enter project budget') }}"
             value="{{ $budgetRaw }}" inputmode="decimal" autocomplete="off">
         <input type="hidden" id="budget" name="budget" value="{{ $budgetRaw }}">
-        <small class="text-muted">{{ __('Display uses comma separators. Stored value remains unformatted.') }}</small>
         @error('budget')
             <div class="text-danger mt-1">{{ $message }}</div>
         @enderror

@@ -41,6 +41,14 @@
                         @enderror
                     </div>
                     <div class="mb-3">
+                        <label class="form-label" for="project-duration">{{ __('Project Duration (Weeks)') }}</label>
+                        <input type="number" class="form-control" id="project-duration" name="project_duration" min="1"
+                            placeholder="Enter project duration in weeks" value="{{ old('project_duration', $project->project_duration) }}">
+                        @error('project_duration')
+                            <div class="text-danger mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label" for="project-budget">{{ __('Budget') }}</label>
                         <input type="text" class="form-control" id="project-budget" name="budget" value="{{ old('budget', $project->budget) }}" maxlength="255">
                         @error('budget')

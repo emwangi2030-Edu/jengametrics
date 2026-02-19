@@ -7,7 +7,7 @@
 
     <div class="row justify-content-center g-4">
         <!-- Total Workers Card -->
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card shadow border-0">
                 <div class="card-body text-center">
                     <h5 class="card-title" style="color:#027333">Total Workers</h5>
@@ -17,7 +17,7 @@
         </div>
 
         <!-- Total Material Expenses Card -->
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card shadow border-0">
                 <div class="card-body text-center">
                     <h5 class="card-title" style="color:#027333">Total Material Expenses</h5>
@@ -27,11 +27,28 @@
         </div>
 
         <!-- Total Labour Expenses Card -->
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card shadow border-0">
                 <div class="card-body text-center">
                     <h5 class="card-title" style="color:#027333">Total Labour Expenses</h5>
                     <h3 class="text-dark">KES {{ number_format($totalPayments, 2) }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Duration Card -->
+        <div class="col-md-3">
+            <div class="card shadow border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title" style="color:#027333">Project Duration</h5>
+                    <h3 class="{{ $projectDurationColorClass }}">{{ $projectRunningWeeks }} weeks</h3>
+                    @if($projectDurationExceeded)
+                        <small class="text-danger">estimated project duration exceeded!</small>
+                    @elseif(!$projectEstimatedWeeks)
+                        <small class="text-muted">Estimated duration not set.</small>
+                    @else
+                        <small class="text-muted">Estimated: {{ $projectEstimatedWeeks }} weeks</small>
+                    @endif
                 </div>
             </div>
         </div>
