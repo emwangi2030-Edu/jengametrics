@@ -65,6 +65,7 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::post('select-project', [ProjectController::class, 'selectProject'])->name('select_project');
+Route::get('projects/check-project-id', [ProjectController::class, 'checkProjectUid'])->name('projects.check_uid');
 
 
 // BoQ Documents Routes

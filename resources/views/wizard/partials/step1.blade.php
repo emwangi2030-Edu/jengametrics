@@ -2,6 +2,19 @@
 
 <form action="{{ route('wizard.step1.post') }}" method="POST">
     @csrf
+    @php
+        $budgetRaw = old('budget', session('budget'));
+    @endphp
+
+    <div class="mb-3">
+        <label for="project_uid" class="form-label">{{ __('Project ID:') }}</label>
+        <input type="text" id="project_uid" name="project_uid" class="form-control" required maxlength="100"
+            placeholder="{{ __('Enter unique project ID (letters, numbers, dashes, underscores)') }}"
+            value="{{ old('project_uid', session('project_uid')) }}">
+        @error('project_uid')
+            <div class="text-danger mt-1">{{ $message }}</div>
+        @enderror
+    </div>
 
     <div class="mb-3">
         <label for="name" class="form-label">{{ __('Project Name:') }}</label>
@@ -16,9 +29,14 @@
     </div>
 
     <div class="mb-3">
-        <label for="budget" class="form-label">{{ __('Project Budget:') }}</label>
-        <input type="text" id="budget" name="budget" class="form-control" required placeholder="{{ __('Enter project budget') }}"
-            value="{{ old('budget', session('budget')) }}">
+        <label for="budget_display" class="form-label">{{ __('Project Budget:') }}</label>
+        <input type="text" id="budget_display" class="form-control" required placeholder="{{ __('Enter project budget') }}"
+            value="{{ $budgetRaw }}" inputmode="decimal" autocomplete="off">
+        <input type="hidden" id="budget" name="budget" value="{{ $budgetRaw }}">
+        <small class="text-muted">{{ __('Display uses comma separators. Stored value remains unformatted.') }}</small>
+        @error('budget')
+            <div class="text-danger mt-1">{{ $message }}</div>
+        @enderror
     </div>
 
     <div class="mb-4">

@@ -19,6 +19,14 @@
                     @csrf
                     @method('PATCH')
                     <div class="mb-3">
+                        <label class="form-label" for="project-uid">{{ __('Project ID') }}</label>
+                        <input type="text" class="form-control" id="project-uid" name="project_uid" value="{{ old('project_uid', $project->project_uid) }}" required maxlength="100">
+                        <small class="text-muted">{{ __('Use letters, numbers, dashes, or underscores.') }}</small>
+                        @error('project_uid')
+                            <div class="text-danger mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label" for="project-name">{{ __('Project Name') }}</label>
                         <input type="text" class="form-control" id="project-name" name="name" value="{{ old('name', $project->name) }}" required maxlength="255">
                         @error('name')
@@ -62,3 +70,61 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    (function () {
+        const form = document.querySelector('form[action="{{ route('projects.settings.update') }}"]');
+        const projectIdInput = document.getElementById('project-uid');
+        const checkUrl = "{{ route('projects.check_uid') }}";
+        const currentProjectId = "{{ $project->id ?? '' }}";
+
+        if (!form || !projectIdInput) {
+            return;
+        }
+
+        const checkAvailability = async () => {
+            const value = (projectIdInput.value || '').trim();
+            if (!value) {
+                return true;
+            }
+
+            try {
+                const query = new URLSearchParams({
+                    project_uid: value,
+                    ignore_project_id: currentProjectId
+                });
+
+                const response = await fetch(`${checkUrl}?${query.toString()}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                if (!response.ok) {
+                    return true;
+                }
+
+                const payload = await response.json();
+                if (payload.exists) {
+                    window.alert('This ID already exists');
+                    projectIdInput.focus();
+                    return false;
+                }
+
+                return true;
+            } catch (error) {
+                return true;
+            }
+        };
+
+        projectIdInput.addEventListener('blur', checkAvailability);
+
+        form.addEventListener('submit', async function (event) {
+            const isAvailable = await checkAvailability();
+            if (!isAvailable) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        });
+    })();
+</script>
+@endpush

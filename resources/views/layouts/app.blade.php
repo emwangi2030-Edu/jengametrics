@@ -690,7 +690,7 @@
                                                     <span key="t-profile">Add Users</span>
                                                 </a>
                                             @endif
-                                            @if(!\Illuminate\Support\Facades\Auth::user()->isSubAccount())
+                                            <!-- @if(!\Illuminate\Support\Facades\Auth::user()->isSubAccount())
                                                 <a class="dropdown-item" href="{{ url('billings') }}">
                                                     <i class="fa fa-users"></i>
                                                     <span key="t-profile">Manage your billings</span>
@@ -699,7 +699,7 @@
                                                     <i class="fa fa-users"></i>
                                                     <span key="t-profile">Manage your subscriptions</span>
                                                 </a>
-                                            @endif
+                                            @endif -->
                                         @endif
                                     </ul>
                                     <hr />
@@ -843,7 +843,10 @@
                                 <tbody>
                                     @foreach ($projects as $project)
                                         <tr>
-                                            <td><b>{{ $loop->iteration }}. {{ $project->name }}</b></td>
+                                            <td>
+                                                <b>{{ $loop->iteration }}. {{ $project->name }}</b>
+                                                <small class="text-muted">({{ $project->project_uid ?: 'N/A' }})</small>
+                                            </td>
                                             <td>
                                                 <form action="{{ route('select_project') }}" method="POST"
                                                     style="display:inline;">
@@ -856,14 +859,8 @@
                                     @endforeach
                                     <tr>
                                         <td>
-                                            <!-- <a class="dropdown-item" href="{{ url('businesses') }}">
-                                                <i class="fa fa-users"></i> 
-                                                <span key="t-profile">Manage your projects</span>
-                                            </a>
-                                            <br> -->
                                             <a class="btn btn-success btn-small" href="{{ route('wizard') }}">
-                                                <i class="fa fa-users"></i>
-                                                <span key="t-profile">Create new project</span>
+                                                <span key="t-profile">Create project</span>
                                             </a>
                                         </td>
                                     </tr>

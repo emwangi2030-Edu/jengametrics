@@ -36,9 +36,106 @@
             const progressBar = document.getElementById('wizardProgressBar');
             const stepLabel1 = document.getElementById('wizardStepLabel1');
             const stepLabel2 = document.getElementById('wizardStepLabel2');
+            const projectIdCheckUrl = "{{ route('projects.check_uid') }}";
 
             if (!container) {
                 return;
+            }
+
+            function attachBudgetDisplayFormatting(scope) {
+                const form = scope.querySelector('form');
+                const budgetDisplay = scope.querySelector('#budget_display');
+                const budgetHidden = scope.querySelector('input[name="budget"]');
+
+                if (!form || !budgetDisplay || !budgetHidden) {
+                    return;
+                }
+
+                const normalizeRawValue = (value) => {
+                    return (value || '').toString().replace(/,/g, '').trim();
+                };
+
+                const formatWithThousands = (value) => {
+                    const raw = normalizeRawValue(value);
+                    if (!raw || !/^-?\d+(\.\d+)?$/.test(raw)) {
+                        return value;
+                    }
+
+                    const parts = raw.split('.');
+                    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                    return parts.join('.');
+                };
+
+                const syncBudgetRaw = () => {
+                    budgetHidden.value = normalizeRawValue(budgetDisplay.value);
+                };
+
+                budgetDisplay.addEventListener('input', syncBudgetRaw);
+
+                budgetDisplay.addEventListener('blur', function () {
+                    syncBudgetRaw();
+                    if (budgetHidden.value) {
+                        budgetDisplay.value = formatWithThousands(budgetHidden.value);
+                    }
+                });
+
+                form.addEventListener('submit', syncBudgetRaw);
+
+                if (budgetDisplay.value) {
+                    syncBudgetRaw();
+                    budgetDisplay.value = formatWithThousands(budgetHidden.value);
+                }
+            }
+
+            function attachProjectIdValidation(scope) {
+                const form = scope.querySelector('form');
+                const projectIdInput = scope.querySelector('input[name="project_uid"]');
+                if (!form || !projectIdInput) {
+                    return;
+                }
+
+                let uidExists = false;
+
+                const checkAvailability = async () => {
+                    const value = (projectIdInput.value || '').trim();
+                    uidExists = false;
+
+                    if (!value) {
+                        return true;
+                    }
+
+                    try {
+                        const response = await fetch(`${projectIdCheckUrl}?project_uid=${encodeURIComponent(value)}`, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+
+                        if (!response.ok) {
+                            return true;
+                        }
+
+                        const payload = await response.json();
+                        uidExists = !!payload.exists;
+
+                        if (uidExists) {
+                            window.alert('This ID already exists');
+                            projectIdInput.focus();
+                        }
+
+                        return !uidExists;
+                    } catch (error) {
+                        return true;
+                    }
+                };
+
+                projectIdInput.addEventListener('blur', checkAvailability);
+
+                form.addEventListener('submit', async function (event) {
+                    const isAvailable = await checkAvailability();
+                    if (!isAvailable) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                });
             }
 
             const currentStep = container.dataset.step === '2' ? 2 : 1;
@@ -57,6 +154,8 @@
                     stepLabel1.classList.toggle('text-success', !isStep2);
                     stepLabel2.classList.toggle('fw-bold', isStep2);
                     stepLabel2.classList.toggle('text-success', isStep2);
+                    attachBudgetDisplayFormatting(container);
+                    attachProjectIdValidation(container);
                 })
                 .catch(() => {
                     container.innerHTML = '<div class="text-danger text-center py-3">Failed to load step content.</div>';

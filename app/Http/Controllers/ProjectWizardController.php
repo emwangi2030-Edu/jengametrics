@@ -58,6 +58,7 @@ class ProjectWizardController extends Controller
     public function step1Post(Request $request)
     {
         $validatedData = $request->validate([
+            'project_uid' => 'required|string|max:100|alpha_dash|unique:projects,project_uid',
             'name' => 'required|string|max:255',
             'description' => 'required',
             'address' => 'required|string|max:255',
@@ -65,6 +66,7 @@ class ProjectWizardController extends Controller
         ]);
 
         // Store in session
+        $request->session()->put('project_uid', $validatedData['project_uid']);
         $request->session()->put('name', $validatedData['name']);
         $request->session()->put('description', $validatedData['description']);
         $request->session()->put('address', $validatedData['address']);
@@ -85,22 +87,26 @@ public function complete(Request $request)
     if (Auth::check() && Auth::user()->isSubAccount()) {
         return redirect()->route('dashboard')->with('warning', 'Sub-accounts cannot create projects.');
     }
-    // Retrieve data from session
-    $name = $request->session()->get('name');
-    $address = $request->session()->get('address');
-    $description = $request->session()->get('description');
-    $budget = $request->session()->get('budget');
+
+    $validated = $request->validate([
+        'project_uid' => 'required|string|max:100|alpha_dash|unique:projects,project_uid',
+        'name' => 'required|string|max:255',
+        'description' => 'required',
+        'address' => 'required|string|max:255',
+        'budget' => 'required|string|max:255',
+    ]);
 
 
 
     $user = Auth::user();
 
     $data = [
-        'name' => $name,
+        'project_uid' => $validated['project_uid'],
+        'name' => $validated['name'],
         'user_id' => $user->id,
-        'address' => $address,
-        'description' => $description,
-        'budget' => $budget,
+        'address' => $validated['address'],
+        'description' => $validated['description'],
+        'budget' => $validated['budget'],
     ];
 
    $project_created = Project::create($data);
@@ -117,7 +123,7 @@ public function complete(Request $request)
    }
 
     // Clear session data
-    $request->session()->forget(['name', 'address', 'description', 'budget']);
+    $request->session()->forget(['project_uid', 'name', 'address', 'description', 'budget']);
 
     return redirect()->to(url('dashboard'))->with('success', 'Project added successfully!');
 }

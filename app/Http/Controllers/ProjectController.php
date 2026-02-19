@@ -8,6 +8,8 @@ use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Illuminate\Http\JsonResponse;
 
 class ProjectController extends Controller
 {
@@ -117,6 +119,13 @@ class ProjectController extends Controller
         }
 
         $validated = $request->validate([
+            'project_uid' => [
+                'required',
+                'string',
+                'max:100',
+                'alpha_dash',
+                Rule::unique('projects', 'project_uid')->ignore($project->id),
+            ],
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'budget' => 'nullable|string|max:255',
@@ -126,6 +135,24 @@ class ProjectController extends Controller
         $project->update($validated);
 
         return redirect()->route('projects.settings')->with('success', 'Project settings updated successfully.');
+    }
+
+    public function checkProjectUid(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'project_uid' => 'required|string|max:100',
+            'ignore_project_id' => 'nullable|integer',
+        ]);
+
+        $query = Project::query()->where('project_uid', $validated['project_uid']);
+
+        if (!empty($validated['ignore_project_id'])) {
+            $query->where('id', '!=', (int) $validated['ignore_project_id']);
+        }
+
+        return response()->json([
+            'exists' => $query->exists(),
+        ]);
     }
 
 }
