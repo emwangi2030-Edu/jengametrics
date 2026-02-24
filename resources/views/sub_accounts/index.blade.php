@@ -119,6 +119,32 @@
                         <label class="form-check-label" for="role-labour">{{ __('Manage Labour') }}</label>
                     </div>
                     <small class="text-muted d-block mt-2">{{ __('Unchecked roles will remain read-only.') }}</small>
+
+                    <div class="mt-4 mb-2 fw-semibold">{{ __('Project Access') }}</div>
+                    @if($projects->isEmpty())
+                        <div class="alert alert-warning py-2 mb-0">
+                            {{ __('No projects available. Create a project first to assign access.') }}
+                        </div>
+                    @else
+                        @foreach($projects as $project)
+                            <div class="form-check">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id="project-access-{{ $project->id }}"
+                                    name="projects[]"
+                                    value="{{ $project->id }}"
+                                >
+                                <label class="form-check-label" for="project-access-{{ $project->id }}">
+                                    {{ $project->name }}
+                                    @if(!empty($project->project_uid))
+                                        <small class="text-muted">({{ $project->project_uid }})</small>
+                                    @endif
+                                </label>
+                            </div>
+                        @endforeach
+                        <small class="text-muted d-block mt-2">{{ __('Select one or more projects this user can access.') }}</small>
+                    @endif
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
@@ -171,6 +197,36 @@
                             <label class="form-check-label" for="edit-role-labour-{{ $subAccount->id }}">{{ __('Manage Labour') }}</label>
                         </div>
                         <small class="text-muted d-block mt-2">{{ __('Unchecked roles will remain read-only.') }}</small>
+
+                        <div class="mt-4 mb-2 fw-semibold">{{ __('Project Access') }}</div>
+                        @if($projects->isEmpty())
+                            <div class="alert alert-warning py-2 mb-0">
+                                {{ __('No projects available. Create a project first to assign access.') }}
+                            </div>
+                        @else
+                            @php
+                                $assignedProjectIds = $subAccount->projects->pluck('id')->all();
+                            @endphp
+                            @foreach($projects as $project)
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        id="edit-project-access-{{ $subAccount->id }}-{{ $project->id }}"
+                                        name="projects[]"
+                                        value="{{ $project->id }}"
+                                        @checked(in_array($project->id, $assignedProjectIds))
+                                    >
+                                    <label class="form-check-label" for="edit-project-access-{{ $subAccount->id }}-{{ $project->id }}">
+                                        {{ $project->name }}
+                                        @if(!empty($project->project_uid))
+                                            <small class="text-muted">({{ $project->project_uid }})</small>
+                                        @endif
+                                    </label>
+                                </div>
+                            @endforeach
+                            <small class="text-muted d-block mt-2">{{ __('Select one or more projects this user can access.') }}</small>
+                        @endif
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>

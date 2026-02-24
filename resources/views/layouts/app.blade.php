@@ -836,7 +836,10 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <?php
-                        $projects = \Illuminate\Support\Facades\Auth::user()->projects()->get();
+                        $projects = \Illuminate\Support\Facades\Auth::user()
+                            ?->accessibleProjects()
+                            ->orderBy('name')
+                            ->get() ?? collect();
                         ?>
                         <div class="modal-body">
                             <table class="table">
@@ -857,13 +860,15 @@
                                             </td>
                                         </tr>
                                     @endforeach
-                                    <tr>
-                                        <td>
-                                            <a class="btn btn-success btn-small" href="{{ route('wizard') }}">
-                                                <span key="t-profile">Create project</span>
-                                            </a>
-                                        </td>
-                                    </tr>
+                                    @if (!auth()->user()->isSubAccount())
+                                        <tr>
+                                            <td>
+                                                <a class="btn btn-success btn-small" href="{{ route('wizard') }}">
+                                                    <span key="t-profile">Create project</span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endif
                                 </tbody>
                             </table>
                                 <!-- Pagination Links -->
