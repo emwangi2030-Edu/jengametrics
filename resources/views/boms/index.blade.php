@@ -58,7 +58,28 @@
                     <div class="mt-4">
                         <!-- Sections List -->
                         <div class="mt-5">
-                            @if($sections->isEmpty())
+                            @php
+                                $sectionsWithTotals = $sections->map(function ($section) {
+                                    $totalSectionMaterial = (float) (\App\Models\BomItem::whereProjectId(project_id())
+                                        ->where('section_id', $section->id)
+                                        ->selectRaw('SUM(quantity * rate) as total')
+                                        ->value('total') ?? 0);
+
+                                    $totalSectionLabour = (float) (\App\Models\BomLabour::whereProjectId(project_id())
+                                        ->where('section_id', $section->id)
+                                        ->sum('amount') ?? 0);
+
+                                    return (object) [
+                                        'section' => $section,
+                                        'total_section_material' => $totalSectionMaterial,
+                                        'total_section_labour' => $totalSectionLabour,
+                                    ];
+                                })->filter(function ($entry) {
+                                    return $entry->total_section_material > 0 || $entry->total_section_labour > 0;
+                                })->values();
+                            @endphp
+
+                            @if($sectionsWithTotals->isEmpty())
                                 <p class="text-muted">{{ __('No sections found.') }}</p>
                             @else
                                 <div class="table-responsive mt-3">
@@ -72,24 +93,15 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($sections as $section)
-                                                @php
-                                                    $total_section_material = \App\Models\BomItem::whereProjectId(project_id())
-                                                        ->where('section_id', $section->id)
-                                                        ->selectRaw('SUM(quantity * rate) as total')
-                                                        ->value('total');
-                                                    $total_section_labour = \App\Models\BomLabour::whereProjectId(project_id())
-                                                        ->where('section_id', $section->id)
-                                                        ->sum('amount');
-                                            @endphp
+                                            @foreach($sectionsWithTotals as $entry)
                                             <tr>
                                                 <td class="fw-semibold p-2">
-                                                    <a href="{{ route('boms.show', $section->id) }}" class="text-decoration-none">
-                                                        {{ $section->name }}
+                                                    <a href="{{ route('boms.show', $entry->section->id) }}" class="text-decoration-none">
+                                                        {{ $entry->section->name }}
                                                     </a>
                                                 </td>
-                                                <td class="text-end fw-bold">{{ number_format($total_section_material, 2) }}</td>
-                                                <td class="text-end fw-bold">{{ number_format($total_section_labour, 2) }}</td>
+                                                <td class="text-end fw-bold">{{ number_format($entry->total_section_material, 2) }}</td>
+                                                <td class="text-end fw-bold">{{ number_format($entry->total_section_labour, 2) }}</td>
                                                 <td class="text-end"></td>
                                             </tr>
                                             @endforeach
