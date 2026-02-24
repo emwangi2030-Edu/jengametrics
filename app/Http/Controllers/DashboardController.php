@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
 {
@@ -34,6 +35,7 @@ class DashboardController extends Controller
         $projectEstimatedWeeks = $project?->project_duration ? (int) $project->project_duration : null;
         $projectDurationColorClass = 'text-success';
         $projectDurationExceeded = false;
+        $projectCreatedDate = $project?->created_at?->format('M d, Y');
 
         if ($project && $project->created_at) {
             $projectRunningWeeks = max(
@@ -121,11 +123,10 @@ class DashboardController extends Controller
             ->orderBy('id')
             ->get();
 
-        $totalProjectSteps = $projectSteps->count();
-        $completedProjectSteps = $projectSteps->where('is_completed', true)->count();
-        $projectCompletionPercent = $totalProjectSteps > 0
-            ? (int) round(($completedProjectSteps / $totalProjectSteps) * 100)
-            : 0;
+        $projectStepStats = $this->projectStepStats($projectId);
+        $totalProjectSteps = $projectStepStats['totalProjectSteps'];
+        $completedProjectSteps = $projectStepStats['completedProjectSteps'];
+        $projectCompletionPercent = $projectStepStats['projectCompletionPercent'];
 
         return view('dashboard', compact(
             'totalWorkers',
@@ -140,6 +141,7 @@ class DashboardController extends Controller
             'projectEstimatedWeeks',
             'projectDurationColorClass',
             'projectDurationExceeded',
+            'projectCreatedDate',
             'projectSteps',
             'totalProjectSteps',
             'completedProjectSteps',
@@ -200,6 +202,88 @@ class DashboardController extends Controller
             'completed_at' => $isCompleted ? now() : null,
         ]);
 
+        if ($request->expectsJson()) {
+            $stats = $this->projectStepStats($projectId);
+
+            return response()->json([
+                'success' => true,
+                'step' => [
+                    'id' => $projectStep->id,
+                    'is_completed' => (bool) $projectStep->is_completed,
+                    'completed_at_human' => $projectStep->completed_at ? $projectStep->completed_at->diffForHumans() : null,
+                ],
+                'stats' => $stats,
+            ]);
+        }
+
         return redirect()->route('dashboard');
+    }
+
+    public function reorderProjectSteps(Request $request)
+    {
+        $user = Auth::user();
+        $projectId = (int) ($user->project_id ?? 0);
+
+        if (!$projectId) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'steps' => 'required|array|min:1',
+            'steps.*' => [
+                'integer',
+                Rule::exists('project_steps', 'id')->where(fn ($query) => $query->where('project_id', $projectId)),
+            ],
+        ]);
+
+        $orderedStepIds = collect($validated['steps'])
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        $validStepIds = ProjectStep::where('project_id', $projectId)
+            ->whereIn('id', $orderedStepIds)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->values();
+
+        if ($orderedStepIds->count() !== $validStepIds->count()) {
+            abort(403);
+        }
+
+        DB::transaction(function () use ($orderedStepIds, $projectId) {
+            foreach ($orderedStepIds as $index => $stepId) {
+                ProjectStep::where('project_id', $projectId)
+                    ->where('id', $stepId)
+                    ->update(['position' => $index + 1]);
+            }
+        });
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'stats' => $this->projectStepStats($projectId),
+            ]);
+        }
+
+        return redirect()->route('dashboard');
+    }
+
+    protected function projectStepStats(int $projectId): array
+    {
+        $totalProjectSteps = ProjectStep::where('project_id', $projectId)->count();
+        $completedProjectSteps = ProjectStep::where('project_id', $projectId)
+            ->where('is_completed', true)
+            ->count();
+
+        $projectCompletionPercent = $totalProjectSteps > 0
+            ? (int) round(($completedProjectSteps / $totalProjectSteps) * 100)
+            : 0;
+
+        return [
+            'totalProjectSteps' => $totalProjectSteps,
+            'completedProjectSteps' => $completedProjectSteps,
+            'projectCompletionPercent' => $projectCompletionPercent,
+        ];
     }
 }

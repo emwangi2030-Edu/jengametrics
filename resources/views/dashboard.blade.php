@@ -91,6 +91,9 @@
                     @else
                         <small class="text-muted">Estimated: {{ $projectEstimatedWeeks }} weeks</small>
                     @endif
+                    <small class="d-block text-muted mt-1">
+                        Created: {{ $projectCreatedDate ?? 'N/A' }}
+                    </small>
                 </div>
             </div>
         </div>
@@ -105,6 +108,7 @@
                         <svg width="140" height="140" viewBox="0 0 140 140" role="img" aria-label="Project completion radial progress">
                             <circle cx="70" cy="70" r="{{ $circleRadius }}" fill="none" stroke="#e9ecef" stroke-width="12"></circle>
                             <circle
+                                id="projectCompletionCircleProgress"
                                 cx="70"
                                 cy="70"
                                 r="{{ $circleRadius }}"
@@ -114,12 +118,13 @@
                                 stroke-linecap="round"
                                 stroke-dasharray="{{ $circleCircumference }}"
                                 stroke-dashoffset="{{ $circleOffset }}"
+                                data-circumference="{{ $circleCircumference }}"
                                 style="transition: stroke-dashoffset 0.6s ease;"
                             ></circle>
                         </svg>
-                        <div class="progress-value">{{ $projectCompletionPercent }}%</div>
+                        <div id="projectCompletionPercentText" class="progress-value">{{ $projectCompletionPercent }}%</div>
                     </div>
-                    <small class="text-muted d-block mt-2">
+                    <small id="projectCompletionSummaryText" class="text-muted d-block mt-2">
                         {{ $completedProjectSteps }} of {{ $totalProjectSteps }} steps completed
                     </small>
                 </div>
@@ -234,35 +239,33 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <div id="projectStepsList">
                 @if($projectSteps->isEmpty())
                     <p class="text-muted mb-0">No project steps added yet.</p>
                 @else
                     @foreach($projectSteps as $step)
-                        <div class="project-step-item d-flex align-items-center justify-content-between">
+                        <div class="project-step-item d-flex align-items-center justify-content-between" draggable="true" data-step-id="{{ $step->id }}">
                             <div class="d-flex align-items-center gap-3">
-                                <form method="POST" action="{{ route('dashboard.project_steps.toggle', $step) }}" class="m-0">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="is_completed" value="0">
-                                    <input
-                                        class="form-check-input"
-                                        type="checkbox"
-                                        name="is_completed"
-                                        value="1"
-                                        {{ $step->is_completed ? 'checked' : '' }}
-                                        onchange="this.form.submit()"
-                                    >
-                                </form>
-                                <span class="{{ $step->is_completed ? 'text-decoration-line-through text-muted' : '' }}">
+                                <span class="text-muted" title="Drag to reorder" style="cursor: grab;">&#9776;</span>
+                                <input
+                                    class="form-check-input js-step-toggle"
+                                    type="checkbox"
+                                    data-url="{{ route('dashboard.project_steps.toggle', $step) }}"
+                                    {{ $step->is_completed ? 'checked' : '' }}
+                                >
+                                <span class="js-step-title {{ $step->is_completed ? 'text-decoration-line-through text-muted' : '' }}">
                                     {{ $step->title }}
                                 </span>
                             </div>
-                            @if($step->is_completed && $step->completed_at)
-                                <small class="text-muted">Done {{ $step->completed_at->diffForHumans() }}</small>
-                            @endif
+                            <small class="text-muted js-step-completed-at">
+                                @if($step->is_completed && $step->completed_at)
+                                    Done {{ $step->completed_at->diffForHumans() }}
+                                @endif
+                            </small>
                         </div>
                     @endforeach
                 @endif
+                </div>
             </div>
             <div class="modal-footer d-flex justify-content-between">
                 <button type="button" class="btn btn-primary" data-bs-target="#addProjectStepsModal" data-bs-toggle="modal">
@@ -303,8 +306,14 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const csrfToken = @json(csrf_token());
         const stepsContainer = document.getElementById('projectStepsInputList');
         const addStepButton = document.getElementById('addAnotherStepBtn');
+        const projectStepsList = document.getElementById('projectStepsList');
+        const progressCircle = document.getElementById('projectCompletionCircleProgress');
+        const percentText = document.getElementById('projectCompletionPercentText');
+        const summaryText = document.getElementById('projectCompletionSummaryText');
+        const reorderUrl = @json(route('dashboard.project_steps.reorder'));
 
         if (!stepsContainer || !addStepButton) {
             return;
@@ -347,6 +356,149 @@
                 }
             }
         });
+
+        const updateRadialProgress = (stats) => {
+            if (!progressCircle || !percentText || !summaryText || !stats) {
+                return;
+            }
+
+            const circumference = parseFloat(progressCircle.dataset.circumference || '0');
+            const percent = Number(stats.projectCompletionPercent || 0);
+            const completed = Number(stats.completedProjectSteps || 0);
+            const total = Number(stats.totalProjectSteps || 0);
+
+            const offset = circumference - ((percent / 100) * circumference);
+            progressCircle.setAttribute('stroke-dashoffset', String(offset));
+            percentText.textContent = `${percent}%`;
+            summaryText.textContent = `${completed} of ${total} steps completed`;
+        };
+
+        if (projectStepsList) {
+            projectStepsList.addEventListener('change', async function (event) {
+                const checkbox = event.target;
+                if (!checkbox.classList.contains('js-step-toggle')) {
+                    return;
+                }
+
+                const url = checkbox.dataset.url;
+                const row = checkbox.closest('.project-step-item');
+                const title = row ? row.querySelector('.js-step-title') : null;
+                const completedAt = row ? row.querySelector('.js-step-completed-at') : null;
+                const intendedState = checkbox.checked;
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ is_completed: intendedState ? 1 : 0 })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to update step');
+                    }
+
+                    const payload = await response.json();
+                    const isCompleted = !!payload?.step?.is_completed;
+
+                    if (title) {
+                        title.classList.toggle('text-decoration-line-through', isCompleted);
+                        title.classList.toggle('text-muted', isCompleted);
+                    }
+                    if (completedAt) {
+                        completedAt.textContent = isCompleted && payload?.step?.completed_at_human
+                            ? `Done ${payload.step.completed_at_human}`
+                            : '';
+                    }
+
+                    updateRadialProgress(payload?.stats);
+                } catch (error) {
+                    checkbox.checked = !intendedState;
+                }
+            });
+
+            let draggedRow = null;
+            let originalOrder = [];
+
+            const getCurrentOrder = () => {
+                return Array.from(projectStepsList.querySelectorAll('.project-step-item[data-step-id]'))
+                    .map((row) => Number(row.dataset.stepId));
+            };
+
+            projectStepsList.addEventListener('dragstart', function (event) {
+                const row = event.target.closest('.project-step-item[data-step-id]');
+                if (!row) {
+                    return;
+                }
+
+                draggedRow = row;
+                originalOrder = getCurrentOrder();
+                row.classList.add('opacity-50');
+                event.dataTransfer.effectAllowed = 'move';
+            });
+
+            projectStepsList.addEventListener('dragover', function (event) {
+                event.preventDefault();
+                const target = event.target.closest('.project-step-item[data-step-id]');
+                if (!target || !draggedRow || target === draggedRow) {
+                    return;
+                }
+
+                const rect = target.getBoundingClientRect();
+                const insertBefore = event.clientY < rect.top + (rect.height / 2);
+                if (insertBefore) {
+                    projectStepsList.insertBefore(draggedRow, target);
+                } else {
+                    projectStepsList.insertBefore(draggedRow, target.nextSibling);
+                }
+            });
+
+            projectStepsList.addEventListener('dragend', async function () {
+                if (!draggedRow) {
+                    return;
+                }
+
+                draggedRow.classList.remove('opacity-50');
+                draggedRow = null;
+
+                const newOrder = getCurrentOrder();
+                if (JSON.stringify(originalOrder) === JSON.stringify(newOrder) || newOrder.length === 0) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(reorderUrl, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ steps: newOrder })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to reorder steps');
+                    }
+                } catch (error) {
+                    const rowsById = {};
+                    Array.from(projectStepsList.querySelectorAll('.project-step-item[data-step-id]')).forEach((row) => {
+                        rowsById[Number(row.dataset.stepId)] = row;
+                    });
+
+                    originalOrder.forEach((id) => {
+                        if (rowsById[id]) {
+                            projectStepsList.appendChild(rowsById[id]);
+                        }
+                    });
+                }
+            });
+        }
     });
 </script>
 @endsection

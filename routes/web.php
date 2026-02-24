@@ -66,6 +66,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 Route::middleware('auth')->group(function () {
     Route::post('/dashboard/project-steps', [DashboardController::class, 'storeProjectSteps'])
         ->name('dashboard.project_steps.store');
+    Route::patch('/dashboard/project-steps/reorder', [DashboardController::class, 'reorderProjectSteps'])
+        ->name('dashboard.project_steps.reorder');
     Route::patch('/dashboard/project-steps/{projectStep}', [DashboardController::class, 'toggleProjectStep'])
         ->name('dashboard.project_steps.toggle');
 });
