@@ -1,9 +1,51 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    $circleRadius = 54;
+    $circleCircumference = 2 * pi() * $circleRadius;
+    $circleOffset = $circleCircumference - (($projectCompletionPercent / 100) * $circleCircumference);
+@endphp
 
 <div class="container-fluid">
-    <h1 class="my-4" style="color:#027333">Dashboard</h1>
+    <style>
+        .project-completion-circle {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .project-completion-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .project-completion-circle .progress-value {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #027333;
+            font-size: 1.25rem;
+        }
+
+        .project-step-item {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.6rem 0.75rem;
+            margin-bottom: 0.5rem;
+            background: #fff;
+        }
+    </style>
+
+    <div class="d-flex align-items-center justify-content-between my-4">
+        <h1 class="mb-0" style="color:#027333">Dashboard</h1>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#projectStepsModal">
+            Project Steps
+        </button>
+    </div>
 
     <div class="row justify-content-center g-4">
         <!-- Total Workers Card -->
@@ -49,6 +91,37 @@
                     @else
                         <small class="text-muted">Estimated: {{ $projectEstimatedWeeks }} weeks</small>
                     @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center g-4 mt-2">
+        <div class="col-md-4">
+            <div class="card shadow border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-3" style="color:#027333">Project Completion</h5>
+                    <div class="project-completion-circle">
+                        <svg width="140" height="140" viewBox="0 0 140 140" role="img" aria-label="Project completion radial progress">
+                            <circle cx="70" cy="70" r="{{ $circleRadius }}" fill="none" stroke="#e9ecef" stroke-width="12"></circle>
+                            <circle
+                                cx="70"
+                                cy="70"
+                                r="{{ $circleRadius }}"
+                                fill="none"
+                                stroke="#20c997"
+                                stroke-width="12"
+                                stroke-linecap="round"
+                                stroke-dasharray="{{ $circleCircumference }}"
+                                stroke-dashoffset="{{ $circleOffset }}"
+                                style="transition: stroke-dashoffset 0.6s ease;"
+                            ></circle>
+                        </svg>
+                        <div class="progress-value">{{ $projectCompletionPercent }}%</div>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                        {{ $completedProjectSteps }} of {{ $totalProjectSteps }} steps completed
+                    </small>
                 </div>
             </div>
         </div>
@@ -150,6 +223,130 @@
             }
         }
     }
+    });
+</script>
+
+<div class="modal fade" id="projectStepsModal" tabindex="-1" aria-labelledby="projectStepsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="projectStepsModalLabel">Project Steps</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if($projectSteps->isEmpty())
+                    <p class="text-muted mb-0">No project steps added yet.</p>
+                @else
+                    @foreach($projectSteps as $step)
+                        <div class="project-step-item d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <form method="POST" action="{{ route('dashboard.project_steps.toggle', $step) }}" class="m-0">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="is_completed" value="0">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        name="is_completed"
+                                        value="1"
+                                        {{ $step->is_completed ? 'checked' : '' }}
+                                        onchange="this.form.submit()"
+                                    >
+                                </form>
+                                <span class="{{ $step->is_completed ? 'text-decoration-line-through text-muted' : '' }}">
+                                    {{ $step->title }}
+                                </span>
+                            </div>
+                            @if($step->is_completed && $step->completed_at)
+                                <small class="text-muted">Done {{ $step->completed_at->diffForHumans() }}</small>
+                            @endif
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-primary" data-bs-target="#addProjectStepsModal" data-bs-toggle="modal">
+                    Add Project Steps
+                </button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addProjectStepsModal" tabindex="-1" aria-labelledby="addProjectStepsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ route('dashboard.project_steps.store') }}">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProjectStepsModalLabel">Add Project Steps</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="projectStepsInputList">
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control" name="steps[]" maxlength="255" placeholder="Enter project step" required>
+                            <button type="button" class="btn btn-outline-danger remove-step-input" disabled>Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-success" id="addAnotherStepBtn">+ Add Another Step</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Steps</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const stepsContainer = document.getElementById('projectStepsInputList');
+        const addStepButton = document.getElementById('addAnotherStepBtn');
+
+        if (!stepsContainer || !addStepButton) {
+            return;
+        }
+
+        const createStepInputRow = () => {
+            const row = document.createElement('div');
+            row.className = 'input-group mb-2';
+            row.innerHTML = `
+                <input type="text" class="form-control" name="steps[]" maxlength="255" placeholder="Enter project step" required>
+                <button type="button" class="btn btn-outline-danger remove-step-input">Remove</button>
+            `;
+            return row;
+        };
+
+        addStepButton.addEventListener('click', function () {
+            stepsContainer.appendChild(createStepInputRow());
+            const removeButtons = stepsContainer.querySelectorAll('.remove-step-input');
+            removeButtons.forEach((btn) => btn.disabled = false);
+        });
+
+        stepsContainer.addEventListener('click', function (event) {
+            const target = event.target;
+            if (!target.classList.contains('remove-step-input')) {
+                return;
+            }
+
+            const row = target.closest('.input-group');
+            if (!row) {
+                return;
+            }
+
+            row.remove();
+
+            const rows = stepsContainer.querySelectorAll('.input-group');
+            if (rows.length === 1) {
+                const onlyRemoveButton = rows[0].querySelector('.remove-step-input');
+                if (onlyRemoveButton) {
+                    onlyRemoveButton.disabled = true;
+                }
+            }
+        });
     });
 </script>
 @endsection

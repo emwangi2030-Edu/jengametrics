@@ -6,6 +6,7 @@ use App\Models\Worker;
 use App\Models\Material;
 use App\Models\Payment;
 use App\Models\Project;
+use App\Models\ProjectStep;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -115,6 +116,17 @@ class DashboardController extends Controller
             ->sort()
             ->values();
 
+        $projectSteps = ProjectStep::where('project_id', $projectId)
+            ->orderBy('position')
+            ->orderBy('id')
+            ->get();
+
+        $totalProjectSteps = $projectSteps->count();
+        $completedProjectSteps = $projectSteps->where('is_completed', true)->count();
+        $projectCompletionPercent = $totalProjectSteps > 0
+            ? (int) round(($completedProjectSteps / $totalProjectSteps) * 100)
+            : 0;
+
         return view('dashboard', compact(
             'totalWorkers',
             'totalMaterialExpenses',
@@ -127,7 +139,67 @@ class DashboardController extends Controller
             'projectRunningWeeks',
             'projectEstimatedWeeks',
             'projectDurationColorClass',
-            'projectDurationExceeded'
+            'projectDurationExceeded',
+            'projectSteps',
+            'totalProjectSteps',
+            'completedProjectSteps',
+            'projectCompletionPercent'
         ));
+    }
+
+    public function storeProjectSteps(Request $request)
+    {
+        $user = Auth::user();
+        $projectId = (int) ($user->project_id ?? 0);
+
+        if (!$projectId) {
+            return redirect()->route('dashboard')->with('warning', 'Select a project first.');
+        }
+
+        $validated = $request->validate([
+            'steps' => 'required|array|min:1',
+            'steps.*' => 'required|string|max:255',
+        ]);
+
+        $steps = collect($validated['steps'])
+            ->map(fn ($step) => trim((string) $step))
+            ->filter()
+            ->values();
+
+        if ($steps->isEmpty()) {
+            return redirect()->route('dashboard')->with('warning', 'Add at least one project step.');
+        }
+
+        $nextPosition = ((int) ProjectStep::where('project_id', $projectId)->max('position')) + 1;
+
+        foreach ($steps as $step) {
+            ProjectStep::create([
+                'project_id' => $projectId,
+                'created_by' => $user->id,
+                'title' => $step,
+                'position' => $nextPosition++,
+            ]);
+        }
+
+        return redirect()->route('dashboard')->with('success', 'Project step(s) added.');
+    }
+
+    public function toggleProjectStep(Request $request, ProjectStep $projectStep)
+    {
+        $user = Auth::user();
+        $projectId = (int) ($user->project_id ?? 0);
+
+        if ((int) $projectStep->project_id !== $projectId) {
+            abort(403);
+        }
+
+        $isCompleted = $request->boolean('is_completed');
+
+        $projectStep->update([
+            'is_completed' => $isCompleted,
+            'completed_at' => $isCompleted ? now() : null,
+        ]);
+
+        return redirect()->route('dashboard');
     }
 }

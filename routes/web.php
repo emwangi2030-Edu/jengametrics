@@ -63,6 +63,12 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::middleware('auth')->group(function () {
+    Route::post('/dashboard/project-steps', [DashboardController::class, 'storeProjectSteps'])
+        ->name('dashboard.project_steps.store');
+    Route::patch('/dashboard/project-steps/{projectStep}', [DashboardController::class, 'toggleProjectStep'])
+        ->name('dashboard.project_steps.toggle');
+});
 
 Route::post('select-project', [ProjectController::class, 'selectProject'])->name('select_project');
 Route::get('projects/check-project-id', [ProjectController::class, 'checkProjectUid'])->name('projects.check_uid');
