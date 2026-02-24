@@ -27,7 +27,7 @@
                         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">{{ __('Update Section') }}</button>
                     </form>
 
-                    <a href="{{ route('bq_documents.show', $bqDocument) }}" class="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 inline-block">{{ __('Back to Document') }}</a>
+                    <a href="{{ route('bq_documents.show', $bqDocument) }}" class="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 inline-block" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                 </div>
             </div>
         </div>

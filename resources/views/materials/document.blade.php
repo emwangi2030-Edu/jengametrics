@@ -24,6 +24,6 @@
             <p>No document available to display.</p>
         @endif
     </div>
-    <a href="{{ route('materials.index') }}" class="btn btn-primary mt-3">Back to Materials List</a>
+    <a href="{{ route('materials.index') }}" class="btn btn-primary mt-3" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
 </div>
 @endsection

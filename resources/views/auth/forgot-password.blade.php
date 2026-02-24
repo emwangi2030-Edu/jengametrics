@@ -114,7 +114,7 @@
 
             <!-- Back to Login -->
             <p class="text-center mt-3 text-light">
-                <a href="{{ route('login') }}" class="text-white fw-bold">Back to Login</a>
+                <a href="{{ route('login') }}" class="text-white fw-bold" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
             </p>
         </form>
     </div>

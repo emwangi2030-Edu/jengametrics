@@ -27,7 +27,7 @@
             </select>
         </div>
         <button type="submit" class="btn btn-primary mt-3">Add</button>
-        <a href="{{ route('products.index') }}" class="btn btn-secondary mt-3">Back</a>
+        <a href="{{ route('products.index') }}" class="btn btn-secondary mt-3" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
     </form>
 </div>
 @endsection

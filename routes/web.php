@@ -25,6 +25,7 @@ use App\Http\Controllers\RequisitionController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\SubAccountController;
+use App\Http\Controllers\LabourTaskController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -180,6 +181,11 @@ Route::post('/attendance', [AttendanceController::class, 'store'])->name('attend
 Route::get('/attendance/fetch', [AttendanceController::class, 'fetchAttendance'])->name('attendance.fetch');
 Route::post('/workers/{worker}/payments', [PaymentController::class, 'store'])->name('payments.store');
 Route::get('/workers/{worker}/payments', [PaymentController::class, 'index'])->name('payments.index');
+Route::get('/labour-tasks', [LabourTaskController::class, 'index'])->name('labour_tasks.index');
+Route::get('/labour-tasks/groups/{group}', [LabourTaskController::class, 'showGroup'])->name('labour_tasks.groups.show');
+Route::post('/labour-tasks/groups', [LabourTaskController::class, 'storeGroup'])->name('labour_tasks.groups.store');
+Route::post('/labour-tasks/tasks', [LabourTaskController::class, 'storeTask'])->name('labour_tasks.tasks.store');
+Route::patch('/labour-tasks/tasks/{task}/complete', [LabourTaskController::class, 'completeTask'])->name('labour_tasks.tasks.complete');
 
 // Route to Suppliers page
 Route::resource('suppliers', SupplierController::class)->only(['index', 'show']);

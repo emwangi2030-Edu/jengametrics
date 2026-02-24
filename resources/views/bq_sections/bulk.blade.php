@@ -62,7 +62,7 @@
                     </form>
 
                     <div class="d-flex justify-content-center mt-3">
-                        <a href="{{ route('boq') }}" class="btn btn-dark">Back</a>
+                        <a href="{{ route('boq') }}" class="btn btn-dark" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                     </div>
                 </div>
             </div>

@@ -13,9 +13,7 @@
             <a href="{{ route('reports.wages', ['download' => 1]) }}" class="btn btn-outline-primary btn-sm">
                 {{ __('Download Excel') }}
             </a>
-            <a href="{{ route('reports') }}" class="btn btn-outline-secondary btn-sm">
-                {{ __('Back') }}
-            </a>
+            <a href="{{ route('reports') }}" class="btn btn-outline-secondary btn-sm" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
         </div>
     </div>
 

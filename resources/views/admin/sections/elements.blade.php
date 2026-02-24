@@ -87,6 +87,6 @@
     </div>
 
     <!-- Back to Sections button -->
-    <a href="{{ route('sections.index') }}" class="btn btn-secondary">Back to Sections</a>
+    <a href="{{ route('sections.index') }}" class="btn btn-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
 </div>
 @endsection

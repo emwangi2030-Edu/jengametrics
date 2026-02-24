@@ -67,7 +67,7 @@
                                 Record Payment
                             </button>
                         </form>
-                        <a href="{{ route('workers.index') }}" class="btn btn-secondary mt-3">Back</a>
+                        <a href="{{ route('workers.index') }}" class="btn btn-secondary mt-3" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                     </div>
                     <div class="p-3 border-top border-md-top-0 border-md-start d-flex align-items-start justify-content-center" style="min-width:220px; flex:0 0 240px;">
                         <img

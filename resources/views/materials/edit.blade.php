@@ -92,7 +92,7 @@
 
                         {{-- Back Button --}}
                         <div class="d-flex justify-content-center mt-3">
-                            <a href="{{ route('materials.index') }}" class="btn btn-dark">Back to Materials</a>
+                            <a href="{{ route('materials.index') }}" class="btn btn-dark" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                         </div>
                     </form>
                 </div>

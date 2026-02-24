@@ -121,6 +121,6 @@
     </div>
 
     <!-- Back to Items button -->
-    <a href="{{ route('subelements.items', $item->element_id) }}" class="btn btn-secondary">Back to Items</a>
+    <a href="{{ route('subelements.items', $item->element_id) }}" class="btn btn-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
 </div>
 @endsection

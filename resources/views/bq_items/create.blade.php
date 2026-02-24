@@ -46,7 +46,7 @@
                         <button type="submit" class="">{{ __('Add Item') }}</button>
                     </form>
 
-                    <a href="#" class="">{{ __('Back to Section') }}</a>
+                    <a href="#" class="" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                 </div>
             </div>
         </div>

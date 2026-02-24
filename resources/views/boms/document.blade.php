@@ -17,7 +17,7 @@
 
     <div class="row mb-4">
         <div class="col-12">
-            <a href="{{ route('boms.index') }}" class="btn btn-outline-secondary me-2">{{ __('Back to BoMs') }}</a>
+            <a href="{{ route('boms.index') }}" class="btn btn-outline-secondary me-2" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
             <a href="{{ route('bq_documents.show', $document) }}" class="btn text-white" style="background-color:#027333">{{ __('View BoQ') }}</a>
         </div>
     </div>

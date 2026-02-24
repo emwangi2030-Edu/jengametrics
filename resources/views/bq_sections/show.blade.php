@@ -17,9 +17,7 @@
                     <a href="{{ route('bq_levels.items.create', [$bqDocument, $bqLevel]) }}" class="btn text-white" style="background-color:#027333">
                         {{ __('Add Item') }}
                     </a>
-                    <a href="{{ route('bq_documents.show', $bqDocument) }}" class="btn btn-outline-secondary ms-2 allow-readonly" data-allow-readonly>
-                        {{ __('Back to BoQ') }}
-                    </a>
+                    <a href="{{ route('bq_documents.show', $bqDocument) }}" class="btn btn-outline-secondary ms-2 allow-readonly" data-allow-readonly aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                 </div>
             </div>
         </div>

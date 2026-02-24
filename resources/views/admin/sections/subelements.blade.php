@@ -91,6 +91,6 @@
     </div>
 
     <!-- Back to Elements button -->
-    <a href="{{ route('sections.elements', ['section' => $element->section_id]) }}" class="btn btn-secondary">Back to Elements</a>
+    <a href="{{ route('sections.elements', ['section' => $element->section_id]) }}" class="btn btn-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
 </div>
 @endsection

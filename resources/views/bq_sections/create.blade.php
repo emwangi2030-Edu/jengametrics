@@ -162,7 +162,7 @@
                     </form>
                     <br>
                     <div class="d-flex justify-content-center">
-                        <a href="{{ route('bq_levels.show', [$bqDocument, $bqLevel]) }}" class="btn btn-dark">{{ __('Back') }}</a>
+                        <a href="{{ route('bq_levels.show', [$bqDocument, $bqLevel]) }}" class="btn btn-dark" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                     </div>
 
                     <!-- Confirm Save Modal -->

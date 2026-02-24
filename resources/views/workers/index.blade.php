@@ -11,6 +11,9 @@
                 Manage Labour: <span class="text-black">{{ $project->name }}</span>
             </h2>
             <div class="d-flex gap-1">
+                <a href="{{ route('labour_tasks.index') }}" class="btn btn-secondary">
+                    {{ __('Assign Tasks') }}
+                </a>
                 <a href="{{ route('workers.create') }}" class="btn btn-success">
                     {{ __('Add Worker') }}
                 </a>

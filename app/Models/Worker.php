@@ -48,4 +48,14 @@ class Worker extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function groups()
+    {
+        return $this->belongsToMany(WorkerGroup::class, 'group_worker')->withTimestamps();
+    }
+
+    public function labourTasks()
+    {
+        return $this->hasMany(LabourTask::class);
+    }
 }

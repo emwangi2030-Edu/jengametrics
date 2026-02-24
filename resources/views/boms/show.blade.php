@@ -10,7 +10,7 @@
                 @if(isset($bqDocumentForSection) && $bqDocumentForSection && $bqSection->bq_level_id)
                     <a href="{{ route('bq_levels.show', [$bqDocumentForSection, $bqSection->bq_level_id]) }}" class="btn btn-outline-primary btn-sm">View BoQ Level</a>
                 @endif
-                <a href="{{ route('boms.index') }}" class="btn btn-outline-secondary btn-sm">Back to Sections</a>
+                <a href="{{ route('boms.index') }}" class="btn btn-outline-secondary btn-sm" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
             </div>
         </div>
 

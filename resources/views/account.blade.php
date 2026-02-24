@@ -27,7 +27,7 @@
                 <h2 class="fw-bold mb-1" style="color:#027333;">{{ __('Profile') }}</h2>
                 <p class="text-muted mb-0">{{ __('Manage your account details and security settings.') }}</p>
             </div>
-            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary mt-3 mt-md-0">{{ __('Back') }}</a>
+            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary mt-3 mt-md-0" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
         </div>
     </div>
 

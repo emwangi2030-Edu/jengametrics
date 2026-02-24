@@ -133,7 +133,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between">
-                    <a href="{{ route('workers.index') }}" class="btn btn-secondary">Back</a>
+                    <a href="{{ route('workers.index') }}" class="btn btn-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                     <button type="submit" class="btn btn-primary">Update</button>
                 </div>
             </form>

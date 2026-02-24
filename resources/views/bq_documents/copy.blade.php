@@ -13,9 +13,7 @@
                             {{ __('Copy items from ":title" into a new BoQ.', ['title' => $sourceDocument->title]) }}
                         </p>
                     </div>
-                    <a href="{{ route('bq_documents.index') }}" class="btn btn-outline-secondary mt-3 mt-md-0">
-                        {{ __('Back to BoQs') }}
-                    </a>
+                    <a href="{{ route('bq_documents.index') }}" class="btn btn-outline-secondary mt-3 mt-md-0" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                 </div>
 
                 @include('flash_msg')
