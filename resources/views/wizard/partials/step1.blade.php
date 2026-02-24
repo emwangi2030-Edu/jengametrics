@@ -29,7 +29,7 @@
     </div>
 
     <div class="mb-3">
-        <label for="project_duration" class="form-label">{{ __('Project Duration:') }}</label>
+        <label for="project_duration" class="form-label">{{ __('Project Duration (Weeks):') }}</label>
         <input type="number" id="project_duration" name="project_duration" class="form-control" required min="1"
             placeholder="Enter project duration in weeks"
             value="{{ old('project_duration', session('project_duration')) }}">

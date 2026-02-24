@@ -20,7 +20,7 @@
 
     <div class="mb-3">
         <label for="project_uid" class="form-label">{{ __('Project ID:') }}</label>
-        <input type="text" id="project_uid" name="project_uid" class="form-control" value="{{ $projectUid }}" required maxlength="100">
+        <input type="text" id="project_uid" name="project_uid" class="form-control" value="{{ $projectUid }}" required maxlength="100" readonly>
         @error('project_uid')
             <div class="text-danger mt-1">{{ $message }}</div>
         @enderror
