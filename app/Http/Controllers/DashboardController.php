@@ -7,6 +7,7 @@ use App\Models\Material;
 use App\Models\Payment;
 use App\Models\Project;
 use App\Models\ProjectStep;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -19,6 +20,16 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+
+        if ($user && $user->is_admin()) {
+            $users = User::query()
+                ->where('user_type', 'user')
+                ->orderBy('name')
+                ->get();
+
+            return view('dashboard_admin', compact('users'));
+        }
+
         if (!$user->has_project) {
             return redirect()->route('wizard');
         }

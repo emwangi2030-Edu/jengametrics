@@ -11,8 +11,8 @@ class ProjectWizardController extends Controller
 {
     public function wizard(Request $request)
     {
-        if (Auth::check() && Auth::user()->isSubAccount()) {
-            return redirect()->route('dashboard')->with('warning', 'Sub-accounts cannot create projects.');
+        if (Auth::check() && (Auth::user()->isSubAccount() || Auth::user()->is_admin())) {
+            return redirect()->route('dashboard')->with('warning', 'You are not allowed to create projects.');
         }
 
         $step = (int) $request->query('step', 1);
@@ -23,24 +23,24 @@ class ProjectWizardController extends Controller
 
     public function step1()
     {
-        if (Auth::check() && Auth::user()->isSubAccount()) {
-            return redirect()->route('dashboard')->with('warning', 'Sub-accounts cannot create projects.');
+        if (Auth::check() && (Auth::user()->isSubAccount() || Auth::user()->is_admin())) {
+            return redirect()->route('dashboard')->with('warning', 'You are not allowed to create projects.');
         }
         return redirect()->route('wizard');
     }
 
     public function step2()
     {
-        if (Auth::check() && Auth::user()->isSubAccount()) {
-            return redirect()->route('dashboard')->with('warning', 'Sub-accounts cannot create projects.');
+        if (Auth::check() && (Auth::user()->isSubAccount() || Auth::user()->is_admin())) {
+            return redirect()->route('dashboard')->with('warning', 'You are not allowed to create projects.');
         }
         return redirect()->route('wizard', ['step' => 2]);
     }
 
     public function step1Fragment()
     {
-        if (Auth::check() && Auth::user()->isSubAccount()) {
-            return response()->json(['error' => 'Sub-accounts cannot create projects.'], 403);
+        if (Auth::check() && (Auth::user()->isSubAccount() || Auth::user()->is_admin())) {
+            return response()->json(['error' => 'You are not allowed to create projects.'], 403);
         }
 
         return view('wizard.partials.step1');
@@ -48,8 +48,8 @@ class ProjectWizardController extends Controller
 
     public function step2Fragment()
     {
-        if (Auth::check() && Auth::user()->isSubAccount()) {
-            return response()->json(['error' => 'Sub-accounts cannot create projects.'], 403);
+        if (Auth::check() && (Auth::user()->isSubAccount() || Auth::user()->is_admin())) {
+            return response()->json(['error' => 'You are not allowed to create projects.'], 403);
         }
 
         return view('wizard.partials.step2');
@@ -86,8 +86,8 @@ class ProjectWizardController extends Controller
 
 public function complete(Request $request)
 {
-    if (Auth::check() && Auth::user()->isSubAccount()) {
-        return redirect()->route('dashboard')->with('warning', 'Sub-accounts cannot create projects.');
+    if (Auth::check() && (Auth::user()->isSubAccount() || Auth::user()->is_admin())) {
+        return redirect()->route('dashboard')->with('warning', 'You are not allowed to create projects.');
     }
 
     $validated = $request->validate([

@@ -860,7 +860,7 @@
                                             </td>
                                         </tr>
                                     @endforeach
-                                    @if (!auth()->user()->isSubAccount())
+                                    @if (!auth()->user()->isSubAccount() && !auth()->user()->is_admin())
                                         <tr>
                                             <td>
                                                 <a class="btn btn-success btn-small" href="{{ route('wizard') }}">

@@ -209,7 +209,9 @@
                         <select class="form-select" name="worker_id" id="workerSelect">
                             <option value="">Select worker</option>
                             @foreach($workers as $worker)
-                                <option value="{{ $worker->id }}">{{ $worker->full_name }}</option>
+                                <option value="{{ $worker->id }}">{{ $worker->full_name }} - 
+                                    <small class="text-muted d-block">{{ $worker->job_category }}</small>
+                                </option>
                             @endforeach
                         </select>
                     </div>

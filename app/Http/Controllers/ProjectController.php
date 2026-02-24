@@ -21,6 +21,10 @@ class ProjectController extends Controller
 
     public function create()
     {
+        if (Auth::check() && Auth::user()->is_admin()) {
+            return redirect()->route('dashboard')->with('warning', 'Admins cannot create projects.');
+        }
+
         $projects = Project::all(); // Fetch projects if needed for some reason in the create view
         // $schools = School::all();   // Fetch schools for dropdown or selection
         // $subjects = Subject::all(); // Fetch subjects if needed in the create view
@@ -29,8 +33,8 @@ class ProjectController extends Controller
 
     public function store(Request $request)
     {
-        if (Auth::check() && Auth::user()->isSubAccount()) {
-            return redirect()->route('projects.index')->with('warning', 'Sub-accounts cannot create projects.');
+        if (Auth::check() && (Auth::user()->isSubAccount() || Auth::user()->is_admin())) {
+            return redirect()->route('projects.index')->with('warning', 'You are not allowed to create projects.');
         }
 
         $request->validate([

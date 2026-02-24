@@ -312,6 +312,10 @@ function project(){
         return null;
     }
 
+    if ($user->is_admin()) {
+        return 'Admin';
+    }
+
     $project_count = $user->projects()->count();
     if($project_count>0){
         $project = $user->project_id ? Project::find($user->project_id) : null;
