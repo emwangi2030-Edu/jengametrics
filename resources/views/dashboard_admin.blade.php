@@ -28,7 +28,11 @@
                             @foreach($users as $listedUser)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $listedUser->name }}</td>
+                                    <td>
+                                        <a href="{{ route('dashboard.admin.users.show', $listedUser) }}" class="fw-semibold text-decoration-underline">
+                                            {{ $listedUser->name }}
+                                        </a>
+                                    </td>
                                     <td>{{ $listedUser->email }}</td>
                                     <td>{{ optional($listedUser->created_at)->format('M d, Y') }}</td>
                                 </tr>
@@ -41,4 +45,3 @@
     </div>
 </div>
 @endsection
-

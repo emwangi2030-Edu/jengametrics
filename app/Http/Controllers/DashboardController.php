@@ -24,6 +24,7 @@ class DashboardController extends Controller
         if ($user && $user->is_admin()) {
             $users = User::query()
                 ->where('user_type', 'user')
+                ->whereNull('parent_user_id')
                 ->orderBy('name')
                 ->get();
 
@@ -158,6 +159,38 @@ class DashboardController extends Controller
             'completedProjectSteps',
             'projectCompletionPercent'
         ));
+    }
+
+    public function showAdminUser(User $user)
+    {
+        $authUser = Auth::user();
+
+        if (!$authUser || !$authUser->is_admin()) {
+            abort(403);
+        }
+
+        if ($user->user_type !== 'user' || !is_null($user->parent_user_id)) {
+            abort(404);
+        }
+
+        $ownedProjects = $user->ownedProjects()
+            ->select('projects.id', 'projects.name', 'projects.project_uid', 'projects.project_duration', 'projects.created_at')
+            ->get();
+
+        $assignedProjects = $user->projects()
+            ->select('projects.id', 'projects.name', 'projects.project_uid', 'projects.project_duration', 'projects.created_at')
+            ->get();
+
+        $projects = $ownedProjects
+            ->merge($assignedProjects)
+            ->unique('id')
+            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
+
+        return view('dashboard_admin_user', [
+            'listedUser' => $user,
+            'projects' => $projects,
+        ]);
     }
 
     public function storeProjectSteps(Request $request)

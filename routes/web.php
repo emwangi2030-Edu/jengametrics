@@ -65,6 +65,8 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::middleware('auth')->group(function () {
+    Route::get('/dashboard/users/{user}', [DashboardController::class, 'showAdminUser'])
+        ->name('dashboard.admin.users.show');
     Route::post('/dashboard/project-steps', [DashboardController::class, 'storeProjectSteps'])
         ->name('dashboard.project_steps.store');
     Route::patch('/dashboard/project-steps/reorder', [DashboardController::class, 'reorderProjectSteps'])
