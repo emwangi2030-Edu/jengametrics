@@ -17,6 +17,13 @@
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        .password-match-indicator {
+            min-width: 42px;
+            justify-content: center;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -153,7 +160,12 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="new-password">{{ __('New Password') }}</label>
-                            <input type="password" class="form-control" id="new-password" name="password" autocomplete="new-password" minlength="8" required>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="new-password" name="password" autocomplete="new-password" minlength="8" required>
+                                <span class="input-group-text password-match-indicator" id="accountPasswordMatchIndicator">
+                                    <span class="bi bi-dash-circle text-muted"></span>
+                                </span>
+                            </div>
                             @error('password')
                                 <div class="text-danger mt-1">{{ $message }}</div>
                             @enderror
@@ -164,7 +176,12 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="password-confirmation">{{ __('Confirm Password') }}</label>
-                            <input type="password" class="form-control" id="password-confirmation" name="password_confirmation" autocomplete="new-password" minlength="8" required>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password-confirmation" name="password_confirmation" autocomplete="new-password" minlength="8" required>
+                                <span class="input-group-text password-match-indicator" id="accountPasswordConfirmationMatchIndicator">
+                                    <span class="bi bi-dash-circle text-muted"></span>
+                                </span>
+                            </div>
                             <div class="invalid-feedback" id="password-confirmation-feedback"></div>
                         </div>
                         <button type="submit" class="btn btn-success" id="password-update-submit">
@@ -190,6 +207,8 @@
         </div>
     </div>
 </div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3" id="accountPasswordToastContainer" style="z-index: 1080;"></div>
 
 <div class="modal fade" id="profileCropperModal" tabindex="-1" aria-labelledby="profileCropperModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -346,6 +365,10 @@
             const currentPasswordFeedback = document.getElementById('current-password-feedback');
             const newPasswordFeedback = document.getElementById('new-password-feedback');
             const confirmPasswordFeedback = document.getElementById('password-confirmation-feedback');
+            const passwordMatchIndicator = document.getElementById('accountPasswordMatchIndicator');
+            const passwordConfirmationMatchIndicator = document.getElementById('accountPasswordConfirmationMatchIndicator');
+            const toastContainer = document.getElementById('accountPasswordToastContainer');
+            let lastMatchState = 'neutral';
 
             const meetsPasswordPolicy = (value) => {
                 return /[a-z]/.test(value)
@@ -370,10 +393,54 @@
                 }
             };
 
-            const validatePasswordForm = () => {
+            const setMatchIndicators = (state) => {
+                const indicators = [passwordMatchIndicator, passwordConfirmationMatchIndicator];
+                indicators.forEach((indicator) => {
+                    if (!indicator) {
+                        return;
+                    }
+
+                    let iconClass = 'bi-dash-circle text-muted';
+                    if (state === 'match') {
+                        iconClass = 'bi-check-circle-fill text-success';
+                    } else if (state === 'mismatch') {
+                        iconClass = 'bi-x-circle-fill text-danger';
+                    }
+
+                    indicator.innerHTML = '<span class="bi ' + iconClass + '"></span>';
+                });
+            };
+
+            const showMatchToast = (state) => {
+                if (!toastContainer || typeof bootstrap === 'undefined') {
+                    return;
+                }
+
+                const isMatch = state === 'match';
+                const toast = document.createElement('div');
+                toast.className = 'toast align-items-center text-bg-' + (isMatch ? 'success' : 'danger') + ' border-0';
+                toast.setAttribute('role', 'alert');
+                toast.setAttribute('aria-live', 'assertive');
+                toast.setAttribute('aria-atomic', 'true');
+                toast.innerHTML =
+                    '<div class="d-flex">' +
+                    '<div class="toast-body">' + (isMatch ? 'Passwords match.' : 'Passwords do not match.') + '</div>' +
+                    '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>' +
+                    '</div>';
+                toastContainer.appendChild(toast);
+
+                const toastInstance = bootstrap.Toast.getOrCreateInstance(toast, { delay: 1800 });
+                toast.addEventListener('hidden.bs.toast', function () {
+                    toast.remove();
+                });
+                toastInstance.show();
+            };
+
+            const validatePasswordForm = (showToastOnChange = false) => {
                 const currentPassword = currentPasswordInput.value || '';
                 const newPassword = newPasswordInput.value || '';
                 const confirmPassword = confirmPasswordInput.value || '';
+                let matchState = 'neutral';
 
                 let isFormValid = true;
 
@@ -400,23 +467,42 @@
                 if (!confirmPassword) {
                     setFieldState(confirmPasswordInput, confirmPasswordFeedback, false, '{{ __('Please confirm your new password.') }}');
                     isFormValid = false;
+                    if (newPassword) {
+                        matchState = 'mismatch';
+                    }
                 } else if (confirmPassword !== newPassword) {
                     setFieldState(confirmPasswordInput, confirmPasswordFeedback, false, '{{ __('Password confirmation does not match.') }}');
                     isFormValid = false;
+                    matchState = 'mismatch';
                 } else {
                     setFieldState(confirmPasswordInput, confirmPasswordFeedback, true, '');
+                    if (newPassword) {
+                        matchState = 'match';
+                    }
                 }
 
+                setMatchIndicators(matchState);
                 passwordSubmit.disabled = !isFormValid;
+
+                if (showToastOnChange && matchState !== 'neutral' && matchState !== lastMatchState) {
+                    showMatchToast(matchState);
+                }
+                lastMatchState = matchState;
                 return isFormValid;
             };
 
-            currentPasswordInput.addEventListener('input', validatePasswordForm);
-            newPasswordInput.addEventListener('input', validatePasswordForm);
-            confirmPasswordInput.addEventListener('input', validatePasswordForm);
+            currentPasswordInput.addEventListener('input', function () {
+                validatePasswordForm(false);
+            });
+            newPasswordInput.addEventListener('input', function () {
+                validatePasswordForm(false);
+            });
+            confirmPasswordInput.addEventListener('input', function () {
+                validatePasswordForm(true);
+            });
 
             passwordForm.addEventListener('submit', function (event) {
-                if (!validatePasswordForm()) {
+                if (!validatePasswordForm(false)) {
                     event.preventDefault();
                     event.stopPropagation();
                 }
