@@ -1,112 +1,126 @@
 # JengaMetrics
 
-JengaMetrics is a Laravel-based construction project management application. It is designed to help teams plan projects, manage project-specific data, track labour and materials, control procurement, and monitor progress from a central dashboard.
+JengaMetrics is a Laravel-based construction project management platform. It brings project setup, quantity planning, labour operations, procurement tracking, and reporting into one system so teams can manage construction work from planning through execution.
 
-The system supports primary accounts, sub-accounts, project-based access control, and a set of operational modules used during project delivery.
+This README is written for two audiences:
 
-## What The Project Does
+- Product and operations users who need to understand what the system does
+- Developers who need to understand how to run and maintain it
 
-JengaMetrics combines several construction management workflows in one application:
+## Product Overview
 
-- Project creation through a multi-step wizard
-- Project dashboards with progress tracking and project steps
-- Bills of Quantities (BoQ) management
-- Bills of Materials (BoM) generation and reporting
-- Labour management, worker grouping, and task assignment
-- Attendance and worker payment tracking
-- Material inventory, usage, and supplier management
-- Requisitions and approval workflows
-- Sub-account management with controlled project access
-- Admin views for managing users and project-related background data
+JengaMetrics is built around the idea that each primary user manages one or more construction projects and can invite sub-users with limited project access and role-based permissions.
 
-## Core Functional Areas
+The application supports the following core workflows:
 
-### 1. Project Setup
+- Create projects through a multi-step project wizard
+- Review project details in a dashboard
+- Track project completion using project steps and progress indicators
+- Build and manage Bills of Quantities (BoQ)
+- Generate and review Bills of Materials (BoM)
+- Manage workers, attendance, payments, and labour tasks
+- Create worker groups and assign tasks to groups or individuals
+- Manage materials, suppliers, and requisitions
+- View procurement and wage-related reports
+- Manage sub-accounts and project-specific access
+- Support admin users with a separate dashboard flow
 
-Projects are created through a guided wizard instead of a simple one-page form. The wizard is intended to collect project details step by step and confirm the entered data before completion.
+## Main User Types
 
-Related areas:
+### Primary User
 
-- `ProjectWizardController`
-- `ProjectController`
-- `DashboardController`
+The primary user creates and owns projects, manages sub-users, and controls which projects a sub-user can access.
 
-### 2. Dashboard And Project Progress
+### Sub-User
 
-The dashboard is the main project overview page. It includes progress information, project duration details, project steps, and project-specific operational summaries. Project steps are intended to track completion status and contribute to the project progress display.
+A sub-user operates under a primary account. Their visibility and actions depend on the permissions and project access granted to them.
 
-Related areas:
+### Admin User
 
-- `DashboardController`
-- `resources/views/dashboard*.blade.php`
+An admin user is handled separately from project-based users. Admin accounts are intended for background or administrative oversight rather than normal project creation and day-to-day project execution.
 
-### 3. BoQ And BoM Management
+## Main Functional Modules
 
-The application includes a BoQ workflow for creating and managing project quantity documents and a BoM workflow for deriving materials and labour information from project items.
+### Project Setup
 
-Related areas:
+Projects are created through a guided wizard. The wizard collects data in steps and presents confirmation data before project creation is finalized.
 
-- `BqDocumentController`
-- `BqLevelController`
-- `BqSectionController`
-- `BqItemController`
-- `BOMController`
+Primary code areas:
 
-### 4. Labour Management
+- `app/Http/Controllers/ProjectWizardController.php`
+- `app/Http/Controllers/ProjectController.php`
+- `resources/views/wizard`
 
-Labour management covers workers, attendance, task assignment, worker grouping, and task completion tracking. Tasks can be assigned to groups or individual workers and surfaced through labour task views.
+### Dashboard And Progress Tracking
 
-Related areas:
+The dashboard is the main project summary page. It surfaces project context, project duration, progress, and project step completion.
 
-- `WorkerController`
-- `AttendanceController`
-- `PaymentController`
-- `LabourTaskController`
+Primary code areas:
 
-### 5. Materials, Suppliers, And Procurement
+- `app/Http/Controllers/DashboardController.php`
+- `resources/views/dashboard.blade.php`
+- `resources/views/dashboard_admin.blade.php`
 
-The procurement side of the application includes suppliers, materials, requisitions, and cost tracking. These modules support inventory monitoring, purchase-related workflows, and reporting.
+### BoQ And BoM
 
-Related areas:
+The BoQ workflow manages quantity documents, sections, levels, and items. The BoM workflow is used to surface materials and labour information derived from project items.
 
-- `MaterialController`
-- `SupplierController`
-- `RequisitionController`
-- `CostTrackingController`
-- `PurchasesReportController`
-- `WagesReportController`
+Primary code areas:
 
-### 6. User Accounts And Access Control
+- `app/Http/Controllers/BqDocumentController.php`
+- `app/Http/Controllers/BqLevelController.php`
+- `app/Http/Controllers/BqSectionController.php`
+- `app/Http/Controllers/BqItemController.php`
+- `app/Http/Controllers/BOMController.php`
 
-The application distinguishes between:
+### Labour Management
 
-- Primary users
-- Sub-users
-- Admin users
+The labour side of the application supports workers, attendance, wage tracking, task assignment, worker grouping, and task completion monitoring.
 
-Sub-users can be given restricted access to selected projects and assigned permissions depending on their role. Admin users are handled differently from standard project users.
+Primary code areas:
 
-Related areas:
+- `app/Http/Controllers/WorkerController.php`
+- `app/Http/Controllers/AttendanceController.php`
+- `app/Http/Controllers/PaymentController.php`
+- `app/Http/Controllers/LabourTaskController.php`
 
-- `SubAccountController`
-- `ProfileController`
-- authentication routes under `routes/auth.php`
+### Materials, Suppliers, And Requisitions
 
-## Application Structure
+These modules support inventory management, material usage, supplier records, requisition workflows, and cost-related tracking.
 
-This project follows a standard Laravel structure:
+Primary code areas:
 
-- `app/Http/Controllers` contains the request handling logic
-- `app/Models` contains the Eloquent models
-- `resources/views` contains the Blade templates
-- `routes/web.php` contains the main application routes
-- `routes/auth.php` contains authentication routes
-- `database/migrations` contains schema migrations
-- `app/Http/helpers.php` contains globally autoloaded helper functions
+- `app/Http/Controllers/MaterialController.php`
+- `app/Http/Controllers/SupplierController.php`
+- `app/Http/Controllers/RequisitionController.php`
+- `app/Http/Controllers/CostTrackingController.php`
+- `app/Http/Controllers/PurchasesReportController.php`
+- `app/Http/Controllers/WagesReportController.php`
 
-## Main Dependencies
+### User And Access Management
 
-The application currently depends on the following core packages from `composer.json`:
+The application supports account updates, authentication, sub-account management, and project-based access restrictions.
+
+Primary code areas:
+
+- `app/Http/Controllers/ProfileController.php`
+- `app/Http/Controllers/SubAccountController.php`
+- `routes/auth.php`
+
+## Technology Stack
+
+JengaMetrics is currently built with:
+
+- PHP 8.2+
+- Laravel 11
+- Blade templates for server-rendered views
+- Eloquent ORM for database interaction
+- PHPUnit for automated testing
+- Laravel Breeze for authentication scaffolding
+
+## Composer Dependencies
+
+The following dependencies are currently declared in `composer.json`.
 
 ### Runtime Dependencies
 
@@ -127,31 +141,36 @@ The application currently depends on the following core packages from `composer.
 - `nunomaduro/collision ^8.0`
 - `phpunit/phpunit ^11.0.1`
 
-## Framework And Tooling Notes
+## Project Structure
 
-- The application is built on Laravel 11.
-- Authentication scaffolding is based on Laravel Breeze.
-- PHPUnit is used for automated testing.
-- Laravel Pint is included for code style enforcement.
-- Passport and Sanctum are installed as dependencies.
+The codebase follows a standard Laravel layout.
 
-## Setup Instructions
+- `app/Http/Controllers` contains request and workflow logic
+- `app/Models` contains Eloquent models
+- `app/Http/helpers.php` contains globally autoloaded helper functions
+- `resources/views` contains Blade templates
+- `routes/web.php` contains the main application routes
+- `routes/auth.php` contains authentication routes
+- `database/migrations` contains schema definitions
+- `tests` contains the automated test suite
 
-### 1. Install PHP Dependencies
+## Local Setup
+
+### 1. Install Dependencies
 
 ```bash
 composer install
 ```
 
-### 2. Create Environment File
-
-If `.env` does not exist, create it from the example file:
+### 2. Create The Environment File
 
 ```bash
 copy .env.example .env
 ```
 
-### 3. Generate Application Key
+If you are not on Windows, use the equivalent shell command for your environment.
+
+### 3. Generate The Application Key
 
 ```bash
 php artisan key:generate
@@ -159,9 +178,7 @@ php artisan key:generate
 
 ### 4. Configure The Database
 
-Update the database settings in `.env` to match your local environment.
-
-Typical settings include:
+Update the database values in `.env`:
 
 - `DB_CONNECTION`
 - `DB_HOST`
@@ -176,9 +193,7 @@ Typical settings include:
 php artisan migrate
 ```
 
-### 6. Link Storage If Required
-
-If the application stores public files, create the storage symlink:
+### 6. Link Storage If The Application Uses Public Uploads
 
 ```bash
 php artisan storage:link
@@ -198,43 +213,47 @@ Run tests:
 php artisan test
 ```
 
-Format code:
-
-```bash
-./vendor/bin/pint
-```
-
-Clear cached application data:
-
-```bash
-php artisan optimize:clear
-```
-
 List routes:
 
 ```bash
 php artisan route:list
 ```
 
-## Important Files
+Clear caches:
 
-- `routes/web.php` for the main web routes
-- `routes/auth.php` for authentication routes
-- `app/Http/helpers.php` for helper functions used across the app
-- `composer.json` for PHP dependencies and scripts
-- `resources/views/layouts` for layout templates
+```bash
+php artisan optimize:clear
+```
 
-## Intended Users
+Format PHP code:
 
-The platform is intended for teams involved in construction project delivery, including:
+```bash
+./vendor/bin/pint
+```
+
+## Key Files For New Developers
+
+- `routes/web.php`
+- `routes/auth.php`
+- `app/Http/helpers.php`
+- `app/Http/Controllers/DashboardController.php`
+- `app/Http/Controllers/ProjectWizardController.php`
+- `app/Http/Controllers/SubAccountController.php`
+- `app/Http/Controllers/LabourTaskController.php`
+- `app/Http/Controllers/BqSectionController.php`
+
+## Intended Audience
+
+JengaMetrics is intended for construction-focused teams such as:
 
 - Project owners
 - Project managers
 - Site administrators
 - Procurement teams
 - Labour supervisors
-- Finance and reporting users
+- Finance and reporting staff
+- System administrators
 
 ## Summary
 
-JengaMetrics is a multi-module construction management platform built with Laravel. Its purpose is to centralize project setup, quantity and material planning, labour operations, procurement workflows, reporting, and user access control in one application.
+JengaMetrics is a multi-module construction operations platform. From a product perspective, it centralizes project setup, progress tracking, labour coordination, materials management, procurement, and reporting. From a developer perspective, it is a Laravel 11 application structured around controllers, Blade views, Eloquent models, and route-driven workflows.
