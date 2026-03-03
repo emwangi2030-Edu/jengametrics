@@ -83,7 +83,11 @@
             <div class="card shadow border-0">
                 <div class="card-body text-center">
                     <h5 class="card-title" style="color:#027333">Project Duration</h5>
-                    <h3 class="{{ $projectDurationColorClass }}">{{ $projectRunningWeeks }} weeks</h3>
+                    @if ($projectRunningWeeks > 1)
+                        <h3 class="{{ $projectDurationColorClass }}">{{ $projectRunningWeeks }} weeks</h3>
+                    @else
+                        <h3 class="{{ $projectDurationColorClass }}">{{ $projectRunningWeeks }} week</h3>
+                    @endif
                     @if($projectDurationExceeded)
                         <small class="text-danger">estimated project duration exceeded!</small>
                     @elseif(!$projectEstimatedWeeks)
