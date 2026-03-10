@@ -205,6 +205,135 @@ php artisan storage:link
 php artisan serve
 ```
 
+## Setup On A Different Server
+
+Use this when deploying the same codebase on staging or production.
+
+### 1. Server Requirements
+
+- PHP 8.2+
+- Composer 2+
+- PostgreSQL or MySQL (matching your `.env` settings)
+- Web server (Nginx or Apache)
+- Access to run Artisan commands
+
+### 2. Pull The Code
+
+```bash
+git clone <your-repository-url> /var/www/jengametrics
+cd /var/www/jengametrics
+```
+
+Or, if the app already exists on the server:
+
+```bash
+git pull origin <branch>
+```
+
+### 3. Install Production Dependencies
+
+```bash
+composer install --no-dev --optimize-autoloader
+```
+
+### 4. Create And Configure Environment Variables
+
+```bash
+cp .env.example .env
+```
+
+Set server-specific values in `.env`:
+
+- `APP_NAME`
+- `APP_ENV=production`
+- `APP_DEBUG=false`
+- `APP_URL`
+- `DB_CONNECTION`
+- `DB_HOST`
+- `DB_PORT`
+- `DB_DATABASE`
+- `DB_USERNAME`
+- `DB_PASSWORD`
+- `FILESYSTEM_DISK`
+- `MAIL_*` values (if using mail features)
+
+### 5. Generate App Key
+
+```bash
+php artisan key:generate
+```
+
+### 6. Run Database Migrations
+
+```bash
+php artisan migrate --force
+```
+
+### 7. Create Storage Symlink
+
+```bash
+php artisan storage:link
+```
+
+### 8. Cache Laravel Config/Routes/Views
+
+```bash
+php artisan optimize
+```
+
+### 9. Set Folder Permissions
+
+Ensure the web server user can write to:
+
+- `storage/`
+- `bootstrap/cache/`
+
+Example on Linux:
+
+```bash
+chown -R www-data:www-data storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
+```
+
+### 10. Configure Web Server Document Root
+
+Point the web server to the Laravel `public` directory, not the project root.
+
+Example:
+
+- `/var/www/jengametrics/public`
+
+### 11. Queue And Scheduler (If Used)
+
+Run queues and scheduler in the background:
+
+```bash
+php artisan queue:work
+```
+
+Cron entry (every minute):
+
+```bash
+* * * * * cd /var/www/jengametrics && php artisan schedule:run >> /dev/null 2>&1
+```
+
+### 12. Deployment Refresh Commands
+
+After each `git pull`, run:
+
+```bash
+composer install --no-dev --optimize-autoloader
+php artisan migrate --force
+php artisan optimize:clear
+php artisan optimize
+```
+
+### Notes
+
+- Keep `.env` out of GitHub and set per server.
+- Development and production should use different `.env` files.
+- Back up your database before running migrations in production.
+
 ## Useful Commands
 
 Run tests:
