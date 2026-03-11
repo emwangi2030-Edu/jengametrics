@@ -598,11 +598,11 @@
                             <input class="form-check-input ms-0 theme-control-toggle-input" type="checkbox" data-theme-control="phoenixTheme" value="dark" id="themeControlToggle" />
                             <label class="mb-0 theme-control-toggle-label theme-control-toggle-light" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
                                 data-bs-title="Switch theme" style="height:32px;width:32px;">
-                                <span class="icon" data-feather="moon"></span>
+                                <span class="icon" data-feather="sun"></span>
                             </label>
                             <label class="mb-0 theme-control-toggle-label theme-control-toggle-dark" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
                                 data-bs-title="Switch theme" style="height:32px;width:32px;">
-                                <span class="icon" data-feather="sun"></span>
+                                <span class="icon" data-feather="moon"></span>
                             </label>
                         </div>
                     </li>
@@ -1346,6 +1346,57 @@
     </script>
 
     <script>
+        (function () {
+            function applyTheme(theme) {
+                const normalizedTheme = theme === 'dark' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-bs-theme', normalizedTheme);
+                try {
+                    localStorage.setItem('phoenixTheme', normalizedTheme);
+                } catch (error) {
+                    // Ignore storage failures.
+                }
+
+                document.body.dispatchEvent(new CustomEvent('clickControl', {
+                    detail: {
+                        control: 'phoenixTheme',
+                        value: normalizedTheme
+                    }
+                }));
+            }
+
+            function initThemeToggle() {
+                const toggle = document.getElementById('themeControlToggle');
+                if (!toggle || toggle.dataset.themeBound === '1') {
+                    return;
+                }
+
+                let savedTheme = 'light';
+                try {
+                    savedTheme = localStorage.getItem('phoenixTheme') || 'light';
+                } catch (error) {
+                    savedTheme = 'light';
+                }
+
+                const initialTheme = savedTheme === 'dark'
+                    ? 'dark'
+                    : (document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light');
+
+                toggle.checked = initialTheme === 'dark';
+                applyTheme(initialTheme);
+
+                toggle.addEventListener('change', function () {
+                    applyTheme(toggle.checked ? 'dark' : 'light');
+                });
+
+                toggle.dataset.themeBound = '1';
+            }
+
+            document.addEventListener('DOMContentLoaded', initThemeToggle);
+            document.addEventListener('turbo:load', initThemeToggle);
+        })();
+    </script>
+
+    <script>
     function toggleDropdown(element) {
         const parent = element.closest('.nav-item-wrapper');
 
@@ -1426,6 +1477,19 @@
                     pendingDeleteForm.submit();
                 });
             }
+        })();
+    </script>
+
+    <script>
+        (function () {
+            function renderFeatherIcons() {
+                if (window.feather && typeof window.feather.replace === 'function') {
+                    window.feather.replace();
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', renderFeatherIcons);
+            document.addEventListener('turbo:load', renderFeatherIcons);
         })();
     </script>
 
