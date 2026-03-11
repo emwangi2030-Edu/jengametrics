@@ -3,12 +3,13 @@
 <form action="{{ route('wizard.complete') }}" method="POST">
     @csrf
     @php
-        $projectUid = old('project_uid', session('project_uid'));
-        $projectName = old('name', session('name'));
-        $projectDescription = old('description', session('description'));
-        $projectDuration = old('project_duration', session('project_duration'));
-        $projectAddress = old('address', session('address'));
-        $projectBudgetRaw = old('budget', session('budget'));
+        $wizardProject = $wizardProject ?? [];
+        $projectUid = $wizardProject['project_uid'] ?? old('project_uid', session('project_uid'));
+        $projectName = $wizardProject['name'] ?? old('name', session('name'));
+        $projectDescription = $wizardProject['description'] ?? old('description', session('description'));
+        $projectDuration = $wizardProject['project_duration'] ?? old('project_duration', session('project_duration'));
+        $projectAddress = $wizardProject['address'] ?? old('address', session('address'));
+        $projectBudgetRaw = $wizardProject['budget'] ?? old('budget', session('budget'));
         $projectBudgetNormalized = preg_replace('/,/', '', (string) $projectBudgetRaw);
         if (is_numeric($projectBudgetNormalized)) {
             $projectBudgetDisplay = number_format((float) $projectBudgetNormalized, 2, '.', ',');

@@ -46,13 +46,15 @@ class ProjectWizardController extends Controller
         return view('wizard.partials.step1');
     }
 
-    public function step2Fragment()
+    public function step2Fragment(Request $request)
     {
         if (Auth::check() && (Auth::user()->isSubAccount() || Auth::user()->is_admin())) {
             return response()->json(['error' => 'You are not allowed to create projects.'], 403);
         }
 
-        return view('wizard.partials.step2');
+        return view('wizard.partials.step2', [
+            'wizardProject' => $this->wizardSessionData($request),
+        ]);
     }
 
     public function step1Post(Request $request)
@@ -67,6 +69,7 @@ class ProjectWizardController extends Controller
         ]);
 
         // Store in session
+        $request->session()->put('wizard_project', $validatedData);
         $request->session()->put('project_uid', $validatedData['project_uid']);
         $request->session()->put('name', $validatedData['name']);
         $request->session()->put('description', $validatedData['description']);
@@ -89,6 +92,16 @@ public function complete(Request $request)
     if (Auth::check() && (Auth::user()->isSubAccount() || Auth::user()->is_admin())) {
         return redirect()->route('dashboard')->with('warning', 'You are not allowed to create projects.');
     }
+
+    $wizardProject = $this->wizardSessionData($request);
+    $request->merge([
+        'project_uid' => $request->input('project_uid', $wizardProject['project_uid']),
+        'name' => $request->input('name', $wizardProject['name']),
+        'description' => $request->input('description', $wizardProject['description']),
+        'project_duration' => $request->input('project_duration', $wizardProject['project_duration']),
+        'address' => $request->input('address', $wizardProject['address']),
+        'budget' => $request->input('budget', $wizardProject['budget']),
+    ]);
 
     $validated = $request->validate([
         'project_uid' => 'required|string|max:100|alpha_dash|unique:projects,project_uid',
@@ -127,10 +140,24 @@ public function complete(Request $request)
    }
 
     // Clear session data
-    $request->session()->forget(['project_uid', 'name', 'address', 'description', 'project_duration', 'budget']);
+    $request->session()->forget(['wizard_project', 'project_uid', 'name', 'address', 'description', 'project_duration', 'budget']);
 
     return redirect()->to(url('dashboard'))->with('success', 'Project added successfully!');
 }
+
+    private function wizardSessionData(Request $request): array
+    {
+        $stored = $request->session()->get('wizard_project', []);
+
+        return [
+            'project_uid' => old('project_uid', $stored['project_uid'] ?? session('project_uid')),
+            'name' => old('name', $stored['name'] ?? session('name')),
+            'description' => old('description', $stored['description'] ?? session('description')),
+            'project_duration' => old('project_duration', $stored['project_duration'] ?? session('project_duration')),
+            'address' => old('address', $stored['address'] ?? session('address')),
+            'budget' => old('budget', $stored['budget'] ?? session('budget')),
+        ];
+    }
 
 
 
