@@ -1,11 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="row py-4">
-        <h2 class="font-weight-bold" style="color:#027333">
-            Material Management: <span class="text-black">{{ $project->name }}</span>
-        </h2>
-        <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
+    <div class="jm-page-header">
+        <div>
+            <h2 class="jm-page-title">{{ __('Material Management:') }} <span class="text-dark">{{ $project->name }}</span></h2>
+            <p class="jm-page-subtitle mb-0">{{ __('Deliveries, inventory, and stock usage in one place.') }}</p>
+        </div>
+        <div class="jm-actions-bar">
             <div>
                 <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#requisitionModal">
                     Requisition Material
@@ -27,7 +28,7 @@
 
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <h3 class="font-weight-bold" style="color:#027333">Materials Delivered</h3>
+            <h3 class="jm-section-title">{{ __('Materials Delivered') }}</h3>
             <div class="card shadow-sm">
                 <form method="GET" action="{{ route('materials.index') }}" class="row g-2 mt-2 justify-content-center">
                     <div class="col-md-3">
@@ -125,7 +126,7 @@
 
     <div class="row mt-5">
         <div class="col-12">
-            <h3 class="font-weight-bold" style="color:#027333;">Inventory Management</h3>
+            <h3 class="jm-section-title">{{ __('Inventory Management') }}</h3>
             <div class="card shadow-sm">
                 <div class="card-body">
                     <table class="table table-bordered mt-3 text-center">
@@ -183,7 +184,7 @@
     
     <div class="row mt-5">
         <div class="col-12">
-            <h3 class="font-weight-bold" style="color:#027333;">Stock Usage History</h3>
+            <h3 class="jm-section-title">{{ __('Stock Usage History') }}</h3>
             <div class="card shadow-sm">
                 <form method="GET" action="{{ route('materials.index') }}" class="row g-2 mt-2 justify-content-center">
                     <div class="col-md-3">

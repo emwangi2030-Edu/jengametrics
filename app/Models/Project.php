@@ -32,4 +32,9 @@ class Project extends Model
     {
         return $this->belongsToMany(User::class)->withTimestamps();
     }
+
+    public function progressCertificates()
+    {
+        return $this->hasMany(ProgressCertificate::class);
+    }
 }

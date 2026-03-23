@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex align-items-center justify-content-between my-4">
-        <h1 class="mb-0" style="color:#027333">User Details</h1>
+        <h1 class="jm-page-title mb-0">{{ __('User Details') }}</h1>
         <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary" aria-label="Back" title="Back">
             <span data-feather="arrow-left-circle"></span>
         </a>

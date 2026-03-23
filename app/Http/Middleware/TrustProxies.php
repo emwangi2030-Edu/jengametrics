@@ -7,10 +7,22 @@ use Illuminate\Http\Request;
 
 class TrustProxies extends Middleware
 {
-    protected $proxies;
+    /**
+     * The trusted proxies for the application.
+     * Trust the nginx reverse proxy so X-Forwarded-Proto is used (request seen as HTTPS).
+     *
+     * @var array<int, string>|string|null
+     */
+    protected $proxies = '*';
 
-    protected function getProxyHeader(Request $request)
-    {
-        return $request::HEADER_X_FORWARDED_FOR;
-    }
+    /**
+     * The headers that should be used to detect proxies.
+     *
+     * @var int
+     */
+    protected $headers =
+        Request::HEADER_X_FORWARDED_FOR |
+        Request::HEADER_X_FORWARDED_HOST |
+        Request::HEADER_X_FORWARDED_PORT |
+        Request::HEADER_X_FORWARDED_PROTO;
 }

@@ -6,6 +6,7 @@ use App\Models\Worker;
 use App\Models\Material;
 use App\Models\Payment;
 use App\Models\Project;
+use App\Models\ProgressCertificate;
 use App\Models\ProjectStep;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,11 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+        if (!$user) {
+            return redirect()->route("login");
+        }
+
+
         if ($user && $user->is_admin()) {
             $users = User::query()
                 ->where('user_type', 'user')
@@ -31,11 +37,12 @@ class DashboardController extends Controller
             return view('dashboard_admin', compact('users'));
         }
 
-        if (!$user->has_project) {
-            return redirect()->route('wizard');
-        }
+        bootstrap_user_active_project_if_missing();
 
-        $projectId = $user->project_id;
+        // Render the new React dashboard for non-admin users.
+        return view('ui.jenga-metrics');
+
+        $projectId = (int) ($user->project_id ?? 0);
         $project = Project::find($projectId);
         $totalWorkers = Worker::where('project_id', $projectId)->count();
         $totalMaterialExpenses = Material::where('project_id', $projectId)
@@ -71,64 +78,12 @@ class DashboardController extends Controller
             }
         }
 
-        // Get selected year or default to current year
         $selectedYear = $request->input('year', now()->year);
-
-        $rawExpenses = Material::select(
-            DB::raw("MONTH(created_at) as month_num"),
-            DB::raw("DATE_FORMAT(created_at, '%b') as month"),
-            DB::raw("SUM(quantity_purchased * unit_price) as total")
-        )
-        ->where('project_id', $projectId)
-        ->whereYear('created_at', $selectedYear)
-        ->groupBy('month_num', 'month')
-        ->orderBy('month_num')
-        ->get()
-        ->keyBy('month_num');
-
-        $rawLabourExpenses = Payment::selectRaw("MONTH(COALESCE(payment_date, created_at)) as month_num")
-            ->selectRaw("DATE_FORMAT(COALESCE(payment_date, created_at), '%b') as month")
-            ->selectRaw("SUM(amount) as total")
-            ->where('project_id', $projectId)
-            ->whereYear(DB::raw('COALESCE(payment_date, created_at)'), $selectedYear)
-            ->groupByRaw("MONTH(COALESCE(payment_date, created_at)), DATE_FORMAT(COALESCE(payment_date, created_at), '%b')")
-            ->orderBy('month_num')
-            ->get()
-            ->keyBy('month_num');
-
-        $allMonths = collect([
-            1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr',
-            5 => 'May', 6 => 'Jun', 7 => 'Jul', 8 => 'Aug',
-            9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dec'
-        ]);
-
-        $labels = [];
-        $data = [];
-        $labourData = [];
-
-        foreach ($allMonths as $monthNum => $monthName) {
-            $labels[] = $monthName;
-            $data[] = $rawExpenses->has($monthNum) ? (float) $rawExpenses[$monthNum]->total : 0;
-            $labourData[] = $rawLabourExpenses->has($monthNum) ? (float) $rawLabourExpenses[$monthNum]->total : 0;
-        }
-        // Get all years for dropdown
-        $materialYears = Material::where('project_id', $projectId)
-            ->select(DB::raw('YEAR(created_at) as year'))
-            ->distinct()
-            ->pluck('year');
-
-        $paymentYears = Payment::where('project_id', $projectId)
-            ->select(DB::raw('YEAR(COALESCE(payment_date, created_at)) as year'))
-            ->distinct()
-            ->pluck('year');
-
-        $availableYears = $materialYears
-            ->merge($paymentYears)
-            ->map(fn ($year) => $year ? (int) $year : null)
-            ->filter()
-            ->unique()
-            ->sort()
-            ->values();
+        $chartData = \App\Services\DashboardChartService::chartDataForProject($projectId, $selectedYear);
+        $labels = $chartData['labels'];
+        $data = $chartData['data'];
+        $labourData = $chartData['labourData'];
+        $availableYears = $chartData['availableYears'];
 
         $projectSteps = ProjectStep::where('project_id', $projectId)
             ->orderBy('position')
@@ -139,6 +94,101 @@ class DashboardController extends Controller
         $totalProjectSteps = $projectStepStats['totalProjectSteps'];
         $completedProjectSteps = $projectStepStats['completedProjectSteps'];
         $projectCompletionPercent = $projectStepStats['projectCompletionPercent'];
+        // Dashboard design: all projects, alerts, recent activity
+        $owned = $user->ownedProjects()->get();
+        $assigned = $user->projects()->get();
+        $allProjects = $owned->merge($assigned)->unique('id')->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->values();
+        if ($allProjects->isEmpty() && $projectId && $project) {
+            $allProjects = collect([$project]);
+        }
+        $projectIds = $allProjects->pluck('id')->toArray();
+        $dashboardProjects = [];
+        $totalBudget = 0;
+        $totalSpent = 0;
+        $activeCount = 0;
+        foreach ($allProjects as $proj) {
+            $budget = (float) ($proj->budget ?? 0);
+            $matSpent = (float) Material::where('project_id', $proj->id)->sum(DB::raw('COALESCE(unit_price, 0) * COALESCE(quantity_purchased, 0)'));
+            $paySpent = (float) Payment::where('project_id', $proj->id)->sum('amount');
+            $spent = $matSpent + $paySpent;
+            $totalBudget += $budget;
+            $totalSpent += $spent;
+            $totalSteps = ProjectStep::where('project_id', $proj->id)->count();
+            $completedSteps = ProjectStep::where('project_id', $proj->id)->where('is_completed', true)->count();
+            $progress = $totalSteps > 0 ? (int) round(($completedSteps / $totalSteps) * 100) : 0;
+            $weeks = (int) ($proj->project_duration ?? 0);
+            $created = $proj->created_at ? $proj->created_at->copy()->startOfDay()->diffInWeeks(now()->startOfDay()) : 0;
+            $weeksLeft = $weeks > 0 ? max(0, $weeks - $created) : 0;
+            $currentStep = ProjectStep::where('project_id', $proj->id)->where('is_completed', false)->orderBy('position')->first();
+            $phase = $currentStep ? $currentStep->title : '—';
+            $statusMap = ['in_progress' => 'Active', 'pending' => 'Active', 'on_hold' => 'On Hold', 'completed' => 'Completed'];
+            $status = $statusMap[$proj->status ?? 'in_progress'] ?? 'Active';
+            if ($status === 'Active') $activeCount++;
+            $dashboardProjects[] = [
+                'id' => $proj->id,
+                'project_uid' => $proj->project_uid ?? ('JM-' . str_pad((string) $proj->id, 3, '0', STR_PAD_LEFT)),
+                'name' => $proj->name,
+                'status' => $status,
+                'progress' => $progress,
+                'budget' => $budget,
+                'spent' => $spent,
+                'weeks' => $weeks,
+                'weeksLeft' => $weeksLeft,
+                'phase' => $phase,
+                'workers' => Worker::where('project_id', $proj->id)->count(),
+            ];
+        }
+        $pendingCerts = ProgressCertificate::whereIn('project_id', $projectIds)->whereIn('status', ['draft', 'sent'])->get();
+        $pendingInvoicesCount = $pendingCerts->count();
+        $pendingInvoicesAmount = $pendingCerts->sum('amount');
+        $alerts = [];
+        $overdueCerts = ProgressCertificate::whereIn('project_id', $projectIds)->where('status', 'sent')->where('period_end', '<', now()->subDays(14))->with('project')->get();
+        foreach ($overdueCerts as $c) {
+            $days = (int) Carbon::parse($c->period_end)->diffInDays(now());
+            $alerts[] = ['type' => 'danger', 'message' => ($c->project->project_uid ?? '?') . ' payment certificate overdue by ' . $days . ' days', 'time' => $c->updated_at->diffForHumans()];
+        }
+        foreach ($dashboardProjects as $p) {
+            if ($p['budget'] > 0 && $p['spent'] >= $p['budget'] * 0.94 && $p['progress'] < 80) {
+                $alerts[] = ['type' => 'warning', 'message' => $p['name'] . ' — budget ' . round($p['spent'] / $p['budget'] * 100) . '% consumed at ' . $p['progress'] . '% completion', 'time' => 'Recent'];
+            }
+        }
+        $alerts = array_slice($alerts, 0, 5);
+        $recentActivity = [];
+        foreach (Material::whereIn('project_id', $projectIds)->with('project')->orderBy('created_at', 'desc')->take(3)->get() as $m) {
+            $recentActivity[] = ['at' => $m->created_at, 'icon' => '📦', 'action' => 'Materials received', 'project' => $m->project->name ?? '—', 'user' => '—'];
+        }
+        foreach (Payment::whereIn('project_id', $projectIds)->with(['project', 'worker'])->orderBy('created_at', 'desc')->take(3)->get() as $p) {
+            $recentActivity[] = ['at' => $p->created_at, 'icon' => '👷', 'action' => 'Labour logged', 'project' => $p->project->name ?? '—', 'user' => $p->worker->full_name ?? '—'];
+        }
+        foreach (ProgressCertificate::whereIn('project_id', $projectIds)->with('project')->orderBy('created_at', 'desc')->take(3)->get() as $c) {
+            $recentActivity[] = ['at' => $c->created_at, 'icon' => '🧾', 'action' => 'Certificate #' . ($c->reference_number ?: $c->id) . ' raised', 'project' => $c->project->name ?? '—', 'user' => 'Admin'];
+        }
+        usort($recentActivity, fn($a, $b) => $b['at']->getTimestamp() - $a['at']->getTimestamp());
+        $recentActivity = array_slice($recentActivity, 0, 6);
+        foreach ($recentActivity as &$a) {
+            $a['time'] = $a['at']->format('Y-m-d') === now()->format('Y-m-d') ? 'Today ' . $a['at']->format('H:i') : $a['at']->diffForHumans();
+            unset($a['at']);
+        }
+
+        $totalWorkersAll = Worker::whereIn('project_id', $projectIds)->count();
+        $totalMaterialExpensesAll = (float) Material::whereIn('project_id', $projectIds)->sum(DB::raw('COALESCE(unit_price,0) * COALESCE(quantity_purchased,0)'));
+        $totalPaymentsAll = (float) Payment::whereIn('project_id', $projectIds)->sum('amount');
+        $costBreakdown = [];
+        if ($totalSpent > 0) {
+            $matPct = (int) round($totalMaterialExpensesAll / $totalSpent * 100);
+            $labPct = (int) round($totalPaymentsAll / $totalSpent * 100);
+            $otherPct = max(0, 100 - $matPct - $labPct);
+            $costBreakdown = [
+                ['name' => 'Materials', 'value' => $matPct, 'color' => '#22c55e'],
+                ['name' => 'Labour', 'value' => $labPct, 'color' => '#38bdf8'],
+                ['name' => 'Other', 'value' => $otherPct, 'color' => '#f59e0b'],
+            ];
+            $costBreakdown = array_values(array_filter($costBreakdown, fn($x) => $x['value'] > 0));
+        }
+        if (empty($costBreakdown)) {
+            $costBreakdown = [['name' => 'Materials', 'value' => 50, 'color' => '#22c55e'], ['name' => 'Labour', 'value' => 50, 'color' => '#38bdf8']];
+        }
+        $milestones = ProjectStep::whereIn('project_id', $projectIds)->where('is_completed', false)->with('project')->orderBy('position')->take(8)->get();
 
         return view('dashboard', compact(
             'totalWorkers',
@@ -157,7 +207,18 @@ class DashboardController extends Controller
             'projectSteps',
             'totalProjectSteps',
             'completedProjectSteps',
-            'projectCompletionPercent'
+            'projectCompletionPercent',
+            'dashboardProjects',
+            'alerts',
+            'recentActivity',
+            'totalBudget',
+            'totalSpent',
+            'activeCount',
+            'pendingInvoicesCount',
+            'pendingInvoicesAmount',
+            'totalWorkersAll',
+            'costBreakdown',
+            'milestones'
         ));
     }
 

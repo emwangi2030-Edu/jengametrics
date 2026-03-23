@@ -7,7 +7,7 @@
 @section('content')
     <div class="card shadow-sm mt-4">
         <div class="card-body">
-            <h2 class="mb-4" style="color:#027333">Daily Attendance</h2>
+            <h2 class="jm-page-title mb-4">{{ __('Daily Attendance') }}</h2>
 
             {{-- Navigation --}}
             <div class="mb-3 d-flex align-items-center">

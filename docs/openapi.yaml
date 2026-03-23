@@ -1,0 +1,60 @@
+openapi: 3.0.3
+info:
+  title: JengaMetrics API
+  version: 1.0.0
+  description: Sprint 1 seed for versioned API contracts.
+servers:
+  - url: https://staging.jengametrics.com/api/v1
+paths:
+  /auth/login:
+    post:
+      summary: Login and issue API token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+  /auth/me:
+    get:
+      summary: Get authenticated user profile
+      responses:
+        '200':
+          description: Authenticated user
+  /auth/logout:
+    post:
+      summary: Logout current token/session
+      responses:
+        '200':
+          description: Logout successful
+  /projects/active:
+    get:
+      summary: Get resolved active project
+      responses:
+        '200':
+          description: Active project
+    post:
+      summary: Switch active project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [project_id]
+              properties:
+                project_id:
+                  type: integer
+      responses:
+        '200':
+          description: Active project updated

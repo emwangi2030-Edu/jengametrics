@@ -5,12 +5,12 @@
     $canManageLabour = auth()->check() && (!auth()->user()->isSubAccount() || auth()->user()->can_manage_labour);
 @endphp
 <div class="container py-4 {{ $canManageLabour ? '' : 'labour-readonly' }}">
-    <div class="row mb-4">
-        <div class="col-12 d-flex justify-content-between align-items-center">
-            <h2 class="font-weight-bold" style="color:#027333;">
-                Manage Labour: <span class="text-black">{{ $project->name }}</span>
-            </h2>
-            <div class="d-flex gap-1">
+    <div class="jm-page-header mb-2">
+        <div>
+            <h2 class="jm-page-title">{{ __('Manage Labour:') }} <span class="text-dark">{{ $project->name }}</span></h2>
+            <p class="jm-page-subtitle mb-0">{{ __('Workers, attendance, and labour assignments.') }}</p>
+        </div>
+            <div class="jm-actions-bar">
                 <a href="{{ route('labour_tasks.index') }}" class="btn btn-secondary">
                     {{ __('Assign Tasks') }}
                 </a>
@@ -21,7 +21,6 @@
                     {{ __('Daily Attendance') }} 
                 </a>
             </div>
-        </div>
     </div>
 
     <div class="d-flex justify-content-center">

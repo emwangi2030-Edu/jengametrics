@@ -2,18 +2,18 @@
 
 @section('content')
 <div class="container py-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
+    <div class="jm-page-header">
         <div>
-            <h2 class="mb-1" style="color:#027333;">Labour Tasks Board</h2>
-            <small class="text-muted">Create groups, assign tasks, and track completion using Kanban.</small>
+            <h2 class="jm-page-title">{{ __('Labour Tasks Board') }}</h2>
+            <p class="jm-page-subtitle mb-0">{{ __('Create teams, assign work, and track progress with a Kanban view.') }}</p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="jm-actions-bar">
             <a href="{{ route('workers.index') }}" class="btn btn-outline-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
             <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#createGroupModal">
-                Create Group
+                {{ __('Create Team') }}
             </button>
             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createTaskModal">
-                Create Task
+                {{ __('Create Task') }}
             </button>
         </div>
     </div>
@@ -22,11 +22,11 @@
         <div class="col-12">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-white border-0 pb-0">
-                    <h5 class="mb-0" style="color:#027333;">Groups Created</h5>
+                    <h5 class="jm-section-title mb-0">{{ __('Teams') }}</h5>
                 </div>
                 <div class="card-body">
                     @if($groups->isEmpty())
-                        <p class="text-muted mb-0">No groups created yet.</p>
+                        <p class="text-muted mb-0">{{ __('No teams created yet.') }}</p>
                     @else
                         <ul class="mb-0">
                             @foreach($groups as $group)
@@ -77,7 +77,7 @@
                                             <small class="text-muted d-block">{{ \Illuminate\Support\Str::limit($task->description, 90) }}</small>
                                         @endif
                                         <small class="text-muted d-block mt-1">
-                                            Assigned to: {{ $assigneeLabel ?: 'N/A' }}
+                                            {{ __('Assigned to:') }} {{ $assigneeLabel ?: __('Not assigned') }}
                                         </small>
                                     </div>
                                     <form method="POST" action="{{ route('labour_tasks.tasks.complete', $task) }}" class="js-complete-task-form" onclick="event.stopPropagation();">
@@ -91,7 +91,7 @@
                             </div>
                         </div>
                     @empty
-                        <p class="text-muted mb-0">No pending tasks.</p>
+                        <p class="text-muted mb-0">{{ __('No pending tasks.') }}</p>
                     @endforelse
                 </div>
             </div>
@@ -118,7 +118,7 @@
                             </div>
                         </div>
                     @empty
-                        <p class="text-muted mb-0">No completed tasks yet.</p>
+                        <p class="text-muted mb-0">{{ __('No completed tasks yet.') }}</p>
                     @endforelse
                 </div>
             </div>
@@ -132,16 +132,16 @@
             <form method="POST" action="{{ route('labour_tasks.groups.store') }}">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createGroupModalLabel">Create Worker Group</h5>
+                    <h5 class="modal-title" id="createGroupModalLabel">{{ __('Create Team') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Group Name</label>
+                        <label class="form-label">{{ __('Team Name') }}</label>
                         <input type="text" class="form-control" name="name" maxlength="255" required>
                     </div>
-                    <div class="mb-2 fw-semibold">Add Workers</div>
-                    <div style="max-height: 220px; overflow-y: auto;">
+                    <div class="mb-2 fw-semibold">{{ __('Add Workers') }}</div>
+                    <div class="jm-scroll-y-sm">
                         @forelse($workers as $worker)
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="worker_ids[]" id="group-worker-{{ $worker->id }}" value="{{ $worker->id }}">
@@ -156,13 +156,13 @@
                                 </label>
                             </div>
                         @empty
-                            <small class="text-muted">No active workers available.</small>
+                            <small class="text-muted">{{ __('No active workers available.') }}</small>
                         @endforelse
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">Create Group</button>
+                    <button type="submit" class="btn btn-success">{{ __('Create Team') }}</button>
                 </div>
             </form>
         </div>
@@ -175,7 +175,7 @@
             <form method="POST" action="{{ route('labour_tasks.tasks.store') }}">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createTaskModalLabel">Create Task</h5>
+                    <h5 class="modal-title" id="createTaskModalLabel">{{ __('Create Task') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">

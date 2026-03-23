@@ -1,19 +1,21 @@
 @extends('layouts.app')
 
+{{-- Must be outside @section: code after @endsection still needs this (readonly pushes). --}}
+@php
+    $canManageBoq = auth()->check() && (!auth()->user()->isSubAccount() || auth()->user()->can_manage_boq);
+@endphp
+
 @push('styles')
 <link rel="preload" href="{{ asset('assets/metrics/assets/css/theme.min.css') }}" as="style">
 <link rel="preload" href="{{ asset('assets/metrics/assets/css/user.min.css') }}" as="style">
 @endpush
 
 @section('content')
-    @php
-        $canManageBoq = auth()->check() && (!auth()->user()->isSubAccount() || auth()->user()->can_manage_boq);
-    @endphp
     <div class="container mt-4 {{ $canManageBoq ? '' : 'boq-readonly' }}">
         <div class="row mb-4">
             <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                 <div>
-                    <h2 class="fw-bold" style="color:#027333">
+                    <h2 class="jm-page-title">
                         {{ $bqDocument->title }}
                     </h2>
                     <p class="text-muted mb-0">{{ $bqDocument->description }}</p>
@@ -28,8 +30,7 @@
         <div class="row mb-4">
             <div class="col-12 d-flex flex-column flex-lg-row align-items-start gap-2">
                 <button type="button"
-                    class="btn text-white"
-                    style="background-color:#027333"
+                    class="btn btn-success"
                     data-bs-toggle="modal"
                     data-bs-target="#createLevelModal">
                     {{ __('Add Level') }}
@@ -230,7 +231,7 @@
                                     @endif
                                 </div>
                             </div>
-                            <div id="import-library-items" class="border rounded p-3" style="max-height: 420px; overflow-y: auto;">
+                            <div id="import-library-items" class="border rounded p-3 jm-scroll-y-lg">
                                 <p class="text-muted mb-0">{{ __('Select a library to load its items.') }}</p>
                             </div>
                         </div>

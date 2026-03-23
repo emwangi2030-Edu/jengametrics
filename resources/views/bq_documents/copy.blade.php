@@ -6,7 +6,7 @@
             <div class="col-lg-10">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
                     <div>
-                        <h2 class="fw-bold text-primary mb-1">
+                        <h2 class="jm-page-title mb-1">
                             {{ __('Copy BoQ') }}
                         </h2>
                         <p class="text-muted mb-0">
@@ -85,7 +85,7 @@
                                         <table class="table table-sm align-middle">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th style="width: 40px;">
+                                                    <th class="jm-col-select">
                                                         <input type="checkbox" class="form-check-input"
                                                             data-group-toggle
                                                             aria-label="{{ __('Select entire section') }}">

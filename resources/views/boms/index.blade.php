@@ -4,8 +4,8 @@
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="font-weight-bold" style="color:#027333">
-                Bill of Materials: <span class="text-black">{{ $project->name }}</span>
+            <h2 class="fw-bold mb-0">
+                {{ __('Bill of Materials:') }} <span class="text-dark">{{ $project->name }}</span>
             </h2>
         </div>
     </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default">
+<html lang="en-US" dir="ltr" data-navigation-type="default" data-navbar-horizontal-shape="default" data-turbo="false">
 
 <head>
     <meta charset="utf-8">
@@ -43,7 +43,7 @@
     <link href="{{ asset('assets/metrics/assets/css/user.min.css') }}" type="text/css" rel="stylesheet"
     id="user-style-default">
     <link href="{{ asset('assets/metrics/vendors/prism/prism-okaidia.css') }}" rel="stylesheet">
-    <script src="https://cdn.skypack.dev/@hotwired/turbo@7.3.0"></script>
+    {{-- Turbo Drive disabled (data-turbo=false on <html>): full page loads for Blade + reliable /boq /boms navigation --}}
 
     <!-- ===============================================-->
     <!--    Additional Scripts and Styles-->
@@ -148,6 +148,9 @@
     <link href="{{ asset('assets/metrics/vendors/leaflet.markercluster/MarkerCluster.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/metrics/vendors/leaflet.markercluster/MarkerCluster.Default.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/metrics/assets/css/ui-refresh.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/metrics/assets/css/app-shell.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/metrics/assets/css/new-ui-system.css') }}">
 
     @yield('page-css')
 
@@ -183,7 +186,7 @@
     </style>
 </head>
 
-<body
+<body class="jm-theme jm-app-shell-page"
     data-user-is-subaccount="{{ auth()->check() && auth()->user()->isSubAccount() ? '1' : '0' }}"
     data-can-manage-boq="{{ auth()->check() && auth()->user()->can_manage_boq ? '1' : '0' }}"
     data-can-manage-materials="{{ auth()->check() && auth()->user()->can_manage_materials ? '1' : '0' }}"
@@ -193,154 +196,36 @@
     <!--    Main Content-->
     <!-- ===============================================-->
     <main class="main" id="top">
-        <nav class="navbar navbar-vertical navbar-expand-lg" style="display:none;" data-turbo-permanent>
+        @php
+            $jmPath = request()->path();
+            $jmNav = [
+                'dashboard' => request()->routeIs('dashboard'),
+                'boq' => request()->is('boq') || request()->is('bq_documents') || request()->is('bq_documents/*'),
+                'boms' => request()->is('boms') || request()->is('boms/*'),
+                'material' => request()->is('requisitions', 'requisitions/*', 'materials', 'materials/*'),
+                'req' => request()->is('requisitions', 'requisitions/*'),
+                'mat_del' => request()->is('materials/delivered'),
+                'mat_inv' => request()->is('materials/inventory'),
+                'mat_use' => request()->is('materials/usage'),
+                'labour' => request()->is('workers', 'workers/*', 'attendance', 'attendance/*', 'labour-tasks', 'labour-tasks/*') || str_contains($jmPath, '/payments'),
+                'cost' => request()->is('cost-tracking', 'cost-tracking/*'),
+                'reports' => request()->is('reports', 'reports/*'),
+                'settings' => request()->routeIs('settings.*') || request()->routeIs('profile.*') || request()->is('admin/settings'),
+            ];
+        @endphp
+        <nav class="navbar navbar-vertical navbar-expand-lg jm-app-sidebar jm-hidden-init">
             <div class="collapse navbar-collapse" id="navbarVerticalCollapse">
-                <!-- scrollbar removed-->
                 <div class="navbar-vertical-content">
+                    <div class="jm-sidebar-brand">
+                        <span class="jm-sidebar-brand-mark" aria-hidden="true">🏗️</span>
+                        <span class="jm-sidebar-brand-text">Jenga<span>Metrics</span></span>
+                    </div>
+                    <div class="jm-sidebar-scroll">
                     <ul class="navbar-nav flex-column" id="navbarVerticalNav">
                         <div class="nav-item">
-                            <!-- label-->
-                            <p class="navbar-vertical-label">Apps</p>
-                            <hr class="navbar-vertical-line" /><!-- parent pages-->
-
-                            <style>
-                                /* Navigation Item Styles */
-                                .nav-item-wrapper {
-                                    margin-bottom: 0.5rem;
-                                    position: relative;
-                                }
-
-                                /* Dropdown menu */
-                                .nav-item-wrapper .dropdown-menu {
-                                    position: static !important;
-                                    display: block;
-                                    margin: 0;
-                                    padding: 0 0 0 1.5rem;
-                                    background: transparent;
-                                    border: none;
-                                    box-shadow: none;
-                                    list-style: none;
-                                    max-height: 0;
-                                    overflow: hidden;
-                                    opacity: 0;
-                                    pointer-events: none;
-                                    transition: max-height 0.3s ease, opacity 0.3s ease;
-                                }
-
-                                /* Smoothly expand submenu when open */
-                                .nav-item-wrapper.open > .dropdown-menu {
-                                    max-height: 600px;
-                                    opacity: 1;
-                                    pointer-events: auto;
-                                }
-
-                                /* Submenu items */
-                                .nav-item-wrapper .dropdown-menu .dropdown-item {
-                                    display: flex;
-                                    align-items: center;
-                                    padding: 0.75rem 1rem 0.75rem 2.5rem;
-                                    color: #027333;
-                                    text-decoration: none;
-                                    font-size: 0.95rem;
-                                    border-radius: 0.375rem;
-                                    transition: background-color 0.3s ease, color 0.3s ease;
-                                    background-color: transparent;
-                                    position: relative;
-                                }
-
-                                /* Parent nav links that have a submenu */
-                                .nav-item-wrapper.has-submenu > .nav-link {
-                                    position: relative;
-                                    padding-right: 2rem;
-                                }
-
-                                /* Chevron arrow for parent links */
-                                .nav-item-wrapper.has-submenu > .nav-link::after {
-                                    content: "▾";
-                                    position: absolute;
-                                    right: 1rem;
-                                    font-size: 14px;
-                                    color: #027333;
-                                    transition: transform 0.3s ease, color 0.3s ease;
-                                }
-
-                                /* Rotate chevron when submenu is expanded */
-                                .nav-item-wrapper.has-submenu.open > .nav-link::after {
-                                    transform: rotate(180deg);
-                                    color: #014d22;
-                                }
-
-                                /* Hover state for submenu items */
-                                .nav-item-wrapper .dropdown-menu .dropdown-item:hover {
-                                    background-color: #e0f2f1;
-                                    color: #014d22;
-                                }
-
-                                .nav-item-wrapper .dropdown-menu .dropdown-item::before {
-                                    content: '';
-                                    position: absolute;
-                                    top: 50%;
-                                    left: 1.1rem;
-                                    transform: translateY(-50%);
-                                    width: 24px;
-                                    height: 24px;
-                                }
-
-                                .nav-item-wrapper .dropdown-menu .dropdown-item.active {
-                                    background-color: #e9ecef;
-                                    font-weight: 500;
-                                }
-
-                                /* Main nav link */
-                                .nav-link {
-                                    display: flex;
-                                    align-items: center;
-                                    padding: 0.75rem 1rem;
-                                    border-radius: 0.375rem;
-                                    transition: background-color 0.3s ease, color 0.3s ease;
-                                    color: #027333;
-                                    text-decoration: none;
-                                }
-
-                                /* Hover state */
-                                .nav-link:hover {
-                                    background-color: #e0f2f1;
-                                    color: #014d22;
-                                }
-
-                                /* Subtle scaling only on text/icon */
-                                .nav-link:hover .nav-link-text,
-                                .nav-link:hover .nav-link-icon {
-                                    transform: scale(1.05);
-                                    transition: transform 0.2s ease-in-out;
-                                }
-
-                                /* Icon styling */
-                                .nav-link-icon i {
-                                    font-size: 20px;
-                                    color: #027333;
-                                    margin-right: 0.5rem;
-                                }
-
-                                /* Text styling */
-                                .nav-link-text {
-                                    font-size: 16px;
-                                    font-weight: 500;
-                                    margin-left: 0.5rem;
-                                    color: #027333;
-                                }
-
-                                .nav-item-wrapper .dropdown-menu .dropdown-item .nav-link-text {
-                                    margin-left: 0;
-                                    color: inherit;
-                                    font-size: 15px;
-                                }
-
-                            </style>
-
-                            <!-- Dashboard Item -->
+                            <!-- Dashboard (all clients) -->
                             <div class="nav-item-wrapper">
-                                <a class="nav-link label-1" href="{{ route('dashboard') }}" role="button" aria-expanded="false">
+                                <a class="nav-link label-1 {{ $jmNav['dashboard'] ? 'jm-nav-active' : '' }}" href="{{ route('dashboard') }}" role="button" aria-expanded="false">
                                     <div class="d-flex align-items-center">
                                         <span class="nav-link-icon"><span data-feather="home"></span></span>
                                         <span class="nav-link-text-wrapper">
@@ -351,13 +236,11 @@
                             </div>
 
                             @if(\Illuminate\Support\Facades\Auth::user()->is_client())
-                                <!-- Bills of Quantities (BQ) -->
+                                <p class="jm-sidebar-section-label">Apps</p>
                                 <div class="nav-item-wrapper">
-                                    <a class="nav-link label-1" href="{{ route('boq') }}" role="button" aria-expanded="false">
+                                    <a class="nav-link label-1 {{ $jmNav['boq'] ? 'jm-nav-active' : '' }}" href="{{ route('boq') }}" role="button" aria-expanded="false">
                                         <div class="d-flex align-items-center">
-                                            <span class="nav-link-icon">
-                                                <span data-feather="file-text"></span>
-                                            </span>
+                                            <span class="nav-link-icon"><span data-feather="file-text"></span></span>
                                             <span class="nav-link-text-wrapper">
                                                 <span class="nav-link-text">Bills of Quantities</span>
                                             </span>
@@ -365,13 +248,10 @@
                                     </a>
                                 </div>
 
-                                <!-- Bills of Materials (BOM) -->
                                 <div class="nav-item-wrapper">
-                                    <a class="nav-link label-1" href="{{ route('boms.index') }}" role="button" aria-expanded="false">
+                                    <a class="nav-link label-1 {{ $jmNav['boms'] ? 'jm-nav-active' : '' }}" href="{{ route('boms.index') }}" role="button" aria-expanded="false">
                                         <div class="d-flex align-items-center">
-                                            <span class="nav-link-icon">
-                                                <span data-feather="file-text"></span>
-                                            </span>
+                                            <span class="nav-link-icon"><span data-feather="layers"></span></span>
                                             <span class="nav-link-text-wrapper">
                                                 <span class="nav-link-text">Bills of Materials</span>
                                             </span>
@@ -379,69 +259,57 @@
                                     </a>
                                 </div>
 
-                              <!-- Material Management (Dropdown Parent) -->
-                                <div class="nav-item-wrapper has-submenu">
-                                    <a class="nav-link label-1" 
-                                    href="javascript:void(0)" 
-                                    onclick="toggleDropdown(this)">
+                                <div class="nav-item-wrapper has-submenu {{ $jmNav['material'] ? 'open' : '' }}">
+                                    <a class="nav-link label-1 {{ $jmNav['material'] ? 'jm-nav-active' : '' }}"
+                                        href="javascript:void(0)"
+                                        onclick="toggleDropdown(this)">
                                         <div class="d-flex align-items-center">
-                                            <span class="nav-link-icon">
-                                                <span data-feather="box"></span>
-                                            </span>
+                                            <span class="nav-link-icon"><span data-feather="box"></span></span>
                                             <span class="nav-link-text-wrapper">
                                                 <span class="nav-link-text">Manage Material</span>
                                             </span>
                                         </div>
                                     </a>
-
-                                    <!-- Dropdown Menu -->
-                                    <ul class="dropdown-menu" style="margin-right: 17px; padding-top: 1px;">
+                                    <ul class="dropdown-menu">
                                         <li>
-                                            <a class="dropdown-item nav-link label-1" href="{{ route('requisitions.index') }}">
-                                                <div class="d-flex align-items-center" style="margin-left: 10px;">
-                                                    <span class="nav-link-text-wrapper">
-                                                        <span class="nav-link-text">Requisitions</span>
-                                                    </span>
-                                                </div>
+                                            <a class="dropdown-item nav-link label-1 {{ $jmNav['req'] ? 'jm-nav-active' : '' }}" href="{{ route('requisitions.index') }}">
+                                                <span class="nav-link-text">Requisitions</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item nav-link label-1" href="{{ route('materials.delivered') }}">
-                                                <div class="d-flex align-items-center" style="margin-left: 10px;">
-                                                    <span class="nav-link-text-wrapper">
-                                                        <span class="nav-link-text">Materials Delivered</span>
-                                                    </span>
-                                                </div>
+                                            <a class="dropdown-item nav-link label-1 {{ $jmNav['mat_del'] ? 'jm-nav-active' : '' }}" href="{{ route('materials.delivered') }}">
+                                                <span class="nav-link-text">Materials Delivered</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item nav-link label-1" href="{{ route('materials.inventory') }}">
-                                                <div class="d-flex align-items-center" style="margin-left: 10px;">
-                                                    <span class="nav-link-text-wrapper">
-                                                        <span class="nav-link-text">Inventory Management</span>
-                                                    </span>
-                                                </div>
+                                            <a class="dropdown-item nav-link label-1 {{ $jmNav['mat_inv'] ? 'jm-nav-active' : '' }}" href="{{ route('materials.inventory') }}">
+                                                <span class="nav-link-text">Inventory Management</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item nav-link label-1" href="{{ route('materials.usage') }}">
-                                                <div class="d-flex align-items-center" style="margin-left: 10px;">
-                                                    <span class="nav-link-text-wrapper">
-                                                        <span class="nav-link-text">Stock Usage</span>
-                                                    </span>
-                                                </div>
+                                            <a class="dropdown-item nav-link label-1 {{ $jmNav['mat_use'] ? 'jm-nav-active' : '' }}" href="{{ route('materials.usage') }}">
+                                                <span class="nav-link-text">Stock Usage</span>
                                             </a>
                                         </li>
                                     </ul>
                                 </div>
 
-                                <!-- Labour -->
                                 <div class="nav-item-wrapper">
-                                    <a class="nav-link label-1" title="Manage your labour" href="{{ route('workers.index') }}" role="button" aria-expanded="false">
+                                    <a class="nav-link label-1 {{ $jmNav['settings'] ? 'jm-nav-active' : '' }}" title="Settings" href="{{ route('settings.index') }}" role="button" aria-expanded="false">
                                         <div class="d-flex align-items-center">
-                                            <span class="nav-link-icon">
-                                                <span data-feather="users"></span>
+                                            <span class="nav-link-icon"><span data-feather="settings"></span></span>
+                                            <span class="nav-link-text-wrapper">
+                                                <span class="nav-link-text">Settings</span>
                                             </span>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <p class="jm-sidebar-section-label">Workforce</p>
+                                <div class="nav-item-wrapper">
+                                    <a class="nav-link label-1 {{ $jmNav['labour'] ? 'jm-nav-active' : '' }}" title="Manage your labour" href="{{ route('workers.index') }}" role="button" aria-expanded="false">
+                                        <div class="d-flex align-items-center">
+                                            <span class="nav-link-icon"><span data-feather="users"></span></span>
                                             <span class="nav-link-text-wrapper">
                                                 <span class="nav-link-text">Labour</span>
                                             </span>
@@ -449,27 +317,22 @@
                                     </a>
                                 </div>
 
-                                <!-- Cost Tracking -->
+                                <p class="jm-sidebar-section-label">Finance</p>
                                 <div class="nav-item-wrapper">
-                                    <a class="nav-link label-1" title="track your costs" href="{{ route('cost-tracking.index') }}" role="button" aria-expanded="false">
+                                    <a class="nav-link label-1 {{ $jmNav['cost'] ? 'jm-nav-active' : '' }}" title="Track your costs" href="{{ route('cost-tracking.index') }}" role="button" aria-expanded="false">
                                         <div class="d-flex align-items-center">
-                                            <span class="nav-link-icon">
-                                                <span data-feather="trending-up"></span>
-                                            </span>
+                                            <span class="nav-link-icon"><span data-feather="trending-up"></span></span>
                                             <span class="nav-link-text-wrapper">
                                                 <span class="nav-link-text">Cost Tracking</span>
                                             </span>
                                         </div>
-                                    </a>        
+                                    </a>
                                 </div>
 
-                                <!-- Reporting -->
                                 <div class="nav-item-wrapper">
-                                    <a class="nav-link label-1" title="Daily logs/reports" href="{{ route('reports') }}" role="button" aria-expanded="false">
+                                    <a class="nav-link label-1 {{ $jmNav['reports'] ? 'jm-nav-active' : '' }}" title="Reports" href="{{ route('reports') }}" role="button" aria-expanded="false">
                                         <div class="d-flex align-items-center">
-                                            <span class="nav-link-icon">
-                                                <span data-feather="file"></span>
-                                            </span> 
+                                            <span class="nav-link-icon"><span data-feather="file"></span></span>
                                             <span class="nav-link-text-wrapper">
                                                 <span class="nav-link-text">Reporting</span>
                                             </span>
@@ -563,6 +426,7 @@
                             @endif
                         </div>
                     </ul>
+                    </div>{{-- .jm-sidebar-scroll --}}
                 </div>
             </div>
             <div class="navbar-vertical-footer px-3 py-2">
@@ -572,9 +436,9 @@
                 </button>
             </div>
         </nav>
-        <nav class="navbar navbar-top fixed-top navbar-expand" id="navbarDefault" style="display:none;" data-turbo-permanent>
+        <nav class="navbar navbar-top fixed-top navbar-expand jm-app-topbar jm-hidden-init" id="navbarDefault">
             <div class="collapse navbar-collapse justify-content-between">
-                <div class="navbar-logo">
+                <div class="navbar-logo d-flex align-items-center gap-2">
                     <button class="btn navbar-toggler navbar-toggler-humburger-icon hover-bg-transparent" type="button"
                         data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse"
                         aria-controls="navbarVerticalCollapse" aria-expanded="false"
@@ -583,25 +447,22 @@
                             <span class="toggle-line"></span>
                         </span>
                     </button>
-                    <a class="navbar-brand me-1 me-sm-3" href="{{ url('/') }}">
-                        <div class="d-flex align-items-center">
-                            <div class="d-flex align-items-center"><img src="{{ favicon_url() }}" alt="b2b"
-                                width="27" />
-                                <h5 class="logo-text ms-2 d-none d-sm-block" style="color: #027333;">JengaMetrics</h5>
-                            </div>
-                        </div>
+                    {{-- Mobile-only brand (matches sidebar); desktop uses sidebar brand only — no duplicate favicon strip --}}
+                    <a class="navbar-brand jm-topbar-mobile-brand d-flex d-lg-none align-items-center gap-2 mb-0 me-0" href="{{ route('dashboard') }}">
+                        <span class="jm-sidebar-brand-mark" aria-hidden="true">🏗️</span>
+                        <span class="jm-sidebar-brand-text">Jenga<span>Metrics</span></span>
                     </a>
                 </div>
                 <ul class="navbar-nav navbar-nav-icons flex-row">
                     <li class="nav-item">
                         <div class="theme-control-toggle fa-icon-wait px-2">
                             <input class="form-check-input ms-0 theme-control-toggle-input" type="checkbox" data-theme-control="phoenixTheme" value="dark" id="themeControlToggle" />
-                            <label class="mb-0 theme-control-toggle-label theme-control-toggle-light" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
-                                data-bs-title="Switch theme" style="height:32px;width:32px;">
+                            <label class="mb-0 theme-control-toggle-label theme-control-toggle-light jm-theme-toggle-btn" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
+                                data-bs-title="Switch theme">
                                 <span class="icon" data-feather="sun"></span>
                             </label>
-                            <label class="mb-0 theme-control-toggle-label theme-control-toggle-dark" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
-                                data-bs-title="Switch theme" style="height:32px;width:32px;">
+                            <label class="mb-0 theme-control-toggle-label theme-control-toggle-dark jm-theme-toggle-btn" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
+                                data-bs-title="Switch theme">
                                 <span class="icon" data-feather="moon"></span>
                             </label>
                         </div>
@@ -610,8 +471,8 @@
                         <a class="nav-link lh-1 pe-2" id="navbarDropdownUser" href="#!" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true"
                             aria-expanded="false">
                             <div class="d-flex align-items-center">
-                                <span class="fs-8">{{ project() }}</span>
-                                <span class="ms-2 fs-8"><span data-feather="menu"></span></span>
+                                <span class="jm-project-chip">{{ project() }}</span>
+                                <span class="ms-2 fs-8"><span data-feather="chevron-down"></span></span>
                             </div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end navbar-dropdown-caret py-0 dropdown-profile shadow border" aria-labelledby="navbarDropdownUser">
@@ -658,38 +519,30 @@
 
                                     <ul class="nav d-flex flex-column mb-2 pb-1">
                                         @if(\Illuminate\Support\Facades\Auth::user()->is_client())
+                                            <li class="nav-item">
+                                                <a class="nav-link px-3 d-block" href="{{ route('settings.index') }}">
+                                                    <span class="me-2 text-body align-bottom" data-feather="settings"></span>
+                                                    Settings
+                                                </a>
+                                            </li>
                                             @if(\Illuminate\Support\Facades\Auth::user()->project_id)
-                                                @if(!\Illuminate\Support\Facades\Auth::user()->isSubAccount())
-                                                    <li class="nav-item">
-                                                        <a class="nav-link px-3 d-block" href="/admin/settings">
-                                                            <span class="me-2 text-body align-bottom" data-feather="settings"></span>
-                                                            Project settings
-                                                        </a>
-                                                    </li>
-                                                @endif
                                                 <li class="nav-item">
                                                     <a class="nav-link px-3 d-block" href="#" data-bs-toggle="modal" data-bs-target="#switchbusinesses">
                                                         <span class="me-2 text-body align-bottom" data-feather="menu"></span>
                                                         Projects
                                                     </a>
                                                 </li>
-                                            @endif 
+                                            @endif
                                         @endif
                                     </ul>
                                 </div>
                                 <div class="card-footer p-0 border-top border-translucent">
                                     <ul class="nav d-flex flex-column my-3">
                                         @if(\Illuminate\Support\Facades\Auth::user()->is_client())
-                                            <a class="dropdown-item" href="{{ url('account') }}">
-                                                <i class="fa fa-user"></i> 
-                                                <span key="t-profile">Profile</span>
+                                            <a class="dropdown-item" href="{{ route('settings.index') }}">
+                                                <i class="fa fa-cog"></i>
+                                                <span key="t-settings">Settings</span>
                                             </a>
-                                            @if(!\Illuminate\Support\Facades\Auth::user()->isSubAccount())
-                                                <a class="dropdown-item" href="{{ route('sub_accounts.index') }}">
-                                                    <i class="fa fa-users"></i>
-                                                    <span key="t-profile">Add Users</span>
-                                                </a>
-                                            @endif
                                             <!-- @if(!\Illuminate\Support\Facades\Auth::user()->isSubAccount())
                                                 <a class="dropdown-item" href="{{ url('billings') }}">
                                                     <i class="fa fa-users"></i>
@@ -852,7 +705,7 @@
                                             </td>
                                             <td>
                                                 <form action="{{ route('select_project') }}" method="POST"
-                                                    style="display:inline;">
+                                                    class="d-inline">
                                                     @csrf
                                                     <input type="hidden" name="id" value="{{ $project->id }}">
                                                     <button type="submit" class="btn btn-success btn-sm">Select</button>
@@ -1392,7 +1245,6 @@
             }
 
             document.addEventListener('DOMContentLoaded', initThemeToggle);
-            document.addEventListener('turbo:load', initThemeToggle);
         })();
     </script>
 
@@ -1489,7 +1341,6 @@
             }
 
             document.addEventListener('DOMContentLoaded', renderFeatherIcons);
-            document.addEventListener('turbo:load', renderFeatherIcons);
         })();
     </script>
 

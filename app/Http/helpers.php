@@ -316,7 +316,11 @@ function project(){
         return 'Admin';
     }
 
-    $project_count = $user->projects()->count();
+    $effectiveUser = ($user->isSubAccount() && $user->parentUser)
+        ? $user->parentUser
+        : $user;
+
+    $project_count = $effectiveUser->projects()->count() + $effectiveUser->ownedProjects()->count();
     if($project_count>0){
         $project = $user->project_id ? Project::find($user->project_id) : null;
         if($project){
@@ -329,6 +333,23 @@ function project(){
 
 }
 
+/**
+ * Ensure the authenticated user has a usable project_id when they have any assigned or owned
+ * projects. Delegates to ActiveProjectResolver (same rules as API ResolveActiveProject middleware).
+ *
+ * Web middleware runs this so flows like login → intended(/settings) still get a project before
+ * module routes that depend on get_project() / project_id().
+ */
+function bootstrap_user_active_project_if_missing(): void
+{
+    $user = Auth::user();
+    if (! $user || $user->is_admin()) {
+        return;
+    }
+
+    app(\App\Support\ActiveProjectResolver::class)->resolve($user);
+}
+
 
 function get_project(){
 
@@ -336,7 +357,15 @@ function get_project(){
     if(!$user || !$user->project_id){
         return null;
     }
-    if (! $user->projects()->where('projects.id', $user->project_id)->exists()) {
+
+    $effectiveUser = ($user->isSubAccount() && $user->parentUser)
+        ? $user->parentUser
+        : $user;
+
+    $assigned = $effectiveUser->projects()->where('projects.id', $user->project_id)->exists();
+    $owned = $effectiveUser->ownedProjects()->where('id', $user->project_id)->exists();
+
+    if (! $assigned && ! $owned) {
         return null;
     }
     $business = Project::find($user->project_id);

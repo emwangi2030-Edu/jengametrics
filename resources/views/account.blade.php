@@ -19,6 +19,65 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
+        .jm-account-page {
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+        .jm-account-header {
+            background: linear-gradient(135deg, #f6fbf7 0%, #eef7f1 100%);
+            border: 1px solid #dce9df;
+            border-radius: 16px;
+            padding: 18px 20px;
+        }
+        .jm-account-title {
+            color: #0f5131;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+        .profile-shell {
+            background: #f7faf8;
+            border-radius: 16px;
+            border: 1px solid #dce9df;
+            padding: 20px;
+        }
+        .jm-profile-card {
+            border: 1px solid #e1ebe4 !important;
+            border-radius: 16px !important;
+            box-shadow: 0 8px 20px rgba(24, 39, 28, 0.06) !important;
+        }
+        .jm-profile-card .card-body {
+            padding: 1.25rem 1.25rem 1.3rem;
+        }
+        .jm-section-title {
+            color: #0f5131;
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+        }
+        .profile-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ebf5ee;
+            color: #1b5e35;
+            border: 1px solid #d3e8d9;
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+        .profile-avatar {
+            border: 4px solid #ebf5ee;
+            box-shadow: 0 8px 20px rgba(23, 77, 47, 0.12);
+        }
+        .jm-muted-note {
+            color: #5e6c63;
+        }
+        .jm-danger-block {
+            border: 1px solid #f1d5d8 !important;
+            background: #fff8f8;
+        }
         .password-match-indicator {
             min-width: 42px;
             justify-content: center;
@@ -27,51 +86,55 @@
 @endpush
 
 @section('content')
-<div class="container mt-4">
+<div class="container mt-4 jm-account-page">
     <div class="row mb-4">
         <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-            <div>
-                <h2 class="fw-bold mb-1" style="color:#027333;">{{ __('Profile') }}</h2>
-                <p class="text-muted mb-0">{{ __('Manage your account details and security settings.') }}</p>
+            <div class="jm-account-header w-100 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <h2 class="jm-account-title mb-1">{{ __('Profile Settings') }}</h2>
+                    <p class="jm-muted-note mb-0">{{ __('Manage your account details and security settings.') }}</p>
+                </div>
+                <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary" aria-label="Back" title="Back">
+                    <span data-feather="arrow-left-circle"></span>
+                </a>
             </div>
-            <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary mt-3 mt-md-0" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
         </div>
     </div>
 
-    <div class="row g-4">
+    <div class="row g-4 profile-shell">
         <div class="col-lg-4">
-            <div class="card shadow-sm border-0">
+            <div class="card jm-profile-card border-0">
                 <div class="card-body text-center">
                     <div class="mb-3">
                         <img
                             id="profile-photo-preview"
-                            class="rounded-circle"
+                            class="rounded-circle profile-avatar"
                             src="{{ $photoUrl ?? asset('assets/media/svg/avatars/blank.svg') }}"
                             alt="{{ auth()->user()->name }}"
                             width="120"
                             height="120"
-                            style="object-fit: cover;">
+                            class="jm-object-cover">
                     </div>
-                    <h4 class="fw-bold mb-1">{{ auth()->user()->name }}</h4>
-                    <p class="text-muted mb-3">{{ auth()->user()->email }}</p>
+                    <h4 class="fw-bold mb-1" id="profile-display-name">{{ auth()->user()->name }}</h4>
+                    <p class="text-muted mb-3" id="profile-display-email">{{ auth()->user()->email }}</p>
                     @if(!auth()->user()->isSubAccount())
                         <div class="d-flex flex-column align-items-center mb-3">
                             <span class="text-muted">{{ __('Linked Users') }}</span>
-                            <a href="{{ route('sub_accounts.index') }}" class="fs-5 fw-bold text-primary text-decoration-underline">
+                            <a href="{{ route('sub_accounts.index') }}" class="fs-5 fw-bold text-primary text-decoration-underline" id="profile-linked-count">
                                 {{ auth()->user()->subAccounts()->count() }}
                             </a>
                         </div>
                     @endif
                     <div class="d-flex justify-content-center gap-2">
-                        <span class="badge bg-success">{{ auth()->user()->isSubAccount() ? __('Sub-Account') : __('Primary Account') }}</span>
+                        <span class="profile-chip">{{ auth()->user()->isSubAccount() ? __('Sub-Account') : __('Primary Account') }}</span>
                     </div>
                 </div>
             </div>
 
             @if(auth()->user()->isSubAccount())
-                <div class="card shadow-sm border-0 mt-4">
+                <div class="card jm-profile-card border-0 mt-4">
                     <div class="card-body">
-                        <h5 class="fw-bold mb-3" style="color:#027333;">{{ __('Role Access') }}</h5>
+                        <h5 class="fw-bold mb-3 jm-section-title">{{ __('Role Access') }}</h5>
                         <ul class="list-unstyled mb-0">
                             <li class="d-flex justify-content-between py-2 border-bottom">
                                 <span>{{ __('Manage BoQ & BoM') }}</span>
@@ -110,10 +173,10 @@
         </div>
 
         <div class="col-lg-8">
-            <div class="card shadow-sm border-0 mb-4">
+            <div class="card jm-profile-card border-0 mb-4">
                 <div class="card-body">
-                    <h5 class="fw-bold mb-3" style="color:#027333;">{{ __('Account Details') }}</h5>
-                    <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+                    <h5 class="fw-bold mb-3 jm-section-title">{{ __('Account Details') }}</h5>
+                    <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" id="profile-details-form">
                         @csrf
                         @method('PATCH')
                         <div class="mb-3">
@@ -137,16 +200,17 @@
                                 <div class="text-danger mt-1">{{ $message }}</div>
                             @enderror
                         </div>
-                        <button type="submit" class="btn btn-success">
+                        <button type="submit" class="btn btn-success" id="profile-save-button">
                             {{ __('Save Changes') }}
                         </button>
+                        <small class="text-muted ms-2" id="profile-save-status"></small>
                     </form>
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0 mb-4">
+            <div class="card jm-profile-card border-0 mb-4">
                 <div class="card-body">
-                    <h5 class="fw-bold mb-3" style="color:#027333;">{{ __('Security') }}</h5>
+                    <h5 class="fw-bold mb-3 jm-section-title">{{ __('Security') }}</h5>
                     <form method="POST" action="{{ route('password.update') }}" id="password-update-form" novalidate>
                         @csrf
                         @method('PUT')
@@ -192,7 +256,7 @@
             </div>
 
             @if(!auth()->user()->isSubAccount())
-                <div class="card shadow-sm border-0">
+                <div class="card jm-profile-card jm-danger-block border-0">
                     <div class="card-body">
                         <h5 class="fw-bold mb-3 text-danger">{{ __('Delete Account') }}</h5>
                         <p class="text-muted">
@@ -208,7 +272,7 @@
     </div>
 </div>
 
-<div class="toast-container position-fixed top-0 end-0 p-3" id="accountPasswordToastContainer" style="z-index: 1080;"></div>
+<div class="toast-container position-fixed top-0 end-0 p-3 jm-toast-layer" id="accountPasswordToastContainer"></div>
 
 <div class="modal fade" id="profileCropperModal" tabindex="-1" aria-labelledby="profileCropperModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -218,8 +282,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
             </div>
             <div class="modal-body">
-                <div class="w-100" style="max-height:60vh;">
-                    <img id="profile-cropper-image" src="" alt="{{ __('Crop image') }}" style="max-width:100%; display:block;">
+                <div class="w-100 jm-max-h-60vh">
+                    <img id="profile-cropper-image" src="" alt="{{ __('Crop image') }}" class="jm-max-w-full-block">
                 </div>
                 <p class="text-muted small mt-2 mb-0">{{ __('Drag to crop. Freeform cropping is enabled.') }}</p>
             </div>
@@ -269,6 +333,102 @@
     <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js"></script>
     <script>
         window.addEventListener('load', function () {
+            const profileForm = document.getElementById('profile-details-form');
+            const profileNameInput = document.getElementById('profile-name');
+            const profileEmailInput = document.getElementById('profile-email');
+            const profilePhotoPreview = document.getElementById('profile-photo-preview');
+            const profileDisplayName = document.getElementById('profile-display-name');
+            const profileDisplayEmail = document.getElementById('profile-display-email');
+            const profileLinkedCount = document.getElementById('profile-linked-count');
+            const profileSaveStatus = document.getElementById('profile-save-status');
+            const profileSaveButton = document.getElementById('profile-save-button');
+
+            let apiToken = null;
+            const getApiToken = async () => {
+                if (apiToken) return apiToken;
+                const response = await fetch('{{ route('dashboard.api-token') }}', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                if (!response.ok) return null;
+                const payload = await response.json();
+                apiToken = payload?.data?.token || null;
+                return apiToken;
+            };
+
+            const hydrateProfile = async () => {
+                if (!profileForm) return;
+                const token = await getApiToken();
+                if (!token) return;
+
+                const response = await fetch('/api/v1/profile', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    }
+                });
+                if (!response.ok) return;
+                const payload = await response.json();
+                const data = payload?.data || {};
+
+                if (profileNameInput && data.name) profileNameInput.value = data.name;
+                if (profileEmailInput && data.email) profileEmailInput.value = data.email;
+                if (profileDisplayName && data.name) profileDisplayName.textContent = data.name;
+                if (profileDisplayEmail && data.email) profileDisplayEmail.textContent = data.email;
+                if (profilePhotoPreview && data.avatar_url) profilePhotoPreview.src = data.avatar_url;
+                if (profileLinkedCount && typeof data.linked_users_count === 'number') {
+                    profileLinkedCount.textContent = String(data.linked_users_count);
+                }
+            };
+
+            if (profileForm) {
+                profileForm.addEventListener('submit', async function (event) {
+                    event.preventDefault();
+                    const token = await getApiToken();
+                    if (!token) {
+                        if (profileSaveStatus) profileSaveStatus.textContent = 'Unable to authenticate request.';
+                        return;
+                    }
+
+                    const formData = new FormData(profileForm);
+                    formData.append('_method', 'PATCH');
+                    if (profileSaveButton) profileSaveButton.disabled = true;
+                    if (profileSaveStatus) profileSaveStatus.textContent = 'Saving...';
+
+                    const response = await fetch('/api/v1/profile', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        body: formData,
+                    });
+
+                    if (profileSaveButton) profileSaveButton.disabled = false;
+
+                    const payload = await response.json().catch(() => null);
+                    if (!response.ok) {
+                        if (profileSaveStatus) profileSaveStatus.textContent = payload?.error?.message || 'Save failed.';
+                        return;
+                    }
+
+                    const data = payload?.data || {};
+                    if (profileDisplayName && data.name) profileDisplayName.textContent = data.name;
+                    if (profileDisplayEmail && data.email) profileDisplayEmail.textContent = data.email;
+                    if (profilePhotoPreview && data.avatar_url) profilePhotoPreview.src = data.avatar_url;
+                    if (profileSaveStatus) profileSaveStatus.textContent = payload?.message || 'Saved.';
+                });
+            }
+
+            hydrateProfile();
+
             const fileInput = document.getElementById('profile-photo');
             const previewImage = document.getElementById('profile-photo-preview');
             const cropperModalEl = document.getElementById('profileCropperModal');
@@ -505,7 +665,57 @@
                 if (!validatePasswordForm(false)) {
                     event.preventDefault();
                     event.stopPropagation();
+                    return;
                 }
+
+                event.preventDefault();
+                const submitPasswordUpdate = async () => {
+                    const token = await getApiToken();
+                    if (!token) {
+                        if (newPasswordFeedback) {
+                            newPasswordFeedback.textContent = 'Unable to authenticate request.';
+                        }
+                        return;
+                    }
+
+                    passwordSubmit.disabled = true;
+                    const response = await fetch('/api/v1/profile/password', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                            current_password: currentPasswordInput.value,
+                            password: newPasswordInput.value,
+                            password_confirmation: confirmPasswordInput.value,
+                        }),
+                    });
+
+                    const payload = await response.json().catch(() => null);
+                    passwordSubmit.disabled = false;
+
+                    if (!response.ok) {
+                        const details = payload?.error?.details || {};
+                        if (details.current_password?.[0]) {
+                            setFieldState(currentPasswordInput, currentPasswordFeedback, false, details.current_password[0]);
+                        }
+                        if (details.password?.[0]) {
+                            setFieldState(newPasswordInput, newPasswordFeedback, false, details.password[0]);
+                        }
+                        return;
+                    }
+
+                    currentPasswordInput.value = '';
+                    newPasswordInput.value = '';
+                    confirmPasswordInput.value = '';
+                    validatePasswordForm(false);
+                    showMatchToast('match');
+                };
+
+                submitPasswordUpdate();
             });
 
             validatePasswordForm();

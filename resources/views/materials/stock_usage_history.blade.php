@@ -1,9 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="row mt-5">
+<div class="container py-4">
+    <div class="jm-page-header">
+        <div>
+            <h2 class="jm-page-title">{{ __('Stock Usage History') }}</h2>
+            <p class="jm-page-subtitle mb-0">{{ __('Review issued material quantities by period and section.') }}</p>
+        </div>
+    </div>
     <div class="col-12">
-        <h3 class="font-weight-bold" style="color:#027333;">Stock Usage History</h3>
+        <h3 class="jm-section-title">{{ __('Usage Records') }}</h3>
         <div class="card shadow-sm">
             <form method="GET" action="{{ route('materials.usage') }}" class="row g-2 mt-2 justify-content-center" id="stock-usage-filters">
                 <div class="col-md-3">
@@ -51,7 +57,7 @@
             const params = new URLSearchParams(new FormData(form));
             const url = `${form.action}?${params.toString()}`;
 
-            results.innerHTML = '<div class="py-5 text-center text-muted">{{ __('Loading usage data...') }}</div>';
+            results.innerHTML = '<div class="py-5 text-center text-muted">{{ __('Loading usage records...') }}</div>';
 
             fetch(url, {
                 headers: {
@@ -68,7 +74,7 @@
                     results.innerHTML = data.table ?? '';
                 })
                 .catch(() => {
-                    results.innerHTML = '<div class="alert alert-danger" role="alert">{{ __('Failed to load usage data. Please try again.') }}</div>';
+                    results.innerHTML = '<div class="alert alert-danger" role="alert">{{ __('Could not load usage records. Please try again.') }}</div>';
                 });
         };
 

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ResolvesActiveProject;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreMaterialRequest;
 use App\Models\Material;
 use App\Models\ItemMaterial;
 use App\Models\Supplier;
@@ -19,12 +21,22 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Support\DateRangeQueries;
 
 class MaterialController extends Controller
 {
+    use ResolvesActiveProject;
+
     public function index(Request $request)
     {
-        $projectId = Auth::user()->project_id;
+        $project = $this->resolveActiveProject();
+        if (! $project) {
+            return redirect()
+                ->route('dashboard')
+                ->with('warning', __('No project is selected. Please choose a project first.'));
+        }
+
+        $projectId = (int) $project->id;
         $year = $request->input('year', now()->year);
 
         // Build materials query
@@ -118,7 +130,7 @@ class MaterialController extends Controller
         }
 
         // Get available years
-        $availableYears = Material::selectRaw('DISTINCT YEAR(created_at) as year')
+        $availableYears = Material::selectRaw('DISTINCT ' . DateRangeQueries::yearColumn('created_at') . ' as year')
             ->orderBy('year', 'desc')
             ->pluck('year');
 
@@ -138,7 +150,14 @@ class MaterialController extends Controller
 
     public function materialsDelivered(Request $request)
     {
-        $projectId = Auth::user()->project_id;
+        $project = $this->resolveActiveProject();
+        if (! $project) {
+            return redirect()
+                ->route('dashboard')
+                ->with('warning', __('No project is selected. Please choose a project first.'));
+        }
+
+        $projectId = (int) $project->id;
         $year = $request->input('year', now()->year);
 
         $materialsQuery = Material::with('supplier')
@@ -160,7 +179,7 @@ class MaterialController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $availableYears = Material::selectRaw('DISTINCT YEAR(created_at) as year')
+        $availableYears = Material::selectRaw('DISTINCT ' . DateRangeQueries::yearColumn('created_at') . ' as year')
             ->orderBy('year', 'desc')
             ->pluck('year');
 
@@ -243,7 +262,14 @@ class MaterialController extends Controller
 
     public function inventoryManagement()
     {
-        $projectId = Auth::user()->project_id;
+        $project = $this->resolveActiveProject();
+        if (! $project) {
+            return redirect()
+                ->route('dashboard')
+                ->with('warning', __('No project is selected. Please choose a project first.'));
+        }
+
+        $projectId = (int) $project->id;
 
         $inventory = Material::select('product_id', 'name', 'unit_of_measure')
             ->selectRaw('SUM(quantity_in_stock) as total_stock')
@@ -261,7 +287,14 @@ class MaterialController extends Controller
 
     public function stockUsageHistory(Request $request)
     {
-        $projectId = Auth::user()->project_id;
+        $project = $this->resolveActiveProject();
+        if (! $project) {
+            return redirect()
+                ->route('dashboard')
+                ->with('warning', __('No project is selected. Please choose a project first.'));
+        }
+
+        $projectId = (int) $project->id;
         $year = $request->input('year', now()->year);
 
         $stockUsageQuery = StockUsage::with(['material', 'section'])
@@ -285,7 +318,7 @@ class MaterialController extends Controller
 
         $sections = Section::all();
 
-        $availableYears = StockUsage::selectRaw('DISTINCT YEAR(created_at) as year')
+        $availableYears = StockUsage::selectRaw('DISTINCT ' . DateRangeQueries::yearColumn('created_at') . ' as year')
             ->orderBy('year', 'desc')
             ->pluck('year');
 
@@ -408,20 +441,8 @@ class MaterialController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(StoreMaterialRequest $request)
     {
-        $request->validate([
-            'material_type' => 'required|in:bom,adhoc',
-            'unit_price' => 'required|numeric',
-            'quantity_in_stock' => 'required|numeric|min:0.01',
-            'supplier_id' => 'required|exists:suppliers,id',
-            'requisitioned_quantity' => 'nullable|numeric',
-            'expected_quantity' => 'nullable|numeric',
-            'variance' => 'nullable|string',
-            'product_id' => 'nullable|integer',
-            'adhoc_name' => 'nullable|string|max:255',
-            'adhoc_unit' => 'nullable|string|max:50',
-        ]);
 
         $materialType = $request->input('material_type');
         $quantityEntered = (float) $request->input('quantity_in_stock');
@@ -534,12 +555,6 @@ class MaterialController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'bom_item_id' => 'required|exists:item_materials,id',
-            'unit_price' => 'required|numeric',
-            'quantity_in_stock' => 'required|numeric',
-            'supplier_id' => 'required|exists:suppliers,id',
-        ]);
 
         $material = Material::findOrFail($id);
         $supplier = Supplier::findOrFail($request->supplier_id);

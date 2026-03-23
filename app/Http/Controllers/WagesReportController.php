@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use App\Support\DateRangeQueries;
 
 class WagesReportController extends Controller
 {
@@ -60,7 +61,7 @@ class WagesReportController extends Controller
         }
 
         $years = Payment::whereProjectId(project_id())
-            ->selectRaw('DISTINCT YEAR(payment_date) as y')
+            ->selectRaw('DISTINCT ' . DateRangeQueries::yearColumn('payment_date') . ' as y')
             ->orderByDesc('y')
             ->pluck('y');
 

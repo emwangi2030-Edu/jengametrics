@@ -47,7 +47,7 @@
                             </button>
 
                             <!-- Delete Element form -->
-                            <form action="{{ route('elements.destroy', $element->id) }}" method="POST" style="display:inline;">
+                            <form action="{{ route('elements.destroy', $element->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this element?');">

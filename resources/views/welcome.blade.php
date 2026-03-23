@@ -91,10 +91,63 @@ a.text-primary:focus {
 }
 
 
-    </style>
+    
+
+.jm-welcome-body {
+  --phoenix-scroll-margin-top: 1.2rem;
+}
+
+.jm-bg-contain {
+  background-size: contain;
+}
+
+.jm-bg-b2b-23 {
+  background-image: url("{{ asset('assets/b2b/assets/img/bg/bg-23.png') }}");
+}
+
+.jm-bg-left-15 {
+  background-image: url("{{ asset('assets/metrics') }}/assets/img/bg/bg-left-15.png");
+  background-position: left;
+  background-size: auto;
+}
+
+.jm-bg-right-15 {
+  background-image: url("{{ asset('assets/metrics') }}/assets/img/bg/bg-right-15.png");
+  background-position: right;
+  background-size: auto;
+}
+
+.jm-bg-18-right {
+  background-image: url("{{ asset('assets/metrics') }}/assets/img/bg/bg-18.png");
+  background-position: right;
+  background-size: auto;
+}
+
+.jm-bg-19 {
+  background-image: url("{{ asset('assets/metrics') }}/assets/img/bg/bg-19.png");
+  background-size: auto;
+}
+
+.jm-bg-right-20 {
+  background-image: url("{{ asset('assets/metrics') }}/assets/img/bg/bg-right-20.png");
+  background-position: right;
+  background-size: auto;
+}
+
+.jm-bg-left-20 {
+  background-image: url("{{ asset('assets/metrics') }}/assets/img/bg/bg-left-20.png");
+  background-position: left;
+  background-size: auto;
+}
+
+.jm-border-opacity-20 {
+  --phoenix-border-opacity: .2;
+}
+
+</style>
   </head>
 
-  <body style="--phoenix-scroll-margin-top: 1.2rem;">
+  <body class="jm-welcome-body">
     <!-- ===============================================-->
     <!--    Main Content-->
     <!-- ===============================================-->
@@ -106,7 +159,7 @@ a.text-primary:focus {
             </div>
           </a>
           <div class="d-lg-none">
-            <div class="theme-control-toggle fa-icon-wait px-2"><input class="form-check-input ms-0 theme-control-toggle-input" type="checkbox" data-theme-control="phoenixTheme" value="dark" id="themeControlToggleSm" /><label class="mb-0 theme-control-toggle-label theme-control-toggle-light" for="themeControlToggleSm" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Switch theme" style="height:32px;width:32px;"><span class="icon" data-feather="moon"></span></label><label class="mb-0 theme-control-toggle-label theme-control-toggle-dark" for="themeControlToggleSm" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Switch theme" style="height:32px;width:32px;"><span class="icon" data-feather="sun"></span></label></div>
+            <div class="theme-control-toggle fa-icon-wait px-2"><input class="form-check-input ms-0 theme-control-toggle-input" type="checkbox" data-theme-control="phoenixTheme" value="dark" id="themeControlToggleSm" /><label class="mb-0 theme-control-toggle-label theme-control-toggle-light" for="themeControlToggleSm" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Switch theme" class="jm-theme-toggle-btn"><span class="icon" data-feather="moon"></span></label><label class="mb-0 theme-control-toggle-label theme-control-toggle-dark" for="themeControlToggleSm" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Switch theme" class="jm-theme-toggle-btn"><span class="icon" data-feather="sun"></span></label></div>
           </div><button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <div class="border-bottom border-translucent border-bottom-lg-0 mb-2">
@@ -140,7 +193,7 @@ a.text-primary:focus {
       <div class="col-12 col-lg-auto order-0 order-md-1 text-end order-1">
         <!-- Mobile Image -->
         <div class="position-relative p-5 p-md-7 d-lg-none">
-          <div class="bg-holder" style="background-image:url('{{ asset('assets/b2b/assets/img/bg/bg-23.png') }}'); background-size:contain;"></div>
+          <div class="bg-holder jm-bg-b2b-23 jm-bg-contain"></div>
           <div class="position-relative">
             <img class="w-100 shadow-lg d-dark-none rounded-2" src="{{ asset('assets/b2b/assets/img/bg/bg-28.webp') }}" alt="hero-header" />
             <img class="w-100 shadow-lg d-light-none rounded-2" src="{{ asset('assets/b2b/assets/img/bg/bg-30.png') }}" alt="hero-header" />
@@ -262,9 +315,9 @@ a.text-primary:focus {
 
 
 <section class="bg-body-emphasis pt-lg-0 pt-xl-8">
-    <div class="bg-holder d-none d-md-block" style="background-image:url({{ asset('assets/metrics') }}/assets/img/bg/bg-left-15.png);background-position:left;background-size:auto;"></div>
+    <div class="bg-holder d-none d-md-block jm-bg-left-15"></div>
     <!--/.bg-holder-->
-    <div class="bg-holder d-none d-md-block" style="background-image:url({{ asset('assets/metrics') }}/assets/img/bg/bg-right-15.png);background-position:right;background-size:auto;"></div>
+    <div class="bg-holder d-none d-md-block jm-bg-right-15"></div>
     <!--/.bg-holder-->
     <div class="container-small position-relative px-lg-7 px-xxl-3">
         <div class="mb-4 text-center text-sm-start">
@@ -379,7 +432,7 @@ a.text-primary:focus {
         <div class="row justify-content-center">
             <div class="col-12 text-center">
                 <div class="card py-md-9 px-md-13 border-0 z-1 shadow-lg cta-card">
-                    <div class="bg-holder" style="background-image:url({{ asset('assets/metrics') }}/assets/img/bg/bg-18.png);background-position:right;background-size:auto;"></div>
+                    <div class="bg-holder jm-bg-18-right"></div>
                     <!--/.bg-holder-->
                     <div class="card-body position-relative">
                         <img class="img-fluid mb-5 d-dark-none" src="{{ asset('assets/metrics') }}/assets/img/spot-illustrations/27.png" width="210" alt="..." />
@@ -400,11 +453,11 @@ a.text-primary:focus {
 
 
       <div class="position-relative">
-        <div class="bg-holder footer-bg" style="background-image:url({{ asset('assets/metrics') }}/assets/img/bg/bg-19.png);background-size:auto;"></div>
+        <div class="bg-holder footer-bg jm-bg-19"></div>
         <!--/.bg-holder-->
-        <div class="bg-holder" style="background-image:url({{ asset('assets/metrics') }}/assets/img/bg/bg-right-20.png);background-position:right;background-size:auto;"></div>
+        <div class="bg-holder jm-bg-right-20"></div>
         <!--/.bg-holder-->
-        <div class="bg-holder" style="background-image:url({{ asset('assets/metrics') }}/assets/img/bg/bg-left-20.png);background-position:left;background-size:auto;"></div>
+        <div class="bg-holder jm-bg-left-20"></div>
         <!--/.bg-holder-->
         <div class="position-relative"><svg class="w-100 text-white dark__text-gray-1100" preserveAspectRatio="none" viewBox="0 0 1920 368" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M1920 0.44L0 367.74V0H1920V0.44Z" fill="currentColor"></path>
@@ -424,7 +477,7 @@ a.text-primary:focus {
                 <div class="row justify-content-between">
                     <!-- Features -->
                     <div class="col-6 col-sm-4 col-lg-3 mb-3">
-                        <div class="border-dashed border-start border-primary-light ps-3" style="--phoenix-border-opacity: .2;">
+                        <div class="border-dashed border-start border-primary-light ps-3 jm-border-opacity-20">
                             <h5 class="fw-bolder mb-2 text-light">Features</h5>
                             <ul class="list-unstyled mb-3">
                                 <li class="mb-1"><a class="text-body-quaternary" href="#!" data-bs-theme="light">Accounting software</a></li>
@@ -442,7 +495,7 @@ a.text-primary:focus {
                     </div>
                     <!-- Wave -->
                     <div class="col-6 col-sm-4 col-lg-3 mb-3">
-                        <div class="border-dashed border-start border-primary-light ps-3" style="--phoenix-border-opacity: .2;">
+                        <div class="border-dashed border-start border-primary-light ps-3 jm-border-opacity-20">
                             <h5 class="fw-bolder mb-2 text-light">Wave</h5>
                             <ul class="list-unstyled mb-3">
                                 <li class="mb-1"><a class="text-body-quaternary" href="#!" data-bs-theme="light">About Us</a></li>
@@ -454,7 +507,7 @@ a.text-primary:focus {
                     </div>
                     <!-- Helpful Links -->
                     <div class="col-6 col-sm-4 col-lg-3 mb-3">
-                        <div class="border-dashed border-start border-primary-light ps-3" style="--phoenix-border-opacity: .2;">
+                        <div class="border-dashed border-start border-primary-light ps-3 jm-border-opacity-20">
                             <h5 class="fw-bolder mb-2 text-light">Helpful Links</h5>
                             <ul class="list-unstyled mb-3">
                                 <li class="mb-1"><a class="text-body-quaternary" href="#!" data-bs-theme="light">Blog</a></li>
@@ -470,7 +523,7 @@ a.text-primary:focus {
                     </div>
                     <!-- Support & Tools -->
                     <div class="col-6 col-sm-4 col-lg-3 mb-3">
-                        <div class="border-dashed border-start border-primary-light ps-3" style="--phoenix-border-opacity: .2;">
+                        <div class="border-dashed border-start border-primary-light ps-3 jm-border-opacity-20">
                             <h5 class="fw-bolder mb-2 text-light">Support & Tools</h5>
                             <ul class="list-unstyled mb-3">
                                 <li class="mb-1"><a class="text-body-quaternary" href="#!" data-bs-theme="light">How support works</a></li>

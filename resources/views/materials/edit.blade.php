@@ -4,8 +4,8 @@
 <div class="container py-5">
     <div class="row mb-5 text-center">
         <div class="col-12">
-            <h2 class="display-6 fw-bold" style="color:#027333;">Edit Material</h2>
-            <p class="text-muted">Update the material details and supplier information below.</p>
+            <h2 class="jm-page-title">{{ __('Edit Material Record') }}</h2>
+            <p class="jm-page-subtitle">{{ __('Update delivered quantity, pricing, and supplier details.') }}</p>
         </div>
     </div>
 
@@ -66,7 +66,7 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                <button type="button" class="btn text-white" style="background-color: #027333;" data-bs-toggle="modal" data-bs-target="#addSupplierModal">Add Supplier</button>
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addSupplierModal">Add Supplier</button>
                             </div>
                         </div>
 
@@ -85,8 +85,8 @@
 
                         {{-- Submit Button --}}
                         <div class="d-flex justify-content-center">
-                            <button type="submit" class="btn w-50 py-2 text-white" style="background-color:#027333;">
-                                Update Material
+                            <button type="submit" class="btn btn-success w-50 py-2">
+                                {{ __('Save Changes') }}
                             </button>
                         </div>
 
@@ -105,7 +105,7 @@
 <div class="modal fade" id="addSupplierModal" tabindex="-1" aria-labelledby="addSupplierModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow">
-      <div class="modal-header" style="background-color:#027333;">
+      <div class="modal-header bg-success text-white">
         <h5 class="modal-title text-white" id="addSupplierModalLabel">Add New Supplier</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -121,7 +121,7 @@
       </div>
       <div class="modal-footer border-0 d-flex justify-content-between px-4 pb-4">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" id="saveNewSupplier" class="btn text-white" style="background-color:#027333;">Save Supplier</button>
+        <button type="button" id="saveNewSupplier" class="btn btn-success">Save Supplier</button>
       </div>
     </div>
   </div>

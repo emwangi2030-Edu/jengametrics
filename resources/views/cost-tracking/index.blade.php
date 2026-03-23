@@ -2,13 +2,15 @@
 
 @section('content')
 <div class="container py-4">
-
-    <h2 class="font-weight-bold mb-3" style="color:#027333">
-        Costs: <span class="text-black">{{ $project->name }}</spanclass>
-    </h2>
+    <div class="jm-page-header">
+        <div>
+            <h2 class="jm-page-title">{{ __('Costs:') }} <span class="text-dark">{{ $project->name }}</span></h2>
+            <p class="jm-page-subtitle mb-0">{{ __('Material and labour spend overview.') }}</p>
+        </div>
+    </div>
     
     <div class="card shadow">
-        <h3 class="mt-3 mx-3" style="color:#027333">Material Costs</h3>
+        <h3 class="jm-section-title mt-3 mx-3">{{ __('Material Costs') }}</h3>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table text-center align-middle">
@@ -42,7 +44,7 @@
     </div>
 
     <div class="card shadow mt-4">
-        <h3 class="mt-3 mx-3" style="color:#027333">Labour Costs</h3>
+        <h3 class="jm-section-title mt-3 mx-3">{{ __('Labour Costs') }}</h3>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table text-center align-middle">

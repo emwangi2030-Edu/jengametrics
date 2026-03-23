@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex align-items-center justify-content-between my-4">
-        <h1 class="mb-0" style="color:#027333">Admin Dashboard</h1>
+        <h1 class="jm-page-title mb-0">{{ __('Admin Dashboard') }}</h1>
     </div>
 
     <div class="card shadow-sm border-0">

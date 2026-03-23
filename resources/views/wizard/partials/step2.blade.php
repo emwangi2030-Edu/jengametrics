@@ -1,6 +1,7 @@
-<h4 class="text-center mb-4">{{ __('Step 2: Confirm and Submit') }}</h4>
+<h4 class="text-center wizard-form-title">{{ __('Confirm Project') }}</h4>
+<p class="text-center text-muted mb-4">Review details below, then complete project creation.</p>
 
-<form action="{{ route('wizard.complete') }}" method="POST">
+<form action="{{ route('wizard.complete') }}" method="POST" class="wizard-step-form">
     @csrf
     @php
         $wizardProject = $wizardProject ?? [];
@@ -20,7 +21,7 @@
     @endphp
 
     <div class="mb-3">
-        <label for="project_uid" class="form-label">{{ __('Project ID:') }}</label>
+        <label for="project_uid" class="form-label wizard-input-label">{{ __('Project ID:') }}</label>
         <input type="text" id="project_uid" name="project_uid" class="form-control" value="{{ $projectUid }}" required maxlength="100" readonly>
         @error('project_uid')
             <div class="text-danger mt-1">{{ $message }}</div>
@@ -28,7 +29,7 @@
     </div>
 
     <div class="mb-3">
-        <label for="name" class="form-label">{{ __('Project Name:') }}</label>
+        <label for="name" class="form-label wizard-input-label">{{ __('Project Name:') }}</label>
         <input type="text" id="name" name="name" class="form-control" value="{{ $projectName }}" readonly>
         @error('name')
             <div class="text-danger mt-1">{{ $message }}</div>
@@ -36,7 +37,7 @@
     </div>
 
     <div class="mb-3">
-        <label for="description" class="form-label">{{ __('Project Description:') }}</label>
+        <label for="description" class="form-label wizard-input-label">{{ __('Project Description:') }}</label>
         <textarea id="description" name="description" class="form-control" rows="3" readonly>{{ $projectDescription }}</textarea>
         @error('description')
             <div class="text-danger mt-1">{{ $message }}</div>
@@ -44,7 +45,7 @@
     </div>
 
     <div class="mb-3">
-        <label for="project_duration" class="form-label">{{ __('Project Duration (Weeks):') }}</label>
+        <label for="project_duration" class="form-label wizard-input-label">{{ __('Project Duration (Weeks):') }}</label>
         <input type="text" id="project_duration" name="project_duration" class="form-control" value="{{ $projectDuration }}" readonly>
         @error('project_duration')
             <div class="text-danger mt-1">{{ $message }}</div>
@@ -52,7 +53,7 @@
     </div>
 
     <div class="mb-3">
-        <label for="address" class="form-label">{{ __('Project Address:') }}</label>
+        <label for="address" class="form-label wizard-input-label">{{ __('Project Address:') }}</label>
         <input type="text" id="address" name="address" class="form-control" value="{{ $projectAddress }}" readonly>
         @error('address')
             <div class="text-danger mt-1">{{ $message }}</div>
@@ -60,7 +61,7 @@
     </div>
 
     <div class="mb-3">
-        <label for="budget" class="form-label">{{ __('Budget:') }}</label>
+        <label for="budget" class="form-label wizard-input-label">{{ __('Budget:') }}</label>
         <input type="text" id="budget_display" class="form-control" value="{{ $projectBudgetDisplay }}" readonly>
         <input type="hidden" id="budget" name="budget" value="{{ $projectBudgetNormalized }}">
         @error('budget')
@@ -69,9 +70,9 @@
     </div>
 
     <div class="d-flex justify-content-between">
-        <a href="{{ route('wizard', ['step' => 1]) }}" class="btn btn-warning">
+        <a href="{{ route('wizard', ['step' => 1]) }}" class="btn btn-warning wizard-primary-btn">
             {{ __('Edit') }}
         </a>
-        <button type="submit" class="btn btn-success">{{ __('Complete') }}</button>
+        <button type="submit" class="btn btn-success wizard-primary-btn">{{ __('Complete') }}</button>
     </div>
 </form>
