@@ -1,7 +1,7 @@
 <input type="hidden" name="date" value="{{ $date }}">
 
 <div class="table-responsive">
-    <table class="table mt-3">
+    <table class="table align-middle mb-0">
         <thead class="table-light">
             <tr>
                 <th>#</th>

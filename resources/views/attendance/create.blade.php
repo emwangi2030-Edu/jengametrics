@@ -5,12 +5,13 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="card shadow-sm mt-4">
-        <div class="card-body">
-            <h2 class="jm-page-title mb-4">{{ __('Daily Attendance') }}</h2>
+    <div class="container py-4">
+        <div class="card jm-ui-card shadow-sm border-0">
+            <div class="card-body">
+                <h2 class="jm-page-title jm-ui-title mb-4">{{ __('Daily Attendance') }}</h2>
 
             {{-- Navigation --}}
-            <div class="mb-3 d-flex align-items-center">
+            <div class="mb-3 d-flex align-items-center jm-ui-surface p-3 rounded-3">
                 <button type="button" id="prevBtn" class="btn btn-outline-secondary me-2">&laquo;</button>
 
                 <input type="date" id="datePicker" class="form-control w-auto me-2"
@@ -24,7 +25,7 @@
             <form method="POST" action="{{ route('attendance.store') }}">
                 @csrf
 
-                <div id="attendance-container">
+                <div id="attendance-container" class="jm-ui-table-wrap">
                     @include('attendance.partials.table', [
                         'workers' => $workers,
                         'date' => $date,
@@ -44,6 +45,7 @@
                     </div>
                 </div>
             </form>
+            </div>
         </div>
     </div>
 @endsection

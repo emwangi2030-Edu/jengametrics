@@ -4,14 +4,14 @@
 <div class="container py-5">
     <div class="row mb-5 text-center">
         <div class="col-12">
-            <h2 class="jm-page-title display-6 fw-bold">{{ __('Add Item to :level', ['level' => $bqLevel->name]) }}</h2>
-            <p class="text-muted">{{ __('Select a section, element, and item to include in this level, or add a manual item.') }}</p>
+            <h2 class="jm-page-title jm-ui-title display-6 fw-bold">{{ __('Add Item to :level', ['level' => $bqLevel->name]) }}</h2>
+            <p class="jm-ui-muted">{{ __('Select a section, element, and item to include in this level, or add a manual item.') }}</p>
         </div>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-sm border-0 rounded">
+            <div class="card jm-ui-card shadow-sm border-0 rounded">
                 <div class="card-body p-5">
                     <form id="bq-section-form" method="POST" action="{{ route('bq_levels.items.store', [$bqDocument, $bqLevel]) }}">
                         @csrf
@@ -55,7 +55,7 @@
                         </div>
 
                         {{-- Manual item materials --}}
-                        <div class="manual-only d-none mb-4">
+                        <div class="manual-only d-none mb-4 jm-ui-surface p-3">
                             <label class="form-label fw-semibold">{{ __('Manual item materials') }}</label>
                             <div id="manual-materials" class="d-flex flex-column gap-3">
                                 <div class="row g-3 align-items-end manual-material-row" data-index="0">
@@ -162,7 +162,7 @@
                     </form>
                     <br>
                     <div class="d-flex justify-content-center">
-                        <a href="{{ route('bq_levels.show', [$bqDocument, $bqLevel]) }}" class="btn btn-dark" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
+                        <a href="{{ route('bq_levels.show', [$bqDocument, $bqLevel]) }}" class="btn btn-outline-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                     </div>
 
                     <!-- Confirm Save Modal -->

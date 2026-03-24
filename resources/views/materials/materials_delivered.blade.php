@@ -7,8 +7,8 @@
 <div class="container py-4 {{ $canManageMaterials ? '' : 'materials-readonly' }}">
     <div class="jm-page-header">
         <div>
-            <h2 class="jm-page-title">{{ __('Material Deliveries') }}</h2>
-            <p class="jm-page-subtitle mb-0">{{ __('Review deliveries against requisitions and monitor supplier performance.') }}</p>
+            <h2 class="jm-page-title jm-ui-title">{{ __('Material Deliveries') }}</h2>
+            <p class="jm-page-subtitle jm-ui-muted mb-0">{{ __('Review deliveries against requisitions and monitor supplier performance.') }}</p>
         </div>
         <div class="jm-actions-bar">
         <div>
@@ -27,8 +27,8 @@
 <div class="row justify-content-center">
     <div class="col-md-12">
         <h3 class="jm-section-title">{{ __('Delivered Materials') }}</h3>
-        <div class="card shadow-sm">
-            <form method="GET" action="{{ route('materials.delivered') }}" class="row g-2 mt-2 justify-content-center" id="materials-delivered-filters">
+        <div class="card jm-ui-card shadow-sm border-0">
+            <form method="GET" action="{{ route('materials.delivered') }}" class="row g-2 mt-2 justify-content-center jm-ui-surface mx-3 p-3" id="materials-delivered-filters">
                 <div class="col-md-3">
                     <select name="filter" class="form-select">
                         <option value="">All Time</option>

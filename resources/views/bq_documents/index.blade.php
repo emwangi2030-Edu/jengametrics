@@ -10,7 +10,7 @@
         <div class="col-lg-10">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
                 <div>
-                    <h2 class="fw-bold mb-1">
+                    <h2 class="fw-bold mb-1 jm-ui-title">
                         {{ __('Bill of Quantities for') }} {{ $project->name }}
                     </h2>
                     <p class="text-muted mb-0">{{ __('Master document aggregates all BoQs for requisitions and reporting.') }}</p>
@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0 mb-4">
+            <div class="card shadow-sm border-0 jm-ui-card mb-4">
                 <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                     <div>
                         <h5 class="fw-bold text-secondary mb-1">{{ $masterDocument->title }}</h5>
@@ -43,12 +43,12 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm border-0 jm-ui-card">
                 <div class="card-body">
                     @if($subDocuments->isEmpty())
                         <p class="text-muted">{{ __('No BoQs created yet.') }}</p>
                     @else
-                        <div class="table-responsive">
+                        <div class="table-responsive jm-ui-table-wrap">
                             <table class="table align-middle">
                                 <thead class="table-light">
                                     <tr>
@@ -164,16 +164,16 @@
         </div>
     @endforeach
 
-            <div class="card shadow-sm border-0 mt-4">
+            <div class="card shadow-sm border-0 jm-ui-card mt-4">
                 <div class="card-body">
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
-                        <h5 class="fw-bold mb-0">{{ __('Libraries') }}</h5>
+                        <h5 class="fw-bold mb-0 jm-ui-title">{{ __('Libraries') }}</h5>
                     </div>
 
                     @if($libraries->isEmpty())
                         <p class="text-muted mb-0">{{ __('No libraries created yet. Use the button above to create one.') }}</p>
                     @else
-                        <div class="table-responsive">
+                        <div class="table-responsive jm-ui-table-wrap">
                             <table class="table align-middle">
                                 <thead class="table-light">
                                     <tr>

@@ -4,8 +4,8 @@
 <div class="container py-4">
     <div class="jm-page-header">
         <div>
-            <h2 class="jm-page-title">{{ __('Progress Certificates:') }} {{ $project->name }}</h2>
-            <p class="jm-page-subtitle mb-0">{{ __('Create and track billing certificates by period.') }}</p>
+            <h2 class="jm-page-title jm-ui-title">{{ __('Progress Certificates:') }} <span class="jm-ui-muted">{{ $project->name }}</span></h2>
+            <p class="jm-page-subtitle jm-ui-muted mb-0">{{ __('Create and track billing certificates by period.') }}</p>
         </div>
         <a href="{{ route('progress_certificates.create') }}" class="btn btn-primary">
             {{ __('New Certificate') }}
@@ -37,7 +37,7 @@
         </div>
     @endif
 
-    <div class="card shadow-sm">
+    <div class="card jm-ui-card shadow-sm border-0">
         <div class="card-body p-0">
             @if ($certificates->isEmpty())
                 <div class="p-5 text-center">
@@ -48,7 +48,7 @@
                     </a>
                 </div>
             @else
-                <div class="table-responsive">
+                <div class="table-responsive jm-ui-table-wrap">
                     <table class="table table-hover align-middle mb-0">
                         <thead>
                             <tr>

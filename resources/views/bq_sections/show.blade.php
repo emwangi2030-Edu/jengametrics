@@ -8,10 +8,10 @@
         <div class="row mb-4">
             <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                 <div>
-                    <h2 class="jm-page-title">
+                    <h2 class="jm-page-title jm-ui-title">
                         {{ $bqLevel->name }}
                     </h2>
-                    <p class="text-muted mb-0">{{ $bqDocument->title }}</p>
+                    <p class="jm-ui-muted mb-0">{{ $bqDocument->title }}</p>
                 </div>
                 <div class="mt-3 mt-md-0">
                     <a href="{{ route('bq_levels.items.create', [$bqDocument, $bqLevel]) }}" class="btn btn-success">
@@ -24,9 +24,9 @@
 
         <div class="row justify-content-center">
             <div class="col-md-11">
-                <div class="card shadow-sm border-0">
+                <div class="card jm-ui-card shadow-sm border-0">
                     <div class="card-body">
-                        <h3 class="text-lg font-weight-bold mb-3">{{ __('Items') }}</h3>
+                        <h3 class="jm-section-title mb-3">{{ __('Items') }}</h3>
                         <form method="GET" id="bq-items-filter" class="row g-3 align-items-end mb-3">
                             <div class="col-md-6 col-lg-4">
                                 <label for="section-filter" class="form-label mb-1">{{ __('Section') }}</label>

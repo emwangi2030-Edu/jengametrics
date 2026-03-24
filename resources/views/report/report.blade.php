@@ -5,17 +5,16 @@
     <!-- Header -->
     <div class="jm-page-header">
         <div>
-            <h2 class="jm-page-title">{{ __('Project Cost Summary:') }} <span class="text-dark">{{ $project->name }}</span></h2>
-            <p class="jm-page-subtitle mb-0">{{ __('Compare estimated and actual material/labour costs.') }}</p>
+            <h2 class="jm-page-title jm-ui-title">{{ __('Project Cost Summary:') }} <span class="jm-ui-muted">{{ $project->name }}</span></h2>
+            <p class="jm-page-subtitle jm-ui-muted mb-0">{{ __('Compare estimated and actual material/labour costs.') }}</p>
         </div>
-            <div class="jm-actions-bar">
-                <a href="{{ route('reports.purchases') }}" class="btn btn-outline-primary btn-sm">
-                    {{ __('Purchases Report') }}
-                </a>
-                <a href="{{ route('reports.wages') }}" class="btn btn-outline-primary btn-sm">
-                    {{ __('Wages Report') }}
-                </a>
-            </div>
+        <div class="jm-actions-bar">
+            <a href="{{ route('reports.purchases') }}" class="btn btn-outline-primary btn-sm">
+                {{ __('Purchases Report') }}
+            </a>
+            <a href="{{ route('reports.wages') }}" class="btn btn-outline-primary btn-sm">
+                {{ __('Wages Report') }}
+            </a>
         </div>
     </div>
 
@@ -23,20 +22,20 @@
     <div class="row">
         <!-- Summary Cards -->
         <div class="col-md-6 mb-4">
-            <div class="card shadow">
+            <div class="card jm-ui-card shadow-sm border-0">
                 <div class="card-body text-center">
                     <h4 class="jm-section-title">{{ __('Total Estimated Cost') }}</h4>
-                    <h2 class="text-dark">
+                    <h2 class="jm-ui-title mb-0">
                         {{ number_format(($totalEstimatedCost ?? 0) + ($totalEstimatedCost_labour ?? 0), 2) }}
                     </h2>
                 </div>
             </div>
         </div>
         <div class="col-md-6 mb-4">
-            <div class="card shadow">
+            <div class="card jm-ui-card shadow-sm border-0">
                 <div class="card-body text-center">
                     <h4 class="jm-section-title">{{ __('Total Actual Cost') }}</h4>
-                    <h2 class="text-dark">
+                    <h2 class="jm-ui-title mb-0">
                         {{ number_format(($total_actual_cost ?? 0) + ($total_actual_payments ?? 0), 2) }}
                     </h2>
                 </div>
@@ -47,7 +46,7 @@
     <!-- Graph Section -->
     <div class="row">
         <div class="col-md-6">
-            <div class="card shadow">
+            <div class="card jm-ui-card shadow-sm border-0">
                 <div class="card-body">
                     <h5 class="jm-section-title">{{ __('Estimated Cost Breakdown') }}</h5>
                     <canvas id="estimatedCostChart"></canvas>
@@ -55,7 +54,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card shadow">
+            <div class="card jm-ui-card shadow-sm border-0">
                 <div class="card-body">
                     <h5 class="jm-section-title">{{ __('Actual Cost Breakdown') }}</h5>
                     <canvas id="actualCostChart"></canvas>
@@ -68,54 +67,58 @@
     <div class="row mt-4">
         <!-- Estimated Cost Table -->
         <div class="col-md-6">
-            <div class="card shadow">
+            <div class="card jm-ui-card shadow-sm border-0">
                 <div class="card-body">
                     <h5 class="jm-section-title">{{ __('Estimated Cost Details') }}</h5>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>{{ __('Description') }}</th>
-                                <th>{{ __('Amount') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{{ __('Materials') }}</td>
-                                <td>{{ number_format($totalEstimatedCost ?? 0, 2) }}</td>
-                            </tr>
-                            <tr>
-                                <td>{{ __('Labour') }}</td>
-                                <td>{{ number_format($totalEstimatedCost_labour ?? 0, 2) }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="jm-ui-table-wrap">
+                        <table class="table table-bordered align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>{{ __('Description') }}</th>
+                                    <th>{{ __('Amount') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ __('Materials') }}</td>
+                                    <td>{{ number_format($totalEstimatedCost ?? 0, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Labour') }}</td>
+                                    <td>{{ number_format($totalEstimatedCost_labour ?? 0, 2) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Actual Cost Table -->
         <div class="col-md-6">
-            <div class="card shadow">
+            <div class="card jm-ui-card shadow-sm border-0">
                 <div class="card-body">
                     <h5 class="jm-section-title">{{ __('Actual Cost Details') }}</h5>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>{{ __('Description') }}</th>
-                                <th>{{ __('Amount') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{{ __('Materials') }}</td>
-                                <td>{{ number_format($total_actual_cost ?? 0, 2) }}</td>
-                            </tr>
-                            <tr>
-                                <td>{{ __('Labour') }}</td>
-                                <td>{{ number_format($total_actual_payments, 2) }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="jm-ui-table-wrap">
+                        <table class="table table-bordered align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>{{ __('Description') }}</th>
+                                    <th>{{ __('Amount') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ __('Materials') }}</td>
+                                    <td>{{ number_format($total_actual_cost ?? 0, 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ __('Labour') }}</td>
+                                    <td>{{ number_format($total_actual_payments, 2) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

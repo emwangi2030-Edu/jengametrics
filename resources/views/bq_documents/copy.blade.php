@@ -6,10 +6,10 @@
             <div class="col-lg-10">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
                     <div>
-                        <h2 class="jm-page-title mb-1">
+                        <h2 class="jm-page-title jm-ui-title mb-1">
                             {{ __('Copy BoQ') }}
                         </h2>
-                        <p class="text-muted mb-0">
+                        <p class="jm-ui-muted mb-0">
                             {{ __('Copy items from ":title" into a new BoQ.', ['title' => $sourceDocument->title]) }}
                         </p>
                     </div>
@@ -20,7 +20,7 @@
 
                 <form method="POST" action="{{ route('bq_documents.copy.store', $sourceDocument) }}">
                     @csrf
-                    <div class="card shadow-sm border-0 mb-4">
+                    <div class="card jm-ui-card shadow-sm border-0 mb-4">
                         <div class="card-body">
                             <h5 class="fw-bold mb-3">{{ __('New BoQ Details') }}</h5>
 
@@ -54,7 +54,7 @@
                         </div>
                     </div>
 
-                    <div class="card shadow-sm border-0 mb-4">
+                    <div class="card jm-ui-card shadow-sm border-0 mb-4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between flex-column flex-md-row align-items-md-center mb-3">
                             <h5 class="fw-bold mb-2 mb-md-0">{{ __('Select Items to Copy') }}</h5>
@@ -81,8 +81,8 @@
                                         </span>
                                     </div>
 
-                                    <div class="table-responsive">
-                                        <table class="table table-sm align-middle">
+                                    <div class="table-responsive jm-ui-table-wrap">
+                                        <table class="table table-sm align-middle mb-0">
                                             <thead class="table-light">
                                                 <tr>
                                                     <th class="jm-col-select">

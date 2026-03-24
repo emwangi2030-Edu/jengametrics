@@ -30,20 +30,20 @@
         <div class="col-lg-10">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
                 <div>
-                    <h2 class="jm-page-title">{{ __('Add Users') }}</h2>
-                    <p class="text-muted mb-0">{{ __('Add and manage users linked to your account.') }}</p>
+                    <h2 class="jm-page-title jm-ui-title">{{ __('Add Users') }}</h2>
+                    <p class="jm-ui-muted mb-0">{{ __('Add and manage users linked to your account.') }}</p>
                 </div>
                 <button type="button" class="btn btn-success mt-3 mt-md-0" data-bs-toggle="modal" data-bs-target="#createSubAccountModal">
                     {{ __('Add User') }}
                 </button>
             </div>
 
-            <div class="card shadow-sm border-0">
+            <div class="card jm-ui-card shadow-sm border-0">
                 <div class="card-body">
                     @if($subAccounts->isEmpty())
                         <p class="text-muted mb-0">{{ __('No users added yet.') }}</p>
                     @else
-                        <div class="table-responsive">
+                        <div class="table-responsive jm-ui-table-wrap">
                             <table class="table align-middle">
                                 <thead class="table-light">
                                     <tr>

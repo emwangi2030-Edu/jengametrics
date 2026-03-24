@@ -7,7 +7,7 @@
 <div class="container py-4 {{ $canManageLabour ? '' : 'labour-readonly' }}">
     <div class="jm-page-header mb-2">
         <div>
-            <h2 class="jm-page-title">{{ __('Manage Labour:') }} <span class="text-dark">{{ $project->name }}</span></h2>
+            <h2 class="jm-page-title jm-ui-title">{{ __('Manage Labour:') }} <span class="jm-ui-muted">{{ $project->name }}</span></h2>
             <p class="jm-page-subtitle mb-0">{{ __('Workers, attendance, and labour assignments.') }}</p>
         </div>
             <div class="jm-actions-bar">
@@ -25,7 +25,7 @@
 
     <div class="d-flex justify-content-center">
         <div class="col-md-12">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm jm-ui-card">
                 <div class="card-body">
                     <form method="GET" class="row g-3 align-items-end mb-3" id="statusFilterForm">
                         <div class="col-md-4 col-lg-3">

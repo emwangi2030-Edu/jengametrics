@@ -18,7 +18,12 @@
 
 .jm-theme.jm-app-shell-page .content > .container,
 .jm-theme.jm-app-shell-page .content > .container-fluid {
-    max-width: 1280px;
+    max-width: 100% !important;
+    width: 100%;
+}
+
+.jm-theme.jm-app-shell-page .content .container {
+    max-width: 100% !important;
 }
 
 .jm-theme.jm-app-shell-page .content h1,

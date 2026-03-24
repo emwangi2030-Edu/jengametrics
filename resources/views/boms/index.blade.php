@@ -4,15 +4,15 @@
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="fw-bold mb-0">
-                {{ __('Bill of Materials:') }} <span class="text-dark">{{ $project->name }}</span>
+            <h2 class="fw-bold mb-0 jm-ui-title">
+                {{ __('Bill of Materials:') }} <span class="jm-ui-muted">{{ $project->name }}</span>
             </h2>
         </div>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-md-10">
-            <div class="card shadow-sm border-0 mb-4">
+            <div class="card shadow-sm border-0 jm-ui-card mb-4">
                 <div class="card-body">
                     <div class="text-end">
                         <p class="fw-bold text-dark mb-0">{{ __('Total') }}: KES {{ number_format($subDocuments->sum(fn($doc) => $doc->combined_total), 2) }}</p>
@@ -20,7 +20,7 @@
                     @if($subDocuments->isEmpty())
                         <p class="text-muted mb-0">{{ __('No BoQs available yet.') }}</p>
                     @else
-                        <div class="table-responsive">
+                        <div class="table-responsive jm-ui-table-wrap">
                             <table class="table align-middle">
                                 <thead class="table-light">
                                     <tr>
@@ -52,7 +52,7 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm border-0 jm-ui-card">
                 <div class="card-body">
                     <!-- Document Details -->
                     <div class="mt-4">
@@ -82,7 +82,7 @@
                             @if($sectionsWithTotals->isEmpty())
                                 <p class="text-muted">{{ __('No sections found.') }}</p>
                             @else
-                                <div class="table-responsive mt-3">
+                                <div class="table-responsive mt-3 jm-ui-table-wrap">
                                     <table class="table table-sm table-hover align-middle">
                                         <thead class="table-light">
                                             <tr>
@@ -109,7 +109,7 @@
                                     </table>
                                 </div>
                             @endif
-                            <div class="bg-secondary bg-opacity-10 text-black border-0 rounded p-3">
+                            <div class="jm-ui-surface p-3">
                                 <table class="table table-borderless">
                                     <thead class="p-0 m-0">
                                         <tr class="p-0 m-0">

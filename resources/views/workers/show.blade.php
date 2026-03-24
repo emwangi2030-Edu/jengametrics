@@ -19,17 +19,17 @@
 <div class="container py-4" data-turbo-cache-control="no-cache">
     <div class="jm-page-header">
     <div>
-        <h2 class="jm-page-title">{{ __('Worker Profile') }}</h2>
-        <p class="jm-page-subtitle mb-0">{{ __('Attendance, payments, and worker details in one view.') }}</p>
+        <h2 class="jm-page-title jm-ui-title">{{ __('Worker Profile') }}</h2>
+        <p class="jm-page-subtitle jm-ui-muted mb-0">{{ __('Attendance, payments, and worker details in one view.') }}</p>
     </div>
 </div>
 
     <div class="row">
         <div class="col-md-6">
-            <div class="card shadow-sm mb-3">
+            <div class="card jm-ui-card shadow-sm border-0 mb-3">
                 <div class="d-flex flex-column flex-md-row align-items-stretch">
                     <div class="card-body flex-grow-1">
-                        <h4 class="text-dark">{{ $worker->full_name }}</h4>
+                        <h4 class="jm-ui-title">{{ $worker->full_name }}</h4>
                         <p><strong>ID Number:</strong> {{ $worker->id_number }}</p>
                         <p><strong>Job Category:</strong> {{ $worker->job_category }}</p>
                         <p><strong>Work Type:</strong> {{ $worker->work_type }}</p>
@@ -72,7 +72,7 @@
                                 {{ __('Record Payment') }}
                             </button>
                         </form>
-                        <a href="{{ route('workers.index') }}" class="btn btn-secondary mt-3" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
+                        <a href="{{ route('workers.index') }}" class="btn btn-outline-secondary mt-3" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                     </div>
                     <div class="p-3 border-top border-md-top-0 border-md-start d-flex align-items-start justify-content-center jm-worker-photo-pane">
                         <img
@@ -85,7 +85,7 @@
         </div>
 
         <div class="col-md-6">
-            <div class="card shadow-sm mb-3">
+            <div class="card jm-ui-card shadow-sm border-0 mb-3">
                 <div class="card-body">
                     <h4 class="jm-section-title">{{ __('Attendance Overview') }}</h4>
 

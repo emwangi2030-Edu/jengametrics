@@ -4,12 +4,12 @@
 <div class="container py-4">
     <div class="jm-page-header">
         <div>
-            <h2 class="jm-page-title">{{ __('Edit Progress Certificate') }}</h2>
-            <p class="jm-page-subtitle mb-0">{{ __('Project: :project · Period: :start - :end', ['project' => $project->name, 'start' => $progressCertificate->period_start->format('d M Y'), 'end' => $progressCertificate->period_end->format('d M Y')]) }}</p>
+            <h2 class="jm-page-title jm-ui-title">{{ __('Edit Progress Certificate') }}</h2>
+            <p class="jm-page-subtitle jm-ui-muted mb-0">{{ __('Project: :project - Period: :start - :end', ['project' => $project->name, 'start' => $progressCertificate->period_start->format('d M Y'), 'end' => $progressCertificate->period_end->format('d M Y')]) }}</p>
         </div>
     </div>
 
-    <div class="card shadow-sm w-100 jm-form-wrap-sm">
+    <div class="card jm-ui-card shadow-sm border-0 w-100 jm-form-wrap-sm">
         <div class="card-body p-4">
             @if ($errors->any())
                 <div class="alert alert-danger">
@@ -63,3 +63,5 @@
     </div>
 </div>
 @endsection
+
+

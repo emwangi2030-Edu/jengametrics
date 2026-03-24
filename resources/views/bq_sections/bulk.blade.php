@@ -4,14 +4,14 @@
 <div class="container py-5">
     <div class="row mb-4 text-center">
         <div class="col-12">
-            <h2 class="jm-page-title display-6 fw-bold">{{ __('Bulk Add BoQ Items') }}</h2>
-            <p class="text-muted">Add multiple items to a section. Use the quick-add modal on the section page for single items.</p>
+            <h2 class="jm-page-title jm-ui-title display-6 fw-bold">{{ __('Bulk Add BoQ Items') }}</h2>
+            <p class="jm-ui-muted">Add multiple items to a section. Use the quick-add modal on the section page for single items.</p>
         </div>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-lg-10">
-            <div class="card shadow-sm border-0 rounded">
+            <div class="card jm-ui-card shadow-sm border-0 rounded">
                 <div class="card-body p-4">
                     <form method="POST" action="{{ route('bq_sections.store_bulk') }}">
                         @csrf
@@ -40,8 +40,8 @@
                             </div>
                         @endif
 
-                        <div class="table-responsive">
-                            <table class="table table-sm table-hover align-middle" id="bulkTable">
+                        <div class="table-responsive jm-ui-table-wrap">
+                            <table class="table table-sm table-hover align-middle mb-0" id="bulkTable">
                                 <thead class="table-light">
                                     <tr>
                                         <th>{{ __('Element') }}</th>
@@ -62,14 +62,14 @@
                     </form>
 
                     <div class="d-flex justify-content-center mt-3">
-                        <a href="{{ route('boq') }}" class="btn btn-dark" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
+                        <a href="{{ route('boq') }}" class="btn btn-outline-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                     </div>
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0 rounded mt-4">
+            <div class="card jm-ui-card shadow-sm border-0 rounded mt-4">
                 <div class="card-body p-4">
-                    <h5 class="mb-3">{{ __('Import from CSV') }}</h5>
+                    <h5 class="jm-section-title mb-3">{{ __('Import from CSV') }}</h5>
                     <p class="text-muted small mb-2">{{ __('Accepted columns (header optional): element_id,item_id,rate,quantity') }}</p>
                     <form method="POST" action="{{ route('bq_sections.import_csv') }}" enctype="multipart/form-data" class="row g-3 align-items-end">
                         @csrf

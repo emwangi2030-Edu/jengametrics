@@ -13,14 +13,14 @@
     @endif
     <div class="row mb-5 text-center">
         <div class="col-12">
-            <h2 class="jm-page-title">{{ __('Receive Approved Materials') }}</h2>
-            <p class="jm-page-subtitle">{{ __('Capture delivered quantities, pricing, and supplier records.') }}</p>
+            <h2 class="jm-page-title jm-ui-title">{{ __('Receive Approved Materials') }}</h2>
+            <p class="jm-page-subtitle jm-ui-muted">{{ __('Capture delivered quantities, pricing, and supplier records.') }}</p>
         </div>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow-sm border-0 rounded">
+            <div class="card jm-ui-card shadow-sm border-0 rounded">
                 <div class="card-body p-5">
                     <form action="{{ route('materials.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -119,7 +119,7 @@
 
                         {{-- Back Button --}}
                         <div class="d-flex justify-content-center mt-3">
-                            <a href="{{ route('materials.delivered') }}" class="btn btn-dark" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
+                            <a href="{{ route('materials.delivered') }}" class="btn btn-outline-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                         </div>
                     </form>
                 </div>
@@ -312,4 +312,3 @@
     });
 </script>
 @endpush
-

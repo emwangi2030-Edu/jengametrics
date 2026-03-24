@@ -4,12 +4,12 @@
     <div class="container py-4">
         <div class="jm-page-header">
             <div>
-                <h2 class="jm-page-title">{{ __('Add Worker') }}</h2>
-                <p class="jm-page-subtitle mb-0">{{ __('Capture worker details, payment terms, and contact information.') }}</p>
+                <h2 class="jm-page-title jm-ui-title">{{ __('Add Worker') }}</h2>
+                <p class="jm-page-subtitle jm-ui-muted mb-0">{{ __('Capture worker details, payment terms, and contact information.') }}</p>
             </div>
         </div>
 
-        <div class="card shadow-sm w-75 m-auto">
+        <div class="card jm-ui-card shadow-sm border-0 w-75 m-auto">
             <div class="card-body">
                 @if ($errors->any())
                     <div class="alert alert-danger">
@@ -111,7 +111,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route('workers.index') }}" class="btn btn-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
+                        <a href="{{ route('workers.index') }}" class="btn btn-outline-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                         <button type="submit" class="btn btn-primary">{{ __('Save Worker') }}</button>
                     </div>
                 </form>

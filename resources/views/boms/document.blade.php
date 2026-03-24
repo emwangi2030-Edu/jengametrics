@@ -5,8 +5,8 @@
     <div class="row mb-4">
         <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
             <div>
-                <h2 class="jm-page-title">{{ $document->title }}</h2>
-                <p class="text-muted mb-0">{{ $document->description }}</p>
+                <h2 class="jm-page-title jm-ui-title">{{ $document->title }}</h2>
+                <p class="jm-ui-muted mb-0">{{ $document->description }}</p>
             </div>
             <div class="text-end mt-3 mt-md-0">
                 <p class="fs-4 fw-bold mb-1">KES {{ number_format($document->combined_total, 2) }}</p>
@@ -25,7 +25,7 @@
     <div class="row justify-content-center">
         <div class="col-md-10">
             @forelse($document->sections as $section)
-                <div class="card shadow-sm border-0 mb-4">
+                <div class="card jm-ui-card shadow-sm border-0 mb-4">
                     <div class="card-body">
                         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                             <div>
@@ -45,8 +45,8 @@
                                 {{ __('No materials are mapped to this BoQ item yet.') }}
                             </div>
                         @else
-                            <div class="table-responsive mt-3">
-                                <table class="table table-sm align-middle">
+                            <div class="table-responsive mt-3 jm-ui-table-wrap">
+                                <table class="table table-sm align-middle mb-0">
                                     <thead class="table-light">
                                         <tr>
                                             <th>{{ __('Material') }}</th>
@@ -74,7 +74,7 @@
                     </div>
                 </div>
             @empty
-                <div class="card shadow-sm border-0">
+                <div class="card jm-ui-card shadow-sm border-0">
                     <div class="card-body text-center py-5">
                         <p class="text-muted mb-0">{{ __('No BoQ items found for this document yet.') }}</p>
                     </div>

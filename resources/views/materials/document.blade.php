@@ -1,9 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1>Document Viewer</h1>
-    <div class="document-viewer">
+<div class="container py-4">
+    <div class="jm-page-header">
+        <div>
+            <h2 class="jm-page-title jm-ui-title">{{ __('Document Viewer') }}</h2>
+            <p class="jm-page-subtitle jm-ui-muted mb-0">{{ __('Preview uploaded material receipts and supporting files.') }}</p>
+        </div>
+        <a href="{{ route('materials.index') }}" class="btn btn-outline-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
+    </div>
+    <div class="card jm-ui-card shadow-sm border-0">
+        <div class="card-body">
         @if($documentUrl)
             @php
                 // Get the file extension to determine the type of document
@@ -23,7 +30,7 @@
         @else
             <p>No document available to display.</p>
         @endif
+        </div>
     </div>
-    <a href="{{ route('materials.index') }}" class="btn btn-primary mt-3" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
 </div>
 @endsection

@@ -4,8 +4,8 @@
 <div class="container py-4">
     <div class="jm-page-header">
         <div>
-            <h2 class="jm-page-title">{{ __('Labour Tasks Board') }}</h2>
-            <p class="jm-page-subtitle mb-0">{{ __('Create teams, assign work, and track progress with a Kanban view.') }}</p>
+            <h2 class="jm-page-title jm-ui-title">{{ __('Labour Tasks Board') }}</h2>
+            <p class="jm-page-subtitle jm-ui-muted mb-0">{{ __('Create teams, assign work, and track progress with a Kanban view.') }}</p>
         </div>
         <div class="jm-actions-bar">
             <a href="{{ route('workers.index') }}" class="btn btn-outline-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
@@ -20,7 +20,7 @@
 
     <div class="row g-4">
         <div class="col-12">
-            <div class="card shadow-sm border-0">
+            <div class="card jm-ui-card shadow-sm border-0">
                 <div class="card-header bg-white border-0 pb-0">
                     <h5 class="jm-section-title mb-0">{{ __('Teams') }}</h5>
                 </div>
@@ -44,7 +44,7 @@
         </div>
 
         <div class="col-lg-6">
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card jm-ui-card shadow-sm border-0 h-100">
                 <div class="card-header bg-white border-0 pb-0 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 text-warning">Pending Tasks</h5>
                     <span id="pendingTasksCount" class="badge bg-warning text-dark">{{ $pendingTasks->count() }}</span>
@@ -57,7 +57,7 @@
                                 : optional($task->worker)->full_name;
                             $sectionLabel = optional($task->section)->name;
                         @endphp
-                        <div id="task-card-{{ $task->id }}" class="card mb-3 border-start border-warning border-4 task-card"
+                        <div id="task-card-{{ $task->id }}" class="card jm-ui-surface mb-3 border-start border-warning border-4 task-card"
                              role="button"
                              data-bs-toggle="modal"
                              data-bs-target="#taskDetailsModal"
@@ -98,7 +98,7 @@
         </div>
 
         <div class="col-lg-6">
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card jm-ui-card shadow-sm border-0 h-100">
                 <div class="card-header bg-white border-0 pb-0 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 text-success">Completed Tasks</h5>
                     <span id="completedTasksCount" class="badge bg-success">{{ $completedTasks->count() }}</span>
@@ -111,7 +111,7 @@
                                 : optional($task->worker)->full_name;
                             $sectionLabel = optional($task->section)->name;
                         @endphp
-                        <div class="card mb-3 border-start border-success border-4">
+                        <div class="card jm-ui-surface mb-3 border-start border-success border-4">
                             <div class="card-body">
                                 <h6 class="mb-1 text-decoration-line-through">{{ $task->title }}</h6>
                                 <small class="text-muted d-block">Assigned to: {{ $assigneeLabel ?: 'N/A' }}</small>

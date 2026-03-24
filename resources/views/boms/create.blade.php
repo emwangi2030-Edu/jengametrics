@@ -1,25 +1,33 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1>Create New BOM</h1>
-
-    <form method="POST" action="{{ route('boms.store') }}">
-        @csrf
-
-        <!-- BOM Name -->
-        <div class="form-group mb-4">
-            <label for="bom_name" class="form-label">{{ __('BOM Name') }}</label>
-            <input type="text" name="bom_name" id="bom_name" class="form-control" placeholder="Enter BOM Name" required>
+<div class="container py-4">
+    <div class="jm-page-header">
+        <div>
+            <h2 class="jm-page-title jm-ui-title">Create New BOM</h2>
+            <p class="jm-page-subtitle jm-ui-muted mb-0">Set up materials and quantities for a new bill of materials.</p>
         </div>
+        <a href="{{ route('boms.index') }}" class="btn btn-outline-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
+    </div>
+
+    <div class="card jm-ui-card shadow-sm border-0">
+        <div class="card-body">
+            <form method="POST" action="{{ route('boms.store') }}">
+                @csrf
+
+            <!-- BOM Name -->
+            <div class="form-group mb-4">
+                <label for="bom_name" class="form-label">{{ __('BOM Name') }}</label>
+                <input type="text" name="bom_name" id="bom_name" class="form-control" placeholder="Enter BOM Name" required>
+            </div>
 
 
 
-        <!-- Items Container -->
-        <div id="items-container">
-            <div class="item-entry mb-4">
-                <label for="item_description" class="form-label">{{ __('Item Description') }}</label>
-                <input type="text" name="items[0][description]" class="form-control mb-2" placeholder="Enter Item Description" required>
+            <!-- Items Container -->
+            <div id="items-container">
+                <div class="item-entry mb-4 jm-ui-surface p-3">
+                    <label for="item_description" class="form-label">{{ __('Item Description') }}</label>
+                    <input type="text" name="items[0][description]" class="form-control mb-2" placeholder="Enter Item Description" required>
 
                 <div class="row">
                     <div class="col-md-3">
@@ -62,16 +70,17 @@
                         <input type="number" name="items[0][amount]" class="form-control mb-2 amount" placeholder="Amount" step="0.01" readonly>
                     </div>
                 </div>
+                </div>
             </div>
+
+            <!-- Add Item Button -->
+            <button type="button" id="add-item" class="btn btn-outline-secondary">{{ __('Add Item') }}</button>
+
+            <!-- Create BOM Button -->
+            <button type="submit" class="btn btn-primary">{{ __('Create BOM') }}</button>
+            </form>
         </div>
-
-        <!-- Add Item Button -->
-        <button type="button" id="add-item" class="btn btn-secondary">{{ __('Add Item') }}</button>
-
-        <!-- Create BOM Button -->
-        <button type="submit" class="btn btn-primary">{{ __('Create BOM') }}</button>
-        <a href="{{ route('boms.index') }}" class="btn btn-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
-    </form>
+    </div>
 </div>
 
 <script>
@@ -108,7 +117,7 @@
         const itemsContainer = document.getElementById('items-container');
         const itemIndex = itemsContainer.children.length;
         const newItem = `
-            <div class="item-entry mb-4">
+            <div class="item-entry mb-4 jm-ui-surface p-3">
                 <label for="item_description" class="form-label">{{ __('Item Description') }}</label>
                 <input type="text" name="items[${itemIndex}][description]" class="form-control mb-2" placeholder="Enter Item Description" required>
 

@@ -7,8 +7,8 @@
 <div class="container mt-4 {{ $canManageMaterials ? '' : 'materials-readonly' }}">
     <div class="jm-page-header">
         <div>
-            <h2 class="jm-page-title">{{ __('Material Requisitions') }}</h2>
-            <p class="jm-page-subtitle mb-0">{{ __('Track requests, approvals, and consumption by section.') }}</p>
+            <h2 class="jm-page-title jm-ui-title">{{ __('Material Requisitions') }}</h2>
+            <p class="jm-page-subtitle jm-ui-muted mb-0">{{ __('Track requests, approvals, and consumption by section.') }}</p>
         </div>
         <div class="jm-actions-bar">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#requisitionModal">
@@ -16,92 +16,96 @@
             </button>
         </div>
     </div>
-    <div class="card shadow-sm">
+    <div class="card jm-ui-card shadow-sm border-0">
         <div class="card-body">
-            <table class="table table-bordered">
-                <thead class="table-light">
-                    <tr>
-                        <th>Requisition No.</th>
-                        <th>Material</th>
-                        <th>BoQ</th>
-                        <th>Quantity Requested</th>
-                        <th>Status</th>
-                        <th>Section</th>
-                        <th>Requested By</th>
-                        <th>Requested At</th>
-                        <th>Approved By</th>
-                        <th>Approved At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($requisitions as $req)
+            <div class="table-responsive jm-ui-table-wrap">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <td>{{ $req->requisition_no }}</td>
-                            <td>{{ $req->bomItem->item_material->name ?? $req->extra_material_name }}</td>
-                            <td>{{ $req->bomItem->bqDocument->title ?? ($req->extra_material_name ? __('Ad-hoc Request') : __('Unknown')) }}</td>
-                            <td>
-                                {{ (int) $req->quantity_requested }} {{ $req->bomItem->item_material->unit_of_measurement ?? $req->extra_unit }}
-                            </td>
-                            <td>
-                                <span class="badge bg-{{ $req->status == 'approved' ? 'success' : ($req->status == 'rejected' ? 'danger' : 'secondary') }}">
-                                {{ ucfirst($req->status) }}
-                                </span>
-                            </td>
-                            <td>{{ $req->section->name }}</td>
-                            <td>{{ $req->requester->name ?? 'N/A' }}</td>
-                            <td>{{ $req->requested_at ? \Carbon\Carbon::parse($req->requested_at)->format('d-m-Y') : '-' }}</td>
-                            <td>{{ $req->approver->name ?? '-' }}</td>
-                            <td>{{ $req->approved_at ? \Carbon\Carbon::parse($req->approved_at)->format('d-m-Y') : '-' }}</td>
-                            <td>
-                                @if($req->status === 'pending')
-                                    <form action="{{ route('requisitions.approve', $req->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button class="btn btn-sm btn-success">Approve</button>
-                                    </form>
-                                    <form action="{{ route('requisitions.reject', $req->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button class="btn btn-sm btn-danger">Reject</button>
-                                    </form>
-                                @else
-                                    <span class="text-muted">N/A</span>
-                                @endif
-                            </td>
+                            <th>Requisition No.</th>
+                            <th>Material</th>
+                            <th>BoQ</th>
+                            <th>Quantity Requested</th>
+                            <th>Status</th>
+                            <th>Section</th>
+                            <th>Requested By</th>
+                            <th>Requested At</th>
+                            <th>Approved By</th>
+                            <th>Approved At</th>
+                            <th>Actions</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="10" class="text-center">No requisitions found.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse($requisitions as $req)
+                            <tr>
+                                <td>{{ $req->requisition_no }}</td>
+                                <td>{{ $req->bomItem->item_material->name ?? $req->extra_material_name }}</td>
+                                <td>{{ $req->bomItem->bqDocument->title ?? ($req->extra_material_name ? __('Ad-hoc Request') : __('Unknown')) }}</td>
+                                <td>
+                                    {{ (int) $req->quantity_requested }} {{ $req->bomItem->item_material->unit_of_measurement ?? $req->extra_unit }}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ $req->status == 'approved' ? 'success' : ($req->status == 'rejected' ? 'danger' : 'secondary') }}">
+                                    {{ ucfirst($req->status) }}
+                                    </span>
+                                </td>
+                                <td>{{ $req->section->name }}</td>
+                                <td>{{ $req->requester->name ?? 'N/A' }}</td>
+                                <td>{{ $req->requested_at ? \Carbon\Carbon::parse($req->requested_at)->format('d-m-Y') : '-' }}</td>
+                                <td>{{ $req->approver->name ?? '-' }}</td>
+                                <td>{{ $req->approved_at ? \Carbon\Carbon::parse($req->approved_at)->format('d-m-Y') : '-' }}</td>
+                                <td>
+                                    @if($req->status === 'pending')
+                                        <form action="{{ route('requisitions.approve', $req->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button class="btn btn-sm btn-success">Approve</button>
+                                        </form>
+                                        <form action="{{ route('requisitions.reject', $req->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button class="btn btn-sm btn-danger">Reject</button>
+                                        </form>
+                                    @else
+                                        <span class="text-muted">N/A</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="10" class="text-center">No requisitions found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>        
     <h3 class="jm-section-title mt-4">{{ __('Summary of Approved Requisitions') }}</h3>
-    <div class="card shadow-sm">
+    <div class="card jm-ui-card shadow-sm border-0">
         <div class="card-body">
-            <table class="table table-bordered mt-3 text-center">
-                <thead class="table-light">
-                    <tr>
-                        <th>Material</th>
-                        <th>Quantity Requested</th>
-                        <th>UoM</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($approvedSummary as $summary)
+            <div class="table-responsive jm-ui-table-wrap">
+                <table class="table table-bordered text-center mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <td>{{ $summary->material }}</td>
-                            <td>{{ (int) $summary->total_quantity }}</td>
-                            <td>{{ $summary->unit }}</td>
+                            <th>Material</th>
+                            <th>Quantity Requested</th>
+                            <th>UoM</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="3" class="text-center">No approved requisitions found.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse($approvedSummary as $summary)
+                            <tr>
+                                <td>{{ $summary->material }}</td>
+                                <td>{{ (int) $summary->total_quantity }}</td>
+                                <td>{{ $summary->unit }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="text-center">No approved requisitions found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

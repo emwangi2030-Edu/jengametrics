@@ -4,16 +4,16 @@
 <div class="container py-4">
     <div class="jm-page-header">
         <div>
-            <h2 class="jm-page-title">{{ __('Costs:') }} <span class="text-dark">{{ $project->name }}</span></h2>
-            <p class="jm-page-subtitle mb-0">{{ __('Material and labour spend overview.') }}</p>
+            <h2 class="jm-page-title jm-ui-title">{{ __('Costs:') }} <span class="jm-ui-muted">{{ $project->name }}</span></h2>
+            <p class="jm-page-subtitle jm-ui-muted mb-0">{{ __('Material and labour spend overview.') }}</p>
         </div>
     </div>
     
-    <div class="card shadow">
+    <div class="card jm-ui-card shadow-sm border-0">
         <h3 class="jm-section-title mt-3 mx-3">{{ __('Material Costs') }}</h3>
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table text-center align-middle">
+            <div class="table-responsive jm-ui-table-wrap">
+                <table class="table text-center align-middle mb-0">
                     <thead class="table-light">
                         <tr>
                             <th>Material Name</th>
@@ -43,11 +43,11 @@
         </div>
     </div>
 
-    <div class="card shadow mt-4">
+    <div class="card jm-ui-card shadow-sm border-0 mt-4">
         <h3 class="jm-section-title mt-3 mx-3">{{ __('Labour Costs') }}</h3>
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table text-center align-middle">
+            <div class="table-responsive jm-ui-table-wrap">
+                <table class="table text-center align-middle mb-0">
                     <thead class="table-light">
                         <tr>
                             <th>Payee</th>

@@ -5,13 +5,13 @@
     <div class="row mb-4">
         <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
             <div>
-                <h2 class="jm-page-title">{{ __('Project Settings') }}</h2>
+                <h2 class="jm-page-title jm-ui-title">{{ __('Project Settings') }}</h2>
             </div>
             <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary mt-3 mt-md-0" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
         </div>
     </div>
 
-    <div class="card shadow-sm border-0 m-7">
+    <div class="card jm-ui-card shadow-sm border-0 m-7">
         <div class="card-body">
             <h5 class="jm-section-title">{{ __('Project Information') }}</h5>
             @if(isset($project))

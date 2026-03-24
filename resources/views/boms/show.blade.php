@@ -4,7 +4,7 @@
     <div class="container py-4">
         <div class="row mb-3 align-items-center">
             <div class="col">
-                <h2 class="jm-page-title m-0">BoM Section: <span class="text-dark">{{ $section_name ?? $bqSection->name ?? __('Section') }}</span></h2>
+                <h2 class="jm-page-title jm-ui-title m-0">BoM Section: <span class="jm-ui-muted">{{ $section_name ?? $bqSection->name ?? __('Section') }}</span></h2>
             </div>
             <div class="col-auto d-flex gap-2">
                 @if(isset($bqDocumentForSection) && $bqDocumentForSection && $bqSection->bq_level_id)
@@ -16,14 +16,14 @@
 
         <div class="row g-4">
             <div class="col-12">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card jm-ui-card shadow-sm border-0 h-100">
                     <div class="card-header bg-white">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="jm-section-title mb-0">{{ __('Materials Summary') }}</span>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive">
+                        <div class="table-responsive jm-ui-table-wrap">
                             <table class="table table-sm table-hover align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
@@ -70,7 +70,7 @@
                 </div>
             </div>
             <div class="col-12">
-                <div class="card shadow-sm border-0 h-100">
+                <div class="card jm-ui-card shadow-sm border-0 h-100">
                     <div class="card-header bg-white">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="jm-section-title mb-0">{{ __('Labour Summary') }}</span>

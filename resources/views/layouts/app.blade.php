@@ -34,6 +34,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&amp;display=swap"
     rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
     <link href="{{ asset('assets/metrics/vendors/simplebar/simplebar.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/metrics/assets/css/line.css') }}">
     <link href="{{ asset('assets/metrics/assets/css/theme-rtl.min.css') }}" type="text/css" rel="stylesheet" id="style-rtl">
@@ -155,6 +157,187 @@
     @yield('page-css')
 
     <style>
+        :root {
+            --jm-primary: #027333;
+            --jm-primary-strong: #015c2a;
+            --jm-primary-soft: #e8f7ef;
+            --jm-accent: #19a36b;
+            --jm-title: #113026;
+            --jm-text: #1f2b26;
+            --jm-muted: #5d6f68;
+            --jm-bg: #f4f7f5;
+            --jm-surface: #ffffff;
+            --jm-surface-alt: #f9fcfa;
+            --jm-border: #d9e5de;
+            --jm-shadow-sm: 0 8px 22px -18px rgba(2, 115, 51, 0.48);
+            --jm-shadow-md: 0 18px 44px -26px rgba(2, 115, 51, 0.42);
+            --jm-radius-sm: 10px;
+            --jm-radius-md: 14px;
+            --jm-radius-lg: 18px;
+        }
+
+        [data-bs-theme='dark'] {
+            --jm-title: #e5f2ec;
+            --jm-text: #d6e7e0;
+            --jm-muted: #9fb8af;
+            --jm-bg: #161e1a;
+            --jm-surface: #1e2823;
+            --jm-surface-alt: #243029;
+            --jm-border: #2f3e36;
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content {
+            color: var(--jm-text);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .card {
+            border: 1px solid var(--jm-border);
+            border-radius: var(--jm-radius-lg);
+            background: var(--jm-surface);
+            box-shadow: var(--jm-shadow-sm);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .card .card-header {
+            background: transparent;
+            border-bottom-color: var(--jm-border);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content h1,
+        body.jm-theme[data-ui-skin='non-admin'] .content h2,
+        body.jm-theme[data-ui-skin='non-admin'] .content h3,
+        body.jm-theme[data-ui-skin='non-admin'] .content h4,
+        body.jm-theme[data-ui-skin='non-admin'] .content h5 {
+            color: var(--jm-title);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .text-muted {
+            color: var(--jm-muted) !important;
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .btn {
+            border-radius: var(--jm-radius-sm);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .btn-success {
+            background-color: var(--jm-primary);
+            border-color: var(--jm-primary);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .btn-success:hover,
+        body.jm-theme[data-ui-skin='non-admin'] .content .btn-success:focus {
+            background-color: var(--jm-primary-strong);
+            border-color: var(--jm-primary-strong);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .btn-primary {
+            background-color: var(--jm-primary);
+            border-color: var(--jm-primary);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .btn-primary:hover,
+        body.jm-theme[data-ui-skin='non-admin'] .content .btn-primary:focus {
+            background-color: var(--jm-primary-strong);
+            border-color: var(--jm-primary-strong);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .btn-outline-primary {
+            color: var(--jm-primary);
+            border-color: var(--jm-primary);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .btn-outline-primary:hover,
+        body.jm-theme[data-ui-skin='non-admin'] .content .btn-outline-primary:focus {
+            color: #fff;
+            background-color: var(--jm-primary);
+            border-color: var(--jm-primary);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .badge.bg-success {
+            background-color: var(--jm-primary) !important;
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .form-control,
+        body.jm-theme[data-ui-skin='non-admin'] .content .form-select,
+        body.jm-theme[data-ui-skin='non-admin'] .content .input-group-text {
+            border-color: var(--jm-border);
+            border-radius: var(--jm-radius-sm);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .modal-content {
+            border: 1px solid var(--jm-border);
+            border-radius: var(--jm-radius-md);
+            background: var(--jm-surface);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .table {
+            border-color: var(--jm-border);
+            color: var(--jm-text);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .table > :not(caption) > * > * {
+            border-bottom-color: var(--jm-border);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content .table thead th,
+        body.jm-theme[data-ui-skin='non-admin'] .content .table-light th {
+            background: var(--jm-surface-alt) !important;
+            color: var(--jm-muted);
+            font-weight: 700;
+            font-size: 0.78rem;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content a:not(.btn):not(.nav-link) {
+            color: var(--jm-primary-strong);
+        }
+
+        body.jm-theme[data-ui-skin='non-admin'] .content a:not(.btn):not(.nav-link):hover {
+            color: var(--jm-primary);
+        }
+
+        .jm-ui-title {
+            color: var(--jm-primary) !important;
+            font-weight: 700;
+        }
+
+        .jm-ui-muted {
+            color: var(--jm-muted) !important;
+        }
+
+        .jm-ui-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            border: 1px solid var(--jm-border);
+            background: var(--jm-primary-soft);
+            color: var(--jm-primary-strong);
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .jm-ui-card {
+            border: 1px solid var(--jm-border);
+            border-radius: var(--jm-radius-lg);
+            background: var(--jm-surface);
+            box-shadow: var(--jm-shadow-sm);
+        }
+
+        .jm-ui-surface {
+            border: 1px solid var(--jm-border);
+            border-radius: var(--jm-radius-md);
+            background: var(--jm-surface-alt);
+        }
+
+        .jm-ui-table-wrap {
+            border: 1px solid var(--jm-border);
+            border-radius: var(--jm-radius-md);
+            overflow: hidden;
+            background: var(--jm-surface);
+        }
+
         .modal {
             z-index: 1050 !important;
             /* Ensure the modal is above other elements */
@@ -166,12 +349,12 @@
         }
 
         a.btn:hover {
-            transform: scale(1.1);
+            transform: scale(1.02);
             transition: transform 0.2s ease-in-out;
         }
 
         button:hover {
-            transform: scale(1.1);
+            transform: scale(1.02);
             transition: transform 0.2s ease-in-out;
         }
 
@@ -186,7 +369,8 @@
     </style>
 </head>
 
-<body class="jm-theme jm-app-shell-page"
+<body class="jm-theme jm-body-reset jm-app-shell-page"
+    data-ui-skin="{{ auth()->check() && auth()->user()->is_admin() ? 'admin' : 'non-admin' }}"
     data-user-is-subaccount="{{ auth()->check() && auth()->user()->isSubAccount() ? '1' : '0' }}"
     data-can-manage-boq="{{ auth()->check() && auth()->user()->can_manage_boq ? '1' : '0' }}"
     data-can-manage-materials="{{ auth()->check() && auth()->user()->can_manage_materials ? '1' : '0' }}"
@@ -198,6 +382,7 @@
     <main class="main" id="top">
         @php
             $jmPath = request()->path();
+            $jmUser = \Illuminate\Support\Facades\Auth::user();
             $jmNav = [
                 'dashboard' => request()->routeIs('dashboard'),
                 'boq' => request()->is('boq') || request()->is('bq_documents') || request()->is('bq_documents/*'),
@@ -212,8 +397,43 @@
                 'reports' => request()->is('reports', 'reports/*'),
                 'settings' => request()->routeIs('settings.*') || request()->routeIs('profile.*') || request()->is('admin/settings'),
             ];
+            $jmNameParts = preg_split('/\s+/', trim((string) ($jmUser->name ?? 'User')));
+            $jmInitials = collect($jmNameParts)->filter()->take(2)->map(fn ($part) => strtoupper(mb_substr($part, 0, 1)))->implode('');
+            $jmRoleLabel = $jmUser->isSubAccount() ? 'Sub Account User' : 'Primary Account User';
+
+            $jmPageTitle = 'Dashboard';
+            if (request()->is('requisitions', 'requisitions/*')) {
+                $jmPageTitle = 'Material Requisitions';
+            } elseif (request()->is('materials/delivered', 'materials/delivered/*')) {
+                $jmPageTitle = 'Materials Delivered';
+            } elseif (request()->is('materials/inventory', 'materials/inventory/*')) {
+                $jmPageTitle = 'Inventory Management';
+            } elseif (request()->is('materials/usage', 'materials/usage/*')) {
+                $jmPageTitle = 'Stock Usage';
+            } elseif ($jmNav['boq']) {
+                $jmPageTitle = 'Bills of Quantities';
+            } elseif ($jmNav['boms']) {
+                $jmPageTitle = 'Bills of Materials';
+            } elseif ($jmNav['material']) {
+                $jmPageTitle = 'Manage Material';
+            } elseif ($jmNav['labour']) {
+                $jmPageTitle = 'Labour';
+            } elseif ($jmNav['cost']) {
+                $jmPageTitle = 'Cost Tracking';
+            } elseif ($jmNav['reports']) {
+                $jmPageTitle = 'Reporting';
+            } elseif ($jmNav['settings']) {
+                $jmPageTitle = 'Settings';
+            } elseif (request()->is('sub-accounts', 'sub-accounts/*')) {
+                $jmPageTitle = 'Sub Accounts';
+            } elseif (request()->is('account', 'profile')) {
+                $jmPageTitle = 'Account';
+            }
         @endphp
-        <nav class="navbar navbar-vertical navbar-expand-lg jm-app-sidebar jm-hidden-init">
+        <div class="jm-shell-root">
+            <div class="jm-shell-row">
+                <div class="jm-shell-sidebar-wrap">
+        <nav class="navbar navbar-vertical navbar-expand-lg jm-app-sidebar">
             <div class="collapse navbar-collapse" id="navbarVerticalCollapse">
                 <div class="navbar-vertical-content">
                     <div class="jm-sidebar-brand">
@@ -223,11 +443,14 @@
                     <div class="jm-sidebar-scroll">
                     <ul class="navbar-nav flex-column" id="navbarVerticalNav">
                         <div class="nav-item">
+                            @if(\Illuminate\Support\Facades\Auth::user()->is_client())
+                                <p class="jm-sidebar-section-label">Apps</p>
+                            @endif
                             <!-- Dashboard (all clients) -->
                             <div class="nav-item-wrapper">
                                 <a class="nav-link label-1 {{ $jmNav['dashboard'] ? 'jm-nav-active' : '' }}" href="{{ route('dashboard') }}" role="button" aria-expanded="false">
                                     <div class="d-flex align-items-center">
-                                        <span class="nav-link-icon"><span data-feather="home"></span></span>
+                                        <span class="nav-link-icon"><span data-feather="grid"></span></span>
                                         <span class="nav-link-text-wrapper">
                                             <span class="nav-link-text">Dashboard</span>
                                         </span>
@@ -236,7 +459,6 @@
                             </div>
 
                             @if(\Illuminate\Support\Facades\Auth::user()->is_client())
-                                <p class="jm-sidebar-section-label">Apps</p>
                                 <div class="nav-item-wrapper">
                                     <a class="nav-link label-1 {{ $jmNav['boq'] ? 'jm-nav-active' : '' }}" href="{{ route('boq') }}" role="button" aria-expanded="false">
                                         <div class="d-flex align-items-center">
@@ -260,16 +482,25 @@
                                 </div>
 
                                 <div class="nav-item-wrapper has-submenu {{ $jmNav['material'] ? 'open' : '' }}">
-                                    <a class="nav-link label-1 {{ $jmNav['material'] ? 'jm-nav-active' : '' }}"
-                                        href="javascript:void(0)"
-                                        onclick="toggleDropdown(this)">
-                                        <div class="d-flex align-items-center">
-                                            <span class="nav-link-icon"><span data-feather="box"></span></span>
-                                            <span class="nav-link-text-wrapper">
-                                                <span class="nav-link-text">Manage Material</span>
-                                            </span>
-                                        </div>
-                                    </a>
+                                    <div class="jm-submenu-row">
+                                        <a class="nav-link label-1 {{ $jmNav['material'] ? 'jm-nav-active' : '' }}"
+                                            href="{{ route('materials.index') }}">
+                                            <div class="d-flex align-items-center">
+                                                <span class="nav-link-icon"><span data-feather="box"></span></span>
+                                                <span class="nav-link-text-wrapper">
+                                                    <span class="nav-link-text">Manage Material</span>
+                                                </span>
+                                            </div>
+                                        </a>
+                                        <button
+                                            type="button"
+                                            class="jm-submenu-toggle-btn"
+                                            aria-label="Toggle material submenu"
+                                            aria-expanded="{{ $jmNav['material'] ? 'true' : 'false' }}"
+                                            onclick="toggleDropdown(this)">
+                                            <span data-feather="chevron-down"></span>
+                                        </button>
+                                    </div>
                                     <ul class="dropdown-menu">
                                         <li>
                                             <a class="dropdown-item nav-link label-1 {{ $jmNav['req'] ? 'jm-nav-active' : '' }}" href="{{ route('requisitions.index') }}">
@@ -427,47 +658,79 @@
                         </div>
                     </ul>
                     </div>{{-- .jm-sidebar-scroll --}}
+                    @if($jmUser->is_client())
+                        <a href="{{ route('account') }}" class="jm-sidebar-account text-decoration-none">
+                            <div class="jm-sidebar-account-avatar">{{ $jmInitials ?: 'U' }}</div>
+                            <div>
+                                <div class="jm-sidebar-account-name">{{ $jmUser->name }}</div>
+                                <div class="jm-sidebar-account-role">{{ $jmRoleLabel }}</div>
+                            </div>
+                        </a>
+                    @endif
                 </div>
             </div>
-            <div class="navbar-vertical-footer px-3 py-2">
-                <button class="navbar-vertical-toggle nav-link w-100 d-flex align-items-center px-3 py-2 text-start border-0 bg-transparent" type="button" role="button">
-                    <span class="navbar-vertical-toggle-icon navbar-vertical-toggle-icon--expanded me-2 fs-4 d-none" aria-hidden="true">&lsaquo;</span>
-                    <span class="navbar-vertical-toggle-icon navbar-vertical-toggle-icon--collapsed fs-4 me-2 d-none" aria-hidden="true">&rsaquo;</span>
-                </button>
-            </div>
         </nav>
-        <nav class="navbar navbar-top fixed-top navbar-expand jm-app-topbar jm-hidden-init" id="navbarDefault">
-            <div class="collapse navbar-collapse justify-content-between">
+                </div>
+                <div class="jm-shell-main-wrap">
+        <nav class="navbar navbar-top navbar-expand jm-app-topbar" id="navbarDefault">
+            <div class="navbar-collapse justify-content-between">
                 <div class="navbar-logo d-flex align-items-center gap-2">
-                    <button class="btn navbar-toggler navbar-toggler-humburger-icon hover-bg-transparent" type="button"
-                        data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse"
-                        aria-controls="navbarVerticalCollapse" aria-expanded="false"
-                        aria-label="Toggle Navigation">
-                        <span class="navbar-toggle-icon">
-                            <span class="toggle-line"></span>
-                        </span>
-                    </button>
-                    {{-- Mobile-only brand (matches sidebar); desktop uses sidebar brand only — no duplicate favicon strip --}}
+{{-- Mobile-only brand (matches sidebar); desktop uses sidebar brand only — no duplicate favicon strip --}}
                     <a class="navbar-brand jm-topbar-mobile-brand d-flex d-lg-none align-items-center gap-2 mb-0 me-0" href="{{ route('dashboard') }}">
                         <span class="jm-sidebar-brand-mark" aria-hidden="true">🏗️</span>
                         <span class="jm-sidebar-brand-text">Jenga<span>Metrics</span></span>
                     </a>
+                    <div class="jm-topbar-context d-none d-lg-flex align-items-center gap-2">
+                        <span class="jm-topbar-title">{{ $jmPageTitle }}</span>
+                        <span class="jm-topbar-period">{{ now()->format('F Y') }}</span>
+                    </div>
                 </div>
-                <ul class="navbar-nav navbar-nav-icons flex-row">
-                    <li class="nav-item">
-                        <div class="theme-control-toggle fa-icon-wait px-2">
-                            <input class="form-check-input ms-0 theme-control-toggle-input" type="checkbox" data-theme-control="phoenixTheme" value="dark" id="themeControlToggle" />
-                            <label class="mb-0 theme-control-toggle-label theme-control-toggle-light jm-theme-toggle-btn" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
-                                data-bs-title="Switch theme">
-                                <span class="icon" data-feather="sun"></span>
-                            </label>
-                            <label class="mb-0 theme-control-toggle-label theme-control-toggle-dark jm-theme-toggle-btn" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
-                                data-bs-title="Switch theme">
-                                <span class="icon" data-feather="moon"></span>
-                            </label>
-                        </div>
+                <ul class="navbar-nav navbar-nav-icons flex-row align-items-center">
+                    <li class="nav-item d-none d-lg-block me-2">
+                        <button type="button" class="btn jm-topbar-bell" aria-label="Notifications">
+                            <span data-feather="bell"></span>
+                            <span class="jm-topbar-bell-dot"></span>
+                        </button>
                     </li>
-                    <li class="nav-item dropdown">
+                    @if(\Illuminate\Support\Facades\Auth::user()->is_client())
+                        <li class="nav-item d-none d-lg-block me-2">
+                            @if(request()->routeIs('dashboard'))
+                                <button type="button" class="btn btn-sm btn-outline-secondary jm-topbar-action" data-bs-toggle="modal" data-bs-target="#projectStepsModal">
+                                    Project Steps
+                                </button>
+                            @else
+                                <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-secondary jm-topbar-action">Project Steps</a>
+                            @endif
+                        </li>
+                        <li class="nav-item d-none d-lg-block me-2">
+                            <a href="{{ route('boq') }}" class="btn btn-sm btn-outline-secondary jm-topbar-action">+ New BOQ</a>
+                        </li>
+                        <li class="nav-item d-none d-lg-block me-2">
+                            <a href="{{ route('wizard') }}" class="btn btn-sm btn-success jm-topbar-action jm-topbar-action-primary">+ New Project</a>
+                        </li>
+                    @endif
+                    @if(!\Illuminate\Support\Facades\Auth::user()->is_client())
+                        <li class="nav-item">
+                            <div class="theme-control-toggle fa-icon-wait px-2">
+                                <input class="form-check-input ms-0 theme-control-toggle-input" type="checkbox" data-theme-control="phoenixTheme" value="dark" id="themeControlToggle" />
+                                <label class="mb-0 theme-control-toggle-label theme-control-toggle-light jm-theme-toggle-btn" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
+                                    data-bs-title="Switch theme">
+                                    <span class="icon" data-feather="sun"></span>
+                                </label>
+                                <label class="mb-0 theme-control-toggle-label theme-control-toggle-dark jm-theme-toggle-btn" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
+                                    data-bs-title="Switch theme">
+                                    <span class="icon" data-feather="moon"></span>
+                                </label>
+                            </div>
+                        </li>
+                    @endif
+                    <li class="nav-item d-none d-lg-block ms-2">
+                        <form method="POST" action="{{ route('logout') }}" class="m-0">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-secondary jm-topbar-action">Logout</button>
+                        </form>
+                    </li>
+                    <li class="nav-item dropdown {{ $jmUser->is_client() ? 'd-lg-none' : '' }}">
                         <a class="nav-link lh-1 pe-2" id="navbarDropdownUser" href="#!" role="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true"
                             aria-expanded="false">
                             <div class="d-flex align-items-center">
@@ -564,7 +827,6 @@
                                                 this.closest('form').submit();">
                                                 <span class="me-2" data-feather="log-out"></span>
                                                     Sign out
-                                                </a>
                                             </x-responsive-nav-link>
                                         </form>
                                     </div>
@@ -579,6 +841,9 @@
                         </div>
                     </li>
                 </ul>
+                <div class="content {{ request()->routeIs('dashboard') ? '' : 'jm-dashboard-inherit' }}">
+                    @yield('content')
+                </div>
             </div>
         </nav>
         <script>
@@ -730,9 +995,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="content">
-                    @yield('content')
-                </div>
+            </div>
                 <style>
                     #toast-container {
                         position: fixed;
@@ -847,6 +1110,9 @@
                     </div>
                 </div>
             </div>
+                </div>{{-- .jm-shell-main-wrap --}}
+            </div>{{-- .jm-shell-row --}}
+        </div>{{-- .jm-shell-root --}}
     </main>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
@@ -877,89 +1143,17 @@
     <script>
         (function () {
             const htmlEl = document.documentElement;
-            const toggleBtn = document.querySelector('.navbar-vertical-toggle');
-
-            if (!htmlEl || !toggleBtn) {
+            if (!htmlEl) {
                 return;
             }
 
-            const expandedIcon = toggleBtn.querySelector('.navbar-vertical-toggle-icon--expanded');
-            const collapsedIcon = toggleBtn.querySelector('.navbar-vertical-toggle-icon--collapsed');
-            const text = toggleBtn.querySelector('.navbar-vertical-footer-text');
-            const chevron = toggleBtn.querySelector('.navbar-vertical-toggle-chevron');
-            const navKey = 'navbarVerticalCollapsed';
-            const dropdownKey = 'navbarVerticalOpenIds';
+            htmlEl.classList.remove('navbar-vertical-collapsed');
 
-            function syncToggleButton() {
-                const isCollapsed = htmlEl.classList.contains('navbar-vertical-collapsed');
-
-                if (expandedIcon) {
-                    expandedIcon.classList.toggle('d-none', isCollapsed);
-                }
-
-                if (collapsedIcon) {
-                    collapsedIcon.classList.toggle('d-none', !isCollapsed);
-                }
-
-                if (text) {
-                    const expandedText = text.getAttribute('data-expanded-text') || text.textContent || 'Collapse Menu';
-                    const collapsedText = text.getAttribute('data-collapsed-text') || 'Expand Menu';
-                    text.textContent = isCollapsed ? collapsedText : expandedText;
-                    text.classList.toggle('d-none', isCollapsed);
-                }
-
-                if (chevron) {
-                    chevron.classList.toggle('d-none', isCollapsed);
-                }
-
-                toggleBtn.setAttribute('aria-label', isCollapsed ? 'Expand navigation menu' : 'Collapse navigation menu');
-                toggleBtn.setAttribute('aria-expanded', (!isCollapsed).toString());
-
-                localStorage.setItem(navKey, isCollapsed ? '1' : '0');
-            }
-
-            syncToggleButton();
-
-            const observer = new MutationObserver(syncToggleButton);
-            observer.observe(htmlEl, { attributes: true, attributeFilter: ['class'] });
-
-            toggleBtn.addEventListener('click', function () {
-                requestAnimationFrame(syncToggleButton);
-            });
-
-            // Restore persisted nav collapsed state
-            const stored = localStorage.getItem(navKey);
-            if (stored !== null && stored === '1') {
-                htmlEl.classList.add('navbar-vertical-collapsed');
-                requestAnimationFrame(syncToggleButton);
-            }
-
-            // Persist dropdown open state
-            const navContainer = document.querySelector('#navbarVerticalCollapse');
-            if (navContainer) {
-                const persistDropdowns = () => {
-                    const openIds = Array.from(navContainer.querySelectorAll('.collapse.show'))
-                        .map(el => el.id)
-                        .filter(Boolean);
-                    localStorage.setItem(dropdownKey, JSON.stringify(openIds));
-                };
-
-                navContainer.addEventListener('shown.bs.collapse', persistDropdowns);
-                navContainer.addEventListener('hidden.bs.collapse', persistDropdowns);
-
-                const storedDropdowns = localStorage.getItem(dropdownKey);
-                if (storedDropdowns) {
-                    try {
-                        const ids = JSON.parse(storedDropdowns);
-                        ids.forEach(id => {
-                            const el = document.getElementById(id);
-                            if (el && !el.classList.contains('show')) {
-                                const collapseInstance = bootstrap.Collapse.getOrCreateInstance(el, { toggle: false });
-                                collapseInstance.show();
-                            }
-                        });
-                    } catch (_) {}
-                }
+            try {
+                localStorage.setItem('navbarVerticalCollapsed', '0');
+                localStorage.setItem('phoenixIsNavbarVerticalCollapsed', 'false');
+            } catch (error) {
+                // Ignore storage access errors.
             }
         })();
     </script>
@@ -1257,6 +1451,12 @@
         }
 
         parent.classList.toggle('open');
+
+        const isOpen = parent.classList.contains('open');
+        const toggleBtn = parent.querySelector('.jm-submenu-toggle-btn');
+        if (toggleBtn) {
+            toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
     }
     </script>
 

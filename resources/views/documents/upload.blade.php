@@ -1,77 +1,78 @@
 @extends('layouts.app')
-@section('content') 
-    <div class="container mt-5">
-        <h1 class="mb-4">Upload Document</h1>
-<<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Upload Document') }}
-        </h2>
-    </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    @if(session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                            <span class="block sm:inline">{{ session('success') }}</span>
-                        </div>
-                    @endif
+@section('content')
+<div class="container py-4">
+    <div class="jm-page-header">
+        <div>
+            <h2 class="jm-page-title jm-ui-title">{{ __('Upload Document') }}</h2>
+            <p class="jm-page-subtitle jm-ui-muted mb-0">{{ __('Store and review uploaded project documents.') }}</p>
+        </div>
+        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
+    </div>
 
-                    @if($errors->any())
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endifgitt
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
-                    <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data" class="mt-4">
-                        @csrf
-                        <div class="mb-4">
-                            <label for="file" class="block text-sm font-medium text-gray-700">Choose a document to upload:</label>
-                            <input type="file" name="file" id="file" required class="mt-1 block w-full">
-                        </div>
-                        <div>
-                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">Upload</button>
-                        </div>
-                    </form>
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-                    <div class="mt-6">
-                        <h3 class="text-lg font-medium text-gray-900">Uploaded Documents</h3>
-                        @if($documents->isEmpty())
-                            <p class="mt-2 text-gray-500">No documents uploaded yet.</p>
-                        @else
-                            <table class="mt-4 w-full">
-                                <thead>
-                                    <tr>
-                                        <th class="px-4 py-2">Document Name</th>
-                                        <th class="px-4 py-2">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($documents as $document)
-                                        <tr>
-                                            <td class="px-4 py-2">{{ $document->name }}</td>
-                                            <td class="px-4 py-2">
-                                                <a href="{{ route('documents.upload', $document->id) }}" class="bg-green-500 text-white px-2 py-1 rounded-md">View</a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        @endif
-                    </div>
+    <div class="card jm-ui-card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data" class="row g-3 align-items-end jm-ui-surface p-3">
+                @csrf
+                <div class="col-md-9">
+                    <label for="file" class="form-label">{{ __('Choose a document to upload') }}</label>
+                    <input type="file" name="file" id="file" required class="form-control">
                 </div>
-            </div>
+                <div class="col-md-3 d-grid">
+                    <button type="submit" class="btn btn-primary">{{ __('Upload') }}</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Include Bootstrap JS (Optional) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="card jm-ui-card shadow-sm border-0">
+        <div class="card-body">
+            <h5 class="jm-section-title mb-3">{{ __('Uploaded Documents') }}</h5>
 
+            @if($documents->isEmpty())
+                <p class="text-muted mb-0">{{ __('No documents uploaded yet.') }}</p>
+            @else
+                <div class="table-responsive jm-ui-table-wrap">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>{{ __('Document Name') }}</th>
+                                <th class="text-end">{{ __('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($documents as $document)
+                                <tr>
+                                    <td>{{ $document->name }}</td>
+                                    <td class="text-end">
+                                        <a href="{{ asset('storage/' . ltrim($document->path, '/')) }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
+                                            {{ __('View') }}
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
 @endsection
-</x-app-layout>

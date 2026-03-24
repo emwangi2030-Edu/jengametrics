@@ -15,7 +15,7 @@
         <div class="row mb-4">
             <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                 <div>
-                    <h2 class="jm-page-title">
+                    <h2 class="jm-page-title jm-ui-title">
                         {{ $bqDocument->title }}
                     </h2>
                     <p class="text-muted mb-0">{{ $bqDocument->description }}</p>
@@ -53,7 +53,7 @@
         <div class="row justify-content-center">
             <div class="col-md-10">
                 @if($levels->isEmpty())
-                    <div class="card shadow-sm border-0">
+                    <div class="card shadow-sm border-0 jm-ui-card">
                         <div class="card-body text-center py-5">
                             <p class="text-muted mb-0">{{ __('No levels have been added to this BoQ yet.') }}</p>
                         </div>
@@ -63,7 +63,7 @@
                         @php
                             $level = $levelData['level'];
                         @endphp
-                        <div class="card shadow-sm border-0 mb-4">
+                        <div class="card shadow-sm border-0 jm-ui-card mb-4">
                             <div class="card-body">
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                                     <div>

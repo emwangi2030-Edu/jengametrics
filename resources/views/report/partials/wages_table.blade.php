@@ -1,5 +1,5 @@
-<div class="table-responsive">
-    <table class="table table-sm align-middle">
+<div class="table-responsive jm-ui-table-wrap">
+    <table class="table table-sm align-middle mb-0">
         <thead class="table-light">
             <tr>
                 <th>{{ __('Payee') }}</th>

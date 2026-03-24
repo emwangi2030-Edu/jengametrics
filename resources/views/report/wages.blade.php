@@ -4,10 +4,10 @@
 <div class="container py-4">
     <div class="jm-page-header">
         <div>
-            <h2 class="jm-page-title">
+            <h2 class="jm-page-title jm-ui-title">
                 {{ __('Wages Report') }}
             </h2>
-            <p class="jm-page-subtitle mb-0">{{ __('Review worker payments by period and export to Excel.') }}</p>
+            <p class="jm-page-subtitle jm-ui-muted mb-0">{{ __('Review worker payments by period and export to Excel.') }}</p>
         </div>
         <div class="mt-3 mt-md-0 d-flex gap-2">
             <a href="{{ route('reports.wages', ['download' => 1]) }}" class="btn btn-outline-primary btn-sm">
@@ -17,9 +17,9 @@
         </div>
     </div>
 
-    <div class="card shadow-sm">
+    <div class="card jm-ui-card shadow-sm border-0">
         <div class="card-body">
-            <form method="GET" class="row g-3 align-items-end mb-3" id="wagesFilterForm">
+            <form method="GET" class="row g-3 align-items-end mb-3 jm-ui-surface p-3" id="wagesFilterForm">
                 <div class="col-md-3">
                     <label class="form-label mb-1" for="wages-year">{{ __('Year') }}</label>
                     <select name="year" id="wages-year" class="form-select">

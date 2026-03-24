@@ -3,7 +3,7 @@
 @section('content')
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold">Suppliers</h3>
+        <h3 class="fw-bold jm-ui-title">Suppliers</h3>
         <a href="{{ route('materials.index') }}" class="btn btn-outline-primary">View Purchased Materials</a>
     </div>
 
@@ -16,10 +16,10 @@
     @endif
 
     {{-- Suppliers Table --}}
-    <div class="card shadow-sm border-0">
+    <div class="card jm-ui-card shadow-sm border-0">
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
+            <div class="table-responsive jm-ui-table-wrap">
+                <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
                             <th>Name</th>

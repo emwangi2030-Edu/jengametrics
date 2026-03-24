@@ -1,5 +1,5 @@
-<div class="table-responsive">
-    <table class="table mt-3 text-center">
+<div class="table-responsive jm-ui-table-wrap">
+    <table class="table mt-3 text-center align-middle">
         <thead class="table-light">
             <tr>
                 <th></th>

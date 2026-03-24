@@ -7,66 +7,68 @@
 <div class="container py-4 {{ $canManageMaterials ? '' : 'materials-readonly' }}">
     <div class="jm-page-header">
         <div>
-            <h2 class="jm-page-title">{{ __('Inventory Management') }}</h2>
-            <p class="jm-page-subtitle mb-0">{{ __('Issue stock by section and track available balances.') }}</p>
+            <h2 class="jm-page-title jm-ui-title">{{ __('Inventory Management') }}</h2>
+            <p class="jm-page-subtitle jm-ui-muted mb-0">{{ __('Issue stock by section and track available balances.') }}</p>
         </div>
     </div>
     <div class="col-12">
         <h3 class="jm-section-title">{{ __('Available Stock') }}</h3>
         <div class="row mt-5">
-            <div class="card shadow-sm">
+            <div class="card jm-ui-card shadow-sm border-0">
                 <div class="card-body">
-                    <table class="table table-bordered mt-3 text-center">
-                        <thead class="table-light">
-                            <tr>
-                                <th>{{ __('Name') }}</th>
-                                <th>{{ __('Unit of Measure') }}</th>
-                                <th>{{ __('Total Quantity in Stock') }}</th>
-                                <th>{{ __('Issue Quantity') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($inventory as $item)
-                                @php
-                                    $inventoryIsAdhoc = empty($item->product_id);
-                                    $inventoryRouteKey = $inventoryIsAdhoc
-                                        ? 'adhoc-' . md5($item->name . '|' . $item->unit_of_measure)
-                                        : $item->product_id;
-                                @endphp
+                    <div class="table-responsive jm-ui-table-wrap">
+                        <table class="table table-bordered text-center align-middle mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <td><div class="px-2">{{ $item->name }}</div></td>
-                                    <td>{{ $item->unit_of_measure }}</td>
-                                    <td>{{ $item->total_stock }}</td>
-                                    <td>
-                                        <div class="px-2">
-                                            <form action="{{ route('materials.use', $inventoryRouteKey) }}" method="POST" class="issue-form d-flex gap-2">
-                                                @csrf
-                                                @if($inventoryIsAdhoc)
-                                                    <input type="hidden" name="adhoc_name" value="{{ $item->name }}">
-                                                    <input type="hidden" name="adhoc_unit" value="{{ $item->unit_of_measure }}">
-                                                @endif
-                                                <input type="number" name="quantity_used" class="form-control form-control-sm quantity-used" 
-                                                    placeholder="{{ __('Qty') }}" step="0.01" required 
-                                                    total-stock="{{ $item->total_stock }}"
-                                                    unit-of-measure="{{ $item->unit_of_measure }}">
-                                                <select name="section_id" class="form-select form-select-sm" required>
-                                                    <option value="" disabled selected>{{ __('Select Section') }}</option>
-                                                    @foreach($sections as $section)
-                                                        <option value="{{ $section->id }}">{{ $section->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <button type="submit" class="btn btn-warning btn-sm">{{ __('Issue') }}</button>
-                                            </form>
-                                        </div>
-                                    </td>
+                                    <th>{{ __('Name') }}</th>
+                                    <th>{{ __('Unit of Measure') }}</th>
+                                    <th>{{ __('Total Quantity in Stock') }}</th>
+                                    <th>{{ __('Issue Quantity') }}</th>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted">{{ __('No inventory found.') }}</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @forelse($inventory as $item)
+                                    @php
+                                        $inventoryIsAdhoc = empty($item->product_id);
+                                        $inventoryRouteKey = $inventoryIsAdhoc
+                                            ? 'adhoc-' . md5($item->name . '|' . $item->unit_of_measure)
+                                            : $item->product_id;
+                                    @endphp
+                                    <tr>
+                                        <td><div class="px-2">{{ $item->name }}</div></td>
+                                        <td>{{ $item->unit_of_measure }}</td>
+                                        <td>{{ $item->total_stock }}</td>
+                                        <td>
+                                            <div class="px-2">
+                                                <form action="{{ route('materials.use', $inventoryRouteKey) }}" method="POST" class="issue-form d-flex gap-2">
+                                                    @csrf
+                                                    @if($inventoryIsAdhoc)
+                                                        <input type="hidden" name="adhoc_name" value="{{ $item->name }}">
+                                                        <input type="hidden" name="adhoc_unit" value="{{ $item->unit_of_measure }}">
+                                                    @endif
+                                                    <input type="number" name="quantity_used" class="form-control form-control-sm quantity-used" 
+                                                        placeholder="{{ __('Qty') }}" step="0.01" required 
+                                                        total-stock="{{ $item->total_stock }}"
+                                                        unit-of-measure="{{ $item->unit_of_measure }}">
+                                                    <select name="section_id" class="form-select form-select-sm" required>
+                                                        <option value="" disabled selected>{{ __('Select Section') }}</option>
+                                                        @foreach($sections as $section)
+                                                            <option value="{{ $section->id }}">{{ $section->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button type="submit" class="btn btn-warning btn-sm">{{ __('Issue') }}</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">{{ __('No inventory found.') }}</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

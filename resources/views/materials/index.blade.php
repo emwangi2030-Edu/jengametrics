@@ -3,7 +3,7 @@
 @section('content')
     <div class="jm-page-header">
         <div>
-            <h2 class="jm-page-title">{{ __('Material Management:') }} <span class="text-dark">{{ $project->name }}</span></h2>
+            <h2 class="jm-page-title jm-ui-title">{{ __('Material Management:') }} <span class="jm-ui-muted">{{ $project->name }}</span></h2>
             <p class="jm-page-subtitle mb-0">{{ __('Deliveries, inventory, and stock usage in one place.') }}</p>
         </div>
         <div class="jm-actions-bar">
@@ -29,7 +29,7 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <h3 class="jm-section-title">{{ __('Materials Delivered') }}</h3>
-            <div class="card shadow-sm">
+            <div class="card shadow-sm jm-ui-card">
                 <form method="GET" action="{{ route('materials.index') }}" class="row g-2 mt-2 justify-content-center">
                     <div class="col-md-3">
                         <select name="filter" class="form-select">
@@ -63,23 +63,24 @@
                                 : number_format($numeric, 2);
                         };
                     @endphp
-                    <table class="table table-bordered mt-3 text-center">
-                        <thead class="table-light">
-                            <tr>
-                                <th>{{ __('Name') }}</th>
-                                <th>{{ __('Requisitioned Quantity') }}</th>
-                                <th>{{ __('Quantity Received') }}</th>
-                                <th>{{ __('Variance') }}</th>
-                                <th>{{ __('UoM') }}</th>
-                                <th>{{ __('Unit Price') }}</th>
-                                <th>{{ __('Total Amount') }}</th>
-                                <th>{{ __('Supplier Name') }}</th>
-                                <th>{{ __('Date') }}</th>
-                                <th>{{ __('Receipt') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($materials as $material)
+                    <div class="table-responsive jm-ui-table-wrap">
+                        <table class="table table-bordered mt-3 text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>{{ __('Name') }}</th>
+                                    <th>{{ __('Requisitioned Quantity') }}</th>
+                                    <th>{{ __('Quantity Received') }}</th>
+                                    <th>{{ __('Variance') }}</th>
+                                    <th>{{ __('UoM') }}</th>
+                                    <th>{{ __('Unit Price') }}</th>
+                                    <th>{{ __('Total Amount') }}</th>
+                                    <th>{{ __('Supplier Name') }}</th>
+                                    <th>{{ __('Date') }}</th>
+                                    <th>{{ __('Receipt') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($materials as $material)
                                 @php
                                     $requisitionedQty = $material->requisitioned_quantity;
                                     if ($requisitionedQty === null && $material->variance !== null && $material->quantity_purchased !== null) {
@@ -90,31 +91,32 @@
                                     $displayQuantity = $formatNumeric($material->quantity_purchased);
                                     $displayVariance = $formatNumeric($variance);
                                 @endphp
-                                <tr>
-                                    <td><div class="px-2">{{ $material->product->name ?? $material->name }}</div></td>
-                                    <td>{{ $displayRequisitioned !== null ? $displayRequisitioned : 'N/A' }}</td>
-                                    <td>{{ $displayQuantity }}</td>
-                                    <td class="{{ $variance > 0 ? 'text-success' : ($variance < 0 ? 'text-danger' : 'text-secondary') }}">
-                                        {{ $variance > 0 ? '+' : '' }}{{ $displayVariance }}
-                                    </td>
-                                    <td>{{ $material->unit_of_measure }}</td>
-                                    <td>{{ number_format($material->unit_price, 2) }}</td>
-                                    <td>{{ number_format($material->unit_price * $material->quantity_purchased, 2) }}</td>
-                                    <td>{{ $material->supplier->name }}</td>
-                                    <td>{{ $material->created_at->format('d-m-Y') }}</td>
-                                    <td>
-                                        @if($material->document)
-                                            <a href="{{ route('materials.viewDocument', $material->id) }}" class="text-decoration-underline">
-                                                {{ __('View') }}
-                                            </a>
-                                        @else
-                                            <span class="text-muted">None</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                    <tr>
+                                        <td><div class="px-2">{{ $material->product->name ?? $material->name }}</div></td>
+                                        <td>{{ $displayRequisitioned !== null ? $displayRequisitioned : 'N/A' }}</td>
+                                        <td>{{ $displayQuantity }}</td>
+                                        <td class="{{ $variance > 0 ? 'text-success' : ($variance < 0 ? 'text-danger' : 'text-secondary') }}">
+                                            {{ $variance > 0 ? '+' : '' }}{{ $displayVariance }}
+                                        </td>
+                                        <td>{{ $material->unit_of_measure }}</td>
+                                        <td>{{ number_format($material->unit_price, 2) }}</td>
+                                        <td>{{ number_format($material->unit_price * $material->quantity_purchased, 2) }}</td>
+                                        <td>{{ $material->supplier->name }}</td>
+                                        <td>{{ $material->created_at->format('d-m-Y') }}</td>
+                                        <td>
+                                            @if($material->document)
+                                                <a href="{{ route('materials.viewDocument', $material->id) }}" class="text-decoration-underline">
+                                                    {{ __('View') }}
+                                                </a>
+                                            @else
+                                                <span class="text-muted">None</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
 
                     @if($materials->isEmpty())
                         <p class="text-center mt-4">{{ __('No materials found.') }}</p>
@@ -127,8 +129,9 @@
     <div class="row mt-5">
         <div class="col-12">
             <h3 class="jm-section-title">{{ __('Inventory Management') }}</h3>
-            <div class="card shadow-sm">
+            <div class="card shadow-sm jm-ui-card">
                 <div class="card-body">
+                    <div class="table-responsive jm-ui-table-wrap">
                     <table class="table table-bordered mt-3 text-center">
                         <thead class="table-light">
                             <tr>
@@ -177,6 +180,7 @@
                             @endforelse
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -185,7 +189,7 @@
     <div class="row mt-5">
         <div class="col-12">
             <h3 class="jm-section-title">{{ __('Stock Usage History') }}</h3>
-            <div class="card shadow-sm">
+            <div class="card shadow-sm jm-ui-card">
                 <form method="GET" action="{{ route('materials.index') }}" class="row g-2 mt-2 justify-content-center">
                     <div class="col-md-3">
                         <select name="filter" class="form-select">
@@ -216,6 +220,7 @@
                     </div>
                 </form>
                 <div class="card-body">
+                    <div class="table-responsive jm-ui-table-wrap">
                     <table class="table table-bordered mt-3 text-center">
                         <thead class="table-light">
                             <tr>
@@ -240,6 +245,7 @@
                             @endforelse
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         </div>
