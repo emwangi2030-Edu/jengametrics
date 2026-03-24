@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\LabourTask;
+use App\Models\BqSection;
+use App\Models\Section;
 use App\Models\Worker;
 use App\Models\WorkerGroup;
 use Illuminate\Http\Request;
@@ -37,7 +39,16 @@ class LabourTaskController extends Controller
             ->orderBy('name')
             ->get();
 
-        $pendingTasks = LabourTask::with(['worker', 'group.workers'])
+        $sectionIds = BqSection::where('project_id', $projectId)
+            ->whereNotNull('section_id')
+            ->distinct()
+            ->pluck('section_id');
+
+        $sections = Section::whereIn('id', $sectionIds)
+            ->orderBy('name')
+            ->get();
+
+        $pendingTasks = LabourTask::with(['worker', 'group.workers', 'section'])
             ->where('project_id', $projectId)
             ->where('is_completed', false)
             ->orderByRaw('due_date IS NULL')
@@ -45,7 +56,7 @@ class LabourTaskController extends Controller
             ->latest()
             ->get();
 
-        $completedTasks = LabourTask::with(['worker', 'group.workers'])
+        $completedTasks = LabourTask::with(['worker', 'group.workers', 'section'])
             ->where('project_id', $projectId)
             ->where('is_completed', true)
             ->orderByDesc('completed_at')
@@ -55,6 +66,7 @@ class LabourTaskController extends Controller
         return view('labour_tasks.index', compact(
             'workers',
             'groups',
+            'sections',
             'pendingTasks',
             'completedTasks'
         ));
@@ -118,6 +130,11 @@ class LabourTaskController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:2000',
+            'section_id' => [
+                'required',
+                'integer',
+                Rule::exists('bq_sections', 'section_id')->where(fn ($query) => $query->where('project_id', $projectId)),
+            ],
             'assignee_type' => ['required', Rule::in(['group', 'worker'])],
             'worker_group_id' => [
                 'nullable',
@@ -139,6 +156,7 @@ class LabourTaskController extends Controller
             'created_by' => $user->id,
             'title' => trim($validated['title']),
             'description' => $validated['description'] ?? null,
+            'section_id' => (int) $validated['section_id'],
             'assignee_type' => $validated['assignee_type'],
             'worker_group_id' => $validated['assignee_type'] === 'group' ? (int) $validated['worker_group_id'] : null,
             'worker_id' => $validated['assignee_type'] === 'worker' ? (int) $validated['worker_id'] : null,

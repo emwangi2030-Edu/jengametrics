@@ -14,6 +14,7 @@ class LabourTask extends Model
         'created_by',
         'title',
         'description',
+        'section_id',
         'assignee_type',
         'worker_group_id',
         'worker_id',
@@ -47,5 +48,9 @@ class LabourTask extends Model
     {
         return $this->belongsTo(Worker::class);
     }
-}
 
+    public function section()
+    {
+        return $this->belongsTo(Section::class);
+    }
+}

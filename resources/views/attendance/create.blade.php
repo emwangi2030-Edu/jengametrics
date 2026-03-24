@@ -39,8 +39,8 @@
                         <button type="button" id="clearAllBtn" class="btn btn-outline-secondary btn-sm">Clear All</button>
                     </div>
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Save Attendance</button>
                         <a href="{{ route('workers.index') }}" class="btn btn-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
+                        <button type="submit" class="btn btn-primary">Save Attendance</button>
                     </div>
                 </div>
             </form>

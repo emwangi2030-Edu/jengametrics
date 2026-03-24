@@ -4,7 +4,7 @@
             <th>{{ __('Date Issued') }}</th>
             <th>{{ __('Material') }}</th>
             <th>{{ __('Section') }}</th>
-            <th>{{ __('Quantity Used') }}</th>
+            <th>{{ __('Quantity Issued') }}</th>
         </tr>
     </thead>
     <tbody>

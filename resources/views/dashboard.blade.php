@@ -42,21 +42,21 @@
 
     <div class="d-flex align-items-center justify-content-between my-4">
         <h1 class="mb-0" style="color:#027333">Dashboard</h1>
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#projectStepsModal">
+        <!-- <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#projectStepsModal">
             Project Steps
-        </button>
+        </button> -->
     </div>
 
     <div class="row justify-content-center g-4">
         <!-- Total Workers Card -->
-        <div class="col-md-3">
+        <!-- <div class="col-md-3">
             <div class="card shadow border-0">
                 <div class="card-body text-center">
                     <h5 class="card-title" style="color:#027333">Total Workers</h5>
                     <h3 class="text-dark">{{ $totalWorkers}}</h3>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- Total Material Expenses Card -->
         <div class="col-md-3">
@@ -103,7 +103,7 @@
         </div>
     </div>
 
-    <div class="row justify-content-center g-4 mt-2">
+    <!-- <div class="row justify-content-center g-4 mt-2">
         <div class="col-md-4">
             <div class="card shadow border-0">
                 <div class="card-body text-center">
@@ -134,7 +134,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <br>
 

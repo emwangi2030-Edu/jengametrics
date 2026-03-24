@@ -12,7 +12,7 @@
             </h2>
             <div class="d-flex gap-1">
                 <a href="{{ route('labour_tasks.index') }}" class="btn btn-secondary">
-                    {{ __('Assign Tasks') }}
+                    {{ __('Task Management') }}
                 </a>
                 <a href="{{ route('workers.create') }}" class="btn btn-success">
                     {{ __('Add Worker') }}
