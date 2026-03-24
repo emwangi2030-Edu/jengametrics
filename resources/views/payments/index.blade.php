@@ -3,7 +3,7 @@
 @section('content')
     <div class="card shadow-sm mt-4 p-4">
         <div class="card-body">
-            <h2 style="color:#027333;">Payment History for {{ $worker->full_name }}</h2>
+            <h2 class="jm-page-title">{{ __('Payment History for :name', ['name' => $worker->full_name]) }}</h2>
 
             <a href="{{ route('workers.show', $worker->id) }}" class="btn btn-secondary mb-3">
                 Worker Profile

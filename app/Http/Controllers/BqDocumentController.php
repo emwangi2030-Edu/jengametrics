@@ -11,7 +11,9 @@ use App\Models\Element;
 use App\Models\Item;
 use App\Models\Library;
 use App\Models\LibraryItem;
+use App\Models\Project;
 use App\Models\Section;
+use App\Http\Controllers\Concerns\ResolvesActiveProject;
 use App\Services\BqItemCreator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +21,8 @@ use Illuminate\Validation\Rule;
 
 class BqDocumentController extends Controller
 {
+    use ResolvesActiveProject;
+
     protected array $levelReplicationCache = [];
     /**
      * Display a listing of the BQ documents.
@@ -27,7 +31,12 @@ class BqDocumentController extends Controller
      */
     public function index()
     {
-        $project = get_project();
+        $project = $this->resolveActiveProject();
+        if (! $project) {
+            return redirect()
+                ->route('dashboard')
+                ->with('warning', __('No project is selected. Please choose a project first.'));
+        }
 
         $masterDocument = $this->ensureMasterDocument($project->id, $project->name);
 
@@ -324,7 +333,12 @@ class BqDocumentController extends Controller
      */
     public function show(BqDocument $bqDocument)
     {
-        $project = get_project();
+        $project = $this->resolveActiveProject();
+        if (! $project) {
+            return redirect()
+                ->route('dashboard')
+                ->with('warning', __('No project is selected. Please choose a project first.'));
+        }
 
         if (is_null($bqDocument->parent_id)) {
             return redirect()->route('bq_documents.index');

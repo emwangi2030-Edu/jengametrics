@@ -63,6 +63,20 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Avatar URL (Gravatar or uploaded photo). Use in views: <img src="{{ $user->avatar_url }}">
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if (!empty($this->photo)) {
+            $storage = $this->photo_storage ?: "public";
+            return $storage === "public"
+                ? Storage::disk("public")->url($this->photo)
+                : avatar_img_url($storage, $this->photo);
+        }
+        return "https://www.gravatar.com/avatar/" . md5(strtolower(trim($this->email ?? ""))) . "?s=40&d=mm&r=g";
+    }
+
 
     public function get_gravatar( $s = 40, $d = 'mm', $r = 'g', $img = false, $atts = array() ) {
 

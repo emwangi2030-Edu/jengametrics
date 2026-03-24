@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ResolvesActiveProject;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreBomRequest;
 use App\Models\BqDocument;
 use App\Models\BqLevel;
 use App\Models\Bom;
@@ -21,9 +23,16 @@ use Illuminate\Support\Facades\Auth;
 
 class BOMController extends Controller
 {
+    use ResolvesActiveProject;
+
     public function index()
     {
-        $project = get_project();
+        $project = $this->resolveActiveProject();
+        if (! $project) {
+            return redirect()
+                ->route('dashboard')
+                ->with('warning', __('No project is selected. Please choose a project first.'));
+        }
 
         $sections = Section::orderBy('id', 'asc')->get();
 
@@ -75,7 +84,7 @@ class BOMController extends Controller
         return view('boms.create', compact('bqDocuments'));
     }
 
-    public function store(Request $request)
+    public function store(StoreBomRequest $request)
     {
         $bom = Bom::create([
             'bq_document_id' => $request->bq_document_id,
@@ -213,16 +222,25 @@ class BOMController extends Controller
     public function report()
     {
         // Calculate the total estimated cost across all sections
-       $totalEstimatedCost = BomItem::whereProjectId(project_id())
+       $project = $this->resolveActiveProject();
+       if (! $project) {
+           return redirect()
+               ->route('dashboard')
+               ->with('warning', __('No project is selected. Please choose a project first.'));
+       }
+
+       $projectId = (int) $project->id;
+
+       $totalEstimatedCost = BomItem::whereProjectId($projectId)
             ->selectRaw('SUM(quantity * rate) as total')
             ->value('total');
 
-        $totalEstimatedCost_labour = BomLabour::whereProjectId(project_id())->sum('amount');
+        $totalEstimatedCost_labour = BomLabour::whereProjectId($projectId)->sum('amount');
 
-        $materials = Material::whereProjectId(project_id())->get();
+        $materials = Material::whereProjectId($projectId)->get();
 
         $payments = Payment::with(['worker' => fn ($q) => $q->withTrashed()])
-            ->whereProjectId(project_id())
+            ->whereProjectId($projectId)
             ->orderByDesc('payment_date')
             ->get();
 
@@ -233,11 +251,6 @@ class BOMController extends Controller
 
         $total_actual_payments = $payments->sum('amount');
         
-        // Get the project details
-        $projectId = Auth::user()->project_id;
-
-        $project = Project::find($projectId);
-
         return view('report.report', compact(
             'totalEstimatedCost',
             'totalEstimatedCost_labour',

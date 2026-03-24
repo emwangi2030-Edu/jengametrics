@@ -1,8 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mt-4">
-        <h2 class="mb-4" style="color:#027333;">Add Worker</h2>
+    <div class="container py-4">
+        <div class="jm-page-header">
+            <div>
+                <h2 class="jm-page-title">{{ __('Add Worker') }}</h2>
+                <p class="jm-page-subtitle mb-0">{{ __('Capture worker details, payment terms, and contact information.') }}</p>
+            </div>
+        </div>
 
         <div class="card shadow-sm w-75 m-auto">
             <div class="card-body">
@@ -94,7 +99,7 @@
                         </select>
                     </div>
 
-                    <div id="bankFields" style="display: none;">
+                    <div id="bankFields" class="d-none">
                         <div class="mb-3">
                             <label for="bank_name" class="form-label">Bank Name</label>
                             <input type="text" name="bank_name" id="bank_name" value="{{ old('bank_name') }}" class="form-control">
@@ -107,7 +112,7 @@
 
                     <div class="d-flex justify-content-between">
                         <a href="{{ route('workers.index') }}" class="btn btn-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary">{{ __('Save Worker') }}</button>
                     </div>
                 </form>
             </div>
@@ -124,13 +129,13 @@
 
             function toggleBankFields() {
                 if (modeSelect.value === 'Bank') {
-                    bankFields.style.display = 'block';
+                    bankFields.classList.remove('d-none');
                     bankName.required = true;
                     bankAccount.required = true;
                     bankName.disabled = false;
                     bankAccount.disabled = false;
                 } else {
-                    bankFields.style.display = 'none';
+                    bankFields.classList.add('d-none');
                     bankName.required = false;
                     bankAccount.required = false;
                     bankName.disabled = true;

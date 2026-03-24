@@ -1,0 +1,260 @@
+.jm-theme.jm-app-shell-page {
+    --jm-ui-bg: #f2f4f2;
+    --jm-ui-surface: #ffffff;
+    --jm-ui-border: #e2e8e4;
+    --jm-ui-text: #1a1a1a;
+    --jm-ui-muted: #5f6f64;
+    --jm-ui-accent: #1a6b3c;
+    --jm-ui-accent-soft: #ebf5ee;
+}
+
+.jm-theme.jm-app-shell-page .main {
+    background: var(--jm-ui-bg);
+}
+
+.jm-theme.jm-app-shell-page .content {
+    padding: 20px 24px 26px;
+}
+
+.jm-theme.jm-app-shell-page .content > .container,
+.jm-theme.jm-app-shell-page .content > .container-fluid {
+    max-width: 1280px;
+}
+
+.jm-theme.jm-app-shell-page .content h1,
+.jm-theme.jm-app-shell-page .content h2,
+.jm-theme.jm-app-shell-page .content h3,
+.jm-theme.jm-app-shell-page .content h4,
+.jm-theme.jm-app-shell-page .content h5,
+.jm-theme.jm-app-shell-page .content h6 {
+    color: var(--jm-ui-text);
+    font-weight: 800;
+    letter-spacing: -0.015em;
+}
+
+.jm-theme.jm-app-shell-page .content p,
+.jm-theme.jm-app-shell-page .content label,
+.jm-theme.jm-app-shell-page .content small {
+    color: var(--jm-ui-muted);
+}
+
+.jm-theme.jm-app-shell-page .content .card,
+.jm-theme.jm-app-shell-page .content .table-responsive,
+.jm-theme.jm-app-shell-page .content .modal-content {
+    border-radius: 14px !important;
+    border: 1px solid var(--jm-ui-border) !important;
+    box-shadow: 0 8px 22px rgba(24, 39, 28, 0.06);
+    background: var(--jm-ui-surface);
+}
+
+.jm-theme.jm-app-shell-page .content .card-header,
+.jm-theme.jm-app-shell-page .content .modal-header {
+    background: #f9fbfa;
+    border-bottom: 1px solid var(--jm-ui-border) !important;
+}
+
+.jm-theme.jm-app-shell-page .content .card-footer,
+.jm-theme.jm-app-shell-page .content .modal-footer {
+    background: #f9fbfa;
+    border-top: 1px solid var(--jm-ui-border) !important;
+}
+
+.jm-theme.jm-app-shell-page .content .btn {
+    border-radius: 10px !important;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    transform: none !important;
+}
+
+.jm-theme.jm-app-shell-page .content .btn-success,
+.jm-theme.jm-app-shell-page .content .btn-primary {
+    background: var(--jm-ui-accent) !important;
+    border-color: var(--jm-ui-accent) !important;
+}
+
+.jm-theme.jm-app-shell-page .content .btn-success:hover,
+.jm-theme.jm-app-shell-page .content .btn-primary:hover {
+    background: #155b32 !important;
+    border-color: #155b32 !important;
+}
+
+.jm-theme.jm-app-shell-page .content .btn-outline-secondary,
+.jm-theme.jm-app-shell-page .content .btn-outline-primary,
+.jm-theme.jm-app-shell-page .content .btn-light {
+    border-color: #ced8d1 !important;
+}
+
+.jm-theme.jm-app-shell-page .content .table {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: #f8fbf9;
+}
+
+.jm-theme.jm-app-shell-page .content .table > :not(caption) > * > * {
+    border-bottom: 1px solid var(--jm-ui-border);
+    padding-top: 0.74rem;
+    padding-bottom: 0.74rem;
+}
+
+.jm-theme.jm-app-shell-page .content .table thead th {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #6e8075;
+    background: #f7faf8;
+}
+
+.jm-theme.jm-app-shell-page .content .form-control,
+.jm-theme.jm-app-shell-page .content .form-select {
+    border-radius: 10px;
+    border: 1px solid #c8d5cc;
+    min-height: 42px;
+    box-shadow: none !important;
+}
+
+.jm-theme.jm-app-shell-page .content .form-control:focus,
+.jm-theme.jm-app-shell-page .content .form-select:focus {
+    border-color: #2f8a56;
+    box-shadow: 0 0 0 0.2rem rgba(47, 138, 86, 0.14) !important;
+}
+
+.jm-theme.jm-app-shell-page .content .alert {
+    border-radius: 12px;
+    border-color: var(--jm-ui-border);
+}
+
+.jm-theme.jm-app-shell-page .content .badge {
+    border-radius: 999px;
+}
+
+@media (max-width: 991.98px) {
+    .jm-theme.jm-app-shell-page .content {
+        padding: 16px 14px 18px;
+    }
+}
+
+.jm-theme.jm-app-shell-page .jm-page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.jm-theme.jm-app-shell-page .jm-page-title {
+    margin: 0;
+    color: var(--jm-ui-text);
+    font-weight: 800;
+    letter-spacing: -0.015em;
+}
+
+.jm-theme.jm-app-shell-page .jm-page-subtitle {
+    margin: 4px 0 0;
+    color: var(--jm-ui-muted);
+}
+
+.jm-theme.jm-app-shell-page .jm-actions-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.jm-theme.jm-app-shell-page .jm-section-title {
+    margin: 0 0 10px;
+    color: var(--jm-ui-text);
+    font-size: 1.05rem;
+    font-weight: 800;
+}
+
+.jm-theme.jm-app-shell-page .jm-form-wrap-sm {
+    max-width: 560px;
+}
+
+.jm-theme.jm-app-shell-page .jm-photo-preview-sm {
+    max-width: 200px;
+}
+
+.jm-theme.jm-app-shell-page .jm-worker-photo-pane {
+    min-width: 220px;
+    flex: 0 0 240px;
+}
+
+.jm-theme.jm-app-shell-page .jm-worker-photo {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.jm-theme.jm-app-shell-page .jm-legend-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.jm-theme.jm-app-shell-page .jm-legend-chip {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.jm-theme.jm-app-shell-page .jm-legend-chip-present { background-color: #28a745; }
+.jm-theme.jm-app-shell-page .jm-legend-chip-absent { background-color: #dc3545; }
+.jm-theme.jm-app-shell-page .jm-legend-chip-weekend { background-color: #add8e6; }
+.jm-theme.jm-app-shell-page .jm-legend-chip-inactive { background-color: #c8c8c8; }
+
+.jm-theme.jm-app-shell-page .jm-scroll-y-sm {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.jm-theme.jm-app-shell-page .jm-toast-layer {
+    z-index: 1080;
+}
+
+.jm-theme.jm-app-shell-page .jm-scroll-y-md {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.jm-theme.jm-app-shell-page .jm-scroll-y-lg {
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+.jm-theme.jm-app-shell-page .jm-col-select {
+    width: 40px;
+}
+
+.jm-hidden-init {
+    display: none;
+}
+
+.jm-theme-toggle-btn {
+    height: 32px;
+    width: 32px;
+}
+
+.jm-object-cover {
+    object-fit: cover;
+}
+
+.jm-max-h-60vh {
+    max-height: 60vh;
+}
+
+.jm-max-w-full-block {
+    max-width: 100%;
+    display: block;
+}
+
+.jm-body-reset {
+    margin: 0;
+}
+
+[x-cloak] {
+    display: none !important;
+}

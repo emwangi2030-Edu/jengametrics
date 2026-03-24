@@ -4,7 +4,7 @@
 <div class="container py-5">
     <div class="row mb-4 text-center">
         <div class="col-12">
-            <h2 class="display-6 fw-bold" style="color:#027333;">{{ __('Bulk Add BoQ Items') }}</h2>
+            <h2 class="jm-page-title display-6 fw-bold">{{ __('Bulk Add BoQ Items') }}</h2>
             <p class="text-muted">Add multiple items to a section. Use the quick-add modal on the section page for single items.</p>
         </div>
     </div>
@@ -57,7 +57,7 @@
                         </div>
 
                         <div class="d-flex justify-content-center mt-3">
-                            <button type="submit" class="btn w-50 py-2 text-white" style="background-color:#027333;">{{ __('Save All') }}</button>
+                            <button type="submit" class="btn btn-success w-50 py-2">{{ __('Save All') }}</button>
                         </div>
                     </form>
 

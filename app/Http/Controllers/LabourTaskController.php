@@ -25,7 +25,7 @@ class LabourTaskController extends Controller
 
         $projectId = (int) ($user->project_id ?? 0);
         if (!$projectId) {
-            return redirect()->route('wizard')->with('warning', 'Select or create a project first.');
+            return redirect()->route('projects.index')->with('warning', 'Select or create a project first.');
         }
 
         $workers = Worker::where('project_id', $projectId)

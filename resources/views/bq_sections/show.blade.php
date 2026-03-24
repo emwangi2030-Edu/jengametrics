@@ -8,13 +8,13 @@
         <div class="row mb-4">
             <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                 <div>
-                    <h2 class="font-weight-bold" style="color:#027333">
+                    <h2 class="jm-page-title">
                         {{ $bqLevel->name }}
                     </h2>
                     <p class="text-muted mb-0">{{ $bqDocument->title }}</p>
                 </div>
                 <div class="mt-3 mt-md-0">
-                    <a href="{{ route('bq_levels.items.create', [$bqDocument, $bqLevel]) }}" class="btn text-white" style="background-color:#027333">
+                    <a href="{{ route('bq_levels.items.create', [$bqDocument, $bqLevel]) }}" class="btn btn-success">
                         {{ __('Add Item') }}
                     </a>
                     <a href="{{ route('bq_documents.show', $bqDocument) }}" class="btn btn-outline-secondary ms-2 allow-readonly" data-allow-readonly aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
@@ -340,7 +340,7 @@
                         return;
                     }
                     if (itemSelect) {
-                        itemSelect.innerHTML = `<option value="" disabled selected style="color: gray;">${loadingText}</option>`;
+                        itemSelect.innerHTML = `<option value="" disabled selected >${loadingText}</option>`;
                     }
 
                     const url = new URL(routes.itemsByElement, window.location.origin);
@@ -360,7 +360,7 @@
                         return;
                     }
                     if (elementSelect) {
-                        elementSelect.innerHTML = `<option value="" disabled selected style="color: gray;">${loadingText}</option>`;
+                        elementSelect.innerHTML = `<option value="" disabled selected >${loadingText}</option>`;
                     }
 
                     const url = new URL(routes.elementsBySection, window.location.origin);

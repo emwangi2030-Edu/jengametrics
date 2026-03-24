@@ -4,7 +4,7 @@
 <div class="container py-5">
     <div class="row mb-5 text-center">
         <div class="col-12">
-            <h2 class="display-6 fw-bold" style="color:#027333;">{{ __('Add Item to :level', ['level' => $bqLevel->name]) }}</h2>
+            <h2 class="jm-page-title display-6 fw-bold">{{ __('Add Item to :level', ['level' => $bqLevel->name]) }}</h2>
             <p class="text-muted">{{ __('Select a section, element, and item to include in this level, or add a manual item.') }}</p>
         </div>
     </div>
@@ -155,7 +155,7 @@
                         </div>
 
                         <div class="d-flex justify-content-center">
-                            <button type="button" class="btn w-50 py-2 text-white" style="background-color:#027333;" data-bs-toggle="modal" data-bs-target="#confirmSaveToBoqModal">
+                            <button type="button" class="btn btn-success w-50 py-2" data-bs-toggle="modal" data-bs-target="#confirmSaveToBoqModal">
                                 {{ __('Save to BoQ') }}
                             </button>
                         </div>

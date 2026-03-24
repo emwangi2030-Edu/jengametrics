@@ -17,7 +17,12 @@
 
 @section('content')
 <div class="container py-4" data-turbo-cache-control="no-cache">
-    <h2 class="mb-4" style="color:#027333;">Worker Profile</h2>
+    <div class="jm-page-header">
+    <div>
+        <h2 class="jm-page-title">{{ __('Worker Profile') }}</h2>
+        <p class="jm-page-subtitle mb-0">{{ __('Attendance, payments, and worker details in one view.') }}</p>
+    </div>
+</div>
 
     <div class="row">
         <div class="col-md-6">
@@ -57,24 +62,23 @@
                         </p>
                         <p><strong>Amount Owed:</strong> {{ number_format($amountOwed, 2) }}</p>
                         <a href="{{ route('payments.index', $worker->id) }}" class="btn btn-primary mb-3">
-                            View Payment History
+                            {{ __('View Payment History') }}
                         </a>
                         <form id="recordPaymentForm" action="{{ route('payments.store', $worker->id) }}" method="POST">
                             @csrf
                             <input type="hidden" name="amount" value="{{ $amountOwed }}">
                             <button type="submit" class="btn btn-success"
                                 @if($amountOwed <= 0) disabled @endif>
-                                Record Payment
+                                {{ __('Record Payment') }}
                             </button>
                         </form>
                         <a href="{{ route('workers.index') }}" class="btn btn-secondary mt-3" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
                     </div>
-                    <div class="p-3 border-top border-md-top-0 border-md-start d-flex align-items-start justify-content-center" style="min-width:220px; flex:0 0 240px;">
+                    <div class="p-3 border-top border-md-top-0 border-md-start d-flex align-items-start justify-content-center jm-worker-photo-pane">
                         <img
                             src="{{ $photoUrl ?? asset('assets/media/svg/avatars/blank.svg') }}"
                             alt="{{ $worker->full_name }} photo"
-                            class="img-fluid rounded shadow-sm"
-                            style="width: 100%; height: auto; object-fit: contain;">
+                            class="img-fluid rounded shadow-sm jm-worker-photo">
                     </div>
                 </div>
             </div>
@@ -83,7 +87,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm mb-3">
                 <div class="card-body">
-                    <h4 class="text-dark mb-3">Attendance Chart</h4>
+                    <h4 class="jm-section-title">{{ __('Attendance Overview') }}</h4>
 
                     <!-- Filter Form -->
                     <div class="row mb-4 g-2">
@@ -109,21 +113,21 @@
 
                     <!-- Chart Canvas -->
                     <canvas id="attendanceChart" height="300"></canvas>
-                    <div class="d-flex flex-wrap align-items-center mt-2" style="gap: 12px;">
+                    <div class="jm-legend-row mt-2">
                         <span class="d-flex align-items-center">
-                            <span style="width:12px;height:12px;background-color:#28a745;border-radius:2px;display:inline-block;margin-right:6px;"></span>
+                            <span class="jm-legend-chip jm-legend-chip-present"></span>
                             <small class="text-muted">Present</small>
                         </span>
                         <span class="d-flex align-items-center">
-                            <span style="width:12px;height:12px;background-color:#dc3545;border-radius:2px;display:inline-block;margin-right:6px;"></span>
+                            <span class="jm-legend-chip jm-legend-chip-absent"></span>
                             <small class="text-muted">Absent</small>
                         </span>
                         <span class="d-flex align-items-center">
-                            <span style="width:12px;height:12px;background-color:#add8e6;border-radius:2px;display:inline-block;margin-right:6px;"></span>
+                            <span class="jm-legend-chip jm-legend-chip-weekend"></span>
                             <small class="text-muted">Weekend</small>
                         </span>
                         <span class="d-flex align-items-center">
-                            <span style="width:12px;height:12px;background-color:#c8c8c8;border-radius:2px;display:inline-block;margin-right:6px;"></span>
+                            <span class="jm-legend-chip jm-legend-chip-inactive"></span>
                             <small class="text-muted">Inactive</small>
                         </span>
                     </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use App\Support\DateRangeQueries;
 
 class PurchasesReportController extends Controller
 {
@@ -60,7 +61,7 @@ class PurchasesReportController extends Controller
         }
 
         $years = Material::whereProjectId(project_id())
-            ->selectRaw('DISTINCT YEAR(created_at) as y')
+            ->selectRaw('DISTINCT ' . DateRangeQueries::yearColumn('created_at') . ' as y')
             ->orderByDesc('y')
             ->pluck('y');
 

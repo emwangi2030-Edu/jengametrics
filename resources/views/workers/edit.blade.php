@@ -1,8 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-4">
-    <h2 class="mb-4 text-success">Edit Worker</h2>
+<div class="container py-4">
+    <div class="jm-page-header">
+        <div>
+            <h2 class="jm-page-title">{{ __('Edit Worker') }}</h2>
+            <p class="jm-page-subtitle mb-0">{{ __('Update profile, role details, and payment settings.') }}</p>
+        </div>
+    </div>
 
     @if($errors->any())
         <div class="alert alert-danger">
@@ -84,7 +89,7 @@
                     <label for="picture" class="form-label">Profile Photo <span class="text-muted">(optional)</span></label>
                     @if ($photoUrl)
                         <div class="mb-2">
-                            <img src="{{ $photoUrl }}" alt="{{ $worker->full_name }} current photo" class="img-fluid rounded shadow-sm" style="max-width: 200px;">
+                            <img src="{{ $photoUrl }}" alt="{{ $worker->full_name }} current photo" class="img-fluid rounded shadow-sm jm-photo-preview-sm">
                         </div>
                         <p class="text-muted small mb-1">Upload a new image to replace the current photo.</p>
                     @else
@@ -119,7 +124,7 @@
                     </select>
                 </div>
 
-                <div id="bankFields" style="display: none;">
+                <div id="bankFields" class="d-none">
                     <div class="mb-3">
                         <label for="bank_name" class="form-label">Bank Name</label>
                         <input type="text" name="bank_name" id="bank_name"
@@ -134,7 +139,7 @@
 
                 <div class="d-flex justify-content-between">
                     <a href="{{ route('workers.index') }}" class="btn btn-secondary" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
-                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="submit" class="btn btn-primary">{{ __('Save Changes') }}</button>
                 </div>
             </form>
         </div>
@@ -151,11 +156,11 @@
 
         function toggleBankFields() {
             if (modeSelect.value === 'Bank') {
-                bankFields.style.display = 'block';
+                bankFields.classList.remove('d-none');
                 bankName.required = true;
                 bankAccount.required = true;
             } else {
-                bankFields.style.display = 'none';
+                bankFields.classList.add('d-none');
                 bankName.required = false;
                 bankAccount.required = false;
             }

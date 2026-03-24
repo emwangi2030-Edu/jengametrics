@@ -5,7 +5,7 @@
     <div class="row mb-4">
         <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
             <div>
-                <h2 class="fw-bold" style="color:#027333">{{ $document->title }}</h2>
+                <h2 class="jm-page-title">{{ $document->title }}</h2>
                 <p class="text-muted mb-0">{{ $document->description }}</p>
             </div>
             <div class="text-end mt-3 mt-md-0">
@@ -18,7 +18,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <a href="{{ route('boms.index') }}" class="btn btn-outline-secondary me-2" aria-label="Back" title="Back"><span data-feather="arrow-left-circle"></span></a>
-            <a href="{{ route('bq_documents.show', $document) }}" class="btn text-white" style="background-color:#027333">{{ __('View BoQ') }}</a>
+            <a href="{{ route('bq_documents.show', $document) }}" class="btn btn-success">{{ __('View BoQ') }}</a>
         </div>
     </div>
 

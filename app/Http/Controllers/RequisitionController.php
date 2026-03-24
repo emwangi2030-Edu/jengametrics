@@ -2,21 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ResolvesActiveProject;
 use Illuminate\Http\Request;
 use App\Models\Requisition;
 use App\Models\BomItem;
 use App\Models\Section;
 use App\Models\UnitOfMeasurement;
 use App\Models\BqDocument;
+use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Carbon\Unit;
 
 class RequisitionController extends Controller
 {
+    use ResolvesActiveProject;
+
     public function index(Request $request)
     {
-        $projectId = Auth::user()->project_id;
+        $project = $this->resolveActiveProject();
+        if (! $project) {
+            return redirect()
+                ->route('dashboard')
+                ->with('warning', __('No project is selected. Please choose a project first.'));
+        }
+
+        $projectId = (int) $project->id;
 
         $projectScope = function ($query) use ($projectId) {
             $query->whereHas('bomItem', function ($bomQuery) use ($projectId) {

@@ -1,0 +1,250 @@
+/**
+ * JengaMetrics app shell — aligns Blade layouts with React dashboard shell (sidebar + top bar).
+ */
+.jm-theme.jm-app-shell-page .navbar-vertical.jm-app-sidebar {
+    width: 240px !important;
+    max-width: 240px !important;
+    background: #ffffff !important;
+    border-right: 1px solid var(--jm-border, #e2e8e4) !important;
+    box-shadow: none !important;
+}
+
+.jm-theme.jm-app-shell-page .navbar-vertical.jm-app-sidebar .navbar-vertical-content {
+    padding: 0 !important;
+}
+
+.jm-theme.jm-app-shell-page .jm-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 16px 14px;
+    border-bottom: 1px solid var(--jm-border, #e2e8e4);
+    margin-bottom: 4px;
+}
+
+.jm-theme.jm-app-shell-page .jm-sidebar-brand-mark {
+    font-size: 1.65rem;
+    line-height: 1;
+}
+
+.jm-theme.jm-app-shell-page .jm-sidebar-brand-text {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1b5e35;
+    letter-spacing: -0.02em;
+}
+
+.jm-theme.jm-app-shell-page .jm-sidebar-brand-text span {
+    color: #3da85e;
+    font-weight: 800;
+}
+
+.jm-theme.jm-app-shell-page .jm-sidebar-scroll {
+    padding: 8px 10px 16px;
+    overflow-y: auto;
+}
+
+.jm-theme.jm-app-shell-page .jm-sidebar-section-label {
+    font-size: 0.5625rem;
+    font-weight: 700;
+    color: var(--jm-text-3, #7a8a7f);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 14px 8px 6px;
+    margin: 0;
+}
+
+.jm-theme.jm-app-shell-page .jm-sidebar-section-label:first-of-type {
+    padding-top: 6px;
+}
+
+/* Nav items — match React pill style */
+.jm-theme.jm-app-shell-page .nav-item-wrapper {
+    margin-bottom: 4px !important;
+}
+
+.jm-theme.jm-app-shell-page .jm-app-sidebar .nav-link.label-1 {
+    border-radius: 8px !important;
+    padding: 9px 10px !important;
+    min-height: auto !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    color: #1a1a1a !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+.jm-theme.jm-app-shell-page .jm-app-sidebar .nav-link.label-1:hover {
+    background: #f7faf8 !important;
+    color: #1b5e35 !important;
+}
+
+.jm-theme.jm-app-shell-page .jm-app-sidebar .nav-link.jm-nav-active,
+.jm-theme.jm-app-shell-page .jm-app-sidebar .nav-link.label-1.jm-nav-active {
+    background: #ebf5ee !important;
+    color: #1b5e35 !important;
+    font-weight: 700 !important;
+}
+
+.jm-theme.jm-app-shell-page .jm-app-sidebar .nav-link-icon {
+    color: #2e7d52 !important;
+    opacity: 0.85;
+}
+
+.jm-theme.jm-app-shell-page .jm-app-sidebar .nav-link.jm-nav-active .nav-link-icon,
+.jm-theme.jm-app-shell-page .jm-app-sidebar .nav-link.label-1.jm-nav-active .nav-link-icon {
+    color: #1b5e35 !important;
+    opacity: 1;
+}
+
+.jm-theme.jm-app-shell-page .jm-app-sidebar .nav-link-text {
+    font-size: 0.8125rem !important;
+    font-weight: inherit !important;
+    color: inherit !important;
+    margin-left: 0.35rem !important;
+}
+
+.jm-theme.jm-app-shell-page .jm-app-sidebar .nav-link.jm-nav-active .nav-link-text {
+    font-weight: 700 !important;
+    color: #1b5e35 !important;
+}
+
+/* Submenu collapse + Material children */
+.jm-theme.jm-app-shell-page .nav-item-wrapper {
+    position: relative;
+}
+
+.jm-theme.jm-app-shell-page .nav-item-wrapper .dropdown-menu {
+    position: static !important;
+    display: block;
+    margin: 0;
+    padding: 0 0 0 0.75rem;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    list-style: none;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    font-size: 0.8125rem !important;
+}
+
+.jm-theme.jm-app-shell-page .nav-item-wrapper .dropdown-menu .dropdown-item {
+    padding: 7px 10px !important;
+    border-radius: 6px !important;
+    margin-bottom: 2px !important;
+    color: #4a4a4a !important;
+}
+
+.jm-theme.jm-app-shell-page .nav-item-wrapper .dropdown-menu .dropdown-item:hover {
+    background: #f7faf8 !important;
+    color: #1b5e35 !important;
+}
+
+.jm-theme.jm-app-shell-page .nav-item-wrapper .dropdown-menu .dropdown-item.jm-nav-active {
+    background: #ebf5ee !important;
+    color: #1b5e35 !important;
+    font-weight: 700 !important;
+}
+
+.jm-theme.jm-app-shell-page .nav-item-wrapper.open > .dropdown-menu {
+    max-height: 600px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.jm-theme.jm-app-shell-page .nav-item-wrapper.has-submenu > .nav-link {
+    position: relative;
+    padding-right: 2rem !important;
+}
+
+.jm-theme.jm-app-shell-page .nav-item-wrapper.has-submenu > .nav-link::after {
+    content: "▾";
+    position: absolute;
+    right: 0.65rem;
+    font-size: 14px;
+    color: #6b7f72 !important;
+    transition: transform 0.3s ease;
+}
+
+.jm-theme.jm-app-shell-page .nav-item-wrapper.has-submenu.open > .nav-link::after {
+    transform: rotate(180deg);
+    color: #1b5e35 !important;
+}
+
+/* Admin collapse sections — softer */
+.jm-theme.jm-app-shell-page .jm-app-sidebar .parent-wrapper .nav-link {
+    border-radius: 8px !important;
+    padding: 8px 10px !important;
+    font-size: 0.8125rem !important;
+}
+
+.jm-theme.jm-app-shell-page .navbar-vertical-footer {
+    border-top: 1px solid var(--jm-border, #e2e8e4) !important;
+    background: #fbfcfb !important;
+}
+
+/* Top bar — same canvas as shell (no “floating white strip” above sidebar) */
+.jm-theme.jm-app-shell-page .navbar-top.jm-app-topbar {
+    background: #f2f4f2 !important;
+    border-bottom: 1px solid var(--jm-border, #e2e8e4) !important;
+    min-height: 52px !important;
+    box-shadow: none !important;
+}
+
+.jm-theme.jm-app-shell-page .jm-app-topbar .jm-topbar-mobile-brand .jm-sidebar-brand-text {
+    font-size: 1rem !important;
+}
+
+.jm-theme.jm-app-shell-page .jm-app-topbar .jm-topbar-mobile-brand .jm-sidebar-brand-mark {
+    font-size: 1.25rem !important;
+}
+
+.jm-theme.jm-app-shell-page .jm-project-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4a4a4a;
+    background: #f2f4f2;
+    border: 1px solid var(--jm-border, #e2e8e4);
+    padding: 6px 12px;
+    border-radius: 999px;
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jm-theme.jm-app-shell-page .jm-app-topbar .theme-control-toggle {
+    border: 1px solid var(--jm-border, #e2e8e4);
+    border-radius: 8px;
+    padding: 0 4px;
+}
+
+/* Dropdown profile card */
+.jm-theme.jm-app-shell-page .navbar-dropdown-caret.dropdown-profile {
+    border-radius: var(--jm-radius-lg, 14px) !important;
+    border: 1px solid var(--jm-border, #e2e8e4) !important;
+    box-shadow: 0 12px 28px rgba(24, 39, 28, 0.08) !important;
+}
+
+/* Main content offset — match sidebar width (Phoenix uses .main margin) */
+@media (min-width: 992px) {
+    .jm-theme.jm-app-shell-page .main {
+        margin-left: 240px !important;
+    }
+
+    html.navbar-vertical-collapsed .jm-theme.jm-app-shell-page .main {
+        margin-left: 5.75rem !important;
+    }
+}
+
+/* Reduce Phoenix “scale on hover” for nav */
+.jm-theme.jm-app-shell-page .jm-app-sidebar .nav-link:hover .nav-link-text,
+.jm-theme.jm-app-shell-page .jm-app-sidebar .nav-link:hover .nav-link-icon {
+    transform: none !important;
+}

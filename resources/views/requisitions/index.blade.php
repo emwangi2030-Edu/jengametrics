@@ -4,20 +4,18 @@
 @php
     $canManageMaterials = auth()->check() && (!auth()->user()->isSubAccount() || auth()->user()->can_manage_materials);
 @endphp
-<div class="row py-4 {{ $canManageMaterials ? '' : 'materials-readonly' }}">
-    <h2 class="font-weight-bold" style="color:#027333">Requisition List</h2>
-
-    <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
+<div class="container mt-4 {{ $canManageMaterials ? '' : 'materials-readonly' }}">
+    <div class="jm-page-header">
         <div>
-            <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#requisitionModal">
-                Requisition Material
+            <h2 class="jm-page-title">{{ __('Material Requisitions') }}</h2>
+            <p class="jm-page-subtitle mb-0">{{ __('Track requests, approvals, and consumption by section.') }}</p>
+        </div>
+        <div class="jm-actions-bar">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#requisitionModal">
+                {{ __('Requisition Material') }}
             </button>
         </div>
     </div>
-</div>
-
-<div class="container mt-4">
-    <h2 class="mb-4" style="color:#027333">Material Requisitions</h2>
     <div class="card shadow-sm">
         <div class="card-body">
             <table class="table table-bordered">
@@ -79,7 +77,7 @@
             </table>
         </div>
     </div>        
-    <h3 class="mt-5" style="color:#027333">Summary of Approved Requisitions</h3>
+    <h3 class="jm-section-title mt-4">{{ __('Summary of Approved Requisitions') }}</h3>
     <div class="card shadow-sm">
         <div class="card-body">
             <table class="table table-bordered mt-3 text-center">

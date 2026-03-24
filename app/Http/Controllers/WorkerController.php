@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ResolvesActiveProject;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreWorkerRequest;
 use App\Models\Worker;
 use App\Models\Project;
 use App\Models\Attendance;
@@ -10,9 +12,12 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Support\DateRangeQueries;
 
 class WorkerController extends Controller
 {
+    use ResolvesActiveProject;
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -20,14 +25,14 @@ class WorkerController extends Controller
 
     public function index()
     {
-        $user = Auth::user();
-        $projectId = $user?->project_id;
-
-        if (!$projectId) {
+        $project = $this->resolveActiveProject();
+        if (! $project) {
             return redirect()
-                ->route('wizard')
-                ->with('warning', 'Select or create a project before managing workers.');
+                ->route('dashboard')
+                ->with('warning', 'No project is selected. Please choose a project first.');
         }
+
+        $projectId = (int) $project->id;
 
         $status = request('status', 'active');
 
@@ -78,7 +83,7 @@ class WorkerController extends Controller
 
         // Dropdown data
         $availableYears = Attendance::where('worker_id', $worker->id)
-            ->selectRaw('YEAR(date) as year')->distinct()->pluck('year');
+            ->selectRaw(DateRangeQueries::yearColumn('date') . ' as year')->distinct()->pluck('year');
 
         $availableMonths = collect(range(1, 12))->mapWithKeys(function ($m) {
             return [$m => Carbon::create()->month($m)->format('F')];
@@ -193,7 +198,7 @@ class WorkerController extends Controller
 
         if (!$projectId) {
             return redirect()
-                ->route('wizard')
+                ->route('projects.index')
                 ->with('warning', 'Select or create a project before adding workers.');
         }
 
@@ -201,31 +206,18 @@ class WorkerController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store(StoreWorkerRequest $request)
     {
         $user = Auth::user();
         $projectId = $user?->project_id;
 
         if (!$projectId) {
             return redirect()
-                ->route('wizard')
+                ->route('projects.index')
                 ->with('warning', 'Select or create a project before adding workers.');
         }
 
-        $validated = $request->validate([
-            'full_name'         => 'required|string|max:255',
-            'id_number'         => 'required|integer',
-            'job_category'      => 'required|string',
-            'work_type'         => 'required|string',
-            'phone'             => 'required|string|max:15',
-            'email'             => 'nullable|email|max:255',
-            'picture'           => 'nullable|image|max:4096',
-            'payment_amount'    => 'nullable|numeric|min:0',
-            'payment_frequency' => 'nullable|string|in:per day,per month,one-time payment',
-            'mode_of_payment'   => 'required|string',
-            'bank_name'         => ['required_if:mode_of_payment,Bank', 'nullable', 'string', 'max:255'],
-            'bank_account'      => ['required_if:mode_of_payment,Bank', 'nullable', 'string', 'max:255'],
-        ]);
+        $validated = $request->validated();
 
         if (($validated['mode_of_payment'] ?? '') !== 'Bank') {
             $validated['bank_name'] = null;
@@ -301,24 +293,11 @@ class WorkerController extends Controller
             ->with('success', 'Worker reinstated successfully.');
     }
 
-    public function update(Request $request, $id)
+    public function update(StoreWorkerRequest $request, $id)
     {
         $worker = Worker::findOrFail($id);
 
-        $validated = $request->validate([
-            'full_name'         => 'required|string|max:255',
-            'id_number'         => 'required|integer',
-            'job_category'      => 'required|string',
-            'work_type'         => 'required|string',
-            'phone'             => 'required|string|max:15',
-            'email'             => 'nullable|email|max:255',
-            'picture'           => 'nullable|image|max:4096',
-            'payment_amount'    => 'nullable|numeric|min:0',
-            'payment_frequency' => 'nullable|string|in:per day,per month,one-time payment',
-            'mode_of_payment'   => 'required|string',
-            'bank_name'         => ['required_if:mode_of_payment,Bank', 'nullable', 'string', 'max:255'],
-            'bank_account'      => ['required_if:mode_of_payment,Bank', 'nullable', 'string', 'max:255'],
-        ]);
+        $validated = $request->validated();
 
         if (($validated['mode_of_payment'] ?? '') !== 'Bank') {
             $validated['bank_name'] = null;

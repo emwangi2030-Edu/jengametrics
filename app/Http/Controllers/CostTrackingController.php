@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ResolvesActiveProject;
 use App\Models\Material;
 use App\Models\Project;
 use App\Models\Payment;
@@ -9,12 +10,23 @@ use Illuminate\Support\Facades\Auth;
 
 class CostTrackingController extends Controller
 {
+    use ResolvesActiveProject;
+
     public function index()
     {
-        $materials = Material::whereProjectId(project_id())->get();
+        $project = $this->resolveActiveProject();
+        if (! $project) {
+            return redirect()
+                ->route('dashboard')
+                ->with('warning', __('No project is selected. Please choose a project first.'));
+        }
+
+        $projectId = (int) $project->id;
+
+        $materials = Material::whereProjectId($projectId)->get();
 
         $payments = Payment::with('worker')
-            ->whereProjectId(project_id())
+            ->whereProjectId($projectId)
             ->get();
 
         $totalCost = $materials->sum(function ($material) {
@@ -24,10 +36,6 @@ class CostTrackingController extends Controller
         $totalPayments = $payments->sum('amount');
 
         session(['totalMaterialCost' => $totalCost]);
-
-        $projectId = Auth::user()->project_id;
-
-        $project = Project::find($projectId);
 
         return view('cost-tracking.index', compact('materials', 'totalCost','project','payments','totalPayments'));
     }

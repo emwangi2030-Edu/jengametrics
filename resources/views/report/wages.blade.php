@@ -2,12 +2,12 @@
 
 @section('content')
 <div class="container py-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+    <div class="jm-page-header">
         <div>
-            <h2 class="font-weight-bold mb-1" style="color:#027333">
+            <h2 class="jm-page-title">
                 {{ __('Wages Report') }}
             </h2>
-            <p class="text-muted mb-0">{{ __('Wages recorded for this project.') }}</p>
+            <p class="jm-page-subtitle mb-0">{{ __('Review worker payments by period and export to Excel.') }}</p>
         </div>
         <div class="mt-3 mt-md-0 d-flex gap-2">
             <a href="{{ route('reports.wages', ['download' => 1]) }}" class="btn btn-outline-primary btn-sm">

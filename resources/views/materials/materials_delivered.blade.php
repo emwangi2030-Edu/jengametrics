@@ -4,14 +4,16 @@
 @php
     $canManageMaterials = auth()->check() && (!auth()->user()->isSubAccount() || auth()->user()->can_manage_materials);
 @endphp
-<div class="row py-4 {{ $canManageMaterials ? '' : 'materials-readonly' }}">
-    <h2 class="font-weight-bold" style="color:#027333">
-        Material Management
-    </h2>
-    <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
+<div class="container py-4 {{ $canManageMaterials ? '' : 'materials-readonly' }}">
+    <div class="jm-page-header">
+        <div>
+            <h2 class="jm-page-title">{{ __('Material Deliveries') }}</h2>
+            <p class="jm-page-subtitle mb-0">{{ __('Review deliveries against requisitions and monitor supplier performance.') }}</p>
+        </div>
+        <div class="jm-actions-bar">
         <div>
             <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#requisitionModal">
-                Requisition Material
+                {{ __('Requisition Material') }}
             </button>
         </div>
         <div>
@@ -19,12 +21,12 @@
                 {{ __('Receive Approved Materials') }}
             </a>
         </div>
+        </div>
     </div>
-</div>
 
 <div class="row justify-content-center">
     <div class="col-md-12">
-        <h3 class="font-weight-bold" style="color:#027333">Materials Delivered</h3>
+        <h3 class="jm-section-title">{{ __('Delivered Materials') }}</h3>
         <div class="card shadow-sm">
             <form method="GET" action="{{ route('materials.delivered') }}" class="row g-2 mt-2 justify-content-center" id="materials-delivered-filters">
                 <div class="col-md-3">

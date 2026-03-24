@@ -28,11 +28,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $user = $request->user();
-        if ($user && !$user->is_admin() && !$user->isSubAccount() && !$user->has_project) {
-            return redirect()->route('wizard');
-        }
-
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

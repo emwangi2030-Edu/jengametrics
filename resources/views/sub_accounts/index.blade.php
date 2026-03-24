@@ -30,10 +30,10 @@
         <div class="col-lg-10">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
                 <div>
-                    <h2 class="fw-bold mb-1" style="color:#027333;">{{ __('Add Users') }}</h2>
+                    <h2 class="jm-page-title">{{ __('Add Users') }}</h2>
                     <p class="text-muted mb-0">{{ __('Add and manage users linked to your account.') }}</p>
                 </div>
-                <button type="button" class="btn mt-3 mt-md-0" style="background-color:#027333; border-color:#027333; color:#fff;" data-bs-toggle="modal" data-bs-target="#createSubAccountModal">
+                <button type="button" class="btn btn-success mt-3 mt-md-0" data-bs-toggle="modal" data-bs-target="#createSubAccountModal">
                     {{ __('Add User') }}
                 </button>
             </div>
@@ -109,7 +109,7 @@
             <form method="POST" action="{{ route('sub_accounts.store') }}">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title text-success" style="color:#027333 !important;" id="createSubAccountModalLabel">{{ __('Add User') }}</h5>
+                    <h5 class="modal-title text-success" id="createSubAccountModalLabel">{{ __('Add User') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                 </div>
                 <div class="modal-body">
@@ -145,7 +145,7 @@
                             </span>
                         </div>
                     </div>
-                    <div class="mb-2 fw-semibold" style="color:#027333;">{{ __('Role Access') }}</div>
+                    <div class="mb-2 fw-semibold text-success">{{ __('Role Access') }}</div>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="role-boq" name="can_manage_boq" value="1">
                         <label class="form-check-label" for="role-boq">{{ __('Manage BoQ and BoM') }}</label>
@@ -160,7 +160,7 @@
                     </div>
                     <small class="text-muted d-block mt-2">{{ __('Unchecked roles will remain read-only.') }}</small>
 
-                    <div class="mt-4 mb-2 fw-semibold" style="color:#027333;">{{ __('Project Access') }}</div>
+                    <div class="mt-4 mb-2 fw-semibold text-success">{{ __('Project Access') }}</div>
                     @if($projects->isEmpty())
                         <div class="alert alert-warning py-2 mb-0">
                             {{ __('No projects available. Create a project first to assign access.') }}
@@ -195,7 +195,7 @@
     </div>
 </div>
 
-<div class="toast-container position-fixed top-0 end-0 p-3" id="subAccountPasswordToastContainer" style="z-index: 1080;"></div>
+<div class="toast-container position-fixed top-0 end-0 p-3 jm-toast-layer" id="subAccountPasswordToastContainer"></div>
 
 @foreach($subAccounts as $subAccount)
     <div class="modal fade" id="editSubAccountModal{{ $subAccount->id }}" tabindex="-1" aria-labelledby="editSubAccountModalLabel{{ $subAccount->id }}" aria-hidden="true">

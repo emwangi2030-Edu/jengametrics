@@ -10,7 +10,7 @@
         <div class="col-lg-10">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
                 <div>
-                    <h2 class="fw-bold text-primary mb-1">
+                    <h2 class="fw-bold mb-1">
                         {{ __('Bill of Quantities for') }} {{ $project->name }}
                     </h2>
                     <p class="text-muted mb-0">{{ __('Master document aggregates all BoQs for requisitions and reporting.') }}</p>
@@ -266,14 +266,14 @@
                                                                                                                                                     
                     <div class="mt-4">                                                                                                            
                         <label class="form-label">{{ __('Available Items') }}</label>                                                             
-                        <div id="edit-library-items-container" class="border rounded p-3" style="max-height: 250px; overflow-y: auto;">           
+                        <div id="edit-library-items-container" class="border rounded p-3 jm-scroll-y-md">           
                             <p class="text-muted mb-0">{{ __('Select a section to load items.') }}</p>                                            
                         </div>                                                                                                                    
                     </div>                                                                                                                        
                                                                                                                                                     
                     <div class="mt-3">                                                                                                            
                         <label class="form-label">{{ __('Selected Items') }}</label>                                                              
-                        <div id="edit-library-selected-items" class="selected-items border rounded p-3 bg-light" style="max-height: 200px; overflow-y: auto;">   
+                        <div id="edit-library-selected-items" class="selected-items border rounded p-3 bg-light jm-scroll-y-sm">   
                             <p class="text-muted mb-0">{{ __('No items selected yet.') }}</p>                                                     
                         </div>                                                                                                                    
                         <div id="edit-library-selected-inputs" class="hidden-selected-inputs d-none"></div>                                                              
@@ -328,7 +328,7 @@
                                                                                                                                                 
                     <div class="mt-4">
                         <label class="form-label">{{ __('Available Items') }}</label>
-                        <div id="library-items-container" class="border rounded p-3" style="max-height: 250px; overflow-y: auto;">
+                        <div id="library-items-container" class="border rounded p-3 jm-scroll-y-md">
                             <p class="text-muted mb-0">{{ __('Select a section and element to load items.') }}</p>
                         </div>
                         <p class="small text-muted mt-2 mb-0">{{ __('Tick items to include them in this library. You can switch sections and elements to keep adding more; selections appear below.') }}</p>
@@ -336,7 +336,7 @@
 
                     <div class="mt-3">
                         <label class="form-label">{{ __('Selected Items') }}</label>
-                        <div id="library-selected-items" class="selected-items border rounded p-3 bg-light" style="max-height: 200px; overflow-y: auto;">
+                        <div id="library-selected-items" class="selected-items border rounded p-3 bg-light jm-scroll-y-sm">
                             <p class="text-muted mb-0">{{ __('No items selected yet.') }}</p>
                         </div>
                         <div id="library-selected-inputs" class="hidden-selected-inputs d-none"></div>

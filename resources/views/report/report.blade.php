@@ -3,12 +3,12 @@
 @section('content')
 <div class="container py-4">
     <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-            <h2 class="font-weight-bold mb-2 mb-md-0" style="color:#027333">
-                Total Costs: <span class="text-black">{{ $project->name }}</span>
-            </h2>
-            <div class="d-flex gap-2">
+    <div class="jm-page-header">
+        <div>
+            <h2 class="jm-page-title">{{ __('Project Cost Summary:') }} <span class="text-dark">{{ $project->name }}</span></h2>
+            <p class="jm-page-subtitle mb-0">{{ __('Compare estimated and actual material/labour costs.') }}</p>
+        </div>
+            <div class="jm-actions-bar">
                 <a href="{{ route('reports.purchases') }}" class="btn btn-outline-primary btn-sm">
                     {{ __('Purchases Report') }}
                 </a>
@@ -25,7 +25,7 @@
         <div class="col-md-6 mb-4">
             <div class="card shadow">
                 <div class="card-body text-center">
-                    <h4 class="font-weight-bold" style="color:#027333">{{ __('Total Estimated Cost') }}</h4>
+                    <h4 class="jm-section-title">{{ __('Total Estimated Cost') }}</h4>
                     <h2 class="text-dark">
                         {{ number_format(($totalEstimatedCost ?? 0) + ($totalEstimatedCost_labour ?? 0), 2) }}
                     </h2>
@@ -35,7 +35,7 @@
         <div class="col-md-6 mb-4">
             <div class="card shadow">
                 <div class="card-body text-center">
-                    <h4 class="font-weight-bold" style="color:#027333">{{ __('Total Actual Cost') }}</h4>
+                    <h4 class="jm-section-title">{{ __('Total Actual Cost') }}</h4>
                     <h2 class="text-dark">
                         {{ number_format(($total_actual_cost ?? 0) + ($total_actual_payments ?? 0), 2) }}
                     </h2>
@@ -49,7 +49,7 @@
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-body">
-                    <h5 class="font-weight-bold text-secondary">{{ __('Estimated Cost Breakdown') }}</h5>
+                    <h5 class="jm-section-title">{{ __('Estimated Cost Breakdown') }}</h5>
                     <canvas id="estimatedCostChart"></canvas>
                 </div>
             </div>
@@ -57,7 +57,7 @@
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-body">
-                    <h5 class="font-weight-bold text-secondary">{{ __('Actual Cost Breakdown') }}</h5>
+                    <h5 class="jm-section-title">{{ __('Actual Cost Breakdown') }}</h5>
                     <canvas id="actualCostChart"></canvas>
                 </div>
             </div>
@@ -70,7 +70,7 @@
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-body">
-                    <h5 class="font-weight-bold text-secondary">{{ __('Estimated Cost Details') }}</h5>
+                    <h5 class="jm-section-title">{{ __('Estimated Cost Details') }}</h5>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -97,7 +97,7 @@
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-body">
-                    <h5 class="font-weight-bold text-secondary">{{ __('Actual Cost Details') }}</h5>
+                    <h5 class="jm-section-title">{{ __('Actual Cost Details') }}</h5>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -112,7 +112,7 @@
                             </tr>
                             <tr>
                                 <td>{{ __('Labour') }}</td>
-                                <td>{{ number_format($total_actual_payments, 2) }}</td> <!-- Replace with actual labour cost if available -->
+                                <td>{{ number_format($total_actual_payments, 2) }}</td>
                             </tr>
                         </tbody>
                     </table>
