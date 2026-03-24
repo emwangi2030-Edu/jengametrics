@@ -39,8 +39,10 @@ class DashboardController extends Controller
 
         bootstrap_user_active_project_if_missing();
 
-        // Render the new React dashboard for non-admin users.
-        return view('ui.jenga-metrics');
+        if (file_exists(public_path('build/manifest.json'))) {
+            // Render the React dashboard when Vite build assets are available.
+            return view('ui.jenga-metrics');
+        }
 
         $projectId = (int) ($user->project_id ?? 0);
         $project = Project::find($projectId);
