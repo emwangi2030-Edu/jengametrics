@@ -65,16 +65,18 @@
     flex-direction: column;
     min-width: 0;
     min-height: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .jm-theme.jm-app-shell-page .jm-shell-main-wrap .navbar-top.jm-app-topbar {
-    position: relative !important;
+    position: sticky !important;
+    top: 0;
     left: auto !important;
     width: auto !important;
     inset: auto !important;
     flex-shrink: 0;
-    z-index: 3;
+    z-index: 4;
     display: block;
     min-height: 52px !important;
 }
@@ -90,8 +92,7 @@
     padding-right: 24px !important;
     padding-bottom: 20px !important;
     padding-left: 24px !important;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: visible;
     background: #f2f4f2;
 }
 
