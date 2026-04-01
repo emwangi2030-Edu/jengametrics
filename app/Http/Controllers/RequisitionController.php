@@ -86,6 +86,17 @@ class RequisitionController extends Controller
 
         $documentMap = BqDocument::whereIn('id', $rawItems->pluck('bq_document_id')->filter()->unique())->get()->keyBy('id');
 
+        $allBomItemIds = $rawItems->pluck('id')->filter()->unique()->values()->all();
+
+        $requisitionTotalsByBomItem = $allBomItemIds === []
+            ? collect()
+            : Requisition::query()
+                ->whereIn('bom_item_id', $allBomItemIds)
+                ->whereIn('status', ['pending', 'approved'])
+                ->selectRaw('bom_item_id, SUM(quantity_requested) as total_requested')
+                ->groupBy('bom_item_id')
+                ->pluck('total_requested', 'bom_item_id');
+
         foreach ($groupedItems as $key => $group) {
             $sampleItem = $group->first();
             $totalQty = $group->sum('quantity');
@@ -110,9 +121,9 @@ class RequisitionController extends Controller
             $documentId = $group->pluck('bq_document_id')->filter()->first();
             $sampleItem->bq_document = $documentId ? $documentMap->get($documentId) : null;
 
-            $requisitionedQty = Requisition::whereIn('bom_item_id', $group->pluck('id'))
-                ->whereIn('status', ['pending', 'approved'])
-                ->sum('quantity_requested');
+            $requisitionedQty = (float) $group->sum(function (BomItem $item) use ($requisitionTotalsByBomItem) {
+                return (float) ($requisitionTotalsByBomItem[$item->id] ?? $requisitionTotalsByBomItem[(string) $item->id] ?? 0);
+            });
 
             $remaining = max(0, $totalQty - $requisitionedQty);
             $sampleItem->remaining_quantity = $remaining;

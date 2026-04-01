@@ -1,13 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('assets/metrics/assets/css/auth-refresh.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-</head>
+@include("auth.partials.head", ["title" => "Login"])
 <body class="jm-auth">
     <div class="jm-auth-shell">
         <div class="jm-auth-brand">
@@ -17,7 +10,7 @@
             </div>
             <h1>Build Smarter, Deliver Faster</h1>
             <p>Track BoQ, BoM, labour, material flow and project cost performance from one control center.</p>
-            <div class="jm-auth-brand-meta">Staging Environment</div>
+            @include("auth.partials.environment-badge")
         </div>
 
         <div class="jm-auth-card">

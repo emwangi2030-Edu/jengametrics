@@ -36,6 +36,14 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/robots.txt', function () {
+    $body = app()->environment('production')
+        ? "User-agent: *\nDisallow:\n"
+        : "User-agent: *\nDisallow: /\n";
+
+    return response($body, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
+})->name('robots');
+
 Route::middleware('auth')->group(function () {
     // Wizard is intentionally disabled for demos; keep named routes for compatibility.
     Route::get('/wizard', fn () => redirect()->route('dashboard'))->name('wizard');
@@ -247,7 +255,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/sub-accounts', [SubAccountController::class, 'store'])->name('sub_accounts.store');
     Route::put('/sub-accounts/{user}', [SubAccountController::class, 'update'])->name('sub_accounts.update');
     Route::delete('/sub-accounts/{user}', [SubAccountController::class, 'destroy'])->name('sub_accounts.destroy');
-    Route::view('/ui-preview', 'ui.jenga-metrics')->name('ui.preview');
+    Route::get('/ui-preview', function () {
+        if (app()->environment('production')) {
+            abort(404);
+        }
+
+        return view('ui.jenga-metrics');
+    })->name('ui.preview');
 
     // Progress certificate routes
     Route::get('/progress-certificates', [ProgressCertificateController::class, 'index'])->name('progress_certificates.index');

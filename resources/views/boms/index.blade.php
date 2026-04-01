@@ -58,27 +58,6 @@
                     <div class="mt-4">
                         <!-- Sections List -->
                         <div class="mt-5">
-                            @php
-                                $sectionsWithTotals = $sections->map(function ($section) {
-                                    $totalSectionMaterial = (float) (\App\Models\BomItem::whereProjectId(project_id())
-                                        ->where('section_id', $section->id)
-                                        ->selectRaw('SUM(quantity * rate) as total')
-                                        ->value('total') ?? 0);
-
-                                    $totalSectionLabour = (float) (\App\Models\BomLabour::whereProjectId(project_id())
-                                        ->where('section_id', $section->id)
-                                        ->sum('amount') ?? 0);
-
-                                    return (object) [
-                                        'section' => $section,
-                                        'total_section_material' => $totalSectionMaterial,
-                                        'total_section_labour' => $totalSectionLabour,
-                                    ];
-                                })->filter(function ($entry) {
-                                    return $entry->total_section_material > 0 || $entry->total_section_labour > 0;
-                                })->values();
-                            @endphp
-
                             @if($sectionsWithTotals->isEmpty())
                                 <p class="text-muted">{{ __('No sections found.') }}</p>
                             @else

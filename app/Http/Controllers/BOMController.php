@@ -20,6 +20,7 @@ use App\Models\Requisition;
 use App\Models\Item;
 use App\Models\ItemMaterial;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BOMController extends Controller
 {
@@ -36,38 +37,86 @@ class BOMController extends Controller
 
         $sections = Section::orderBy('id', 'asc')->get();
 
-        $projectId = project_id();
-
-        $labourTotalsByDocument = BomLabour::where('project_id', $projectId)
-            ->with('bqSection')
-            ->get()
-            ->groupBy(function (BomLabour $labour) {
-                return $labour->bq_document_id
-                    ?: optional($labour->bqSection)->bq_document_id
-                    ?: 'unassigned';
-            })
-            ->map(function ($items) {
-                return (float) $items->sum('amount');
-            });
+        $projectId = (int) project_id();
 
         $subDocuments = BqDocument::where('project_id', $project->id)
             ->whereNotNull('parent_id')
             ->orderBy('created_at')
-            ->with(['levels' => function ($levelQuery) {
-                $levelQuery->with(['sections' => function ($query) {
-                    $query->orderBy('section_id')
-                        ->with([
-                            'section',
-                            'bomItems.item_material',
-                            'bomItems.product',
-                        ]);
-                }]);
-            }])
-            ->get()
-            ->map(fn (BqDocument $document) => $this->transformDocumentForBom($document, $labourTotalsByDocument));
+            ->get();
+
+        $documentIds = $subDocuments->pluck('id')->all();
+
+        $materialTotals = collect();
+        $labourTotals = collect();
+
+        if ($documentIds !== []) {
+            $docIdExpr = 'COALESCE(bi.bq_document_id, bs.bq_document_id)';
+            $materialTotals = DB::table('bom_items as bi')
+                ->leftJoin('bq_sections as bs', 'bs.id', '=', 'bi.bq_section_id')
+                ->where('bi.project_id', $projectId)
+                ->where(function ($q) use ($documentIds) {
+                    $q->whereIn('bi.bq_document_id', $documentIds)
+                        ->orWhereIn('bs.bq_document_id', $documentIds);
+                })
+                ->groupBy(DB::raw($docIdExpr))
+                ->selectRaw($docIdExpr . ' as doc_id, SUM(bi.amount) as total')
+                ->pluck('total', 'doc_id');
+
+            $labDocExpr = 'COALESCE(bl.bq_document_id, bs.bq_document_id)';
+            $labourTotals = DB::table('bom_labours as bl')
+                ->leftJoin('bq_sections as bs', 'bs.id', '=', 'bl.bq_section_id')
+                ->where('bl.project_id', $projectId)
+                ->where(function ($q) use ($documentIds) {
+                    $q->whereIn('bl.bq_document_id', $documentIds)
+                        ->orWhereIn('bs.bq_document_id', $documentIds);
+                })
+                ->groupBy(DB::raw($labDocExpr))
+                ->selectRaw($labDocExpr . ' as doc_id, SUM(bl.amount) as total')
+                ->pluck('total', 'doc_id');
+        }
+
+        $subDocuments = $subDocuments->map(function (BqDocument $document) use ($materialTotals, $labourTotals) {
+            $id = $document->id;
+            $materials = (float) ($materialTotals[$id] ?? $materialTotals[(string) $id] ?? 0);
+            $labour = (float) ($labourTotals[$id] ?? $labourTotals[(string) $id] ?? 0);
+            $document->materials_total = $materials;
+            $document->labour_total = $labour;
+            $document->combined_total = $materials + $labour;
+
+            return $document;
+        });
 
         $totalAmount = $subDocuments->sum('materials_total');
         $totalLabour = $subDocuments->sum('labour_total');
+
+        $materialBySection = BomItem::query()
+            ->where('project_id', $projectId)
+            ->whereNotNull('section_id')
+            ->selectRaw('section_id, SUM(quantity * rate) as total')
+            ->groupBy('section_id')
+            ->pluck('total', 'section_id');
+
+        $labourBySection = BomLabour::query()
+            ->where('project_id', $projectId)
+            ->whereNotNull('section_id')
+            ->selectRaw('section_id, SUM(amount) as total')
+            ->groupBy('section_id')
+            ->pluck('total', 'section_id');
+
+        $sectionsWithTotals = $sections
+            ->map(function (Section $section) use ($materialBySection, $labourBySection) {
+                $sid = $section->id;
+
+                return (object) [
+                    'section' => $section,
+                    'total_section_material' => (float) ($materialBySection[$sid] ?? $materialBySection[(string) $sid] ?? 0),
+                    'total_section_labour' => (float) ($labourBySection[$sid] ?? $labourBySection[(string) $sid] ?? 0),
+                ];
+            })
+            ->filter(static function ($entry) {
+                return $entry->total_section_material > 0 || $entry->total_section_labour > 0;
+            })
+            ->values();
 
         return view('boms.index', [
             'project' => $project,
@@ -75,6 +124,7 @@ class BOMController extends Controller
             'totalAmount' => $totalAmount,
             'totalLabour' => $totalLabour,
             'subDocuments' => $subDocuments,
+            'sectionsWithTotals' => $sectionsWithTotals,
         ]);
     }
 

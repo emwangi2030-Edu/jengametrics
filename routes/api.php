@@ -23,8 +23,8 @@ use Illuminate\Support\Facades\Route;
 | Legacy API endpoints (kept for backward compatibility)
 |--------------------------------------------------------------------------
 */
-Route::post('register', [UsersController::class, 'register']);
-Route::post('login', [UsersController::class, 'login']);
+Route::middleware('throttle:api-register')->post('register', [UsersController::class, 'register']);
+Route::middleware('throttle:api-auth')->post('login', [UsersController::class, 'login']);
 Route::middleware('auth:sanctum')->get('user', [UsersController::class, 'getAuthenticatedUser']);
 
 /*
@@ -34,7 +34,7 @@ Route::middleware('auth:sanctum')->get('user', [UsersController::class, 'getAuth
 */
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
-        Route::post('login', [AuthController::class, 'login']);
+        Route::middleware('throttle:api-auth')->post('login', [AuthController::class, 'login']);
 
         Route::middleware(\App\Http\Middleware\ApiAuthenticate::class)->group(function () {
             Route::get('me', [AuthController::class, 'me']);

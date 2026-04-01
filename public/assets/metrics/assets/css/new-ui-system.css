@@ -102,8 +102,8 @@
 
 .jm-theme.jm-app-shell-page .content .table thead th {
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    font-size: 0.8125rem;
     font-weight: 700;
     color: #6e8075;
     background: #f7faf8;
@@ -152,6 +152,8 @@
     color: var(--jm-ui-text);
     font-weight: 800;
     letter-spacing: -0.015em;
+    font-size: clamp(1.35rem, 1rem + 1vw, 1.75rem);
+    line-height: 1.25;
 }
 
 .jm-theme.jm-app-shell-page .jm-page-subtitle {
@@ -168,7 +170,7 @@
 .jm-theme.jm-app-shell-page .jm-section-title {
     margin: 0 0 10px;
     color: var(--jm-ui-text);
-    font-size: 1.05rem;
+    font-size: 1.125rem;
     font-weight: 800;
 }
 
@@ -262,4 +264,10 @@
 
 [x-cloak] {
     display: none !important;
+}
+
+/* Empty states: match body copy scale (avoid looking smaller than filters). */
+.jm-theme.jm-app-shell-page .content .card-body > p.text-center {
+    font-size: 1em;
+    line-height: 1.45;
 }

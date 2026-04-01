@@ -283,7 +283,7 @@
             background: var(--jm-surface-alt) !important;
             color: var(--jm-muted);
             font-weight: 700;
-            font-size: 0.78rem;
+            font-size: 0.8125rem;
             letter-spacing: 0.02em;
             text-transform: uppercase;
         }

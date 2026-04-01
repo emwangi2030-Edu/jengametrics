@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\ContentSecurityPolicy;
 use App\Http\Middleware\EnsureUserActiveProject;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -18,7 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->trustProxies(at: '*');
         $middleware->web(append: [
+            ContentSecurityPolicy::class,
             EnsureUserActiveProject::class,
         ]);
     })

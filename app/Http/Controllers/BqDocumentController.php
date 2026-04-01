@@ -41,7 +41,18 @@ class BqDocumentController extends Controller
         $masterDocument = $this->ensureMasterDocument($project->id, $project->name);
 
         $subDocuments = $masterDocument->children()
-            ->with(['sections'])
+            ->with(['sections' => function ($q) {
+                $q->select([
+                    'id',
+                    'bq_document_id',
+                    'item_id',
+                    'item_name',
+                    'units',
+                    'rate',
+                    'amount',
+                    'quantity',
+                ]);
+            }])
             ->orderBy('created_at')
             ->get()
             ->map(function (BqDocument $document) {
@@ -85,7 +96,10 @@ class BqDocumentController extends Controller
             ->latest()
             ->get() ?? collect();
 
-        $sections = Section::orderBy('name')->get();
+        $sections = Section::query()
+            ->select(['id', 'name'])
+            ->orderBy('name')
+            ->get();
 
         return view('bq_documents.index', [
             'project' => $project,
