@@ -10,7 +10,7 @@ class Material extends Model
     use HasFactory;
 
     protected $fillable = [
-        'product_id', 'bom_item_id', 'name', 'description', 'unit_price', 'unit_of_measure',
+        'requisition_id', 'product_id', 'bom_item_id', 'name', 'description', 'unit_price', 'unit_of_measure',
         'quantity_purchased', 'quantity_in_stock', 'variance', 'requisitioned_quantity', 'supplier_id', 'supplier_contact',
         'document', 'project_id'
     ];
@@ -48,7 +48,10 @@ class Material extends Model
         return $this->belongsTo(ItemMaterial::class, 'bom_item_id');
     }
 
-    // Requisition relationship removed: requisition_id column no longer present
+    public function requisition()
+    {
+        return $this->belongsTo(Requisition::class);
+    }
 
     public function stockUsages()
     {

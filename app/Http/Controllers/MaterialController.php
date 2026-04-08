@@ -14,7 +14,6 @@ use App\Models\Requisition;
 use App\Models\StockUsage;
 use App\Models\Section;
 use App\Models\BqDocument;
-use App\Models\Product;
 use App\Models\UnitOfMeasurement;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
@@ -40,7 +39,7 @@ class MaterialController extends Controller
         $year = $request->input('year', now()->year);
 
         // Build materials query
-        $materialsQuery = Material::with('supplier')
+        $materialsQuery = Material::with(['supplier', 'requisition'])
             ->where('project_id', $projectId);
 
         // Apply time filters
@@ -160,7 +159,7 @@ class MaterialController extends Controller
         $projectId = (int) $project->id;
         $year = $request->input('year', now()->year);
 
-        $materialsQuery = Material::with('supplier')
+        $materialsQuery = Material::with(['supplier', 'requisition'])
             ->where('project_id', $projectId);
 
         if ($request->filter === 'week') {
@@ -341,8 +340,15 @@ class MaterialController extends Controller
 
     public function create()
     {
-        $projectId = Auth::user()->project_id;
-        $suppliers = Supplier::all();
+        $project = $this->resolveActiveProject();
+        if (! $project) {
+            return redirect()
+                ->route('dashboard')
+                ->with('warning', __('No project is selected. Please choose a project first.'));
+        }
+
+        $projectId = (int) $project->id;
+        $suppliers = Supplier::orderBy('name')->get();
 
         $projectScope = function ($query) use ($projectId) {
             $query->whereHas('bomItem', function ($bomQuery) use ($projectId) {
@@ -359,82 +365,47 @@ class MaterialController extends Controller
             ->where(function ($query) use ($projectScope) {
                 $projectScope($query);
             })
-            ->with(['bomItem.item_material', 'requester'])
-            ->get()
-            ->map(function ($req) {
-                if ($req->bom_item_id && $req->bomItem && $req->bomItem->item_material) {
-                    $itemMaterial = $req->bomItem->item_material;
+            ->with(['bomItem.item_material', 'bomItem.product'])
+            ->orderByDesc('approved_at')
+            ->orderByDesc('id')
+            ->get();
 
-                    return (object) [
-                        'key' => 'product_' . $req->bomItem->product_id,
-                        'type' => 'bom',
-                        'product_id' => $req->bomItem->product_id,
-                        'name' => $itemMaterial->name,
-                        'unit' => $itemMaterial->unit_of_measurement,
-                        'total_requested' => $req->quantity_requested,
-                    ];
-                }
-
-                if (!$req->bom_item_id) {
-                    return (object) [
-                        'key' => 'adhoc_' . Str::slug($req->extra_material_name . '_' . $req->extra_unit),
-                        'type' => 'adhoc',
-                        'product_id' => null,
-                        'name' => $req->extra_material_name,
-                        'unit' => $req->extra_unit,
-                        'total_requested' => $req->quantity_requested,
-                    ];
-                }
-
-                return null;
-            })
-            ->filter()
-            ->groupBy('key')
-            ->map(function ($group) {
-                $first = $group->first();
-
-                return (object) [
-                    'key' => $first->key,
-                    'type' => $first->type,
-                    'product_id' => $first->product_id,
-                    'name' => $first->name,
-                    'unit' => $first->unit,
-                    'total_requested' => $group->sum('total_requested'),
-                ];
-            });
-
-        $purchases = Material::where('project_id', $projectId)
-            ->get()
-            ->groupBy(function ($material) {
-                if ($material->product_id) {
-                    return 'product_' . $material->product_id;
-                }
-
-                return 'adhoc_' . Str::slug($material->name . '_' . $material->unit_of_measure);
-            })
-            ->map(function ($group) {
-                return $group->sum(function ($material) {
-                    $reference = $material->requisitioned_quantity;
-
-                    if (is_null($reference) || $reference <= 0) {
-                        return (float) $material->quantity_purchased;
-                    }
-
-                    return min((float) $material->quantity_purchased, (float) $reference);
-                });
-            });
+        $deliveredByRequisition = Material::where('project_id', $projectId)
+            ->whereNotNull('requisition_id')
+            ->selectRaw('requisition_id, SUM(quantity_purchased) as total_delivered')
+            ->groupBy('requisition_id')
+            ->pluck('total_delivered', 'requisition_id');
 
         $requisitions = $approvedRequisitions
-            ->map(function ($item) use ($purchases) {
-                $totalRequested = (float) $item->total_requested;
-                $totalPurchased = (float) ($purchases[$item->key] ?? 0);
+            ->map(function (Requisition $req) use ($deliveredByRequisition) {
+                $itemMaterial = optional($req->bomItem)->item_material;
+                $product = optional($req->bomItem)->product;
 
-                $item->requested_quantity = $totalRequested;
-                $item->remaining_quantity = max(0.0, $totalRequested - $totalPurchased);
+                $materialName = $itemMaterial->name
+                    ?? $product->name
+                    ?? $req->extra_material_name
+                    ?? __('Unknown Material');
 
-                return $item;
+                $unit = $itemMaterial->unit_of_measurement
+                    ?? $product->unit
+                    ?? $req->extra_unit
+                    ?? 'unit';
+
+                $requestedQty = (float) $req->quantity_requested;
+                $deliveredQty = (float) ($deliveredByRequisition[$req->id] ?? 0);
+                $remainingQty = max(0, $requestedQty - $deliveredQty);
+
+                return (object) [
+                    'id' => $req->id,
+                    'requisition_no' => $req->requisition_no,
+                    'material_name' => $materialName,
+                    'unit' => $unit,
+                    'requested_quantity' => $requestedQty,
+                    'delivered_quantity' => $deliveredQty,
+                    'remaining_quantity' => $remainingQty,
+                ];
             })
-            ->filter(fn ($item) => $item->remaining_quantity > 0)
+            ->filter(fn ($req) => $req->remaining_quantity > 0.0001)
             ->values();
 
         return view('materials.create', compact('suppliers', 'requisitions'));
@@ -443,62 +414,61 @@ class MaterialController extends Controller
 
     public function store(StoreMaterialRequest $request)
     {
+        $project = $this->resolveActiveProject();
+        if (! $project) {
+            return redirect()
+                ->route('dashboard')
+                ->with('warning', __('No project is selected. Please choose a project first.'));
+        }
 
-        $materialType = $request->input('material_type');
+        $projectId = (int) $project->id;
+
+        $projectScope = function ($query) use ($projectId) {
+            $query->whereHas('bomItem', function ($bomQuery) use ($projectId) {
+                $bomQuery->where('project_id', $projectId);
+            })->orWhere(function ($adhocQuery) use ($projectId) {
+                $adhocQuery->whereNull('bom_item_id')
+                    ->whereHas('requester', function ($userQuery) use ($projectId) {
+                        $userQuery->where('project_id', $projectId);
+                    });
+            });
+        };
+
+        $requisition = Requisition::where('id', $request->integer('requisition_id'))
+            ->where('status', 'approved')
+            ->where(function ($query) use ($projectScope) {
+                $projectScope($query);
+            })
+            ->with(['bomItem.item_material', 'bomItem.product'])
+            ->firstOrFail();
+
+        $requestedQty = (float) $requisition->quantity_requested;
+        $alreadyDelivered = (float) Material::where('project_id', $projectId)
+            ->where('requisition_id', $requisition->id)
+            ->sum('quantity_purchased');
+        $remainingQty = max(0, $requestedQty - $alreadyDelivered);
+
+        if ($remainingQty <= 0) {
+            return back()->withErrors([
+                'requisition_id' => __('This requisition has already been fully delivered.'),
+            ])->withInput();
+        }
+
         $quantityEntered = (float) $request->input('quantity_in_stock');
-        $productId = $request->input('product_id');
+        $itemMaterial = optional($requisition->bomItem)->item_material;
+        $product = optional($requisition->bomItem)->product;
 
-        if ($materialType === 'bom') {
-            if (!$productId) {
-                return back()->withErrors([
-                    'product_id' => 'Please select a material from approved requisitions.',
-                ])->withInput();
-            }
+        $name = $itemMaterial->name
+            ?? $product->name
+            ?? $requisition->extra_material_name
+            ?? __('Unknown Material');
 
-            $product = Product::findOrFail($productId);
-            $name = $product->name;
-            $unit = $product->unit;
-        } else {
-            $adhocName = $request->input('adhoc_name');
-            $adhocUnit = $request->input('adhoc_unit');
+        $unit = $itemMaterial->unit_of_measurement
+            ?? $product->unit
+            ?? $requisition->extra_unit
+            ?? 'unit';
 
-            if (!$adhocName || !$adhocUnit) {
-                return back()->withErrors([
-                    'adhoc_name' => 'Please provide both material name and unit of measure for ad-hoc purchases.',
-                ])->withInput();
-            }
-
-            $productId = null;
-            $name = $adhocName;
-            $unit = $adhocUnit;
-        }
-
-        $expectedQty = $request->filled('expected_quantity')
-            ? (float) $request->input('expected_quantity')
-            : null;
-
-        $projectId = Auth::user()->project_id;
-
-        $requisitionedQty = $expectedQty
-            ?? ($request->filled('requisitioned_quantity')
-                ? (float) $request->input('requisitioned_quantity')
-                : ($materialType === 'adhoc' ? $quantityEntered : 0.0));
-
-        $varianceValue = 0.0;
-
-        if ($request->filled('variance')) {
-            $varianceValue = (float) $request->input('variance');
-        } elseif ($materialType === 'bom') {
-            $referenceQty = $expectedQty
-                ?? ($request->filled('requisitioned_quantity')
-                    ? (float) $request->input('requisitioned_quantity')
-                    : 0.0);
-
-            $varianceValue = $quantityEntered - $referenceQty;
-        }
-
-        $varianceValue = round($varianceValue, 2);
-
+        $varianceValue = round($quantityEntered - $remainingQty, 2);
         if (abs($varianceValue) < 0.005) {
             $varianceValue = 0.0;
         }
@@ -506,14 +476,15 @@ class MaterialController extends Controller
         $supplier = Supplier::findOrFail($request->input('supplier_id'));
 
         $data = [
+            'requisition_id' => $requisition->id,
             'name' => $name,
-            'product_id' => $productId,
+            'product_id' => optional($requisition->bomItem)->product_id,
             'unit_of_measure' => $unit,
             'unit_price' => $request->unit_price,
             'quantity_purchased' => $quantityEntered,
             'quantity_in_stock' => $quantityEntered,
             'variance' => $varianceValue,
-            'requisitioned_quantity' => $requisitionedQty,
+            'requisitioned_quantity' => $remainingQty,
             'supplier_id' => $supplier->id,
             'supplier_contact' => $supplier->contact_info,
             'project_id' => $projectId,
@@ -527,7 +498,7 @@ class MaterialController extends Controller
         Material::create($data);
 
         return redirect()->route('materials.delivered')
-            ->with('success', 'Material recorded successfully!');
+            ->with('success', 'Material delivery recorded successfully.');
     }
 
     public function show($id)

@@ -17,6 +17,7 @@
         <thead class="table-light">
             <tr>
                 <th>{{ __('Name') }}</th>
+                <th>{{ __('Requisition') }}</th>
                 <th>{{ __('Requisitioned Quantity') }}</th>
                 <th>{{ __('Quantity Received') }}</th>
                 <th>{{ __('Variance') }}</th>
@@ -42,6 +43,13 @@
                 @endphp
                 <tr>
                     <td><div class="px-2">{{ $material->product->name ?? $material->name }}</div></td>
+                    <td>
+                        @if($material->requisition_id)
+                            #{{ $material->requisition_id }}{{ optional($material->requisition)->requisition_no ? ' - ' . optional($material->requisition)->requisition_no : '' }}
+                        @else
+                            N/A
+                        @endif
+                    </td>
                     <td>{{ $displayRequisitioned !== null ? $displayRequisitioned : 'N/A' }}</td>
                     <td>{{ $displayQuantity }}</td>
                     <td class="{{ $variance > 0 ? 'text-success' : ($variance < 0 ? 'text-danger' : 'text-secondary') }}">
@@ -64,7 +72,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="10" class="text-center py-4">{{ __('No materials found.') }}</td>
+                    <td colspan="11" class="text-center py-4">{{ __('No materials found.') }}</td>
                 </tr>
             @endforelse
         </tbody>

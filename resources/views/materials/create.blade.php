@@ -25,40 +25,40 @@
                     <form action="{{ route('materials.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
-                        {{-- Material Dropdown --}}
+                        {{-- Requisition Dropdown --}}
                         <div class="mb-4">
-                            <label class="form-label">Materials (from Approved Requisitions)</label>
+                            <label class="form-label">Approved Requisition ID</label>
                             <div class="input-group">
-                                <select class="form-select" id="material_key" name="material_key" required {{ $requisitions->isEmpty() ? 'disabled' : '' }}>
-                                    <option value="" disabled {{ old('material_key') ? '' : 'selected' }}>Select Material</option>
+                                <select class="form-select" id="requisition_id" name="requisition_id" required {{ $requisitions->isEmpty() ? 'disabled' : '' }}>
+                                    <option value="" disabled {{ old('requisition_id') ? '' : 'selected' }}>Select Requisition</option>
                                     @foreach($requisitions as $req)
                                         <option
-                                            value="{{ $req->key }}"
-                                            data-type="{{ $req->type }}"
-                                            data-product="{{ $req->product_id }}"
-                                            data-name="{{ $req->name }}"
+                                            value="{{ $req->id }}"
                                             data-unit="{{ $req->unit }}"
-                                            data-quantity="{{ (float) $req->remaining_quantity }}"
+                                            data-remaining="{{ (float) $req->remaining_quantity }}"
                                             data-requested="{{ (float) $req->requested_quantity }}"
-                                            {{ old('material_key') === $req->key ? 'selected' : '' }}
+                                            data-material="{{ $req->material_name }}"
+                                            data-requisition-no="{{ $req->requisition_no }}"
+                                            {{ (string) old('requisition_id') === (string) $req->id ? 'selected' : '' }}
                                         >
-                                            {{ $req->name }} (Remaining: {{ (float) $req->remaining_quantity }} {{ $req->unit }})
+                                            #{{ $req->id }} - {{ $req->requisition_no }} - {{ $req->material_name }} (Remaining: {{ (float) $req->remaining_quantity }} {{ $req->unit }})
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
 
-                        <input type="hidden" id="material_type" name="material_type" value="{{ old('material_type') }}">
-                        <input type="hidden" id="product_id" name="product_id" value="{{ old('product_id') }}">
-                        <input type="hidden" id="adhoc_name" name="adhoc_name" value="{{ old('adhoc_name') }}">
-                        <input type="hidden" id="adhoc_unit" name="adhoc_unit" value="{{ old('adhoc_unit') }}">
                         <input type="hidden" id="requisitioned_quantity" name="requisitioned_quantity" value="{{ old('requisitioned_quantity') }}">
-                        <input type="hidden" id="expected_quantity" name="expected_quantity" value="{{ old('expected_quantity') }}">
 
                         @if($requisitions->isEmpty())
-                            <p class="text-muted small">No approved requisitions available to receive.</p>
+                            <p class="text-muted small mb-0">No approved requisitions pending delivery.</p>
                         @endif
+
+                        <div id="requisitionSummary" class="alert alert-light border mb-4 d-none">
+                            <div class="small text-muted">Selected Requisition</div>
+                            <div class="fw-semibold" id="requisitionSummaryTitle"></div>
+                            <div class="small text-muted" id="requisitionSummaryMeta"></div>
+                        </div>
 
                         {{-- Unit Price --}}
                         <div class="form-floating mb-4">
@@ -112,8 +112,8 @@
 
                         {{-- Submit Button --}}
                         <div class="d-flex justify-content-center">
-                            <button type="submit" class="btn btn-success w-50 py-2">
-                                {{ isset($material) ? 'Update Material' : '{{ __('Save Material Receipt') }}' }}
+                            <button type="submit" class="btn btn-success w-50 py-2" {{ $requisitions->isEmpty() ? 'disabled' : '' }}>
+                                {{ __('Save Material Delivery') }}
                             </button>
                         </div>
 
@@ -158,19 +158,16 @@
 @push('scripts')
 <script>
     $(document).ready(function () {
-        const $materialSelect = $('#material_key');
-        const $materialType = $('#material_type');
-        const $productIdInput = $('#product_id');
-        const $adhocNameInput = $('#adhoc_name');
-        const $adhocUnitInput = $('#adhoc_unit');
+        const $requisitionSelect = $('#requisition_id');
         const $quantityInput = $('#quantity_in_stock');
         const $unitPriceLabel = $('#unit_price_label');
+        const $quantityLabel = $('#quantity_label');
         const $varianceDisplay = $('#variance_display');
         const $varianceInput = $('#variance');
         const $requisitionedQuantity = $('#requisitioned_quantity');
-        const $expectedQuantity = $('#expected_quantity');
-        const initialQuantity = $quantityInput.val();
-        const hasInitialQuantity = initialQuantity !== '';
+        const $summary = $('#requisitionSummary');
+        const $summaryTitle = $('#requisitionSummaryTitle');
+        const $summaryMeta = $('#requisitionSummaryMeta');
 
         $('#supplier_id').on('change', function () {
             const contact = $(this).find('option:selected').data('contact');
@@ -215,83 +212,24 @@
             }
         });
 
-        $materialSelect.on('change', function () {
-            const selectedOption = $(this).find('option:selected');
-            const type = selectedOption.data('type') || '';
-            const rawMax = selectedOption.data('quantity');
-            const maxQty = parseFloat(rawMax);
-            const hasMaxQty = !Number.isNaN(maxQty);
+        const setVariance = function () {
+            const selectedOption = $requisitionSelect.find('option:selected');
+            const remaining = parseFloat(selectedOption.data('remaining'));
             const unit = selectedOption.data('unit') || '';
-            const productId = selectedOption.data('product') || '';
-            const name = selectedOption.data('name') || '';
-            const requestedRaw = selectedOption.data('requested');
-            const requested = requestedRaw !== undefined ? parseFloat(requestedRaw) : NaN;
-            const hasRequested = !Number.isNaN(requested);
+            const entered = parseFloat($quantityInput.val());
 
-            $materialType.val(type);
-
-            if (type === 'bom') {
-                $productIdInput.val(productId);
-                $adhocNameInput.val('');
-                $adhocUnitInput.val('');
-            } else if (type === 'adhoc') {
-                $productIdInput.val('');
-                $adhocNameInput.val(name);
-                $adhocUnitInput.val(unit);
-            } else {
-                $productIdInput.val('');
-                $adhocNameInput.val('');
-                $adhocUnitInput.val('');
-            }
-
-            $unitPriceLabel.text(unit ? 'Price per ' + unit : 'Price per Unit');
-            $quantityInput
-                .attr('placeholder', hasMaxQty ? ('Approved quantity: ' + maxQty + ' ' + unit + ' (can record more)') : 'Enter quantity')
-                .data('max', hasMaxQty ? maxQty : null)
-                .data('unit', unit);
-
-            if (!hasInitialQuantity) {
-                $quantityInput.val('');
-            }
-
-            if (hasMaxQty) {
-                $requisitionedQuantity.val(maxQty);
-            } else if (hasRequested) {
-                $requisitionedQuantity.val(requested);
-            } else {
-                $requisitionedQuantity.val('');
-            }
-
-            if (hasMaxQty) {
-                $expectedQuantity.val(maxQty);
-            } else if (hasRequested) {
-                $expectedQuantity.val(requested);
-            } else {
-                $expectedQuantity.val('');
-            }
-
-            $varianceDisplay.val('');
-            $varianceInput.val('');
-        });
-
-        $quantityInput.on('input', function () {
-            const maxRaw = $(this).data('max');
-            const max = typeof maxRaw === 'number' ? maxRaw : parseFloat(maxRaw);
-            const unit = $(this).data('unit') || '';
-            const entered = parseFloat($(this).val());
-
-            if (Number.isNaN(entered) || Number.isNaN(max)) {
+            if (Number.isNaN(entered) || Number.isNaN(remaining)) {
                 $varianceDisplay.val('');
                 $varianceInput.val('');
                 return;
             }
 
-            let difference = Number((entered - max).toFixed(2));
+            let difference = Number((entered - remaining).toFixed(2));
             if (Math.abs(difference) < 0.005) {
                 difference = 0;
             }
-            let varianceText = '0';
 
+            let varianceText = '0';
             if (difference > 0) {
                 varianceText = 'excess: ' + difference + ' ' + unit;
             } else if (difference < 0) {
@@ -300,14 +238,50 @@
 
             $varianceDisplay.val(varianceText);
             $varianceInput.val(difference);
+        };
+
+        $requisitionSelect.on('change', function () {
+            const selectedOption = $(this).find('option:selected');
+            const remaining = parseFloat(selectedOption.data('remaining'));
+            const requested = parseFloat(selectedOption.data('requested'));
+            const unit = selectedOption.data('unit') || '';
+            const material = selectedOption.data('material') || '';
+            const requisitionNo = selectedOption.data('requisition-no') || '';
+            const requisitionId = selectedOption.val() || '';
+
+            $unitPriceLabel.text(unit ? 'Price per ' + unit : 'Price per Unit');
+            $quantityLabel.text(unit ? 'Quantity Delivered (' + unit + ')' : 'Quantity Delivered');
+
+            if (!Number.isNaN(remaining)) {
+                $quantityInput.attr('placeholder', 'Remaining: ' + remaining + ' ' + unit);
+                $requisitionedQuantity.val(remaining);
+            } else {
+                $quantityInput.attr('placeholder', 'Enter quantity delivered');
+                $requisitionedQuantity.val('');
+            }
+
+            if (requisitionId) {
+                $summary.removeClass('d-none');
+                $summaryTitle.text('#' + requisitionId + ' - ' + requisitionNo + ' - ' + material);
+                $summaryMeta.text(
+                    'Requested: ' + (Number.isNaN(requested) ? 'N/A' : requested) + ' ' + unit +
+                    ' | Remaining: ' + (Number.isNaN(remaining) ? 'N/A' : remaining) + ' ' + unit
+                );
+            } else {
+                $summary.addClass('d-none');
+                $summaryTitle.text('');
+                $summaryMeta.text('');
+            }
+
+            setVariance();
         });
 
-        if ($materialSelect.val()) {
-            $materialSelect.trigger('change');
-            if (hasInitialQuantity) {
-                $quantityInput.val(initialQuantity);
-                $quantityInput.trigger('input');
-            }
+        $quantityInput.on('input', function () {
+            setVariance();
+        });
+
+        if ($requisitionSelect.val()) {
+            $requisitionSelect.trigger('change');
         }
     });
 </script>
