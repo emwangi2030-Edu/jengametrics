@@ -18,64 +18,21 @@
     </div>
     <div class="card jm-ui-card shadow-sm border-0">
         <div class="card-body">
-            <div class="table-responsive jm-ui-table-wrap">
-                <table class="table table-bordered align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Requisition No.</th>
-                            <th>Material</th>
-                            <th>BoQ</th>
-                            <th>Quantity Requested</th>
-                            <th>Status</th>
-                            <th>Section</th>
-                            <th>Requested By</th>
-                            <th>Requested At</th>
-                            <th>Approved By</th>
-                            <th>Approved At</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($requisitions as $req)
-                            <tr>
-                                <td>{{ $req->requisition_no }}</td>
-                                <td>{{ $req->bomItem->item_material->name ?? $req->extra_material_name }}</td>
-                                <td>{{ $req->bomItem->bqDocument->title ?? ($req->extra_material_name ? __('Ad-hoc Request') : __('Unknown')) }}</td>
-                                <td>
-                                    {{ (int) $req->quantity_requested }} {{ $req->bomItem->item_material->unit_of_measurement ?? $req->extra_unit }}
-                                </td>
-                                <td>
-                                    <span class="badge bg-{{ $req->status == 'approved' ? 'success' : ($req->status == 'rejected' ? 'danger' : 'secondary') }}">
-                                    {{ ucfirst($req->status) }}
-                                    </span>
-                                </td>
-                                <td>{{ $req->section->name }}</td>
-                                <td>{{ $req->requester->name ?? 'N/A' }}</td>
-                                <td>{{ $req->requested_at ? \Carbon\Carbon::parse($req->requested_at)->format('d-m-Y') : '-' }}</td>
-                                <td>{{ $req->approver->name ?? '-' }}</td>
-                                <td>{{ $req->approved_at ? \Carbon\Carbon::parse($req->approved_at)->format('d-m-Y') : '-' }}</td>
-                                <td>
-                                    @if($req->status === 'pending')
-                                        <form action="{{ route('requisitions.approve', $req->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button class="btn btn-sm btn-success">Approve</button>
-                                        </form>
-                                        <form action="{{ route('requisitions.reject', $req->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button class="btn btn-sm btn-danger">Reject</button>
-                                        </form>
-                                    @else
-                                        <span class="text-muted">N/A</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="10" class="text-center">No requisitions found.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+            <form method="GET" action="{{ route('requisitions.index') }}" class="row g-2 mb-3" id="requisitions-status-filter">
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <select name="status" class="form-select">
+                        <option value="all" {{ ($statusFilter ?? 'all') === 'all' ? 'selected' : '' }}>All Statuses</option>
+                        <option value="pending" {{ ($statusFilter ?? 'all') === 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="approved" {{ ($statusFilter ?? 'all') === 'approved' ? 'selected' : '' }}>Approved</option>
+                        <option value="rejected" {{ ($statusFilter ?? 'all') === 'rejected' ? 'selected' : '' }}>Rejected</option>
+                    </select>
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <a href="{{ route('requisitions.index') }}" class="btn btn-outline-secondary w-100" id="requisitions-filter-reset" data-allow-readonly>Reset Filter</a>
+                </div>
+            </form>
+            <div id="requisitions-table-results">
+                @include('requisitions.partials.requisitions_table', ['requisitions' => $requisitions])
             </div>
         </div>
     </div>        
@@ -113,6 +70,69 @@
 @include('requisitions.requisition_modal')
 @include('requisitions.adhoc_modal')
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterForm = document.getElementById('requisitions-status-filter');
+            const results = document.getElementById('requisitions-table-results');
+            const statusSelect = filterForm ? filterForm.querySelector('select[name="status"]') : null;
+            const resetBtn = document.getElementById('requisitions-filter-reset');
+
+            if (!filterForm || !results || !statusSelect) {
+                return;
+            }
+
+            const fetchTable = function () {
+                const params = new URLSearchParams(new FormData(filterForm));
+                const url = filterForm.action + '?' + params.toString();
+
+                results.innerHTML = '<div class="py-5 text-center text-muted">{{ __('Loading...') }}</div>';
+
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('Network error');
+                        }
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        results.innerHTML = data.table || '';
+                        const status = statusSelect.value || 'all';
+                        const nextUrl = new URL(filterForm.action, window.location.origin);
+                        if (status !== 'all') {
+                            nextUrl.searchParams.set('status', status);
+                        }
+                        window.history.replaceState({}, '', nextUrl.toString());
+                    })
+                    .catch(function () {
+                        results.innerHTML = '<div class="alert alert-danger mb-0">{{ __('Failed to load requisitions. Please try again.') }}</div>';
+                    });
+            };
+
+            statusSelect.addEventListener('change', function () {
+                fetchTable();
+            });
+
+            filterForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                fetchTable();
+            });
+
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    statusSelect.value = 'all';
+                    fetchTable();
+                });
+            }
+        });
+    </script>
+@endpush
 
 @if(!$canManageMaterials)
     @push('styles')

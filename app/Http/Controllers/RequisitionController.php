@@ -44,10 +44,30 @@ class RequisitionController extends Controller
             $projectScope($query);
         });
 
-        $requisitions = (clone $baseQuery)
+        $allowedStatuses = ['pending', 'approved', 'rejected'];
+        $statusFilter = strtolower((string) $request->query('status', 'all'));
+        if (!in_array($statusFilter, array_merge(['all'], $allowedStatuses), true)) {
+            $statusFilter = 'all';
+        }
+
+        $requisitionsQuery = (clone $baseQuery)
             ->with('bomItem.bqDocument', 'requester', 'approver', 'section')
-            ->orderByDesc('created_at')
-            ->get();
+            ->orderByDesc('created_at');
+
+        if ($statusFilter !== 'all') {
+            $requisitionsQuery->where('status', $statusFilter);
+        }
+
+        $requisitions = $requisitionsQuery->get();
+
+        if ($request->ajax()) {
+            $table = view('requisitions.partials.requisitions_table', compact('requisitions'))
+                ->render();
+
+            return response()->json([
+                'table' => $table,
+            ]);
+        }
 
         $approvedSummary = (clone $baseQuery)
             ->where('status', 'approved')
@@ -135,7 +155,7 @@ class RequisitionController extends Controller
 
         $units = UnitOfMeasurement::all();
 
-        return view('requisitions.index', compact('requisitions', 'approvedSummary', 'sections', 'requisitionableItems', 'units'));
+        return view('requisitions.index', compact('requisitions', 'approvedSummary', 'sections', 'requisitionableItems', 'units', 'statusFilter'));
     }
 
 
