@@ -48,6 +48,12 @@
                             <label for="item_id">{{ __('Select Item') }}</label>
                         </div>
 
+                        {{-- Item unit of measurement (auto-filled) --}}
+                        <div class="form-floating mb-4 standard-only">
+                            <input type="text" id="item_unit_display" class="form-control" placeholder="{{ __('Unit of Measurement') }}" readonly>
+                            <label for="item_unit_display">{{ __('Unit of Measurement') }}</label>
+                        </div>
+
                         {{-- Manual item name --}}
                         <div class="form-floating mb-4 manual-only d-none">
                             <input type="text" name="manual_name" id="manual_name" class="form-control" placeholder="{{ __('Item name') }}">
@@ -314,6 +320,7 @@
         $('#section').on('change', function () {
             let sectionId = $(this).val();
             $('#element, #item_id').html('<option value="">{{ __("Choose") }}</option>');
+            $('#item_unit_display').val('');
 
             if (sectionId) {
                 $.ajax({
@@ -342,6 +349,7 @@
         $('#element').on('change', function () {
             let elementId = $(this).val();
             $('#item_id').html('<option value="">{{ __("Choose Item") }}</option>');
+            $('#item_unit_display').val('');
 
             if (elementId) {
                 $.ajax({
@@ -355,7 +363,11 @@
                         $('#item_id').html('<option value="">{{ __("Choose Item") }}</option>');
                         const options = sortOptionsByName(normalizeOptions(data));
                         $.each(options, function (_, option) {
-                            $('#item_id').append('<option value="' + option.id + '">' + option.name + '</option>');
+                            const itemOption = $('<option></option>')
+                                .val(option.id)
+                                .text(option.name)
+                                .attr('data-unit', option.unit || '');
+                            $('#item_id').append(itemOption);
                         });
                     },
                     error: function() {
@@ -363,6 +375,12 @@
                     }
                 });
             }
+        });
+
+        // Auto-fill unit of measurement when an item is selected
+        $('#item_id').on('change', function () {
+            const unit = $(this).find('option:selected').data('unit') || '';
+            $('#item_unit_display').val(unit);
         });
 
         // Calculate amount
