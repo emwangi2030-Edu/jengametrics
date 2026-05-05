@@ -36,7 +36,7 @@
                                         <tr>
                                             <td class="fw-semibold">
                                                 <a href="{{ route('boms.documents.show', $document) }}" class="text-decoration-none">
-                                                    {{ $document->title }}
+                                                   {{ $document->title }} ({{ (int) ($document->units) }})
                                                 </a>
                                             </td>
                                            <td class="text-end">{{ number_format($document->materials_total, 2) }}</td>

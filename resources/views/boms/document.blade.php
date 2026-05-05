@@ -33,7 +33,8 @@
                                 <p class="text-muted mb-0">{{ __('BoQ Items: :count', ['count' => $section->item_count ?? 0]) }}</p>
                             </div>
                             <div class="text-end mt-3 mt-md-0">
-                                @php($sectionQuantity = $section->quantity ?? 0)
+                                @php($documentUnits = max(1, (int) ($document->units ?? 1)))
+                                @php($sectionQuantity = ($section->quantity ?? 0) * $documentUnits)
                                 <p class="mb-1">{{ __('Total Quantity:') }} {{ is_int($sectionQuantity) ? $sectionQuantity : number_format($sectionQuantity, 2) }} {{ $section->units ?? 'N/A' }}</p>
                                 <p class="mb-1">{{ __('BoQ Amount Sum:') }} KES {{ number_format((float) ($section->amount ?? 0), 2) }}</p>
                                 <p class="fw-bold mb-0">{{ __('Materials Total:') }} KES {{ number_format((float) ($section->material_total ?? 0), 2) }}</p>
