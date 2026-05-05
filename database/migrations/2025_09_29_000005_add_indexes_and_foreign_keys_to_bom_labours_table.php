@@ -22,10 +22,10 @@ return new class extends Migration
             }
         });
 
-        // Cleanup orphan references
-        DB::statement('UPDATE bom_labours bl LEFT JOIN items i ON i.id = bl.item_id SET bl.item_id = NULL WHERE bl.item_id IS NOT NULL AND i.id IS NULL');
-        DB::statement('UPDATE bom_labours bl LEFT JOIN bq_sections bs ON bs.id = bl.bq_section_id SET bl.bq_section_id = NULL WHERE bl.bq_section_id IS NOT NULL AND bs.id IS NULL');
-        DB::statement('UPDATE bom_labours bl LEFT JOIN sections s ON s.id = bl.section_id SET bl.section_id = NULL WHERE bl.section_id IS NOT NULL AND s.id IS NULL');
+        // Cleanup orphan references (PostgreSQL-compatible; avoid MySQL UPDATE ... LEFT JOIN).
+        DB::statement('UPDATE bom_labours SET item_id = NULL WHERE item_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM items i WHERE i.id = bom_labours.item_id)');
+        DB::statement('UPDATE bom_labours SET bq_section_id = NULL WHERE bq_section_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM bq_sections bs WHERE bs.id = bom_labours.bq_section_id)');
+        DB::statement('UPDATE bom_labours SET section_id = NULL WHERE section_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM sections s WHERE s.id = bom_labours.section_id)');
 
         // Indexes
         Schema::table('bom_labours', function (Blueprint $table) {

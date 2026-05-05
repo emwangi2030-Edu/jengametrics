@@ -28,12 +28,11 @@ return new class extends Migration
             }
         });
 
-        // Normalize data to satisfy new constraints (after columns are nullable)
-        // Nullify orphaned item_material_id and product_id values
-        DB::statement('UPDATE bom_items bi LEFT JOIN item_materials im ON im.id = bi.item_material_id SET bi.item_material_id = NULL WHERE bi.item_material_id IS NOT NULL AND im.id IS NULL');
-        DB::statement('UPDATE bom_items bi LEFT JOIN products p ON p.id = bi.product_id SET bi.product_id = NULL WHERE bi.product_id IS NOT NULL AND p.id IS NULL');
-        // Nullify orphaned section_id values (legacy data)
-        DB::statement('UPDATE bom_items bi LEFT JOIN sections s ON s.id = bi.section_id SET bi.section_id = NULL WHERE bi.section_id IS NOT NULL AND s.id IS NULL');
+        // Normalize data to satisfy new constraints (after columns are nullable).
+        // Use NOT EXISTS so updates work on PostgreSQL (MySQL UPDATE LEFT JOIN is not valid on pgsql).
+        DB::statement('UPDATE bom_items SET item_material_id = NULL WHERE item_material_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM item_materials im WHERE im.id = bom_items.item_material_id)');
+        DB::statement('UPDATE bom_items SET product_id = NULL WHERE product_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM products p WHERE p.id = bom_items.product_id)');
+        DB::statement('UPDATE bom_items SET section_id = NULL WHERE section_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM sections s WHERE s.id = bom_items.section_id)');
 
         Schema::table('bom_items', function (Blueprint $table) {
             // Indexes for performance

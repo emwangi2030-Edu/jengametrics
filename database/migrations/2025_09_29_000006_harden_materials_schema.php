@@ -9,12 +9,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Make quantity_in_stock decimal for fractional units
-        // Use raw SQL to avoid doctrine/dbal requirement
+        // Make quantity_in_stock decimal for fractional units.
+        // MySQL: MODIFY; PostgreSQL: ALTER COLUMN TYPE + constraints.
         try {
-            DB::statement('ALTER TABLE materials MODIFY quantity_in_stock DECIMAL(10,2) NOT NULL DEFAULT 0');
-        } catch (Throwable $e) {
-            // ignore if already decimal
+            $driver = Schema::getConnection()->getDriverName();
+            if ($driver === 'pgsql') {
+                DB::statement('ALTER TABLE materials ALTER COLUMN quantity_in_stock TYPE DECIMAL(10,2)');
+                DB::statement('ALTER TABLE materials ALTER COLUMN quantity_in_stock SET DEFAULT 0');
+                DB::statement('ALTER TABLE materials ALTER COLUMN quantity_in_stock SET NOT NULL');
+            } else {
+                DB::statement('ALTER TABLE materials MODIFY quantity_in_stock DECIMAL(10,2) NOT NULL DEFAULT 0');
+            }
+        } catch (\Throwable $e) {
+            // ignore if already decimal / incompatible cast in edge environments
         }
 
         Schema::table('materials', function (Blueprint $table) {
