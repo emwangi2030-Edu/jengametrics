@@ -93,7 +93,16 @@ return new class extends Migration
 
     private static function hasIndex(string $table, string $indexName): bool
     {
+        $connection = Schema::getConnection();
+        if ($connection->getDriverName() === 'pgsql') {
+            return DB::selectOne(
+                'select 1 as x from pg_indexes where schemaname = any (current_schemas(false)) and tablename = ? and indexname = ? limit 1',
+                [$table, $indexName]
+            ) !== null;
+        }
+
         $schema = config('database.connections.'.config('database.default').'.database');
+
         return DB::table('information_schema.STATISTICS')
             ->where('TABLE_SCHEMA', $schema)
             ->where('TABLE_NAME', $table)
@@ -103,7 +112,16 @@ return new class extends Migration
 
     private static function hasForeign(string $table, string $fkName): bool
     {
+        $connection = Schema::getConnection();
+        if ($connection->getDriverName() === 'pgsql') {
+            return DB::selectOne(
+                'select 1 as x from information_schema.table_constraints where table_schema = any (current_schemas(false)) and table_name = ? and constraint_type = ? and constraint_name = ? limit 1',
+                [$table, 'FOREIGN KEY', $fkName]
+            ) !== null;
+        }
+
         $schema = config('database.connections.'.config('database.default').'.database');
+
         return DB::table('information_schema.TABLE_CONSTRAINTS')
             ->where('CONSTRAINT_SCHEMA', $schema)
             ->where('TABLE_NAME', $table)
